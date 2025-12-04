@@ -139,10 +139,3 @@ COMMENT ON TABLE "Contratos" IS 'Tabela de contratos';
 COMMENT ON TABLE "Requisicoes" IS 'Tabela de requisições';
 COMMENT ON TABLE "Telefonia" IS 'Tabela de telefonia';
 COMMENT ON TABLE "Parametros" IS 'Tabela de parâmetros do sistema';
-
-Write-Host "✅ Script SQL criado com sucesso!" -ForegroundColor Green
-Write-Host ""
-Write-Host "📋 Para executar o script:" -ForegroundColor Cyan
-Write-Host "   psql -h localhost -U postgres -d singleone -f create-tables.sql" -ForegroundColor White
-Write-Host ""
-Write-Host "⚠️  Certifique-se de que o banco 'singleone' existe antes de executar" -ForegroundColor Yellow 
