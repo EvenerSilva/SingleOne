@@ -67,6 +67,27 @@ services:
       start_period: 40s
 
   # ==========================================
+  # pgAdmin (Gerenciamento PostgreSQL)
+  # ==========================================
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: singleone-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@singleone.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin123}
+      PGADMIN_CONFIG_SERVER_MODE: 'True'
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: 'False'
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    networks:
+      - singleone-network
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+
+  # ==========================================
   # Frontend (Angular + Nginx)
   # ==========================================
   frontend:
@@ -104,4 +125,6 @@ volumes:
   postgres_data:
     driver: local
   backend_logs:
+    driver: local
+  pgadmin_data:
     driver: local
