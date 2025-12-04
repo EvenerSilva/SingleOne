@@ -1,0 +1,103 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+</head>
+<body class="d-flex flex-column min-vh-100">
+    <br clear="all" /><br clear="all" />
+    <div class="container text-center">
+        <img src="cid:imagem" />
+    </div>
+    <br clear="all" /><br clear="all" />
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <h3>Laudo Técnico do Equipamento</h3>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-md-12">
+                <!--<b>Tipo de Equipamento:</b>  @tipo-->
+                <b>Equipamento:</b> @tipo @fabricante @modelo
+            </div>
+            <!--<div class="col-md-12">
+                <div style="width:50%;float:left">
+                    <b>Fabricante:</b>  @fabricante
+                </div>
+                <div style="width:50%;float:left" class="text-justify">
+                    <b>Modelo: </b> @modelo
+                </div>
+            </div>-->
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div style="width:50%;float:left">
+                    <b>Número de Série:</b>  @numeroSerie
+                </div>
+                <div style="width:50%;float:left" class="text-justify">
+                    <b>Patrimônio: </b> @patrimonio
+                </div>
+            </div>
+        </div>
+        <br clear="all" /><br clear="all" /><br clear="all" />
+        <div class="row">
+            <div class="col-md-12 text-justify">
+                <b>Caracteristicas da abertura do Laudo:</b> @laudoInicial
+            </div>
+        </div>
+        <br clear="all" />
+        <div class="row">
+            <div class="col-md-12 text-justify">
+                <b>Caracteristicas do encerramento do Laudo:</b> @laudoFinal
+            </div>
+        </div>
+        <br clear="all" />
+        <div class="row">
+            <div class="col-md-12 text-justify">
+                <b>Caracterizou mau uso?</b> @mauUso
+            </div>
+        </div>
+        <br /><br />
+        <div class="row">
+            <div class="col-md-12">
+                <!--<div style="width:50%;float:left" class="text-center">
+                    <hr style="width:90%;" /><br />
+                    @usuarioLogado<br />
+                </div>-->
+                Técnico analista: @tecnico<br />
+            </div>
+        </div>
+    </div>
+    <div style="height:250px"></div>
+    <footer class="footer" style="background-color:whitesmoke">
+        <div class="container">
+            <div class="text-center" style="width:50%;float:left">
+                <small>SingleOne - Inventário Permamente</small><br />
+                <small>Todos os direitos reservados</small>
+            </div>
+            <div class="text-center" style="width:50%;float:left">
+                <small>@dataAtual</small>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
+
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        line-height: 1;
+        font-size: 12pt;
+        /*height: 20mm;*/ /* set it to your bottom margin */
+        height: 100%;
+    }
+
+    .footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+    }
+</style>

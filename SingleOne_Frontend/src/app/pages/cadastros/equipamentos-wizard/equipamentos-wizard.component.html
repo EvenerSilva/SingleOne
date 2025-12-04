@@ -1,0 +1,291 @@
+<!-- 🎯 HEADER MODERNO DO WIZARD -->
+<div class="wizard-header">
+  <div class="header-content">
+    <div class="header-left">
+      <button class="back-button" [routerLink]="['/cadastros']" matTooltip="Voltar para Cadastros">
+        <i class="cil-arrow-left"></i>
+      </button>
+      <div class="header-title">
+        <div class="title-icon">
+          <i class="cil-laptop"></i>
+        </div>
+        <div class="title-text">
+                     <h1>Cadastro Rápido de Recursos</h1>
+           <p>Configure seu recurso em poucos passos</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 🍞 BREADCRUMB MODERNO -->
+<nav class="modern-breadcrumb">
+  <div class="breadcrumb-container">
+    <a [routerLink]="['/dashboard']" class="breadcrumb-item">
+      <i class="cil-home"></i>
+      <span>Dashboard</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a [routerLink]="['/cadastros']" class="breadcrumb-item">
+      <i class="cil-cog"></i>
+      <span>Cadastros</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <span class="breadcrumb-item active">Modelos</span>
+  </div>
+</nav>
+
+<!-- 📋 CONTEÚDO PRINCIPAL -->
+<div class="wizard-content">
+  
+  <!-- 🚀 PROGRESS BAR MODERNO -->
+  <div class="progress-section">
+    <div class="progress-container">
+             <div class="progress-steps">
+         <div class="progress-step" 
+              [class.active]="currentStep === 1"
+              [class.completed]="isStepComplete(1)">
+           <div class="step-number">1</div>
+           <div class="step-label">Categoria</div>
+           <div class="step-icon">
+             <i class="cil-tags"></i>
+           </div>
+         </div>
+         
+         <div class="progress-connector" [class.active]="currentStep >= 2"></div>
+         
+         <div class="progress-step" 
+              [class.active]="currentStep === 2"
+              [class.completed]="isStepComplete(2)">
+           <div class="step-number">2</div>
+           <div class="step-label">Tipo de Recurso</div>
+           <div class="step-icon">
+             <i class="cil-laptop"></i>
+           </div>
+         </div>
+         
+         <div class="progress-connector" [class.active]="currentStep >= 3"></div>
+         
+         <div class="progress-step" 
+              [class.active]="currentStep === 3"
+              [class.completed]="isStepComplete(3)">
+           <div class="step-number">3</div>
+           <div class="step-label">Fabricante & Modelo</div>
+           <div class="step-icon">
+             <i class="cil-industry"></i>
+           </div>
+         </div>
+       </div>
+    </div>
+  </div>
+
+  <!-- 📝 FORMULÁRIO DO WIZARD -->
+  <div class="wizard-form-container">
+    <form [formGroup]="wizardForm" (ngSubmit)="submitForm()" class="wizard-form">
+      
+      <!-- 🎯 PASSO 1: CATEGORIA -->
+      <div class="form-step" [class.active]="currentStep === 1">
+                 <div class="step-header">
+           <h3>Selecione a Categoria</h3>
+           <p>Escolha a categoria do recurso que deseja cadastrar</p>
+         </div>
+        
+        <div class="form-field">
+          <label class="field-label">
+            <i class="cil-tags"></i>
+            Categoria *
+          </label>
+          <select class="form-select" formControlName="categoriaId" [class.error]="wizardForm.get('categoriaId')?.invalid && wizardForm.get('categoriaId')?.touched">
+            <option value="">Selecione uma categoria</option>
+            <option *ngFor="let categoria of categorias" [value]="categoria.id">
+              {{ categoria.nome }}
+            </option>
+          </select>
+          <div class="field-error" *ngIf="wizardForm.get('categoriaId')?.invalid && wizardForm.get('categoriaId')?.touched">
+            Categoria é obrigatória
+          </div>
+        </div>
+      </div>
+
+      <!-- 🎯 PASSO 2: TIPO DE RECURSO -->
+      <div class="form-step" [class.active]="currentStep === 2">
+                 <div class="step-header">
+           <h3>Selecione o Tipo de Recurso</h3>
+           <p>Escolha o tipo específico do recurso</p>
+         </div>
+        
+        <div class="form-field">
+          <label class="field-label">
+            <i class="cil-laptop"></i>
+            Tipo de Recurso *
+          </label>
+          <div class="field-with-action">
+            <select class="form-select" formControlName="tipoRecursoId" [class.error]="wizardForm.get('tipoRecursoId')?.invalid && wizardForm.get('tipoRecursoId')?.touched">
+              <option value="">Selecione um tipo</option>
+              <option *ngFor="let tipo of tiposRecursos" [value]="tipo.id">
+                {{ tipo.descricao }}
+              </option>
+            </select>
+            <button type="button" class="btn-new" (click)="abrirModalNovoTipo()" title="Cadastrar novo tipo">
+              <i class="cil-plus"></i>
+              <span>Novo</span>
+            </button>
+          </div>
+          <div class="field-error" *ngIf="wizardForm.get('tipoRecursoId')?.invalid && wizardForm.get('tipoRecursoId')?.touched">
+            Tipo de recurso é obrigatório
+          </div>
+        </div>
+      </div>
+
+      <!-- 🎯 PASSO 3: FABRICANTE E MODELO -->
+      <div class="form-step" [class.active]="currentStep === 3">
+                 <div class="step-header">
+           <h3>Fabricante e Modelo</h3>
+           <p>Complete as informações finais do recurso</p>
+         </div>
+        
+        <div class="form-row">
+          <div class="form-field">
+            <label class="field-label">
+              <i class="cil-industry"></i>
+              Fabricante *
+            </label>
+            <div class="field-with-action">
+              <select class="form-select" formControlName="fabricanteId" [class.error]="wizardForm.get('fabricanteId')?.invalid && wizardForm.get('fabricanteId')?.touched">
+                <option value="">Selecione um fabricante</option>
+                <option *ngFor="let fabricante of fabricantes" [value]="fabricante.id">
+                  {{ fabricante.descricao }}
+                </option>
+              </select>
+              <button type="button" class="btn-new" (click)="abrirModalNovoFabricante()" title="Cadastrar novo fabricante">
+                <i class="cil-plus"></i>
+                <span>Novo</span>
+              </button>
+            </div>
+            <div class="field-error" *ngIf="wizardForm.get('fabricanteId')?.invalid && wizardForm.get('fabricanteId')?.touched">
+              Fabricante é obrigatório
+            </div>
+          </div>
+          
+          <div class="form-field">
+            <label class="field-label">
+              <i class="cil-devices"></i>
+              Modelo *
+            </label>
+            <input type="text" class="form-input" formControlName="modelo" placeholder="Ex: Latitude 5520" [class.error]="wizardForm.get('modelo')?.invalid && wizardForm.get('modelo')?.touched">
+            <div class="field-error" *ngIf="wizardForm.get('modelo')?.invalid && wizardForm.get('modelo')?.touched">
+              Modelo é obrigatório
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-field">
+          <label class="field-label">
+            <i class="cil-description"></i>
+            Descrição (Opcional)
+          </label>
+                     <textarea class="form-textarea" formControlName="descricao" placeholder="Descrição adicional do recurso..." rows="3"></textarea>
+        </div>
+      </div>
+
+      <!-- 🎯 AÇÕES DO WIZARD -->
+      <div class="wizard-actions">
+        <div class="actions-left">
+          <button type="button" class="btn-secondary" (click)="cancel()">
+            <i class="cil-x"></i>
+            <span>Cancelar</span>
+          </button>
+        </div>
+        
+        <div class="actions-center">
+          <button type="button" class="btn-secondary" (click)="previousStep()" [disabled]="currentStep === 1">
+            <i class="cil-arrow-left"></i>
+            <span>Anterior</span>
+          </button>
+          
+          <button type="button" class="btn-primary" (click)="nextStep()" 
+                  [disabled]="!canGoToNextStep() || currentStep === totalSteps">
+            <i class="cil-arrow-right"></i>
+            <span>Próximo</span>
+          </button>
+        </div>
+        
+        <div class="actions-right">
+                     <button type="submit" class="btn-success" [disabled]="wizardForm.invalid || submitting" *ngIf="currentStep === totalSteps">
+             <i class="cil-check" *ngIf="!submitting"></i>
+             <i class="cil-reload" *ngIf="submitting"></i>
+             <span>{{ submitting ? 'Salvando...' : 'Salvar Recurso' }}</span>
+           </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- 🎨 SPINNER DE CARREGAMENTO -->
+<div class="loading-overlay" *ngIf="loading">
+  <div class="loading-spinner">
+    <i class="cil-reload"></i>
+    <p>Carregando categorias...</p>
+  </div>
+</div>
+
+<!-- 🆕 MODAL NOVO TIPO DE RECURSO -->
+<div class="modal-overlay" *ngIf="mostrarModalTipo" (click)="fecharModalTipo()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3><i class="cil-laptop"></i> Novo Tipo de Recurso</h3>
+      <button class="modal-close" (click)="fecharModalTipo()">
+        <i class="cil-x"></i>
+      </button>
+    </div>
+    
+    <div class="modal-body">
+      <div class="form-field">
+        <label class="field-label">Descrição *</label>
+        <input type="text" class="form-input" [(ngModel)]="novoTipo.descricao" placeholder="Ex: Notebook, Desktop, Servidor...">
+      </div>
+    </div>
+    
+    <div class="modal-footer">
+      <button type="button" class="btn-secondary" (click)="fecharModalTipo()">
+        <i class="cil-x"></i>
+        <span>Cancelar</span>
+      </button>
+      <button type="button" class="btn-primary" (click)="salvarNovoTipo()" [disabled]="!novoTipo.descricao">
+        <i class="cil-check"></i>
+        <span>Salvar</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 🆕 MODAL NOVO FABRICANTE -->
+<div class="modal-overlay" *ngIf="mostrarModalFabricante" (click)="fecharModalFabricante()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3><i class="cil-industry"></i> Novo Fabricante</h3>
+      <button class="modal-close" (click)="fecharModalFabricante()">
+        <i class="cil-x"></i>
+      </button>
+    </div>
+    
+    <div class="modal-body">
+      <div class="form-field">
+        <label class="field-label">Descrição *</label>
+        <input type="text" class="form-input" [(ngModel)]="novoFabricante.descricao" placeholder="Ex: Dell, HP, Lenovo...">
+      </div>
+    </div>
+    
+    <div class="modal-footer">
+      <button type="button" class="btn-secondary" (click)="fecharModalFabricante()">
+        <i class="cil-x"></i>
+        <span>Cancelar</span>
+      </button>
+      <button type="button" class="btn-primary" (click)="salvarNovoFabricante()" [disabled]="!novoFabricante.descricao">
+        <i class="cil-check"></i>
+        <span>Salvar</span>
+      </button>
+    </div>
+  </div>
+</div>

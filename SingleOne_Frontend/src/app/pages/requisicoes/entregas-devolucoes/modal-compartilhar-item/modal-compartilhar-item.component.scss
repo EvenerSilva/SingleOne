@@ -1,0 +1,171 @@
+// Remover backdrop feio do Material Dialog
+:ng-deep .mat-dialog-container {
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  border: 0 !important;
+  outline: none !important;
+}
+
+:ng-deep .mat-mdc-dialog-container .mdc-dialog__surface {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  outline: none !important;
+  padding: 0 !important;
+}
+
+:ng-deep .cdk-overlay-backdrop {
+  background: rgba(0, 0, 0, 0.4) !important;
+  backdrop-filter: blur(8px);
+}
+
+.modern-dialog {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+  padding: 0;
+  overflow: hidden;
+  min-width: 380px;
+  max-width: 600px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  position: relative;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+  border: 0;
+  outline: none;
+}
+
+.dialog-header {
+  background: linear-gradient(135deg, #080039 0%, #1a1a2e 100%);
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.header-icon {
+  margin-bottom: 0.5rem;
+  i {
+    font-size: 2rem;
+    color: #FF3A0F;
+  }
+}
+
+.dialog-title {
+  color: white;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.dialog-content {
+  padding: 1.5rem;
+}
+
+.resource-info {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  p {
+    margin: 0.5rem 0;
+    font-size: 0.9rem;
+    color: #333;
+    strong { color: #080039; }
+    
+    // ✅ Destaque para o título da linha telefônica (primeiro <p> com <strong> que contém "Linha telefônica")
+    &:first-child strong {
+      font-size: 1rem;
+      color: #080039;
+      font-weight: 600;
+    }
+  }
+}
+
+.lista-vinculos { margin-bottom: 1rem; }
+.vinculo { display: flex; align-items: center; gap: 8px; padding: 6px 0; }
+.vinculo .status.ativo { color: #2e7d32; font-weight: 500; }
+.vinculo .status.inativo { color: #9e9e9e; }
+.vinculo .obs { color: #555; font-size: 0.85rem; }
+
+.info-box {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #e3f2fd;
+  border-left: 4px solid #2196f3;
+  padding: 0.75rem;
+  border-radius: 4px;
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  color: #1565c0;
+  i {
+    color: #2196f3;
+    font-size: 1.2rem;
+  }
+  span {
+    flex: 1;
+  }
+}
+
+.form-group { margin-bottom: 1rem; }
+.w-100 { width: 100%; }
+
+.dialog-actions {
+  padding: 0 1.5rem 1.5rem;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  .btn {
+    padding: 0.75rem 1.25rem;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 0.9rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 100px;
+    justify-content: center;
+    i { font-size: 0.9rem; }
+    &:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+  }
+  .btn-secondary { background: #6c757d; color: white; &:hover { background: #5a6268; } }
+  .btn-primary { background: linear-gradient(135deg, #FF3A0F 0%, #ff6b3d 100%); color: white; &:hover { background: linear-gradient(135deg, #e6330e 0%, #e65a2e 100%); } }
+}
+
+@media (max-width: 480px) {
+  .modern-dialog { min-width: 320px; margin: 1rem; }
+  .dialog-actions { flex-direction: column; .btn { width: 100%; } }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Overrides adicionais para remover qualquer borda/sombra residual do diálogo */
+::ng-deep .mat-dialog-container,
+::ng-deep .mat-mdc-dialog-container,
+::ng-deep .mat-mdc-dialog-container .mdc-dialog__surface,
+::ng-deep .cdk-overlay-pane .mat-mdc-dialog-container {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  outline: none !important;
+  padding: 0 !important;
+}
+
+::ng-deep .mdc-dialog__surface:focus,
+::ng-deep .mdc-dialog__surface:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.modern-dialog,
+.dialog-header,
+.dialog-content,
+.dialog-actions {
+  border: none !important;
+}

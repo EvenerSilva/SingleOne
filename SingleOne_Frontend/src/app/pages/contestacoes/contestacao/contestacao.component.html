@@ -1,0 +1,286 @@
+<!-- 🎯 HEADER MODERNO DA CONTESTAÇÃO -->
+<div class="contestacao-header">
+  <div class="header-content">
+    <div class="header-left">
+      <button class="back-button" [routerLink]="['/movimentacoes/contestacoes']" matTooltip="Voltar para Contestações">
+        <i class="cil-arrow-left"></i>
+      </button>
+      <div class="header-title">
+        <div class="title-icon">
+          <i class="cil-clipboard"></i>
+        </div>
+        <div class="title-text">
+          <h1>{{ getTituloAtendimento() }}</h1>
+          <p>{{ getSubtituloAtendimento() }}</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="header-right" *ngIf="isEditMode && podeResolver()">
+      <button class="action-btn success-btn" (click)="resolverContestacao()" 
+              [matTooltip]="tipoContestacao === 'auto_inventario' ? 'Resolver auto inventário' : tipoContestacao === 'inventario_forcado' ? 'Resolver inventário forçado' : 'Resolver contestação'">
+        <i class="cil-check-circle"></i>
+        <span>Resolver</span>
+      </button>
+      <!-- Botão diferente para Auto Inventário / Inventário Forçado vs Contestação -->
+      <button *ngIf="tipoContestacao === 'auto_inventario' || tipoContestacao === 'inventario_forcado'" 
+              class="action-btn danger-btn" 
+              (click)="cancelarAutoInventario()" 
+              [matTooltip]="tipoContestacao === 'inventario_forcado' ? 'Cancelar inventário forçado' : 'Cancelar solicitação de auto inventário'">
+        <i class="cil-x-circle"></i>
+        <span>Cancelar</span>
+      </button>
+      <button *ngIf="tipoContestacao !== 'auto_inventario' && tipoContestacao !== 'inventario_forcado'" 
+              class="action-btn danger-btn" 
+              (click)="negarContestacao()" 
+              matTooltip="Negar contestação">
+        <i class="cil-thumb-down"></i>
+        <span>Negar</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 🍞 BREADCRUMB MODERNO -->
+<nav class="modern-breadcrumb">
+  <div class="breadcrumb-container">
+    <a [routerLink]="['/dashboard']" class="breadcrumb-item">
+      <i class="cil-home"></i>
+      <span>Dashboard</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a [routerLink]="['/movimentacoes']" class="breadcrumb-item">
+      <i class="cil-transfer"></i>
+      <span>Solicitações</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a [routerLink]="['/movimentacoes/contestacoes']" class="breadcrumb-item">
+      <i class="cil-clipboard"></i>
+      <span>Contestações</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <span class="breadcrumb-item active">{{ getBreadcrumbAtivo() }}</span>
+  </div>
+</nav>
+
+<!-- 📋 CONTEÚDO PRINCIPAL -->
+<div class="contestacao-content" *ngIf="!isLoading">
+  <div class="form-container">
+    
+    <!-- 📊 SEÇÃO DE INFORMAÇÕES BÁSICAS -->
+    <div class="form-section">
+      <div class="section-header">
+        <div class="section-icon">
+          <i class="cil-info"></i>
+        </div>
+        <div class="section-title">
+          <h3>Informações Básicas</h3>
+          <p>Dados principais da contestação</p>
+        </div>
+      </div>
+      
+      <div class="form-grid">
+        <!-- ID e Status -->
+        <div class="info-card" *ngIf="isEditMode">
+          <div class="info-label">
+            <i class="cil-hash"></i>
+            ID da Contestação
+          </div>
+          <div class="info-value">#{{ contestacao?.id }}</div>
+        </div>
+
+        <div class="info-card" *ngIf="isEditMode">
+          <div class="info-label">
+            <i class="cil-flag"></i>
+            Status
+          </div>
+          <div class="info-value">
+            <span class="status-badge" [class]="getStatusClass(contestacao?.statusId)">
+              {{ getStatusLabel(contestacao?.statusId) }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Colaborador -->
+        <div class="info-card">
+          <div class="info-label">
+            <i class="cil-user"></i>
+            Colaborador
+          </div>
+          <div class="info-value">
+            <strong>{{ contestacao?.colaborador?.nome || 'N/A' }}</strong>
+            <small>ID: {{ contestacao?.colaboradorId }}</small>
+          </div>
+        </div>
+
+        <!-- Equipamento -->
+        <div class="info-card">
+          <div class="info-label">
+            <i class="cil-devices"></i>
+            {{ getLabelEquipamento() }}
+          </div>
+          <div class="info-value">
+            <strong>{{ getValorEquipamento() }}</strong>
+            <small>{{ getLabelNumeroSerie() }}: {{ contestacao?.equipamento?.numeroSerie || 'N/A' }}</small>
+          </div>
+        </div>
+
+        <!-- Data da Contestação -->
+        <div class="info-card">
+          <div class="info-label">
+            <i class="cil-calendar"></i>
+            Data da Contestação
+          </div>
+          <div class="info-value">
+            {{ contestacao?.dataContestacao | date: 'dd/MM/yyyy HH:mm' }}
+          </div>
+        </div>
+
+        <!-- Técnico Responsável -->
+        <div class="info-card" *ngIf="isEditMode && contestacao?.tecnicoResponsavel">
+          <div class="info-label">
+            <i class="cil-user-follow"></i>
+            Técnico Responsável
+          </div>
+          <div class="info-value">
+            {{ contestacao?.tecnicoResponsavel }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 📝 SEÇÃO DE DETALHES DA CONTESTAÇÃO -->
+    <div class="form-section">
+      <div class="section-header">
+        <div class="section-icon">
+          <i class="cil-description"></i>
+        </div>
+        <div class="section-title">
+          <h3>Detalhes da Contestação</h3>
+          <p>Informações sobre o motivo e descrição</p>
+        </div>
+      </div>
+      
+      <div class="details-content">
+        <!-- Motivo -->
+        <div class="detail-block">
+          <div class="detail-label">
+            <i class="cil-warning"></i>
+            Motivo da Contestação
+          </div>
+          <div class="detail-value">
+            {{ contestacao?.motivo || 'N/A' }}
+          </div>
+        </div>
+
+        <!-- Descrição -->
+        <div class="detail-block">
+          <div class="detail-label">
+            <i class="cil-text"></i>
+            Descrição Detalhada
+          </div>
+          <div class="detail-value">
+            {{ contestacao?.descricao || 'N/A' }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ✅ SEÇÃO DE RESOLUÇÃO -->
+    <div class="form-section" *ngIf="isEditMode">
+      <div class="section-header">
+        <div class="section-icon">
+          <i class="cil-check-circle"></i>
+        </div>
+        <div class="section-title">
+          <h3>Resolução</h3>
+          <p>Informações sobre a resolução da contestação</p>
+        </div>
+      </div>
+      
+      <div class="details-content">
+        <!-- Formulário de Resolução -->
+        <div class="detail-block" *ngIf="podeResolver()">
+          <div class="detail-label">
+            <i class="cil-text"></i>
+            Observações da Resolução *
+          </div>
+          <textarea 
+            [(ngModel)]="observacoesResolucao"
+            (blur)="observacoesTouched = true"
+            [class.has-error]="temErroObservacoes()"
+            class="modern-textarea"
+            rows="5"
+            placeholder="Descreva como a contestação foi resolvida..."></textarea>
+          
+          <div class="field-error" *ngIf="temErroObservacoes()">
+            <i class="cil-warning"></i>
+            <span *ngIf="!observacoesResolucao || observacoesResolucao.trim().length === 0">
+              Campo obrigatório. Por favor, preencha as observações da resolução.
+            </span>
+            <span *ngIf="observacoesResolucao && observacoesResolucao.trim().length > 0 && observacoesResolucao.trim().length < 10">
+              Mínimo de 10 caracteres. Você digitou {{ observacoesResolucao.trim().length }} caracteres.
+            </span>
+          </div>
+          
+          <div class="field-help" *ngIf="!temErroObservacoes()">
+            <small>
+              <i class="cil-info"></i>
+              Obrigatório para resolução da contestação (mínimo 10 caracteres)
+            </small>
+          </div>
+        </div>
+
+        <!-- Exibição de Resolução Existente -->
+        <div class="detail-block" *ngIf="!podeResolver()">
+          <div class="detail-label">
+            <i class="cil-text"></i>
+            Observações da Resolução
+          </div>
+          <div class="detail-value" *ngIf="contestacao?.observacaoResolucao">
+            {{ contestacao?.observacaoResolucao }}
+          </div>
+          <div class="alert-info" *ngIf="!contestacao?.observacaoResolucao">
+            <i class="cil-info"></i>
+            Nenhuma observação de resolução registrada.
+          </div>
+        </div>
+
+        <!-- Informações de Resolução -->
+        <div class="form-grid" *ngIf="contestacao?.dataResolucao">
+          <div class="info-card">
+            <div class="info-label">
+              <i class="cil-calendar"></i>
+              Data de Resolução
+            </div>
+            <div class="info-value">
+              {{ contestacao.dataResolucao | date: 'dd/MM/yyyy HH:mm' }}
+            </div>
+          </div>
+
+          <div class="info-card" *ngIf="contestacao?.tecnicoResponsavel">
+            <div class="info-label">
+              <i class="cil-user-follow"></i>
+              Resolvido por
+            </div>
+            <div class="info-value">
+              {{ contestacao.tecnicoResponsavel }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ⏳ LOADING -->
+<div class="loading-state" *ngIf="isLoading">
+  <div class="loading-content">
+    <div class="loading-spinner">
+      <i class="cil-sync"></i>
+    </div>
+    <h3>Carregando contestação...</h3>
+    <p>Aguarde enquanto buscamos as informações</p>
+  </div>
+</div>

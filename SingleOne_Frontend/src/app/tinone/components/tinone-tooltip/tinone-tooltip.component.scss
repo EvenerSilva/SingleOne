@@ -1,0 +1,65 @@
+.tinone-tooltip {
+  position: absolute;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 12px;
+  max-width: 300px;
+  z-index: 10000;
+  animation: fadeIn 0.2s ease;
+}
+
+.tinone-tooltip-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.tinone-tooltip-icon {
+  font-size: 18px;
+}
+
+.tinone-tooltip-body {
+  color: #666;
+  font-size: 13px;
+
+  p {
+    margin: 0 0 8px 0;
+  }
+}
+
+.tinone-tooltip-example {
+  background: #f8f8f8;
+  padding: 6px 8px;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+.tinone-tooltip-required {
+  color: #e74c3c;
+}
+
+.tinone-tooltip-tips {
+  ul {
+    margin: 4px 0 0 0;
+    padding-left: 20px;
+  }
+
+  li {
+    margin-bottom: 2px;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+

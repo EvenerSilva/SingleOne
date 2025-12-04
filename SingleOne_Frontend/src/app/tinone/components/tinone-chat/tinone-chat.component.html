@@ -1,0 +1,149 @@
+<div class="tinone-chat-window" [ngClass]="getPositionClass()" [style.border-top-color]="corPrimaria">
+  <!-- Header -->
+  <div class="tinone-chat-header" [style.background-color]="corPrimaria">
+    <div class="tinone-header-left">
+      <div class="tinone-avatar">
+        <span style="font-size: 28px;">🦉</span>
+      </div>
+      <div class="tinone-header-info">
+        <div class="tinone-name">Oni o Sábio</div>
+        <div class="tinone-status">Assistente Virtual</div>
+      </div>
+    </div>
+    <div class="tinone-header-actions">
+      <button class="tinone-btn-icon" (click)="limparHistorico()" title="Limpar histórico">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+          <polyline points="1 4 1 10 7 10"></polyline>
+          <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+        </svg>
+      </button>
+      <button class="tinone-btn-icon" (click)="fecharChat()" title="Fechar">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- 🔔 ALERTA DE MUDANÇA DE TELA (FIXO APÓS HEADER) -->
+  <div *ngIf="mostrarAlertaMudancaTela" class="alerta-mudanca-tela-fixo">
+    <div class="alerta-header">
+      <span class="alerta-icon">🦉</span>
+      <span class="alerta-titulo">Mudança de tela detectada!</span>
+    </div>
+    <div class="alerta-corpo">
+      <p>Percebi que você está agora em:</p>
+      <p class="alerta-tela"><strong>{{ novaTelaContexto }}</strong></p>
+      <p class="alerta-pergunta">Deseja atualizar as perguntas sugeridas?</p>
+    </div>
+    <div class="alerta-acoes">
+      <button class="btn-alerta btn-sim" (click)="atualizarSugestoes()">
+        ✅ Sim, atualizar
+      </button>
+      <button class="btn-alerta btn-nao" (click)="ignorarMudancaTela()">
+        ❌ Não, obrigado
+      </button>
+    </div>
+  </div>
+
+  <!-- Mensagens -->
+  <div class="tinone-chat-messages" #messagesContainer>
+    
+    <div *ngFor="let msg of mensagens; let i = index" 
+         class="tinone-message"
+         [class.tinone-message-usuario]="msg.tipo === 'usuario'"
+         [class.tinone-message-assistente]="msg.tipo === 'assistente'">
+      
+      <div class="tinone-message-bubble" [style.background-color]="msg.tipo === 'usuario' ? corPrimaria : '#f1f1f1'">
+        <div class="tinone-message-text" [style.color]="msg.tipo === 'usuario' ? 'white' : '#333'">
+          {{ msg.texto }}
+        </div>
+        
+        <!-- Se for um guia, mostra botão para expandir -->
+        <div *ngIf="isGuia(msg)" class="tinone-guia-container">
+          <button 
+            class="tinone-btn-guia"
+            [style.background-color]="corPrimaria"
+            (click)="toggleGuia(i)">
+            <svg *ngIf="!isGuiaExpandido(i)" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+              <path d="M9 18l6-6-6-6"/>
+            </svg>
+            <svg *ngIf="isGuiaExpandido(i)" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+              <path d="M18 15l-6-6-6 6"/>
+            </svg>
+            <span>{{ isGuiaExpandido(i) ? 'Ocultar passos' : 'Ver passos' }}</span>
+          </button>
+
+          <!-- Passos do guia -->
+          <div *ngIf="isGuiaExpandido(i)" class="tinone-passos">
+            <div class="tinone-processo-header">
+              <h4>📋 {{ msg.dados.Nome }}</h4>
+              <p *ngIf="msg.dados.TempoEstimado" class="tempo-estimado">
+                ⏱️ Tempo estimado: {{ msg.dados.TempoEstimado }}
+              </p>
+            </div>
+
+            <div *ngFor="let passo of msg.dados.Passos" class="tinone-passo">
+              <div class="tinone-passo-numero">{{ passo.Numero }}</div>
+              <div class="tinone-passo-conteudo">
+                <h5>{{ passo.Titulo }}</h5>
+                <p>{{ passo.Descricao }}</p>
+                <div *ngIf="passo.Dica" class="tinone-passo-dica">
+                  💡 {{ passo.Dica }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tinone-message-time" [style.color]="msg.tipo === 'usuario' ? 'rgba(255,255,255,0.7)' : '#999'">
+          {{ formatarHora(msg.timestamp) }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading indicator -->
+    <div *ngIf="isLoading" class="tinone-message tinone-message-assistente">
+      <div class="tinone-message-bubble tinone-loading">
+        <div class="tinone-typing-indicator">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sugestões Rápidas Contextuais (MOVIDAS PARA DEPOIS DAS MENSAGENS) -->
+    <app-tinone-quick-suggestions
+      #quickSuggestions
+      *ngIf="showQuickSuggestions && (mensagens.length === 1 || mostrarSugestoesAposAtualizacao)"
+      [currentRoute]="currentRoute"
+      [corPrimaria]="corPrimaria"
+      (suggestionSelected)="onSuggestionSelected($event)">
+    </app-tinone-quick-suggestions>
+  </div>
+
+  <!-- Input -->
+  <div class="tinone-chat-input">
+    <textarea
+      [(ngModel)]="perguntaAtual"
+      (keypress)="onKeyPress($event)"
+      placeholder="Digite sua pergunta..."
+      rows="1"
+      [disabled]="isLoading"
+    ></textarea>
+    <button 
+      class="tinone-btn-send"
+      [style.background-color]="corPrimaria"
+      (click)="enviarPergunta()"
+      [disabled]="!perguntaAtual.trim() || isLoading"
+      title="Enviar">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="22" y1="2" x2="11" y2="13"></line>
+        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+      </svg>
+    </button>
+  </div>
+</div>
+

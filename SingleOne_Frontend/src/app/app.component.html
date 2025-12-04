@@ -1,0 +1,156 @@
+<div class="c-app">
+  <!-- Backdrop para mobile -->
+  <div class="sidebar-backdrop" 
+       [class.show]="sidebarVisible"
+       (click)="fecharMenu()"
+       *ngIf="mostrarMenu"></div>
+  
+  <!-- Sidebar CoreUI -->
+  <div class="c-sidebar c-sidebar-dark c-sidebar-fixed" 
+       [class.c-sidebar-show]="sidebarVisible"
+       [class.c-sidebar-minimized]="sidebarMinimized"
+       id="sidebar" 
+       *ngIf="mostrarMenu">
+    
+
+    
+    <!-- Navigation -->
+    <ul class="c-sidebar-nav">
+      <!-- User Info Card -->
+      <li class="c-sidebar-nav-item user-info-card" *ngIf="session != undefined">
+        <div class="user-card-content">
+          <div class="user-avatar">
+            <span class="c-icon cil-user"></span>
+          </div>
+          <div class="user-name">
+            <span>{{ session.usuario.nome }}</span>
+          </div>
+        </div>
+      </li>
+      
+      <!-- Menu Items -->
+      <li class="c-sidebar-nav-item" *ngFor="let p of paginas; trackBy: trackByPagina">
+        <div *ngIf="p.visivel && p.listado">
+          <a class="c-sidebar-nav-link" 
+             *ngIf="p.url != undefined"
+             [routerLink]="p.url"
+             routerDirection="'root'"
+             (click)="fecharMenu()"
+             routerLinkActive="c-active">
+            <span class="c-sidebar-nav-icon" [class]="getIconClass(p.icon)"></span>
+            <span class="c-sidebar-nav-text">{{ p.title }}</span>
+          </a>
+        </div>
+      </li>
+    </ul>
+    
+    <!-- Sidebar Minimizer -->
+    <div class="c-sidebar-minimizer-container">
+      <button class="c-sidebar-minimizer" 
+              type="button" 
+              (click)="toggleSidebar()"
+              [attr.title]="sidebarMinimized ? 'Expandir menu' : 'Minimizar menu'">
+        <span class="c-icon cil-arrow-left"></span>
+      </button>
+      
+      <button class="c-sidebar-pin-button" 
+              type="button" 
+              (click)="togglePreferenciaSidebar()"
+              [class.active]="menuMinimizadoPorPadrao"
+              [attr.title]="menuMinimizadoPorPadrao ? 'Preferência fixada - clique para desfixar' : 'Fixar preferência atual'">
+        <span class="pin-icon">📌</span>
+      </button>
+    </div>
+  </div>
+  
+  <!-- Wrapper -->
+  <div class="c-wrapper d-flex flex-column min-vh-100">
+    <!-- Header -->
+    <header class="c-header c-header-fixed c-header-light" *ngIf="mostrarMenu">
+      <!-- Menu Toggle - Botão responsivo único -->
+      <button class="c-header-toggler" type="button" (click)="toggleMenu()" [disabled]="!paginas || paginas.length === 0" title="Menu">
+        <span class="c-icon cil-menu" style="font-size: 1.5rem; color: white;"></span>
+      </button>
+      
+      <!-- Logo SingleOne Centralizada -->
+      <div class="c-header-brand-central">
+        <a [routerLink]="['/dashboard']" class="header-logo-link">
+          <img src="../assets/Branding/logo.png" alt="SingleOne" class="header-logo-img" />
+        </a>
+      </div>
+      
+
+      
+      <!-- Navigation -->
+      <ul class="c-header-nav ms-auto" *ngIf="mostrarMenu && session">
+        <!-- Logo do Cliente -->
+        <li class="c-header-nav-item" *ngIf="clienteLogo">
+          <div class="cliente-logo-header">
+            <img [src]="clienteLogo" 
+                 [alt]="'Logo do Cliente'" 
+                 class="cliente-logo-header-img"
+                 title="Logo do Cliente">
+          </div>
+        </li>
+        
+        <li class="c-header-nav-item dropdown">
+          <a class="c-header-nav-link" 
+             (click)="toggleDropdownUsuario()" 
+             role="button" 
+             aria-haspopup="true" 
+             [attr.aria-expanded]="dropdownUsuarioAberto"
+             style="cursor: pointer;">
+            <span class="c-icon cil-user"></span>
+          </a>
+          <div class="dropdown-menu dropdown-menu-end pt-0" 
+               [class.show]="dropdownUsuarioAberto"
+               (click)="$event.stopPropagation()">
+            <div class="dropdown-header bg-light py-2">
+              <div class="fw-semibold">{{ session?.usuario?.nome }}</div>
+            </div>
+            <a class="dropdown-item" (click)="MeusDados(); fecharDropdownUsuario()">
+              <span class="c-icon cil-user me-2"></span> Meus Dados
+            </a>
+            <a class="dropdown-item" (click)="ajuda(); fecharDropdownUsuario()">
+              <span class="c-icon cil-question me-2"></span> Ajuda
+            </a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" (click)="sair(); fecharDropdownUsuario()">
+              <span class="c-icon cil-account-logout me-2"></span> Sair
+            </a>
+          </div>
+        </li>
+      </ul>
+    </header>
+    
+    <!-- Main Content -->
+    <div class="c-body flex-grow-1 px-3">
+      <main class="c-main">
+        <router-outlet></router-outlet>
+      </main>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="c-footer" *ngIf="mostrarMenu">
+      <div>
+        <a href="https://singleone.com.br" target="_blank">SingleOne</a> © 2025 <a href="https://singleone.com.br" target="_blank">singleone.com.br</a>
+      </div>
+      <div class="ms-auto">
+        Versão: {{ systemVersion }}
+      </div>
+    </footer>
+  </div>
+</div>
+
+<!-- Spinner -->
+<ngx-spinner
+  bdColor="rgba(51,51,51,0.8)"
+  size="medium"
+  color="#fff"
+  type="ball-scale-multiple"
+>
+  <p style="font-size: 20px; color: white">Aguarde...</p>
+</ngx-spinner>
+
+<!-- 🦉 Oni o Sábio - Assistente Virtual (isolado e opcional) -->
+<app-tinone-widget></app-tinone-widget>

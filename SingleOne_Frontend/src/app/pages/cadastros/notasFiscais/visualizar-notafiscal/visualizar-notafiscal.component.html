@@ -1,0 +1,54 @@
+<mat-toolbar color="accent">
+  <div class="container" style="color:#080039">
+    <button mat-icon-button [routerLink]="['/notas-fiscais']"><mat-icon>chevron_left</mat-icon></button>Visualização NF
+  </div>
+</mat-toolbar>
+<div class="container p-4">
+  <mat-card>
+    <mat-card-content>
+      <div class="row">
+        <div class="col-md-4" appearance="fill">
+          <strong>Fornecedor:</strong> {{nf.fornecedor}}
+        </div>
+        <div class="col-md-4" appearance="fill">
+          <strong>Descrição:</strong> {{nf.descricao}}
+        </div>
+        <div class="col-md-4" appearance="fill">
+          <strong>Número:</strong> {{nf.numero}}
+        </div>
+        <div class="col-md-4" appearance="fill">
+          <strong>Data Emissão:</strong> {{nf.dtemissao}}
+        </div>
+        <div class="col-md-4" appearance="fill">
+          <strong>Valor:</strong> {{nf.valor}}
+        </div>
+        <div class="col-md-4" appearance="fill">
+          <strong>Qtde. Itens:</strong> {{nf.quantidadeItens}}
+        </div>
+        <div class="col-md-4" appearance="fill">
+          <strong>Gerou recurso?</strong> {{nf.gerouequipamento}}
+        </div>
+      </div>
+      <hr>
+      <div class="col-md-12" *ngFor="let item of nf.itens">
+        <mat-card class="custom-card">
+          <mat-card-header>
+            <mat-card-title>
+              <span style="color:#080039">{{ item.tipoequipamento }} {{ item.fabricante }} {{ item.modelo }} </span>
+            </mat-card-title>
+            <hr>
+          </mat-card-header>
+          <mat-card-content>
+            <p></p>
+            <div class="row col-md-12">
+              <div class="col-md-4 linha"><strong>Contrato:</strong> {{ item.contrato }}</div>
+              <div class="col-md-3 linha"><strong>Vl. Unitário:</strong> {{ item.valorunitario }}</div>
+              <div class="col-md-3 linha"><strong>Tipo Aquisição:</strong> {{ item.tipoAquisicao }}</div>
+              <div class="col-md-3 linha"><strong>Quantidade:</strong> {{ item.quantidade }}</div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

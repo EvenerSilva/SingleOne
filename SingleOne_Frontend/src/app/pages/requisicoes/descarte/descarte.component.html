@@ -1,0 +1,250 @@
+<!-- 🎯 HEADER MODERNO DO DESCARTE -->
+<div class="descarte-header">
+  <div class="header-content">
+    <div class="header-left">
+      <button class="back-button" [routerLink]="['/movimentacoes']" matTooltip="Voltar para Solicitações">
+        <i class="cil-arrow-left"></i>
+      </button>
+      <div class="header-title">
+        <div class="title-icon">
+          <i class="cil-trash"></i>
+        </div>
+        <div class="title-text">
+          <h1>Processo de Descartes</h1>
+          <p>Gestão de descarte de recursos</p>
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="header-stats">
+        <div class="stat-item">
+          <div class="stat-number">{{descartes.length}}</div>
+          <div class="stat-label">Itens para Descarte</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 🍞 BREADCRUMB MODERNO -->
+<nav class="modern-breadcrumb">
+  <div class="breadcrumb-container">
+    <a [routerLink]="['/dashboard']" class="breadcrumb-item">
+      <i class="cil-home"></i>
+      <span>Dashboard</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a [routerLink]="['/movimentacoes']" class="breadcrumb-item">
+      <i class="cil-transfer"></i>
+      <span>Solicitações</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <span class="breadcrumb-item active">Processo de Descartes</span>
+  </div>
+</nav>
+
+<!-- 📋 CONTEÚDO PRINCIPAL -->
+<div class="descarte-content">
+  
+  <!-- 📦 RECURSOS PARA DESCARTE -->
+  <div class="equipamentos-section">
+    <div class="section-header">
+      <div class="header-content">
+        <div class="header-icon">
+          <i class="material-icons">inventory_2</i>
+        </div>
+        <div class="header-text">
+          <h2>Recursos para Descarte</h2>
+          <p>Selecione os recursos que serão descartados</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="equipamentos-content">
+      <div class="input-group">
+        <mat-form-field appearance="outline" class="equipamento-input">
+          <mat-label>Recurso</mat-label>
+          <mat-select #singleSelect [(ngModel)]="equipamento">
+            <mat-select-trigger>
+              <span *ngIf="equipamento && equipamento.equipamento">
+                {{equipamento.equipamento.tipoequipamento}} {{equipamento.equipamento.fabricante}} - SN:{{equipamento.equipamento.numeroserie}}
+              </span>
+            </mat-select-trigger>
+            <mat-option disabled>
+              <ngx-mat-select-search [formControl]="eqtpsForm" placeholderLabel="Buscar pelo número de série ou patrimônio" noEntriesFoundLabel="Nenhum recurso encontrado"></ngx-mat-select-search>
+            </mat-option>
+            <mat-option *ngFor="let row of equipamentos" [value]="row">
+              {{row.equipamento.tipoequipamento}} {{row.equipamento.fabricante}} {{row.equipamento.modelo}} SN:{{row.equipamento.numeroserie}} - {{row.equipamento.patrimonio}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <button mat-raised-button color="primary" class="add-button" (click)="adicionarEquipamento()" [disabled]="!equipamento.equipamento">
+          <i class="material-icons">add</i>
+          Adicionar
+        </button>
+      </div>
+      
+      <div class="equipamentos-table" *ngIf="descartes.length > 0">
+        <div class="table-container">
+          <table mat-table [dataSource]="dataSource" class="modern-table">
+            <ng-container matColumnDef="equipamento">
+              <th mat-header-cell *matHeaderCellDef>Recurso</th>
+              <td mat-cell *matCellDef="let row">
+                <div class="equipamento-info">
+                  <div class="equipamento-name">{{row.equipamento.tipoequipamento}} {{row.equipamento.fabricante}} {{row.equipamento.modelo}}</div>
+                </div>
+              </td>
+            </ng-container>
+            
+            <ng-container matColumnDef="numeroserie">
+              <th mat-header-cell *matHeaderCellDef>Número de Série</th>
+              <td mat-cell *matCellDef="let row">
+                <span class="serial-number">{{row.equipamento.numeroserie}}</span>
+              </td>
+            </ng-container>
+            
+            <ng-container matColumnDef="patrimonio">
+              <th mat-header-cell *matHeaderCellDef>Patrimônio</th>
+              <td mat-cell *matCellDef="let row">
+                <span class="patrimonio">{{row.equipamento.patrimonio}}</span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="criticidade">
+              <th mat-header-cell *matHeaderCellDef>Criticidade</th>
+              <td mat-cell *matCellDef="let row">
+                <span *ngIf="row.nivelCriticidade" class="badge-criticidade" [ngClass]="getNivelCriticidadeClass(row.nivelCriticidade)">
+                  {{row.nivelCriticidade}}
+                </span>
+                <span *ngIf="!row.nivelCriticidade" class="badge-criticidade criticidade-normal">
+                  NORMAL
+                </span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="processos">
+              <th mat-header-cell *matHeaderCellDef>Processos Obrigatórios</th>
+              <td mat-cell *matCellDef="let row">
+                <!-- SE NÃO EXIGIR EVIDÊNCIAS: Apenas checkboxes simples -->
+                <div *ngIf="row.processosObrigatorios && !row.obrigarEvidencias" class="processos-container">
+                  <div class="processo-item" *ngIf="row.obrigarSanitizacao">
+                    <mat-checkbox 
+                      [(ngModel)]="row.sanitizacaoExecutada"
+                      color="primary"
+                      matTooltip="Sanitização de dados sensíveis">
+                      Sanitização
+                    </mat-checkbox>
+                  </div>
+                  <div class="processo-item" *ngIf="row.obrigarDescaracterizacao">
+                    <mat-checkbox 
+                      [(ngModel)]="row.descaracterizacaoExecutada"
+                      color="primary"
+                      matTooltip="Remoção de identificação do recurso">
+                      Descaracterização
+                    </mat-checkbox>
+                  </div>
+                  <div class="processo-item" *ngIf="row.obrigarPerfuracaoDisco">
+                    <mat-checkbox 
+                      [(ngModel)]="row.perfuracaoDiscoExecutada"
+                      color="primary"
+                      matTooltip="Perfuração física do disco rígido">
+                      Perfuração Disco
+                    </mat-checkbox>
+                  </div>
+                  <div *ngIf="row.cargosConfiancaEncontrados && row.cargosConfiancaEncontrados.length > 0" class="cargos-info">
+                    <small><i class="material-icons">info</i> Cargos: {{row.cargosConfiancaEncontrados.join(', ')}}</small>
+                  </div>
+                </div>
+
+                <!-- SE EXIGIR EVIDÊNCIAS: Botão para anexar evidências de cada processo -->
+                <div *ngIf="row.processosObrigatorios && row.obrigarEvidencias" class="processos-container">
+                  <div class="evidencias-obrigatorias-header">
+                    <i class="material-icons">photo_library</i>
+                    <strong>Evidências Fotográficas Obrigatórias</strong>
+                  </div>
+                  
+                  <div class="processos-com-evidencias">
+                    <div class="processo-evidencia" *ngIf="row.obrigarSanitizacao">
+                      <span class="processo-nome">📸 Sanitização</span>
+                      <span class="contador-evidencias">{{getCountEvidencias(row, 'SANITIZACAO')}} foto(s)</span>
+                    </div>
+                    <div class="processo-evidencia" *ngIf="row.obrigarDescaracterizacao">
+                      <span class="processo-nome">📸 Descaracterização</span>
+                      <span class="contador-evidencias">{{getCountEvidencias(row, 'DESCARACTERIZACAO')}} foto(s)</span>
+                    </div>
+                    <div class="processo-evidencia" *ngIf="row.obrigarPerfuracaoDisco">
+                      <span class="processo-nome">📸 Perfuração Disco</span>
+                      <span class="contador-evidencias">{{getCountEvidencias(row, 'PERFURACAO_DISCO')}} foto(s)</span>
+                    </div>
+                  </div>
+
+                  <button 
+                    mat-raised-button 
+                    color="accent" 
+                    class="btn-gerenciar-evidencias"
+                    [matBadge]="row.evidencias?.length || 0"
+                    [matBadgeHidden]="!row.evidencias || row.evidencias.length === 0"
+                    matBadgeColor="warn"
+                    matBadgeSize="medium"
+                    (click)="abrirModalEvidencias(row)"
+                    matTooltip="Anexar evidências fotográficas de cada processo">
+                    <i class="material-icons">photo_camera</i>
+                    Gerenciar Evidências
+                  </button>
+
+                  <div *ngIf="row.cargosConfiancaEncontrados && row.cargosConfiancaEncontrados.length > 0" class="cargos-info">
+                    <small><i class="material-icons">info</i> Cargos: {{row.cargosConfiancaEncontrados.join(', ')}}</small>
+                  </div>
+                </div>
+
+                <div *ngIf="!row.processosObrigatorios" class="sem-processos">
+                  <span class="badge-sem-processos">Sem processos obrigatórios</span>
+                </div>
+              </td>
+            </ng-container>
+            
+            <ng-container matColumnDef="acao">
+              <th mat-header-cell *matHeaderCellDef></th>
+              <td mat-cell *matCellDef="let row" class="action-cell">
+                <div class="action-buttons">
+                  <button mat-icon-button *ngIf="row.alerta" class="warning-button" matTooltip="Este recurso pertenceu a um cargo indicado para alertar. Recurso NECESSITA de tratamento especial, como descaracterização, perfuração de disco, entre outras atividades, antes do descarte.">
+                    <i class="material-icons">warning</i>
+                  </button>
+                  <button mat-icon-button color="warn" class="remove-button" matTooltip="Remover da lista" (click)="removerAtivo(row)">
+                    <i class="material-icons">delete</i>
+                  </button>
+                </div>
+              </td>
+            </ng-container>
+            
+            <tr mat-header-row *matHeaderRowDef="colunas"></tr>
+            <tr mat-row *matRowDef="let row; columns: colunas;"></tr>
+          </table>
+        </div>
+        
+        <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [pageSize]="10" showFirstLastButtons class="modern-paginator"></mat-paginator>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🚀 AÇÃO FINAL -->
+  <div class="action-section" *ngIf="descartes.length > 0">
+    <div class="action-content">
+      <div class="action-info">
+        <i class="material-icons">info</i>
+        <span>Total de {{descartes.length}} item(s) selecionado(s) para descarte</span>
+      </div>
+      <button 
+        mat-raised-button 
+        color="warn" 
+        class="descarte-button" 
+        (click)="realizarDescarte()" 
+        [disabled]="!podeRealizarDescarte()"
+        [matTooltip]="podeRealizarDescarte() ? 'Realizar descarte dos recursos selecionados' : 'Complete os processos obrigatórios e/ou anexe as evidências necessárias antes de realizar o descarte'"
+      >
+        <i class="material-icons">delete_forever</i>
+        REALIZAR DESCARTE
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,460 @@
+<!-- 🎯 HEADER MODERNO DO NOVO RECURSO -->
+<div class="novo-recurso-header">
+  <div class="header-content">
+    <div class="header-left">
+      <button class="back-button" [routerLink]="['/recursos']" matTooltip="Voltar para Recursos">
+        <i class="cil-arrow-left"></i>
+      </button>
+      <div class="header-title">
+        <div class="title-icon">
+          <i class="cil-plus"></i>
+        </div>
+        <div class="title-text">
+          <h1>Novo Recurso</h1>
+          <p>Cadastrar novo recurso no sistema</p>
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="action-btn primary-btn" (click)="salvar()" matTooltip="Salvar recurso">
+        <i class="cil-save"></i>
+        <span>Salvar</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 🍞 BREADCRUMB MODERNO -->
+<nav class="modern-breadcrumb">
+  <div class="breadcrumb-container">
+    <a [routerLink]="['/dashboard']" class="breadcrumb-item">
+      <i class="cil-home"></i>
+      <span>Dashboard</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a [routerLink]="['/cadastros']" class="breadcrumb-item">
+      <i class="cil-settings"></i>
+      <span>Cadastros</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a [routerLink]="['/recursos']" class="breadcrumb-item">
+      <i class="cil-devices"></i>
+      <span>Recursos</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <span class="breadcrumb-item active">Novo Recurso</span>
+  </div>
+</nav>
+
+<!-- 📋 CONTEÚDO PRINCIPAL -->
+<div class="novo-recurso-content">
+  <form [formGroup]="form" (ngSubmit)="salvar()" class="form-container">
+    
+    <!-- 🎯 SEÇÃO PRINCIPAL -->
+    <div class="form-section">
+      <div class="section-header">
+        <div class="section-icon">
+          <i class="cil-devices"></i>
+        </div>
+        <div class="section-title">
+          <h3>Informações do Recurso</h3>
+          <p>Dados básicos para identificação do recurso</p>
+        </div>
+      </div>
+      
+      <div class="form-grid">
+        <!-- Tipo de Equipamento -->
+        <div class="form-field">
+          <label class="field-label">
+            <i class="cil-tag"></i>
+            Tipo de Recurso *
+          </label>
+          <mat-select
+            formControlName="tipoequipamento"
+            [(ngModel)]="equipamento.tipoequipamento"
+            (selectionChange)="listarFabricantesDoTipoEquipamento()"
+            class="modern-select"
+            placeholder="Selecione o tipo de recurso">
+            <mat-option *ngFor="let row of tipos" [value]="row.id">
+              {{ row.descricao }}
+            </mat-option>
+          </mat-select>
+        </div>
+
+        <!-- Fabricante -->
+        <div class="form-field">
+          <label class="field-label">
+            <i class="cil-factory"></i>
+            Fabricante *
+          </label>
+          <mat-select
+            formControlName="fabricante"
+            [(ngModel)]="equipamento.fabricante"
+            (selectionChange)="listarModelosDoFabricante()"
+            class="modern-select"
+            placeholder="Selecione o fabricante">
+            <mat-option *ngFor="let row of fabricantes" [value]="row.id">
+              {{ row.descricao }}
+            </mat-option>
+          </mat-select>
+        </div>
+
+        <!-- Modelo -->
+        <div class="form-field">
+          <label class="field-label">
+            <i class="cil-layers"></i>
+            Modelo *
+          </label>
+          <mat-select
+            formControlName="modelo"
+            [(ngModel)]="equipamento.modelo"
+            class="modern-select"
+            placeholder="Selecione o modelo">
+            <mat-option *ngFor="let row of modelos" [value]="row.id">
+              {{ row.descricao }}
+            </mat-option>
+          </mat-select>
+        </div>
+
+        <!-- Número de Série -->
+        <div class="form-field">
+          <label class="field-label">
+            <i class="cil-barcode"></i>
+            Número de Série *
+          </label>
+          <input
+            type="text"
+            formControlName="numeroserie"
+            [(ngModel)]="equipamento.numeroserie"
+            class="modern-input"
+            placeholder="Digite o número de série">
+        </div>
+
+        <!-- Patrimônio -->
+        <div class="form-field">
+          <label class="field-label">
+            <i class="cil-credit-card"></i>
+            Patrimônio
+          </label>
+          <input
+            type="text"
+            formControlName="patrimonio"
+            [(ngModel)]="equipamento.patrimonio"
+            class="modern-input"
+            placeholder="Digite o número do patrimônio">
+        </div>
+
+        <!-- Tipo de Aquisição -->
+        <div class="form-field">
+          <label class="field-label">
+            <i class="cil-cart"></i>
+            Tipo de Aquisição *
+          </label>
+          <mat-select
+            formControlName="tipoaquisicao"
+            [(ngModel)]="equipamento.tipoaquisicao"
+            class="modern-select"
+            placeholder="Selecione o tipo de aquisição">
+            <mat-option *ngFor="let row of tiposaquisicao" [value]="row.id">
+              {{ row.nome }}
+            </mat-option>
+          </mat-select>
+        </div>
+      </div>
+    </div>
+
+    <!-- 🏢 SEÇÃO DE LOCALIZAÇÃO E EMPRESA -->
+    <div class="form-section">
+      <div class="section-header">
+        <div class="section-icon">
+          <i class="cil-location-pin"></i>
+        </div>
+        <div class="section-title">
+          <h3>Localização e Empresa</h3>
+          <p>Informações sobre onde o recurso está localizado</p>
+        </div>
+      </div>
+      
+      <div class="form-grid">
+        <!-- Localidade -->
+        <div class="form-field">
+          <label class="field-label">
+            <i class="cil-map"></i>
+            Localidade
+          </label>
+          <mat-select
+            formControlName="localidade"
+            [(ngModel)]="equipamento.localidade"
+            class="modern-select"
+            placeholder="Selecione a localidade">
+            <mat-option *ngFor="let row of localidades" [value]="row.id">
+              {{ row.descricao }}
+            </mat-option>
+          </mat-select>
+        </div>
+
+        <!-- Empresa -->
+        <div class="form-field">
+          <label class="field-label">
+            <i class="cil-building"></i>
+            Empresa
+          </label>
+          <mat-select
+            formControlName="empresa"
+            [(ngModel)]="equipamento.empresa"
+            (selectionChange)="listarCentrosCustos()"
+            class="modern-select"
+            placeholder="Selecione a empresa">
+            <mat-option *ngFor="let row of empresas" [value]="row.id">
+              {{ row.nome }}
+            </mat-option>
+          </mat-select>
+        </div>
+
+        <!-- Centro de Custo -->
+        <div class="form-field">
+          <label class="field-label">
+            <i class="cil-dollar"></i>
+            Centro de Custo
+          </label>
+          <mat-select
+            formControlName="centrocusto"
+            [(ngModel)]="equipamento.centrocusto"
+            class="modern-select"
+            placeholder="Selecione o centro de custo">
+            <mat-option *ngFor="let row of centros" [value]="row.id">
+              {{ row.nome }}
+            </mat-option>
+          </mat-select>
+        </div>
+
+        <!-- Filial -->
+        <div class="form-field">
+          <label class="field-label">
+            <i class="cil-office-building"></i>
+            Filial
+          </label>
+          <mat-select
+            formControlName="filialId"
+            [(ngModel)]="equipamento.filialId"
+            class="modern-select"
+            placeholder="Selecione a filial">
+            <mat-option *ngFor="let row of filiais" [value]="row.id">
+              {{ row.nome }}
+            </mat-option>
+          </mat-select>
+        </div>
+      </div>
+    </div>
+
+    <!-- 📄 SEÇÃO DE DOCUMENTAÇÃO -->
+    <div class="form-section">
+      <div class="section-header">
+        <div class="section-icon">
+          <i class="cil-file"></i>
+        </div>
+        <div class="section-title">
+          <h3>Documentação</h3>
+          <p>Informações sobre notas fiscais e contratos</p>
+        </div>
+      </div>
+      
+      <div class="form-grid">
+        <!-- Nota Fiscal -->
+        <div class="form-field">
+          <label class="field-label">
+            <i class="cil-receipt"></i>
+            Nota Fiscal
+          </label>
+          <mat-select
+            formControlName="notafiscal"
+            [(ngModel)]="equipamento.notafiscal"
+            (selectionChange)="onNotaFiscalChange($event)"
+            class="modern-select"
+            placeholder="Selecione a nota fiscal">
+            <mat-option *ngFor="let row of notasfiscais" [value]="row.id">
+              {{ row.numero }} - {{ row.fornecedorNavigation?.nome }}
+            </mat-option>
+          </mat-select>
+        </div>
+
+        <!-- Fornecedor -->
+        <div class="form-field">
+          <label class="field-label">
+            <i class="cil-truck"></i>
+            Fornecedor
+            <span class="field-info" style="font-size: 0.85em; color: #666; font-style: italic;">(Definido automaticamente pela nota fiscal)</span>
+          </label>
+          <mat-select
+            formControlName="fornecedor"
+            [(ngModel)]="equipamento.fornecedor"
+            class="modern-select"
+            placeholder="Selecione o fornecedor"
+            disabled>
+            <mat-option *ngFor="let row of fornecedores" [value]="row.id">
+              {{ row.nome }}
+            </mat-option>
+          </mat-select>
+        </div>
+
+
+
+      </div>
+    </div>
+
+    <!-- ⚙️ SEÇÃO DE CONFIGURAÇÕES -->
+    <div class="form-section">
+      <div class="section-header">
+        <div class="section-icon">
+          <i class="cil-settings"></i>
+        </div>
+        <div class="section-title">
+          <h3>Configurações</h3>
+          <p>Configurações adicionais do recurso</p>
+        </div>
+      </div>
+      
+      <div class="form-grid">
+
+
+        <!-- Data Limite de Garantia -->
+        <div class="form-field">
+          <label class="field-label">
+            <i class="cil-calendar"></i>
+            Data Limite de Garantia
+            <span *ngIf="getStatusGarantia()" class="field-info" [ngClass]="getStatusGarantia().class">
+              {{ getStatusGarantia().text }}
+            </span>
+          </label>
+          <input
+            type="date"
+            formControlName="dtlimitegarantia"
+            [(ngModel)]="equipamento.dtlimitegarantia"
+            (change)="onDataGarantiaChange()"
+            class="modern-input">
+        </div>
+
+        <!-- Possui BO - Indicador Visual com Link -->
+        <div class="form-field bo-field">
+          <label class="field-label">
+            <i class="cil-warning"></i>
+            Boletim de Ocorrência
+          </label>
+          <div class="bo-indicator" 
+               [class.has-bo]="equipamento.possuibo" 
+               [class.no-bo]="!equipamento.possuibo"
+               (click)="abrirModalBO()"
+               matTooltip="{{ equipamento.possuibo ? 'Ver/Editar Boletim de Ocorrência' : 'Registrar Boletim de Ocorrência' }}">
+            <div class="bo-status">
+              <i class="cil-warning" *ngIf="equipamento.possuibo"></i>
+              <i class="cil-plus" *ngIf="!equipamento.possuibo"></i>
+              <span>{{ equipamento.possuibo ? 'Possui BO' : 'Sem BO' }}</span>
+            </div>
+            <div class="bo-action">
+              <i class="cil-chevron-right"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Descrição BO -->
+        <div class="form-field full-width" *ngIf="equipamento.possuibo">
+          <label class="field-label">
+            <i class="cil-note"></i>
+            Descrição do BO
+          </label>
+          <textarea
+            formControlName="descricaobo"
+            [(ngModel)]="equipamento.descricaobo"
+            class="modern-textarea"
+            placeholder="Descreva as informações do Back Office"
+            rows="3"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- 🎯 BOTÕES DE AÇÃO -->
+    <div class="form-actions">
+      <button type="button" class="action-btn secondary-btn" (click)="cancelar($event)">
+        <i class="cil-x"></i>
+        <span>Cancelar</span>
+      </button>
+      <button type="submit" class="action-btn primary-btn" [disabled]="!form.valid">
+        <i class="cil-save"></i>
+        <span>Salvar Recurso</span>
+      </button>
+    </div>
+  </form>
+</div>
+
+<!-- 🚨 MODAL DE BOLETIM DE OCORRÊNCIA -->
+<div class="bo-modal" *ngIf="showBoModal" (click)="closeBoModal($event)">
+  <div class="bo-modal-content" (click)="$event.stopPropagation()">
+    <div class="bo-modal-header">
+      <h3><i class="cil-warning"></i> Boletim de Ocorrência</h3>
+      <button class="modal-close" (click)="closeBoModal($event)">
+        <i class="cil-x"></i>
+      </button>
+    </div>
+    
+    <div class="bo-modal-body">
+      <div class="recurso-info">
+        <h4>Recurso Selecionado:</h4>
+        <div class="recurso-details">
+          <div class="recurso-avatar">
+            <i class="cil-devices"></i>
+          </div>
+          <div class="recurso-text">
+            <div class="recurso-tipo">{{ getTipoEquipamentoDescricao() }} {{ getFabricanteDescricao() }} {{ getModeloDescricao() }}</div>
+            <div class="recurso-serial">S/N: {{ equipamento?.numeroserie || 'N/A' }}</div>
+            <div class="recurso-patrimonio">Patrimônio: {{ equipamento?.patrimonio || 'N/A' }}</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="form-field">
+        <label class="field-label">Descrição do Problema *</label>
+        <textarea 
+          class="form-textarea" 
+          [(ngModel)]="boData.descricao" 
+          placeholder="Descreva detalhadamente o que aconteceu com o recurso..."
+          rows="4"></textarea>
+      </div>
+      
+      <div class="form-field">
+        <label class="field-label">Anexos</label>
+        <input 
+          type="file" 
+          class="form-file" 
+          (change)="onFileSelected($event)"
+          multiple
+          accept="image/*,.pdf,.doc,.docx">
+        <small class="form-help">Formatos aceitos: imagens, PDF, Word. Máximo 5 arquivos.</small>
+      </div>
+      
+      <div class="selected-files" *ngIf="selectedFiles.length > 0">
+        <h5>Arquivos Selecionados:</h5>
+        <div class="file-list">
+          <div class="file-item" *ngFor="let file of selectedFiles; let i = index">
+            <i class="cil-file"></i>
+            <span>{{ file.name }}</span>
+            <button class="remove-file" (click)="removeFile(i)">
+              <i class="cil-x"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="bo-modal-footer">
+      <button class="btn-secondary" (click)="closeBoModal($event)">
+        <i class="cil-x"></i>
+        <span>Cancelar</span>
+      </button>
+      <button class="btn-primary" (click)="salvarBO()" [disabled]="!boData.descricao || saving">
+        <i class="cil-check" *ngIf="!saving"></i>
+        <i class="cil-reload" *ngIf="saving"></i>
+        <span>{{ saving ? 'Salvando...' : 'Salvar BO' }}</span>
+      </button>
+    </div>
+  </div>
+</div>

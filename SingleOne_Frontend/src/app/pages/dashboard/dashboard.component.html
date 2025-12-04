@@ -1,0 +1,1369 @@
+<!-- 🎯 HEADER MODERNO DO DASHBOARD -->
+<div class="dashboard-header">
+  <div class="header-content">
+    <div class="header-left">
+      <div class="header-title">
+        <div class="title-icon">
+          <i class="material-icons">dashboard</i>
+        </div>
+        <div class="title-text">
+          <h1>Dashboard</h1>
+          <p>Visão geral do sistema patrimonial</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="header-actions">
+      <!-- 🔔 Notificações -->
+      <button 
+              (click)="toggleNotificationsPanel()"
+              matTooltip="Notificações"
+              class="action-button notifications-toggle"
+              [class.has-notifications]="notificacoesNaoLidas > 0">
+        <i class="material-icons">notifications_outlined</i>
+        <span class="notification-badge" *ngIf="notificacoesNaoLidas > 0">
+          {{ notificacoesNaoLidas }}
+        </span>
+      </button>
+
+      <!-- ⏰ Última Atualização e Refresh -->
+      <div class="refresh-container">
+        <span class="last-update-text">{{ getTempoDecorrido() }}</span>
+        <button 
+                (click)="refreshDashboard()"
+                [disabled]="isRefreshing"
+                matTooltip="Atualizar dashboard"
+                class="refresh-button"
+                [class.refreshing]="isRefreshing">
+          <i class="material-icons">sync</i>
+        </button>
+      </div>
+
+      <!-- Controles de visibilidade -->
+      <button 
+              [matMenuTriggerFor]="visibilityMenu" 
+              matTooltip="Controles de visibilidade"
+              class="action-button visibility-toggle">
+        <i class="material-icons">visibility_outlined</i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Menu de visibilidade (fora do header para evitar problemas de hierarquia) -->
+<mat-menu #visibilityMenu="matMenu" class="visibility-menu">
+  <div class="visibility-controls p-3" (click)="$event.stopPropagation()">
+    <h6 class="mb-3">
+      <i class="material-icons me-2">settings</i>
+      Controles de Visibilidade
+    </h6>
+    
+    <!-- Ações Pendentes -->
+    <div class="visibility-item mb-2">
+      <mat-checkbox 
+        [(ngModel)]="visibilitySettings.acoesPendentes" 
+        (change)="updateVisibility()"
+        color="primary">
+        Ações Pendentes
+      </mat-checkbox>
+    </div>
+    
+    <!-- Colaboradores Desligados -->
+    <div class="visibility-item mb-2">
+      <mat-checkbox 
+        [(ngModel)]="visibilitySettings.colaboradoresDesligados" 
+        (change)="updateVisibility()"
+        color="primary">
+        Colaboradores Desligados
+      </mat-checkbox>
+    </div>
+    
+    <!-- Devoluções Programadas -->
+    <div class="visibility-item mb-2">
+      <mat-checkbox 
+        [(ngModel)]="visibilitySettings.devolucoesProgramadas" 
+        (change)="updateVisibility()"
+        color="primary">
+        Devoluções Programadas
+      </mat-checkbox>
+    </div>
+    
+    <!-- Estatísticas Gerais -->
+    <div class="visibility-item mb-2">
+      <mat-checkbox 
+        [(ngModel)]="visibilitySettings.estatisticasGerais" 
+        (change)="updateVisibility()"
+        color="primary">
+        Estatísticas Gerais
+      </mat-checkbox>
+    </div>
+    
+    <!-- Gráficos e Métricas -->
+    <div class="visibility-item mb-2">
+      <mat-checkbox 
+        [(ngModel)]="visibilitySettings.graficosMetricas" 
+        (change)="updateVisibility()"
+        color="primary">
+        Gráficos e Métricas
+      </mat-checkbox>
+    </div>
+    
+    <mat-divider class="my-3"></mat-divider>
+    
+    <!-- Controles Rápidos -->
+    <div class="d-flex gap-2">
+      <button mat-stroked-button size="small" (click)="showAll()" class="control-btn">
+        <i class="material-icons me-1">visibility</i>
+        Mostrar Tudo
+      </button>
+      <button mat-stroked-button size="small" (click)="hideAll()" class="control-btn">
+        <i class="material-icons me-1">visibility_off</i>
+        Ocultar Tudo
+      </button>
+    </div>
+    
+    <div class="d-flex gap-2 mt-2">
+      <button mat-stroked-button size="small" (click)="showOnlyUrgent()" class="control-btn">
+        <i class="material-icons me-1">priority_high</i>
+        Apenas Urgente
+      </button>
+      <button mat-stroked-button size="small" (click)="showOnlyStats()" class="control-btn">
+        <i class="material-icons me-1">analytics</i>
+        Apenas Stats
+      </button>
+    </div>
+  </div>
+</mat-menu>
+
+<!-- 🔔 PAINEL DE NOTIFICAÇÕES -->
+<div class="notifications-panel" *ngIf="showNotificationsPanel" [@slideIn]>
+    <div class="notifications-overlay" (click)="toggleNotificationsPanel()"></div>
+    <div class="notifications-container">
+        <div class="notifications-header">
+            <h3>
+                <i class="material-icons">notifications_active</i>
+                Notificações
+            </h3>
+            <div class="notifications-actions">
+                <button mat-button (click)="marcarTodasComoLidas()" *ngIf="notificacoesNaoLidas > 0">
+                    <i class="material-icons">done_all</i>
+                    Marcar todas como lidas
+                </button>
+                <button mat-icon-button (click)="toggleNotificationsPanel()">
+                    <i class="material-icons">close</i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="notifications-list">
+            <div *ngIf="!vm.notificacoes || vm.notificacoes.length === 0" class="no-notifications">
+                <i class="material-icons">notifications_none</i>
+                <p>Nenhuma notificação no momento</p>
+            </div>
+
+            <div *ngFor="let notif of vm.notificacoes" 
+                 class="notification-item"
+                 [class.unread]="!notif.lida"
+                 [ngClass]="getNotificacaoIconClass(notif.tipo)"
+                 (click)="navegarPara(notif.link, notif)">
+                <div class="notif-icon">
+                    <i class="material-icons">{{ notif.icone }}</i>
+                </div>
+                <div class="notif-content">
+                    <h4>{{ notif.titulo }}</h4>
+                    <p>{{ notif.mensagem }}</p>
+                    <span class="notif-time">{{ formatarDataHora(notif.dataHora) }}</span>
+                </div>
+                <div class="notif-indicator" *ngIf="!notif.lida"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 📋 CONTEÚDO PRINCIPAL DO DASHBOARD -->
+<div class="dashboard-content">
+
+<!-- 📊 SEÇÃO DE KPIs PRINCIPAIS (SEMPRE VISÍVEL) -->
+<div class="container mt-3 mb-4" *ngIf="vm && (vm.totalRecursos || vm.sinalizacoesPendentes || vm.devolucoesPendentes || vm.taxaAdesaoTermo)">
+    <div class="stats-section">
+        <div class="section-header">
+            <div class="header-content">
+                <div class="header-icon">
+                    <i class="material-icons">dashboard</i>
+    </div>
+                <div class="header-text">
+                    <h2 class="section-title">KPIs Principais</h2>
+                    <p class="section-subtitle">Indicadores chave de desempenho do sistema patrimonial</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="kpis-grid">
+            <!-- KPI: Total de Recursos -->
+            <a [routerLink]="['/recursos']" class="kpi-card recursos-clickable" *ngIf="vm.totalRecursos" matTooltip="Clique para ver os recursos">
+                <div class="kpi-icon recursos">
+                    <i class="material-icons">inventory_2</i>
+                </div>
+                <div class="kpi-content">
+                    <span class="kpi-label">Total de Recursos</span>
+                    <div class="kpi-value-row">
+                        <h2 class="kpi-value">{{ vm.totalRecursos.valor | number }}</h2>
+                        <div class="kpi-change" [ngClass]="getKPIClass(vm.totalRecursos.tendencia)">
+                            <i class="material-icons">{{ getKPIIcon(vm.totalRecursos.tendencia) }}</i>
+                            <span>{{ formatKPIVariacao(vm.totalRecursos) }}</span>
+                        </div>
+                    </div>
+                    <span class="kpi-comparison">vs. período anterior ({{ vm.totalRecursos.valorAnterior | number }})</span>
+                </div>
+            </a>
+
+            <!-- KPI: Total de Colaboradores -->
+            <a [routerLink]="['/colaboradores']" class="kpi-card colaboradores-ativos-clickable" *ngIf="vm.totalColaboradores" matTooltip="Clique para ver os colaboradores">
+              <div class="kpi-icon colaboradores">
+                <i class="material-icons">groups</i>
+              </div>
+              <div class="kpi-content">
+                <span class="kpi-label">Colaboradores Ativos</span>
+                <div class="kpi-value-row">
+                  <h2 class="kpi-value">{{ vm.totalColaboradores.valor | number }}</h2>
+                  <div class="kpi-change" [ngClass]="getKPIClass(vm.totalColaboradores.tendencia)">
+                    <i class="material-icons">{{ getKPIIcon(vm.totalColaboradores.tendencia) }}</i>
+                    <span>{{ formatKPIVariacao(vm.totalColaboradores) }}</span>
+                  </div>
+                </div>
+                <span class="kpi-comparison">Somente colaboradores ativos · vs. período anterior ({{ vm.totalColaboradores.valorAnterior | number }})</span>
+              </div>
+            </a>
+
+            <!-- KPI: Recursos Associados a Colaboradores -->
+            <a [routerLink]="['/movimentacoes/entregas-devolucoes']" class="kpi-card recursos-associados-clickable" *ngIf="vm.recursosAssociados" matTooltip="Clique para ver as movimentações de entregas/devoluções">
+                <div class="kpi-icon recursos">
+                    <i class="material-icons">link</i>
+                </div>
+                <div class="kpi-content">
+                    <span class="kpi-label">Recursos Associados</span>
+                    <div class="kpi-value-row">
+                        <h2 class="kpi-value">{{ vm.recursosAssociados.valor | number }}</h2>
+                        <div class="kpi-change" [ngClass]="getKPIClass(vm.recursosAssociados.tendencia)">
+                            <i class="material-icons">{{ getKPIIcon(vm.recursosAssociados.tendencia) }}</i>
+                            <span>{{ formatKPIVariacao(vm.recursosAssociados) }}</span>
+                        </div>
+                    </div>
+                    <span class="kpi-comparison">vs. período anterior ({{ vm.recursosAssociados.valorAnterior | number }})</span>
+                </div>
+            </a>
+
+            <!-- KPI: Colaboradores com Recurso -->
+            <a [routerLink]="['/movimentacoes/entregas-devolucoes']" class="kpi-card colaboradores-com-recursos-clickable" *ngIf="vm.colaboradoresComRecursos" matTooltip="Clique para ver as movimentações de entregas/devoluções">
+                <div class="kpi-icon sinalizacoes">
+                    <i class="material-icons">group</i>
+                </div>
+                <div class="kpi-content">
+                    <span class="kpi-label">Colaboradores com Recurso</span>
+                    <div class="kpi-value-row">
+                        <h2 class="kpi-value">{{ vm.colaboradoresComRecursos.valor | number }}</h2>
+                        <div class="kpi-change" [ngClass]="getKPIClass(vm.colaboradoresComRecursos.tendencia)">
+                            <i class="material-icons">{{ getKPIIcon(vm.colaboradoresComRecursos.tendencia) }}</i>
+                            <span>{{ formatKPIVariacao(vm.colaboradoresComRecursos) }}</span>
+                        </div>
+                    </div>
+                    <span class="kpi-comparison">vs. período anterior ({{ vm.colaboradoresComRecursos.valorAnterior | number }})</span>
+                </div>
+            </a>
+
+            <!-- KPI: Colaboradores sem Recurso -->
+            <a [routerLink]="['/relatorios/colaboradores-sem-recursos']" class="kpi-card colaboradores-sem-recursos-clickable" *ngIf="vm.colaboradoresSemRecurso" matTooltip="Clique para analisar colaboradores sem recursos">
+                <div class="kpi-icon devolucoes">
+                    <i class="material-icons">person_off</i>
+                </div>
+                <div class="kpi-content">
+                    <span class="kpi-label">Colaboradores sem Recurso</span>
+                    <div class="kpi-value-row">
+                        <h2 class="kpi-value">{{ vm.colaboradoresSemRecurso.valor | number }}</h2>
+                        <div class="kpi-change" [ngClass]="getKPIClass(vm.colaboradoresSemRecurso.tendencia)">
+                            <i class="material-icons">{{ getKPIIcon(vm.colaboradoresSemRecurso.tendencia) }}</i>
+                            <span>{{ formatKPIVariacao(vm.colaboradoresSemRecurso) }}</span>
+                        </div>
+                    </div>
+                    <span class="kpi-comparison">vs. período anterior ({{ vm.colaboradoresSemRecurso.valorAnterior | number }})</span>
+                </div>
+            </a>
+
+            <!-- KPI: Contestações e Auto Inventário -->
+            <a [routerLink]="['/movimentacoes/contestacoes']" class="kpi-card contestacoes-clickable" *ngIf="vm.contestacoesPendentes" matTooltip="Clique para ver as contestações pendentes">
+                <div class="kpi-icon contestacoes">
+                    <i class="material-icons">gavel</i>
+                </div>
+                <div class="kpi-content">
+                    <span class="kpi-label">Contestações Pendentes</span>
+                    <div class="kpi-value-row">
+                        <h2 class="kpi-value">{{ vm.contestacoesPendentes.valor | number }}</h2>
+                        <div class="kpi-change" [ngClass]="getKPIClass(vm.contestacoesPendentes.tendencia)">
+                            <i class="material-icons">{{ getKPIIcon(vm.contestacoesPendentes.tendencia) }}</i>
+                            <span>{{ formatKPIVariacao(vm.contestacoesPendentes) }}</span>
+                        </div>
+                    </div>
+                    <span class="kpi-comparison">vs. período anterior ({{ vm.contestacoesPendentes.valorAnterior | number }})</span>
+                </div>
+            </a>
+
+            <!-- KPI: Não Conformidades de Elegibilidade -->
+            <a [routerLink]="['/relatorios/nao-conformidade-elegibilidade']" class="kpi-card nao-conformidade-clickable" *ngIf="vm.naoConformidadeElegibilidade" matTooltip="Clique para ver o relatório de não conformidades">
+                <div class="kpi-icon nao-conformidade">
+                    <i class="material-icons">report_problem</i>
+                </div>
+                <div class="kpi-content">
+                    <span class="kpi-label">Não Conformidades</span>
+                    <div class="kpi-value-row">
+                        <h2 class="kpi-value">{{ vm.naoConformidadeElegibilidade.valor | number }}</h2>
+                        <div class="kpi-change" [ngClass]="getKPIClass(vm.naoConformidadeElegibilidade.tendencia)">
+                            <i class="material-icons">{{ getKPIIcon(vm.naoConformidadeElegibilidade.tendencia) }}</i>
+                            <span>{{ formatKPIVariacao(vm.naoConformidadeElegibilidade) }}</span>
+                        </div>
+                    </div>
+                    <span class="kpi-comparison">vs. período anterior ({{ vm.naoConformidadeElegibilidade.valorAnterior | number }})</span>
+                </div>
+            </a>
+
+            <!-- KPI: Garantias Críticas -->
+            <a [routerLink]="['/relatorios/gestao-garantias']" class="kpi-card garantias-clickable" *ngIf="vm.garantiasCriticas" matTooltip="Clique para ver a gestão de garantias">
+                <div class="kpi-icon garantias">
+                    <i class="material-icons">shield</i>
+                </div>
+                <div class="kpi-content">
+                    <span class="kpi-label">Garantias Críticas</span>
+                    <div class="kpi-value-row">
+                        <h2 class="kpi-value">{{ vm.garantiasCriticas.valor | number }}</h2>
+                        <div class="kpi-change" [ngClass]="getKPIClass(vm.garantiasCriticas.tendencia)">
+                            <i class="material-icons">{{ getKPIIcon(vm.garantiasCriticas.tendencia) }}</i>
+                            <span>{{ formatKPIVariacao(vm.garantiasCriticas) }}</span>
+                        </div>
+                    </div>
+                    <span class="kpi-comparison">sem data + expiradas ({{ vm.garantiasCriticas.valorAnterior | number }})</span>
+                </div>
+            </a>
+
+            <!-- KPI: Sinalizações de Suspeitas -->
+            <a [routerLink]="['/relatorios/sinalizacoes-suspeitas']" class="kpi-card sinalizacoes-clickable" *ngIf="vm.sinalizacoesPendentes" matTooltip="Clique para ver as sinalizações de suspeitas">
+                <div class="kpi-icon sinalizacoes">
+                    <i class="material-icons">flag</i>
+                </div>
+                <div class="kpi-content">
+                    <span class="kpi-label">Sinalizações de Suspeitas</span>
+                    <div class="kpi-value-row">
+                        <h2 class="kpi-value">{{ vm.sinalizacoesPendentes.valor }}</h2>
+                        <div class="kpi-change" [ngClass]="getKPIClass(vm.sinalizacoesPendentes.tendencia)">
+                            <i class="material-icons">{{ getKPIIcon(vm.sinalizacoesPendentes.tendencia) }}</i>
+                            <span>{{ formatKPIVariacao(vm.sinalizacoesPendentes) }}</span>
+                        </div>
+                    </div>
+                    <span class="kpi-comparison">vs. período anterior ({{ vm.sinalizacoesPendentes.valorAnterior }})</span>
+                </div>
+            </a>
+
+            <!-- KPI: Devoluções Pendentes -->
+            <div class="kpi-card devolucoes-pendentes-clickable"
+                 *ngIf="vm.devolucoesPendentes"
+                 (click)="abrirModalDevolucoesProgramadas()"
+                 matTooltip="Ver devoluções programadas">
+                <div class="kpi-icon devolucoes">
+                    <i class="material-icons">assignment_return</i>
+                </div>
+                <div class="kpi-content">
+                    <span class="kpi-label">Devoluções Pendentes</span>
+                    <div class="kpi-value-row">
+                        <h2 class="kpi-value">{{ vm.devolucoesPendentes.valor }}</h2>
+                        <div class="kpi-change" [ngClass]="getKPIClass(vm.devolucoesPendentes.tendencia)">
+                            <i class="material-icons">{{ getKPIIcon(vm.devolucoesPendentes.tendencia) }}</i>
+                            <span>{{ formatKPIVariacao(vm.devolucoesPendentes) }}</span>
+                        </div>
+                    </div>
+                    <span class="kpi-comparison">vs. período anterior ({{ vm.devolucoesPendentes.valorAnterior }})</span>
+                </div>
+            </div>
+
+            <!-- KPI: Taxa de Adesão ao Termo -->
+            <div class="kpi-card adesao-clickable" *ngIf="vm.taxaAdesaoTermo" (click)="scrollToSection('card-adesao-campanhas')" matTooltip="Ver gráfico de Adesão ao Termo e Campanhas">
+                <div class="kpi-icon adesao">
+                    <i class="material-icons">assignment_turned_in</i>
+                </div>
+                <div class="kpi-content">
+                    <span class="kpi-label">Taxa de Adesão ao Termo</span>
+                    <div class="kpi-value-row">
+                        <h2 class="kpi-value">{{ vm.taxaAdesaoTermo.valor }}%</h2>
+                        <div class="kpi-change" [ngClass]="getKPIClass(vm.taxaAdesaoTermo.tendencia)">
+                            <i class="material-icons">{{ getKPIIcon(vm.taxaAdesaoTermo.tendencia) }}</i>
+                            <span>{{ formatKPIVariacao(vm.taxaAdesaoTermo) }}</span>
+                        </div>
+                    </div>
+                    <span class="kpi-comparison">vs. período anterior ({{ vm.taxaAdesaoTermo.valorAnterior }}%)</span>
+                </div>
+            </div>
+
+            <!-- KPI: Recursos Descartados -->
+            <a [routerLink]="['/descarte']" class="kpi-card descartados-clickable" *ngIf="vm.recursosDescartados" matTooltip="Clique para gerenciar os recursos descartados">
+                <div class="kpi-icon descartados">
+                    <i class="material-icons">delete_sweep</i>
+                </div>
+                <div class="kpi-content">
+                    <span class="kpi-label">Recursos Descartados</span>
+                    <div class="kpi-value-row">
+                        <h2 class="kpi-value">{{ vm.recursosDescartados.valor | number }}</h2>
+                        <div class="kpi-change" [ngClass]="getKPIClass(vm.recursosDescartados.tendencia)">
+                            <i class="material-icons">{{ getKPIIcon(vm.recursosDescartados.tendencia) }}</i>
+                            <span>{{ formatKPIVariacao(vm.recursosDescartados) }}</span>
+                        </div>
+                    </div>
+                    <span class="kpi-comparison">vs. período anterior ({{ vm.recursosDescartados.valorAnterior | number }})</span>
+                </div>
+            </a>
+
+            <!-- KPI: Recursos Perdidos (Roubados/Extraviados) -->
+            <div class="kpi-card" *ngIf="vm.recursosPerdidos">
+                <div class="kpi-icon perdidos">
+                    <i class="material-icons">report_off</i>
+                </div>
+                <div class="kpi-content">
+                    <span class="kpi-label">Recursos Perdidos</span>
+                    <div class="kpi-value-row">
+                        <h2 class="kpi-value">{{ vm.recursosPerdidos.valor | number }}</h2>
+                        <div class="kpi-change" [ngClass]="getKPIClass(vm.recursosPerdidos.tendencia)">
+                            <i class="material-icons">{{ getKPIIcon(vm.recursosPerdidos.tendencia) }}</i>
+                            <span>{{ formatKPIVariacao(vm.recursosPerdidos) }}</span>
+                        </div>
+                    </div>
+                    <span class="kpi-comparison">roubados/extraviados ({{ vm.recursosPerdidos.valorAnterior | number }})</span>
+                </div>
+            </div>
+
+            <!-- KPI: Administradores Ativos -->
+            <a [routerLink]="['/usuarios']" class="kpi-card administradores-clickable" *ngIf="vm.administradoresAtivos" matTooltip="Clique para gerenciar os usuários">
+                <div class="kpi-icon administradores" [class.alerta]="vm.administradoresAtivos.valor > 5">
+                    <i class="material-icons">admin_panel_settings</i>
+                </div>
+                <div class="kpi-content">
+                    <span class="kpi-label">Administradores Ativos</span>
+                    <div class="kpi-value-row">
+                        <h2 class="kpi-value" [class.text-danger]="vm.administradoresAtivos.valor > 5" [class.text-success]="vm.administradoresAtivos.valor <= 5">
+                            {{ vm.administradoresAtivos.valor | number }}
+                        </h2>
+                        <div class="kpi-change" [ngClass]="getKPIClass(vm.administradoresAtivos.tendencia)">
+                            <i class="material-icons">{{ getKPIIcon(vm.administradoresAtivos.tendencia) }}</i>
+                            <span>{{ formatKPIVariacao(vm.administradoresAtivos) }}</span>
+                        </div>
+                    </div>
+                    <span class="kpi-comparison" [class.text-success]="vm.administradoresAtivos.valor <= 5" [class.text-danger]="vm.administradoresAtivos.valor > 5">
+                        <i class="material-icons" *ngIf="vm.administradoresAtivos.valor <= 5">check_circle</i>
+                        <i class="material-icons" *ngIf="vm.administradoresAtivos.valor > 5">warning</i>
+                        {{ vm.administradoresAtivos.valor <= 5 ? 'Dentro do limite recomendado (máx. 5)' : 'Acima do limite recomendado (máx. 5)' }}
+                    </span>
+                </div>
+            </a>
+
+            <!-- KPI: Recursos Movimentados Hoje -->
+            <div class="kpi-card movimentados-clickable"
+                 *ngIf="vm.qtdeAtivosMovimentadoDia !== undefined"
+                 (click)="scrollToSection('card-movimentacoes-usuarios')"
+                 matTooltip="Ver histórico de movimentações">
+                <div class="kpi-icon movimentacoes">
+                    <i class="material-icons">sync</i>
+                </div>
+                <div class="kpi-content">
+                    <span class="kpi-label">Recursos Movimentados Hoje</span>
+                    <div class="kpi-value-row">
+                        <h2 class="kpi-value">{{ vm.qtdeAtivosMovimentadoDia || 0 }}</h2>
+                        <div class="kpi-change neutral" *ngIf="vm.distribuicaoMovimentacoes">
+                            <i class="material-icons">info</i>
+                            <span>{{ (vm.distribuicaoMovimentacoes.entregas || 0) + (vm.distribuicaoMovimentacoes.devolucoes || 0) + (vm.distribuicaoMovimentacoes.outros || 0) }} operações</span>
+                        </div>
+                    </div>
+                    <span class="kpi-comparison" *ngIf="vm.distribuicaoMovimentacoes">
+                        Entregas: {{ vm.distribuicaoMovimentacoes.entregas || 0 }} • 
+                        Devoluções: {{ vm.distribuicaoMovimentacoes.devolucoes || 0 }} • 
+                        Outros: {{ vm.distribuicaoMovimentacoes.outros || 0 }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- 📧 KPI: Agendamento de Emails (Hangfire) -->
+            <a [href]="hangfireDashboardUrl" target="_blank" class="kpi-card hangfire-card hangfire-clickable" *ngIf="hangfireStats" matTooltip="Clique para abrir o dashboard do Hangfire">
+                <div class="kpi-icon hangfire">
+                    <i class="material-icons">schedule_send</i>
+                </div>
+                <div class="kpi-content">
+                    <span class="kpi-label">Agendamento de Emails</span>
+                    <div class="kpi-value-row">
+                        <h2 class="kpi-value">{{ hangfireStats.jobsAgendados || 0 }}</h2>
+                        <div class="kpi-change info">
+                            <i class="material-icons">hourglass_empty</i>
+                            <span>Aguardando</span>
+                        </div>
+                    </div>
+                    <span class="kpi-comparison">
+                        Enfileirados: {{ hangfireStats.jobsEnfileirados || 0 }} • 
+                        Processando: {{ hangfireStats.jobsProcessando || 0 }} • 
+                        Falhados: {{ hangfireStats.jobsFalhados || 0 }}
+                    </span>
+                </div>
+            </a>
+
+            <!-- 📄 KPI: Contratos -->
+            <a [routerLink]="['/contratos']" class="kpi-card contratos-clickable" *ngIf="vm.contratosVencidos" matTooltip="Clique para gerenciar os contratos">
+                <div class="kpi-icon contratos" [class.alerta]="vm.contratosVencidos.valor > 0">
+                    <i class="material-icons">description</i>
+                </div>
+                <div class="kpi-content">
+                    <span class="kpi-label">Contratos</span>
+                    <div class="kpi-value-row">
+                        <h2 class="kpi-value">{{ vm.totalContratos || 0 }}</h2>
+                        <div class="kpi-change" [ngClass]="{
+                            'danger': vm.contratosVencidos.valor > 0,
+                            'success': vm.contratosVencidos.valor === 0
+                        }">
+                            <i class="material-icons">{{ vm.contratosVencidos.valor > 0 ? 'warning' : 'check_circle' }}</i>
+                            <span>{{ vm.contratosVencidos.valor || 0 }} vencido{{ vm.contratosVencidos.valor !== 1 ? 's' : '' }}</span>
+                        </div>
+                    </div>
+                    <span class="kpi-comparison">
+                        <span [class.text-success]="vm.contratosVencidos.valor === 0" [class.text-danger]="vm.contratosVencidos.valor > 0">
+                            <i class="material-icons">{{ vm.contratosVencidos.valor === 0 ? 'check_circle' : 'error' }}</i>
+                            {{ vm.contratosVencidos.valor === 0 ? 'Nenhum contrato vencido' : vm.contratosVencidos.valor + ' contrato(s) vencido(s)' }}
+                        </span>
+                    </span>
+                </div>
+            </a>
+
+            <!-- 🔧 KPI: Sinistros (Laudos) -->
+            <a [routerLink]="['/laudos']" class="kpi-card laudos-clickable" *ngIf="vm.laudosEncerrados" matTooltip="Clique para gerenciar os laudos">
+                <div class="kpi-icon laudos" [class.alerta]="vm.laudosEmAnalise > 0">
+                    <i class="material-icons">build_circle</i>
+                </div>
+                <div class="kpi-content">
+                    <span class="kpi-label">Sinistros (Laudos)</span>
+                    <div class="kpi-value-row">
+                        <h2 class="kpi-value">{{ vm.totalLaudos || 0 }}</h2>
+                        <div class="kpi-change" [ngClass]="{
+                            'warning': vm.laudosEmAnalise > 0,
+                            'success': vm.laudosEmAnalise === 0
+                        }">
+                            <i class="material-icons">{{ vm.laudosEmAnalise > 0 ? 'build' : 'check_circle' }}</i>
+                            <span>{{ vm.laudosEmAnalise || 0 }} em análise</span>
+                        </div>
+                    </div>
+                    <span class="kpi-comparison">
+                        <span [class.text-success]="vm.laudosEmAnalise === 0" [class.text-warning]="vm.laudosEmAnalise > 0">
+                            <i class="material-icons">{{ vm.laudosEmAnalise === 0 ? 'check_circle' : 'schedule' }}</i>
+                            {{ vm.laudosEmAnalise === 0 ? 'Todos os laudos finalizados' : vm.laudosEmAnalise + ' laudo(s) aguardando conclusão' }}
+                        </span>
+                    </span>
+                </div>
+            </a>
+        </div>
+</div>
+</div>
+
+<!-- 🎯 DIVIDER DECORATIVO ENTRE SEÇÕES -->
+<div class="section-divider">
+  <div class="divider-line"></div>
+  <div class="divider-icon">
+    <i class="material-icons">fiber_manual_record</i>
+  </div>
+  <div class="divider-line"></div>
+</div>
+
+<!-- 🎯 SEÇÃO PRINCIPAL 1: AÇÕES RÁPIDAS (título removido) -->
+<div class="container mt-3">
+    <div class="dashboard-main-section urgent-section">
+        <!-- CONTEÚDO DE AÇÕES RÁPIDAS -->
+        <div class="main-section-content">
+
+<!-- 🆘 SEÇÃO AÇÕES PENDENTES - PRIORITÁRIA -->
+<div class="container p-4" *ngIf="visibilitySettings.acoesPendentes && temAcoesPendentes()">
+    <div class="row mb-4" id="card-movimentacoes-usuarios">
+        <div class="col-12">
+            <div class="urgent-alert">
+                <div class="alert-icon">
+                    <i class="material-icons">priority_high</i>
+                </div>
+                <div class="alert-content">
+                    <h3 class="alert-title">Ações Pendentes - Requer Atenção Imediata</h3>
+                    <p class="alert-description">Monitore e resolva estas situações para manter o controle patrimonial atualizado.</p>
+                    <div class="alert-actions">
+                        <span class="alert-badge urgent">Urgente</span>
+                        <span class="alert-badge priority">Prioridade Alta</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🎯 CARDS DE AÇÕES PENDENTES -->
+    <div class="row mb-4">
+        <!-- Card: Recursos com Colaboradores Desligados -->
+        <div class="col-md-6 mb-4" *ngIf="visibilitySettings.colaboradoresDesligados && (vm.totalDesligadosComRecursos || dataSourceEqpColDesligado?.data?.length || 0) > 0">
+            <mat-card class="action-card urgent-card h-100">
+                <div class="card-header-urgent">
+                    <div class="card-icon">
+                        <i class="material-icons">person_off</i>
+                    </div>
+                    <div class="card-badge urgent-badge">
+                        <span>{{vm.totalDesligadosComRecursos || dataSourceEqpColDesligado?.data?.length || 0}}</span>
+                    </div>
+                </div>
+                <mat-card-content>
+                    <h3 class="card-title">Colaboradores Desligados</h3>
+                    <p class="card-subtitle">Recursos ainda alocados a ex-colaboradores</p>
+                    
+                    <div class="urgent-stats">
+                        <div class="stat-item">
+                            <div class="stat-number">{{vm.totalDesligadosComRecursos || dataSourceEqpColDesligado?.data?.length || 0}}</div>
+                            <div class="stat-label">Colaboradores</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">{{vm.totalRecursosDesligados || getTotalRecursosDesligados()}}</div>
+                            <div class="stat-label">Recursos</div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-warning">
+                        <i class="material-icons">warning</i>
+                        <span>Requer ação imediata</span>
+                    </div>
+                </mat-card-content>
+                <mat-card-actions class="p-3">
+                    <button mat-raised-button color="warn" class="action-btn urgent-btn" (click)="abrirModalDesligados()">
+                        <i class="material-icons me-2">visibility</i>
+                        Ver Detalhes
+                    </button>
+                </mat-card-actions>
+            </mat-card>
+        </div>
+
+        <!-- Card: Devoluções Programadas -->
+        <div class="col-md-6 mb-4" *ngIf="visibilitySettings.devolucoesProgramadas && (dataSourceDevolucaoProgramada?.data?.length || 0) > 0">
+            <mat-card class="action-card warning-card h-100">
+                <div class="card-header-warning">
+                    <div class="card-icon">
+                        <i class="material-icons">schedule</i>
+                    </div>
+                    <div class="card-badge warning-badge">
+                        <span>{{dataSourceDevolucaoProgramada?.data?.length || 0}}</span>
+                    </div>
+                </div>
+                <mat-card-content>
+                    <h3 class="card-title">Devoluções Programadas</h3>
+                    <p class="card-subtitle">Recursos com prazo de devolução vencendo</p>
+                    
+                    <div class="warning-stats">
+                        <div class="stat-item">
+                            <div class="stat-number">{{dataSourceDevolucaoProgramada?.data?.length || 0}}</div>
+                            <div class="stat-label">Devoluções</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">{{getDevolucoesVencidas()}}</div>
+                            <div class="stat-label">Vencidas</div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-warning">
+                        <i class="material-icons">schedule</i>
+                        <span>{{getDevolucoesVencidas()}} vencidas | {{getDevolucoesProximas()}} próximas</span>
+                    </div>
+                </mat-card-content>
+                <mat-card-actions class="p-3">
+                    <button mat-raised-button class="action-btn warning-btn" (click)="abrirModalDevolucoesProgramadas()">
+                        <i class="material-icons me-2">visibility</i>
+                        Ver Detalhes
+                    </button>
+                </mat-card-actions>
+            </mat-card>
+        </div>
+
+        <!-- Card: Contestações Pendentes -->
+        <div class="col-md-6 mb-4" *ngIf="getContestacoesPendentes() > 0">
+            <mat-card class="action-card info-card h-100">
+                <div class="card-header-info">
+                    <div class="card-icon">
+                        <i class="material-icons">report_problem</i>
+                    </div>
+                    <div class="card-badge info-badge">
+                        <span>{{getContestacoesPendentes()}}</span>
+                    </div>
+                </div>
+                <mat-card-content>
+                    <h3 class="card-title">Contestações Pendentes</h3>
+                    <p class="card-subtitle">Ações de contestação/auto inventário aguardando atendimento</p>
+                    
+                    <div class="info-stats">
+                        <div class="stat-item">
+                            <div class="stat-number">{{getContestacoesPendentes()}}</div>
+                            <div class="stat-label">Totais</div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-info">
+                        <i class="material-icons">info</i>
+                        <span>Requer atenção da equipe técnica</span>
+                    </div>
+
+                    <!-- Lista das últimas pendências (com tipo) -->
+                    <div class="mt-3" *ngIf="getAcoesPendentesContestacoes().length > 0">
+                        <div class="list-group">
+                            <div class="list-group-item d-flex align-items-center justify-content-between" *ngFor="let it of getAcoesPendentesContestacoes()">
+                                <div class="d-flex align-items-center">
+                                    <span class="badge me-2" [ngClass]="isAutoInventarioItem(it) ? 'badge-warning' : 'badge-info'">
+                                        {{ getTipoContestacaoLabel(it) }}
+                                    </span>
+                                    <span class="text-truncate" style="max-width: 260px;" [matTooltip]="it.descricao || it.motivo">
+                                        {{ it.motivo || it.descricao || 'Sem descrição' }}
+                                    </span>
+                                </div>
+                                <small class="text-muted">{{ it.dataContestacao | date:'dd/MM/yyyy' }}</small>
+                            </div>
+                        </div>
+                    </div>
+                </mat-card-content>
+                <mat-card-actions class="p-3">
+                    <button mat-raised-button class="action-btn info-btn" [routerLink]="['/movimentacoes/contestacoes']">
+                        <i class="material-icons me-2">visibility</i>
+                        Ver Contestações
+                    </button>
+                </mat-card-actions>
+            </mat-card>
+        </div>
+
+        <!-- 🆕 Card: Sinalizações de Suspeitas -->
+        <div class="col-md-6 mb-4" *ngIf="getSinalizacoesPendentesTotal() > 0">
+            <mat-card class="action-card critical-card h-100">
+                <div class="card-header-critical">
+                    <div class="card-icon">
+                        <i class="material-icons">flag</i>
+                    </div>
+                    <div class="card-badge critical-badge">
+                        <span>{{ getSinalizacoesPendentesTotal() }}</span>
+                    </div>
+                </div>
+                <mat-card-content>
+                    <h3 class="card-title">Sinalizações de Suspeitas</h3>
+                    <p class="card-subtitle">Situações suspeitas detectadas que requerem investigação</p>
+                    
+                    <div class="critical-stats">
+                        <div class="stat-item">
+                            <div class="stat-number">{{ getSinalizacoesPendentesTotal() }}</div>
+                            <div class="stat-label">Pendentes</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number critical-number">{{ getSinalizacoesCriticasOuAltas() }}</div>
+                            <div class="stat-label">Críticas/Altas</div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-warning critical-warning">
+                        <i class="material-icons">error</i>
+                        <span>{{ vm.sinalizacoes.criticasNaoAtendidas }} críticas não atendidas</span>
+                    </div>
+
+                    <!-- Mini resumo por prioridade -->
+                    <div class="mini-summary" *ngIf="vm.sinalizacoes && getSinalizacoesPendentesTotal() > 0">
+                        <div class="summary-item critica">
+                            <span class="priority-dot"></span>
+                            <span>{{ vm.sinalizacoes.criticas }} Crítica(s)</span>
+                        </div>
+                        <div class="summary-item alta">
+                            <span class="priority-dot"></span>
+                            <span>{{ vm.sinalizacoes.altas }} Alta(s)</span>
+                        </div>
+                        <div class="summary-item media">
+                            <span class="priority-dot"></span>
+                            <span>{{ vm.sinalizacoes.medias }} Média(s)</span>
+                        </div>
+                    </div>
+                </mat-card-content>
+                <mat-card-actions class="p-3" *ngIf="getSinalizacoesPendentesTotal() > 0">
+                    <button mat-raised-button class="action-btn critical-btn" (click)="navegarParaSinalizacoes()">
+                        <i class="material-icons me-2">search</i>
+                        Investigar
+                    </button>
+                </mat-card-actions>
+            </mat-card>
+        </div>
+    </div>
+
+    <!-- Seção de tabela de Colaboradores Desligados removida conforme solicitação -->
+            
+    <!-- Seção de Tabela de Devoluções Programadas removida -->
+
+</div>
+<!-- FIM DO CONTAINER DE AÇÕES PENDENTES -->
+
+        </div>
+        <!-- FIM DO CONTEÚDO DE AÇÕES RÁPIDAS -->
+    </div>
+</div>
+
+<!-- 🎯 DIVIDER DECORATIVO ENTRE SEÇÕES -->
+<div class="section-divider">
+  <div class="divider-line"></div>
+  <div class="divider-icon">
+    <i class="material-icons">fiber_manual_record</i>
+  </div>
+  <div class="divider-line"></div>
+</div>
+
+<!-- 📊 SEÇÃO PRINCIPAL 2: OUTRAS INFORMAÇÕES (título removido) -->
+<div class="container mt-3">
+    <div class="dashboard-main-section info-section">
+        <!-- CONTEÚDO DE OUTRAS INFORMAÇÕES -->
+        <div class="main-section-content">
+
+    <!-- 📊 SEÇÃO DE ESTATÍSTICAS GERAIS -->
+    <div class="row mb-5" *ngIf="visibilitySettings.estatisticasGerais">
+        <div class="col-12">
+            <div class="stats-section">
+                <div class="section-header">
+                    <div class="header-content">
+                        <div class="header-icon">
+                            <i class="material-icons">analytics</i>
+                        </div>
+                        <div class="header-text">
+                            <h2 class="section-title">Recursos por Status</h2>
+                            <p class="section-subtitle">Visão consolidada do patrimônio da empresa</p>
+                        </div>
+                    </div>
+                    <div class="header-actions">
+                        <a [routerLink]="['/equipamentos-status-detalhe']" class="details-link">
+                            <i class="material-icons">open_in_new</i>
+                            <span>Ver detalhes completos</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="stats-content">
+                    <!-- 🚨 ALERTA CRÍTICO: Status Transitórios - COLAPSÁVEL SIMPLES -->
+                    <div class="collapsible-alert-wrapper" [class.collapsed]="!alertaStatusTransitoriosExpanded">
+                        <div class="collapsible-alert-header" (click)="alertaStatusTransitoriosExpanded = !alertaStatusTransitoriosExpanded">
+                            <div class="alert-header-content">
+                                <div class="alert-icon-small">
+                                    <i class="material-icons">warning</i>
+                                </div>
+                                <span class="alert-header-title">⚠️ Status Transitórios - Pontos Críticos de Controle</span>
+                                <span class="badge badge-danger ms-2">Importante</span>
+                            </div>
+                            <div class="expand-indicator">
+                                <i class="material-icons">{{ alertaStatusTransitoriosExpanded ? 'expand_less' : 'expand_more' }}</i>
+                            </div>
+                        </div>
+                        
+                        <div class="collapsible-alert-content" *ngIf="alertaStatusTransitoriosExpanded">
+                            <div class="critical-status-alert">
+                                <div class="alert-icon-wrapper">
+                                    <i class="material-icons">warning</i>
+                                </div>
+                                <div class="alert-content-wrapper">
+                                    <p class="alert-message">
+                                        As colunas <strong class="text-danger">REQUISITADO</strong> e <strong class="text-warning">DEVOLVIDO</strong> 
+                                        são status <strong>temporários/transitórios</strong> no fluxo de recursos. 
+                                        <strong>O RISCO:</strong> recursos que ficam <strong>esquecidos ou parados por muito tempo</strong> 
+                                        nestes status, sem serem processados para o próximo estágio (aprovação, entrega, recebimento, etc).
+                                    </p>
+                                    <div class="alert-tips">
+                                        <div class="tip-item tip-normal">
+                                            <i class="material-icons">trending_flat</i>
+                                            <span><strong>Normal:</strong> Ter recursos nestes status faz parte do fluxo operacional diário.</span>
+                                        </div>
+                                        <div class="tip-item tip-warning">
+                                            <i class="material-icons">schedule</i>
+                                            <span><strong>⚠️ ATENÇÃO:</strong> Verifique se há recursos <strong>parados há muitos dias</strong> sem serem processados.</span>
+                                        </div>
+                                        <div class="tip-item tip-critical">
+                                            <i class="material-icons">report_problem</i>
+                                            <span><strong>🚨 CRÍTICO:</strong> Recursos esquecidos nestes status = perda de controle e inventário desatualizado.</span>
+                                        </div>
+                                    </div>
+                                    <div class="alert-action">
+                                        <i class="material-icons">lightbulb</i>
+                                        <strong>Ação recomendada:</strong> Monitore o <strong>tempo de permanência</strong>, não apenas a quantidade. 
+                                        Investigue itens que estão há mais de 3-5 dias sem movimentação.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-table-container">
+                        <table class="stats-table">
+                            <thead>
+                                <tr>
+                                    <th class="th-tipo">Tipo</th>
+                                    <th class="th-requisitado th-critical">
+                                        <div class="th-content">
+                                            <i class="material-icons">pending</i>
+                                            <a [routerLink]="['/recursos']" [queryParams]="{ status: 'requisitado' }" class="header-link">Requisitado</a>
+                                            <i class="material-icons alert-icon" matTooltip="⚠️ Status transitório! Verifique o TEMPO DE PERMANÊNCIA. Recursos parados há muito tempo aqui podem indicar falta de aprovação/processamento.">warning</i>
+                                        </div>
+                                    </th>
+                                    <th class="th-devolvido th-critical">
+                                        <div class="th-content">
+                                            <i class="material-icons">assignment_return</i>
+                                            <a [routerLink]="['/recursos']" [queryParams]="{ status: 'devolvido' }" class="header-link">Devolvido</a>
+                                            <i class="material-icons alert-icon" matTooltip="⚠️ Status transitório! Verifique o TEMPO DE PERMANÊNCIA. Recursos parados há muito tempo aqui podem indicar falta de recebimento/processamento.">warning</i>
+                                        </div>
+                                    </th>
+                                    <th class="th-danificado">
+                                        <div class="th-content">
+                                            <i class="material-icons">build</i>
+                                            <span>Danificado</span>
+                                        </div>
+                                    </th>
+                                    <th class="th-emestoque">
+                                        <div class="th-content">
+                                            <i class="material-icons">inventory</i>
+                                            <span>Em estoque</span>
+                                        </div>
+                                    </th>
+                                    <th class="th-entregue">
+                                        <div class="th-content">
+                                            <i class="material-icons">check_circle</i>
+                                            <span>Entregue</span>
+                                        </div>
+                                    </th>
+                                    <th class="th-extraviado">
+                                        <div class="th-content">
+                                            <i class="material-icons">search_off</i>
+                                            <span>Extraviado</span>
+                                        </div>
+                                    </th>
+                                    <th class="th-novo">
+                                        <div class="th-content">
+                                            <i class="material-icons">new_releases</i>
+                                            <span>Lançado</span>
+                                        </div>
+                                    </th>
+                                    <th class="th-roubado">
+                                        <div class="th-content">
+                                            <i class="material-icons">security</i>
+                                            <span>Roubado</span>
+                                        </div>
+                                    </th>
+                                    <th class="th-semconserto">
+                                        <div class="th-content">
+                                            <i class="material-icons">block</i>
+                                            <span>Sem conserto</span>
+                                        </div>
+                                    </th>
+                                    <th class="th-descartado">
+                                        <div class="th-content">
+                                            <i class="material-icons">delete_forever</i>
+                                            <span>Descartado</span>
+                                        </div>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let row of dataSourceEquipamentosStatus?.data || []" class="stats-row">
+                                    <td class="td-tipo">
+                                        <div class="tipo-content">
+                                            <i class="material-icons tipo-icon">devices</i>
+                                            <span class="tipo-text">{{row.tipoequipamento}}</span>
+                                        </div>
+                                    </td>
+                                    <td class="td-requisitado" 
+                                        [ngClass]="{
+                                            'no-pendency': row.requisitado === 0, 
+                                            'has-pendency-requisitado': row.requisitado > 0
+                                        }">
+                                        <!-- ✅ SE ZERO = JOINHA (SEM PENDÊNCIAS) -->
+                                        <div *ngIf="row.requisitado === 0" class="status-badge ok-status">
+                                            <i class="material-icons">check_circle</i>
+                                        </div>
+                                        <!-- 🚨 SE MAIOR QUE ZERO = ALERTA CRÍTICO -->
+                                        <div *ngIf="row.requisitado > 0" class="status-badge requisitado">
+                                            <span class="status-number">{{row.requisitado}}</span>
+                                        </div>
+                                    </td>
+                                    <td class="td-devolvido" 
+                                        [ngClass]="{
+                                            'no-pendency': row.devolvido === 0, 
+                                            'has-pendency-devolvido': row.devolvido > 0
+                                        }">
+                                        <!-- ✅ SE ZERO = JOINHA (SEM PENDÊNCIAS) -->
+                                        <div *ngIf="row.devolvido === 0" class="status-badge ok-status">
+                                            <i class="material-icons">check_circle</i>
+                                        </div>
+                                        <!-- 🚨 SE MAIOR QUE ZERO = ALERTA CRÍTICO -->
+                                        <div *ngIf="row.devolvido > 0" class="status-badge devolvido">
+                                            <span class="status-number">{{row.devolvido}}</span>
+                                        </div>
+                                    </td>
+                                    <td class="td-danificado">
+                                        <!-- ✅ JOINHA SE ZERO -->
+                                        <div *ngIf="row.danificado === 0" class="status-badge ok-status-secondary">
+                                            <i class="material-icons">check_circle</i>
+                                        </div>
+                                        <div *ngIf="row.danificado > 0" class="status-badge danificado">
+                                            <span class="status-number">{{row.danificado}}</span>
+                                        </div>
+                                    </td>
+                                    <td class="td-emestoque">
+                                        <!-- ✅ JOINHA SE ZERO -->
+                                        <div *ngIf="row.emestoque === 0" class="status-badge ok-status-secondary">
+                                            <i class="material-icons">check_circle</i>
+                                        </div>
+                                        <div *ngIf="row.emestoque > 0" class="status-badge emestoque">
+                                            <span class="status-number">{{row.emestoque}}</span>
+                                        </div>
+                                    </td>
+                                    <td class="td-entregue">
+                                        <!-- ✅ JOINHA SE ZERO -->
+                                        <div *ngIf="row.entregue === 0" class="status-badge ok-status-secondary">
+                                            <i class="material-icons">check_circle</i>
+                                        </div>
+                                        <div *ngIf="row.entregue > 0" class="status-badge entregue">
+                                            <span class="status-number">{{row.entregue}}</span>
+                                        </div>
+                                    </td>
+                                    <td class="td-extraviado">
+                                        <!-- ✅ JOINHA SE ZERO -->
+                                        <div *ngIf="row.extraviado === 0" class="status-badge ok-status-secondary">
+                                            <i class="material-icons">check_circle</i>
+                                        </div>
+                                        <div *ngIf="row.extraviado > 0" class="status-badge extraviado">
+                                            <span class="status-number">{{row.extraviado}}</span>
+                                        </div>
+                                    </td>
+                                    <td class="td-novo">
+                                        <!-- ✅ JOINHA SE ZERO -->
+                                        <div *ngIf="row.novo === 0" class="status-badge ok-status-secondary">
+                                            <i class="material-icons">check_circle</i>
+                                        </div>
+                                        <div *ngIf="row.novo > 0" class="status-badge novo">
+                                            <span class="status-number">{{row.novo}}</span>
+                                        </div>
+                                    </td>
+                                    <td class="td-roubado">
+                                        <!-- ✅ JOINHA SE ZERO -->
+                                        <div *ngIf="row.roubado === 0" class="status-badge ok-status-secondary">
+                                            <i class="material-icons">check_circle</i>
+                                        </div>
+                                        <div *ngIf="row.roubado > 0" class="status-badge roubado">
+                                            <span class="status-number">{{row.roubado}}</span>
+                                        </div>
+                                    </td>
+                                    <td class="td-semconserto">
+                                        <!-- ✅ JOINHA SE ZERO -->
+                                        <div *ngIf="row.semconserto === 0" class="status-badge ok-status-secondary">
+                                            <i class="material-icons">check_circle</i>
+                                        </div>
+                                        <div *ngIf="row.semconserto > 0" class="status-badge semconserto">
+                                            <span class="status-number">{{row.semconserto}}</span>
+                                        </div>
+                                    </td>
+                                    <td class="td-descartado">
+                                        <!-- ✅ JOINHA SE ZERO -->
+                                        <div *ngIf="row.descartado === 0" class="status-badge ok-status-secondary">
+                                            <i class="material-icons">check_circle</i>
+                                        </div>
+                                        <div *ngIf="row.descartado > 0" class="status-badge descartado">
+                                            <span class="status-number">{{row.descartado}}</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="stats-summary">
+                        <div class="summary-item">
+                            <div class="summary-icon">
+                                <i class="material-icons">trending_up</i>
+                            </div>
+                            <div class="summary-content">
+                                <div class="summary-number">{{getTotalRecursos()}}</div>
+                                <div class="summary-label">Total de Recursos</div>
+                            </div>
+                        </div>
+                        
+                        <div class="summary-item">
+                            <div class="summary-icon">
+                                <i class="material-icons">check_circle</i>
+                            </div>
+                            <div class="summary-content">
+                                <div class="summary-number">{{getRecursosAtivos()}}</div>
+                                <div class="summary-label">Recursos Ativos</div>
+                            </div>
+                        </div>
+                        
+                        <div class="summary-item">
+                            <div class="summary-icon">
+                                <i class="material-icons">warning</i>
+                            </div>
+                            <div class="summary-content">
+                                <div class="summary-number">{{getRecursosProblema()}}</div>
+                                <div class="summary-label">Com Problemas</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Bloco "Status Críticos - Requer Atenção" removido -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- FIM DA SEÇÃO RECURSOS POR STATUS -->
+
+    <!-- 🎯 SEPARADOR FORTE ENTRE SUBSEÇÕES -->
+    <div class="section-divider">
+        <div class="divider-line"></div>
+        <div class="divider-icon">
+            <i class="material-icons">fiber_manual_record</i>
+        </div>
+        <div class="divider-line"></div>
+    </div>
+
+    <!-- 📈 SEÇÃO OUTRAS INFORMAÇÕES -->
+    <div class="row mb-5" *ngIf="visibilitySettings.graficosMetricas">
+        <div class="col-12">
+            <div class="stats-section">
+                <div class="section-header">
+                    <div class="header-content">
+                        <div class="header-icon">
+                            <i class="material-icons">insights</i>
+                        </div>
+                        <div class="header-text">
+                            <h2 class="section-title">Outras Informações</h2>
+                            <p class="section-subtitle">Análises visuais: adesão ao termo, movimentações, recursos descartados e métricas</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stats-content">
+                    <div class="row mb-4">
+        <!-- 📊 CARD EXPANDIDO: ADESÃO AO TERMO E CAMPANHAS -->
+        <div class="col-12 mb-3" id="card-adesao-campanhas">
+            <mat-card class="chart-card expanded-card">
+                <mat-card-header>
+                    <mat-card-title>
+                        <div class="title-with-link">
+                            <div class="title-content">
+                                <i class="material-icons me-2">campaign</i>
+                                <span>Adesão ao Termo e Campanhas de Assinatura</span>
+                            </div>
+                            <a [routerLink]="['/termo-eletronico']" class="details-link-inline" matTooltip="Gerenciar Campanhas">
+                                <i class="material-icons">open_in_new</i>
+                            </a>
+                        </div>
+                    </mat-card-title>
+                    <mat-card-subtitle>
+                        Status dos colaboradores e métricas consolidadas de campanhas
+                    </mat-card-subtitle>
+                </mat-card-header>
+                <mat-card-content>
+                    <div class="row">
+                        <!-- COLUNA 1: GRÁFICO DE ADESÃO AO TERMO -->
+                        <div class="col-lg-4 col-md-6 mb-3">
+                            <h6 class="subsection-title">
+                                <i class="material-icons me-1">pie_chart</i>
+                                Adesão ao Termo
+                            </h6>
+                            <div class="chart-container">
+                                <div id="totaladesao_div" class="chart-div"></div>
+                            </div>
+                            
+                            <!-- 📊 RESUMO NUMÉRICO -->
+                            <div class="chart-summary mt-3" *ngIf="vm?.adesaoTermoResponsabilidade">
+                                <div class="row text-center">
+                                    <div class="col-6">
+                                        <div class="summary-item success">
+                                            <div class="summary-number">{{vm.adesaoTermoResponsabilidade.assinados || 0}}</div>
+                                            <div class="summary-label">Assinados</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="summary-item danger">
+                                            <div class="summary-number">{{vm.adesaoTermoResponsabilidade.naoAssinados || 0}}</div>
+                                            <div class="summary-label">Não Assinados</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- 📈 BARRA DE PROGRESSO -->
+                                <div class="progress-container mt-3" *ngIf="(vm.adesaoTermoResponsabilidade.assinados + vm.adesaoTermoResponsabilidade.naoAssinados) > 0">
+                                    <div class="progress-label mb-2">
+                                        <small class="text-muted">
+                                            Taxa de Adesão: 
+                                            <strong>{{Math.round((vm.adesaoTermoResponsabilidade.assinados / (vm.adesaoTermoResponsabilidade.assinados + vm.adesaoTermoResponsabilidade.naoAssinados)) * 100)}}%</strong>
+                                        </small>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="progress-bar bg-success" 
+                                             [style.width.%]="(vm.adesaoTermoResponsabilidade.assinados / (vm.adesaoTermoResponsabilidade.assinados + vm.adesaoTermoResponsabilidade.naoAssinados)) * 100">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- COLUNA 2: MÉTRICAS DE CAMPANHAS -->
+                        <div class="col-lg-4 col-md-6 mb-3" *ngIf="vm?.metricasCampanhas">
+                            <h6 class="subsection-title">
+                                <i class="material-icons me-1">analytics</i>
+                                Métricas de Campanhas
+                            </h6>
+                            
+                            <div class="campanhas-metrics">
+                                <!-- Status de Campanhas -->
+                                <div class="metric-row">
+                                    <div class="metric-item">
+                                        <span class="metric-icon success">
+                                            <i class="material-icons">check_circle</i>
+                                        </span>
+                                        <div class="metric-info">
+                                            <div class="metric-value">{{vm.metricasCampanhas.campanhasAbertas}}</div>
+                                            <div class="metric-label">Campanhas Abertas</div>
+                                        </div>
+                                    </div>
+                                    <div class="metric-item">
+                                        <span class="metric-icon completed">
+                                            <i class="material-icons">done_all</i>
+                                        </span>
+                                        <div class="metric-info">
+                                            <div class="metric-value">{{vm.metricasCampanhas.campanhasEncerradas}}</div>
+                                            <div class="metric-label">Campanhas Encerradas</div>
+                                        </div>
+                                    </div>
+                                    <div class="metric-item">
+                                        <span class="metric-icon scheduled">
+                                            <i class="material-icons">schedule</i>
+                                        </span>
+                                        <div class="metric-info">
+                                            <div class="metric-value">{{vm.metricasCampanhas.campanhasAgendadas}}</div>
+                                            <div class="metric-label">Campanhas Agendadas</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Adesão às Campanhas -->
+                                <div class="adesao-box mt-3">
+                                    <div class="adesao-header">
+                                        <i class="material-icons">groups</i>
+                                        <span>Adesão às Campanhas</span>
+                                    </div>
+                                    <div class="adesao-stats">
+                                        <div class="stat-item">
+                                            <span class="stat-label">Colaboradores Incluídos:</span>
+                                            <span class="stat-value">{{vm.metricasCampanhas.totalColaboradoresEmCampanhas}}</span>
+                                        </div>
+                                        <div class="stat-item">
+                                            <span class="stat-label">Assinaturas Realizadas:</span>
+                                            <span class="stat-value text-success">{{vm.metricasCampanhas.totalAssinaturasRealizadas}}</span>
+                                        </div>
+                                        <div class="stat-item">
+                                            <span class="stat-label">Assinaturas Pendentes:</span>
+                                            <span class="stat-value text-warning">{{vm.metricasCampanhas.totalAssinaturasPendentes}}</span>
+                                        </div>
+                                        <div class="stat-item highlight">
+                                            <span class="stat-label">Taxa Média de Adesão:</span>
+                                            <span class="stat-value-large">{{vm.metricasCampanhas.taxaAdesaoMedia}}%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- COLUNA 3: ÚLTIMAS CAMPANHAS -->
+                        <div class="col-lg-4 col-md-12 mb-3" *ngIf="vm?.metricasCampanhas?.ultimasCampanhas?.length > 0">
+                            <h6 class="subsection-title">
+                                <i class="material-icons me-1">history</i>
+                                Últimas Campanhas
+                            </h6>
+                            
+                            <div class="campanhas-list">
+                                <div class="campanha-item" *ngFor="let campanha of vm.metricasCampanhas.ultimasCampanhas">
+                                    <div class="campanha-header">
+                                        <span class="campanha-status" [ngClass]="{
+                                            'status-ativa': campanha.status === 'A',
+                                            'status-concluida': campanha.status === 'C',
+                                            'status-agendada': campanha.status === 'G',
+                                            'status-inativa': campanha.status === 'I'
+                                        }">
+                                            {{campanha.statusDescricao}}
+                                        </span>
+                                        <span class="campanha-nome">{{campanha.nome}}</span>
+                                    </div>
+                                    <div class="campanha-stats">
+                                        <div class="campanha-stat">
+                                            <i class="material-icons">people</i>
+                                            <span>{{campanha.totalColaboradores}} colaboradores</span>
+                                        </div>
+                                        <div class="campanha-stat">
+                                            <i class="material-icons">check_circle</i>
+                                            <span>{{campanha.totalAssinados}} assinados</span>
+                                        </div>
+                                        <div class="campanha-stat">
+                                            <i class="material-icons">pending</i>
+                                            <span>{{campanha.totalPendentes}} pendentes</span>
+                                        </div>
+                                    </div>
+                                    <div class="campanha-progress" *ngIf="campanha.percentualAdesao">
+                                        <div class="progress-mini">
+                                            <div class="progress-bar" [style.width.%]="campanha.percentualAdesao"></div>
+                                        </div>
+                                        <span class="progress-label">{{campanha.percentualAdesao}}% de adesão</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </mat-card-content>
+            </mat-card>
+        </div>
+        
+    </div>
+
+    <!-- 📈 GRÁFICO DE MOVIMENTAÇÕES POR USUÁRIOS -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <mat-card class="chart-card">
+                <mat-card-header>
+                    <mat-card-title>
+                        <i class="material-icons me-2">bar_chart</i>
+                        Recursos Movimentados nos Últimos 5 Dias
+                    </mat-card-title>
+                    <mat-card-subtitle>
+                        Atividade por usuário
+                    </mat-card-subtitle>
+                </mat-card-header>
+                <mat-card-content>
+                    <div class="chart-container">
+                        <div id="grpMovimentacoesUsuarios" class="chart-div"></div>
+                    </div>
+                    
+                    <!-- 📊 RESUMO DAS MOVIMENTAÇÕES -->
+                    <div class="movimentacoes-summary mt-3" *ngIf="vm?.ultimosUsuariosQueMovimentaram">
+                        <div class="summary-stats">
+                            <div class="stat-item">
+                                <div class="stat-number">{{getUsuariosAtivosCount()}}</div>
+                                <div class="stat-label">Usuários Ativos</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number">{{getTotalMovimentacoes()}}</div>
+                                <div class="stat-label">Total Movimentações</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number">{{getUsuarioMaisAtivo()}}</div>
+                                <div class="stat-label">Usuário Mais Ativo</div>
+                            </div>
+                        </div>
+                    </div>
+                </mat-card-content>
+            </mat-card>
+        </div>
+    </div>
+    <!-- FIM DA SEÇÃO OUTRAS INFORMAÇÕES -->
+
+        </div>
+        <!-- FIM DO CONTEÚDO DE OUTRAS INFORMAÇÕES -->
+    </div>
+</div>
+
+<!-- FIM DO CONTEÚDO PRINCIPAL DO DASHBOARD -->

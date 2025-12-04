@@ -1,0 +1,945 @@
+<!-- 🎯 HEADER PARA PÁGINA (QUANDO NÃO É MODAL) -->
+<div *ngIf="!isModal">
+  <mat-toolbar color="accent">
+    <div class="container" style="color: #080039">
+      <button mat-icon-button [routerLink]="['/colaboradores']">
+        <mat-icon>chevron_left</mat-icon></button
+      >Colaborador
+    </div>
+  </mat-toolbar>
+  <div class="container p-4">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <!--  <li class="breadcrumb-item"><a [routerLink]="['/dashboard']">Home</a></li>
+              <li class="breadcrumb-item"><a [routerLink]="['/colaboradores']">Colaboradores</a></li>
+              <li class="breadcrumb-item active" aria-current="page">Colaborador</li> -->
+      </ol>
+    </nav>
+  </div>
+</div>
+
+<!-- 🎯 FORMULÁRIO MODAL DE COLABORADOR SIMPLIFICADO -->
+<div *ngIf="isModal" class="colaborador-form-container">
+  <div class="form-header">
+    <h2 class="form-title">{{ getTitulo() }}</h2>
+    <p class="form-subtitle">
+      {{ modo === 'criar' ? 'Cadastre um novo colaborador no sistema' : 'Edite as informações do colaborador selecionado' }}
+    </p>
+  </div>
+  
+  <form [formGroup]="form" (ngSubmit)="salvar()" class="colaborador-form">
+    
+    <!-- 🎯 SEÇÃO 1: DADOS PESSOAIS -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <mat-icon>person</mat-icon>
+        Dados Pessoais
+      </h3>
+      
+      <div class="form-content">
+        <!-- Linha Nome e CPF -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="nome" class="form-label">
+              Nome do Colaborador <span class="required">*</span>
+            </label>
+            <input 
+              id="nome"
+              type="text"
+              formControlName="nome"
+              class="form-control"
+              [class.is-invalid]="form.get('nome')?.invalid && form.get('nome')?.touched"
+              placeholder="Digite o nome completo"
+            />
+            <div class="invalid-feedback" *ngIf="form.get('nome')?.invalid && form.get('nome')?.touched">
+              <span *ngIf="form.get('nome')?.errors?.required">Nome é obrigatório</span>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="cpf" class="form-label">
+              CPF <span class="required">*</span>
+            </label>
+            <input 
+              id="cpf"
+              type="text"
+              formControlName="cpf"
+              class="form-control"
+              appCpfMask
+              inputmode="numeric"
+              maxlength="14"
+              [class.is-invalid]="form.get('cpf')?.invalid && form.get('cpf')?.touched"
+              placeholder="000.000.000-00"
+            />
+            <div class="invalid-feedback" *ngIf="form.get('cpf')?.invalid && form.get('cpf')?.touched">
+              <span *ngIf="form.get('cpf')?.errors?.required">CPF é obrigatório</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Linha Matrícula e Email -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="matricula" class="form-label">
+              Matrícula <span class="required">*</span>
+            </label>
+            <input 
+              id="matricula"
+              type="text"
+              formControlName="matricula"
+              class="form-control"
+              [class.is-invalid]="form.get('matricula')?.invalid && form.get('matricula')?.touched"
+              placeholder="Digite a matrícula"
+            />
+            <div class="invalid-feedback" *ngIf="form.get('matricula')?.invalid && form.get('matricula')?.touched">
+              <span *ngIf="form.get('matricula')?.errors?.required">Matrícula é obrigatória</span>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="email" class="form-label">
+              Email <span class="required">*</span>
+            </label>
+            <input 
+              id="email"
+              type="email"
+              formControlName="email"
+              class="form-control"
+              [class.is-invalid]="form.get('email')?.invalid && form.get('email')?.touched"
+              placeholder="colaborador@empresa.com"
+            />
+            <div class="invalid-feedback" *ngIf="form.get('email')?.invalid && form.get('email')?.touched">
+              <span *ngIf="form.get('email')?.errors?.required">Email é obrigatório</span>
+              <span *ngIf="form.get('email')?.errors?.email">Email inválido</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 🎯 SEÇÃO 2: VINCULAÇÃO ORGANIZACIONAL -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <mat-icon>business</mat-icon>
+        Vinculação Organizacional
+      </h3>
+      
+      <div class="form-content">
+        <!-- Linha Empresa e Centro de Custo -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="empresa" class="form-label">
+              Empresa <span class="required">*</span>
+            </label>
+            <select 
+              id="empresa"
+              formControlName="empresa"
+              class="form-control"
+              [class.is-invalid]="form.get('empresa')?.invalid && form.get('empresa')?.touched"
+              (change)="onEmpresaChange()"
+            >
+              <option value="">Selecione a empresa</option>
+              <option *ngFor="let row of empresas" [value]="row.id">{{row.nome}}</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="form.get('empresa')?.invalid && form.get('empresa')?.touched">
+              <span *ngIf="form.get('empresa')?.errors?.required">Empresa é obrigatória</span>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="centrocusto" class="form-label">
+              Centro de Custo <span class="required">*</span>
+            </label>
+            <select 
+              id="centrocusto"
+              formControlName="centrocusto"
+              class="form-control"
+              [class.is-invalid]="form.get('centrocusto')?.invalid && form.get('centrocusto')?.touched"
+            >
+              <option value="">Selecione o centro de custo</option>
+              <option *ngFor="let row of centrocustos" [value]="row.id">{{row.nome}}</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="form.get('centrocusto')?.invalid && form.get('centrocusto')?.touched">
+              <span *ngIf="form.get('centrocusto')?.errors?.required">Centro de custo é obrigatório</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Linha Localidade e Cargo -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="localidade" class="form-label">
+              Localidade <span class="required">*</span>
+            </label>
+            <select 
+              id="localidade"
+              formControlName="localidade"
+              class="form-control"
+              [class.is-invalid]="form.get('localidade')?.invalid && form.get('localidade')?.touched"
+              (change)="onLocalidadeChange()"
+            >
+              <option value="">Selecione a localidade</option>
+              <option *ngFor="let row of localidades" [value]="row.id">{{row.descricao}}</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="form.get('localidade')?.invalid && form.get('localidade')?.touched">
+              <span *ngIf="form.get('localidade')?.errors?.required">Localidade é obrigatória</span>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="cargo" class="form-label">
+              Cargo <span class="required">*</span>
+            </label>
+            <input 
+              id="cargo"
+              type="text"
+              formControlName="cargo"
+              class="form-control"
+              [class.is-invalid]="form.get('cargo')?.invalid && form.get('cargo')?.touched"
+              placeholder="Digite o cargo"
+            />
+            <div class="invalid-feedback" *ngIf="form.get('cargo')?.invalid && form.get('cargo')?.touched">
+              <span *ngIf="form.get('cargo')?.errors?.required">Cargo é obrigatório</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Linha Setor e Data de Admissão -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="setor" class="form-label">Setor</label>
+            <input 
+              id="setor"
+              type="text"
+              formControlName="setor"
+              class="form-control"
+              placeholder="Digite o setor"
+            />
+          </div>
+          
+          <div class="form-group">
+            <label for="dtadmissao" class="form-label">
+              Data de Admissão <span class="required">*</span>
+            </label>
+            <input 
+              id="dtadmissao"
+              type="date"
+              formControlName="dtadmissao"
+              class="form-control"
+              [class.is-invalid]="form.get('dtadmissao')?.invalid && form.get('dtadmissao')?.touched"
+            />
+            <div class="invalid-feedback" *ngIf="form.get('dtadmissao')?.invalid && form.get('dtadmissao')?.touched">
+              <span *ngIf="form.get('dtadmissao')?.errors?.required">Data de admissão é obrigatória</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Linha Tipo de Colaborador e Data de Demissão -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="tipocolaborador" class="form-label">
+              Tipo de Colaborador <span class="required">*</span>
+            </label>
+            <select 
+              id="tipocolaborador"
+              formControlName="tipocolaborador"
+              class="form-control"
+              [class.is-invalid]="form.get('tipocolaborador')?.invalid && form.get('tipocolaborador')?.touched"
+              (change)="onTipoColaboradorChange()"
+            >
+              <option value="">Selecione o tipo</option>
+              <option value="F">Funcionário</option>
+              <option value="T">Terceirizado</option>
+              <option value="C">Consultor</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="form.get('tipocolaborador')?.invalid && form.get('tipocolaborador')?.touched">
+              <span *ngIf="form.get('tipocolaborador')?.errors?.required">Tipo de colaborador é obrigatório</span>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="dtdemissao" class="form-label">
+              Data de Término de Contrato
+              <span class="required" *ngIf="isDataDemissaoObrigatoria()">*</span>
+            </label>
+            <input 
+              id="dtdemissao"
+              type="date"
+              formControlName="dtdemissao"
+              class="form-control"
+              [class.is-invalid]="isDataDemissaoObrigatoria() && !form.get('dtdemissao')?.value && form.get('tipocolaborador')?.touched"
+              [class.data-passada]="isDataDesligamentoPassada()"
+              [class.data-futura]="isDataDesligamentoFutura()"
+            />
+            <div class="invalid-feedback" *ngIf="isDataDemissaoObrigatoria() && !form.get('dtdemissao')?.value && form.get('tipocolaborador')?.touched">
+              <span>Data de término de contrato é obrigatória para Terceirizados e Consultores</span>
+            </div>
+            
+            <!-- Indicadores de status da data -->
+            <small class="form-text text-danger" *ngIf="isDataDesligamentoPassada()">
+              <i class="fas fa-exclamation-triangle"></i> <strong>Data já passou!</strong> Colaborador deve estar desligado.
+            </small>
+            <small class="form-text text-warning" *ngIf="isDataDesligamentoFutura()">
+              <i class="fas fa-clock"></i> <strong>Data futura:</strong> Colaborador será desligado nesta data.
+            </small>
+            <small class="form-text text-muted" *ngIf="isDataDemissaoObrigatoria() && !temDataDesligamento()">
+              <i class="fas fa-info-circle"></i> Obrigatório para Terceirizados e Consultores
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 🎯 SEÇÃO 3: INFORMAÇÕES ADICIONAIS (OPCIONAIS) -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <mat-icon>add_circle_outline</mat-icon>
+        Informações Adicionais (Opcionais)
+        <button 
+          type="button" 
+          class="btn-toggle-section"
+          (click)="toggleCamposAvancados()"
+        >
+          <mat-icon>{{ camposAvancadosExpanded ? 'expand_less' : 'expand_more' }}</mat-icon>
+        </button>
+      </h3>
+      
+      <div class="campos-avancados" [class.expanded]="camposAvancadosExpanded">
+        <!-- Linha Filial -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="filial_id" class="form-label">Filial</label>
+            <select 
+              id="filial_id"
+              formControlName="filial_id"
+              class="form-control"
+            >
+              <option value="">Selecione a filial (opcional)</option>
+              <option *ngFor="let row of filiais" [value]="row.id">{{row.nome}}</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Linha Superior Imediato -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="pesquisaSuperior" class="form-label">Superior Imediato</label>
+            <div class="superior-search-container">
+              <input 
+                type="text"
+                id="pesquisaSuperior"
+                [formControl]="pesquisaSuperior"
+                class="form-control"
+                placeholder="Digite nome, matrícula ou email para pesquisar..."
+                autocomplete="off"
+                (blur)="onSuperiorBlur()"
+              />
+              <button 
+                type="button" 
+                class="btn-clear-search" 
+                *ngIf="pesquisaSuperior.value"
+                (click)="limparPesquisaSuperior()"
+                matTooltip="Limpar pesquisa"
+              >
+                <i class="material-icons">clear</i>
+              </button>
+            </div>
+            
+            <!-- Lista de resultados -->
+            <div class="superior-results" *ngIf="pesquisaSuperior.value && colaboradoresFiltrados && colaboradoresFiltrados.length > 0">
+              <div class="result-item" 
+                   *ngFor="let colaborador of colaboradoresFiltrados.slice(0, 10); let i = index" 
+                   (click)="selecionarSuperior(colaborador)">
+                <div class="result-name">{{colaborador.nome}}</div>
+                <div class="result-details">
+                  <span class="matricula">Matrícula: {{colaborador.matricula}}</span>
+                  <span class="email" *ngIf="colaborador.email">• {{colaborador.email}}</span>
+                </div>
+              </div>
+              <div class="result-info" *ngIf="colaboradoresFiltrados.length > 10">
+                Mostrando 10 de {{colaboradoresFiltrados.length}} resultados
+              </div>
+            </div>
+            
+            <!-- Mensagem quando não há resultados -->
+            <div class="no-results" *ngIf="pesquisaSuperior.value && colaboradoresFiltrados.length === 0">
+              <i class="material-icons">search_off</i>
+              <span>Nenhum colaborador encontrado</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Botões de Ação -->
+    <div class="form-actions">
+      <button
+        type="button"
+        class="btn btn-secondary"
+        (click)="cancelar()"
+        [disabled]="carregando"
+      >
+        <i class="fas fa-times"></i>
+        Cancelar
+      </button>
+      
+      <!-- Botões de Desligamento/Reativação - Apenas no modo de edição -->
+      <div class="desligamento-actions" *ngIf="modo === 'editar' && colaboradorLocal.id">
+        <!-- Botão Desligar - Aparece quando NÃO há data de desligamento OU data é futura -->
+        <button
+          type="button"
+          class="btn btn-warning"
+          (click)="desligarColaborador()"
+          [disabled]="carregando"
+          title="Desligar colaborador agora com data/hora atual"
+          *ngIf="!temDataDesligamento() || isDataDesligamentoFutura()"
+        >
+          <i class="fas fa-user-times"></i>
+          Desligar Agora
+        </button>
+        
+        <!-- Botão Reativar - Aparece quando data de desligamento JÁ PASSOU -->
+        <button
+          type="button"
+          class="btn btn-success"
+          (click)="reativarColaborador()"
+          [disabled]="carregando"
+          title="Reativar colaborador (remover data de desligamento passada)"
+          *ngIf="isDataDesligamentoPassada()"
+        >
+          <i class="fas fa-user-check"></i>
+          Reativar Colaborador
+        </button>
+        
+        <!-- Botão Reprogramar - Aparece quando HÁ data de desligamento (passada ou futura) -->
+        <button
+          type="button"
+          class="btn btn-info"
+          (click)="abrirModalReprogramar()"
+          [disabled]="carregando"
+          title="Reprogramar data de desligamento"
+          *ngIf="temDataDesligamento()"
+        >
+          <i class="fas fa-calendar-alt"></i>
+          Reprogramar Desligamento
+        </button>
+      </div>
+      
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="!form.valid || carregando"
+      >
+        <i class="fas fa-save" *ngIf="!carregando"></i>
+        <i class="fas fa-spinner fa-spin" *ngIf="carregando"></i>
+        {{ getBotaoTexto() }}
+      </button>
+    </div>
+  </form>
+</div>
+
+<!-- 🎯 FORMULÁRIO PÁGINA (QUANDO NÃO É MODAL) -->
+<div *ngIf="!isModal" class="container">
+  <form [formGroup]="form" (ngSubmit)="salvar()" class="colaborador-form">
+    
+    <!-- 🎯 SEÇÃO 1: DADOS PESSOAIS -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <mat-icon>person</mat-icon>
+        Dados Pessoais
+      </h3>
+      
+      <div class="form-content">
+        <!-- Linha Nome e CPF -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="nome" class="form-label">
+              Nome do Colaborador <span class="required">*</span>
+            </label>
+            <input 
+              id="nome"
+              type="text"
+              formControlName="nome"
+              class="form-control"
+              [class.is-invalid]="form.get('nome')?.invalid && form.get('nome')?.touched"
+              placeholder="Digite o nome completo"
+            />
+            <div class="invalid-feedback" *ngIf="form.get('nome')?.invalid && form.get('nome')?.touched">
+              <span *ngIf="form.get('nome')?.errors?.required">Nome é obrigatório</span>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="cpf" class="form-label">
+              CPF <span class="required">*</span>
+            </label>
+            <input 
+              id="cpf"
+              type="text"
+              formControlName="cpf"
+              class="form-control"
+              appCpfMask
+              inputmode="numeric"
+              maxlength="14"
+              [class.is-invalid]="form.get('cpf')?.invalid && form.get('cpf')?.touched"
+              placeholder="000.000.000-00"
+            />
+            <div class="invalid-feedback" *ngIf="form.get('cpf')?.invalid && form.get('cpf')?.touched">
+              <span *ngIf="form.get('cpf')?.errors?.required">CPF é obrigatório</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Linha Matrícula e Email -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="matricula" class="form-label">
+              Matrícula <span class="required">*</span>
+            </label>
+            <input 
+              id="matricula"
+              type="text"
+              formControlName="matricula"
+              class="form-control"
+              [class.is-invalid]="form.get('matricula')?.invalid && form.get('matricula')?.touched"
+              placeholder="Digite a matrícula"
+            />
+            <div class="invalid-feedback" *ngIf="form.get('matricula')?.invalid && form.get('matricula')?.touched">
+              <span *ngIf="form.get('matricula')?.errors?.required">Matrícula é obrigatória</span>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="email" class="form-label">
+              Email <span class="required">*</span>
+            </label>
+            <input 
+              id="email"
+              type="email"
+              formControlName="email"
+              class="form-control"
+              [class.is-invalid]="form.get('email')?.invalid && form.get('email')?.touched"
+              placeholder="colaborador@empresa.com"
+            />
+            <div class="invalid-feedback" *ngIf="form.get('email')?.invalid && form.get('email')?.touched">
+              <span *ngIf="form.get('email')?.errors?.required">Email é obrigatório</span>
+              <span *ngIf="form.get('email')?.errors?.email">Email inválido</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 🎯 SEÇÃO 2: VINCULAÇÃO ORGANIZACIONAL -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <mat-icon>business</mat-icon>
+        Vinculação Organizacional
+      </h3>
+      
+      <div class="form-content">
+        <!-- Linha Empresa e Centro de Custo -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="empresa" class="form-label">
+              Empresa <span class="required">*</span>
+            </label>
+            <select 
+              id="empresa"
+              formControlName="empresa"
+              class="form-control"
+              [class.is-invalid]="form.get('empresa')?.invalid && form.get('empresa')?.touched"
+              (change)="onEmpresaChange()"
+            >
+              <option value="">Selecione a empresa</option>
+              <option *ngFor="let row of empresas" [value]="row.id">{{row.nome}}</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="form.get('empresa')?.invalid && form.get('empresa')?.touched">
+              <span *ngIf="form.get('empresa')?.errors?.required">Empresa é obrigatória</span>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="centrocusto" class="form-label">
+              Centro de Custo <span class="required">*</span>
+            </label>
+            <select 
+              id="centrocusto"
+              formControlName="centrocusto"
+              class="form-control"
+              [class.is-invalid]="form.get('centrocusto')?.invalid && form.get('centrocusto')?.touched"
+            >
+              <option value="">Selecione o centro de custo</option>
+              <option *ngFor="let row of centrocustos" [value]="row.id">{{row.nome}}</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="form.get('centrocusto')?.invalid && form.get('centrocusto')?.touched">
+              <span *ngIf="form.get('centrocusto')?.errors?.required">Centro de custo é obrigatório</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Linha Localidade e Cargo -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="localidade" class="form-label">
+              Localidade <span class="required">*</span>
+            </label>
+            <select 
+              id="localidade"
+              formControlName="localidade"
+              class="form-control"
+              [class.is-invalid]="form.get('localidade')?.invalid && form.get('localidade')?.touched"
+              (change)="onLocalidadeChange()"
+            >
+              <option value="">Selecione a localidade</option>
+              <option *ngFor="let row of localidades" [value]="row.id">{{row.descricao}}</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="form.get('localidade')?.invalid && form.get('localidade')?.touched">
+              <span *ngIf="form.get('localidade')?.errors?.required">Localidade é obrigatória</span>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="cargo" class="form-label">
+              Cargo <span class="required">*</span>
+            </label>
+            <input 
+              id="cargo"
+              type="text"
+              formControlName="cargo"
+              class="form-control"
+              [class.is-invalid]="form.get('cargo')?.invalid && form.get('cargo')?.touched"
+              placeholder="Digite o cargo"
+            />
+            <div class="invalid-feedback" *ngIf="form.get('cargo')?.invalid && form.get('cargo')?.touched">
+              <span *ngIf="form.get('cargo')?.errors?.required">Cargo é obrigatório</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Linha Setor e Data de Admissão -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="setor" class="form-label">Setor</label>
+            <input 
+              id="setor"
+              type="text"
+              formControlName="setor"
+              class="form-control"
+              placeholder="Digite o setor"
+            />
+          </div>
+          
+          <div class="form-group">
+            <label for="dtadmissao" class="form-label">
+              Data de Admissão <span class="required">*</span>
+            </label>
+            <input 
+              id="dtadmissao"
+              type="date"
+              formControlName="dtadmissao"
+              class="form-control"
+              [class.is-invalid]="form.get('dtadmissao')?.invalid && form.get('dtadmissao')?.touched"
+            />
+            <div class="invalid-feedback" *ngIf="form.get('dtadmissao')?.invalid && form.get('dtadmissao')?.touched">
+              <span *ngIf="form.get('dtadmissao')?.errors?.required">Data de admissão é obrigatória</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Linha Tipo de Colaborador e Data de Demissão -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="tipocolaborador" class="form-label">
+              Tipo de Colaborador <span class="required">*</span>
+            </label>
+            <select 
+              id="tipocolaborador"
+              formControlName="tipocolaborador"
+              class="form-control"
+              [class.is-invalid]="form.get('tipocolaborador')?.invalid && form.get('tipocolaborador')?.touched"
+              (change)="onTipoColaboradorChange()"
+            >
+              <option value="">Selecione o tipo</option>
+              <option value="F">Funcionário</option>
+              <option value="T">Terceirizado</option>
+              <option value="C">Consultor</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="form.get('tipocolaborador')?.invalid && form.get('tipocolaborador')?.touched">
+              <span *ngIf="form.get('tipocolaborador')?.errors?.required">Tipo de colaborador é obrigatório</span>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="dtdemissao" class="form-label">
+              Data de Término de Contrato
+              <span class="required" *ngIf="isDataDemissaoObrigatoria()">*</span>
+            </label>
+            <input 
+              id="dtdemissao"
+              type="date"
+              formControlName="dtdemissao"
+              class="form-control"
+              [class.is-invalid]="isDataDemissaoObrigatoria() && !form.get('dtdemissao')?.value && form.get('tipocolaborador')?.touched"
+              [class.data-passada]="isDataDesligamentoPassada()"
+              [class.data-futura]="isDataDesligamentoFutura()"
+            />
+            <div class="invalid-feedback" *ngIf="isDataDemissaoObrigatoria() && !form.get('dtdemissao')?.value && form.get('tipocolaborador')?.touched">
+              <span>Data de término de contrato é obrigatória para Terceirizados e Consultores</span>
+            </div>
+            
+            <!-- Indicadores de status da data -->
+            <small class="form-text text-danger" *ngIf="isDataDesligamentoPassada()">
+              <i class="fas fa-exclamation-triangle"></i> <strong>Data já passou!</strong> Colaborador deve estar desligado.
+            </small>
+            <small class="form-text text-warning" *ngIf="isDataDesligamentoFutura()">
+              <i class="fas fa-clock"></i> <strong>Data futura:</strong> Colaborador será desligado nesta data.
+            </small>
+            <small class="form-text text-muted" *ngIf="isDataDemissaoObrigatoria() && !temDataDesligamento()">
+              <i class="fas fa-info-circle"></i> Obrigatório para Terceirizados e Consultores
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 🎯 SEÇÃO 3: INFORMAÇÕES ADICIONAIS (OPCIONAIS) -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <mat-icon>add_circle_outline</mat-icon>
+        Informações Adicionais (Opcionais)
+        <button 
+          type="button" 
+          class="btn-toggle-section"
+          (click)="toggleCamposAvancados()"
+        >
+          <mat-icon>{{ camposAvancadosExpanded ? 'expand_less' : 'expand_more' }}</mat-icon>
+        </button>
+      </h3>
+      
+      <div class="campos-avancados" [class.expanded]="camposAvancadosExpanded">
+        <!-- Linha Filial -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="filial_id" class="form-label">Filial</label>
+            <select 
+              id="filial_id"
+              formControlName="filial_id"
+              class="form-control"
+            >
+              <option value="">Selecione a filial (opcional)</option>
+              <option *ngFor="let row of filiais" [value]="row.id">{{row.nome}}</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Linha Superior Imediato -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="pesquisaSuperior" class="form-label">Superior Imediato</label>
+            <div class="superior-search-container">
+              <input 
+                type="text"
+                id="pesquisaSuperior"
+                [formControl]="pesquisaSuperior"
+                class="form-control"
+                placeholder="Digite nome, matrícula ou email para pesquisar..."
+                autocomplete="off"
+              />
+              <button 
+                type="button" 
+                class="btn-clear-search" 
+                *ngIf="pesquisaSuperior.value"
+                (click)="limparPesquisaSuperior()"
+                matTooltip="Limpar pesquisa"
+              >
+                <i class="material-icons">clear</i>
+              </button>
+            </div>
+            
+            <!-- Lista de resultados -->
+            <div class="superior-results" *ngIf="pesquisaSuperior.value && colaboradoresFiltrados && colaboradoresFiltrados.length > 0">
+              <div class="result-item" 
+                   *ngFor="let colaborador of colaboradoresFiltrados.slice(0, 10); let i = index" 
+                   (click)="selecionarSuperior(colaborador)">
+                <div class="result-name">{{colaborador.nome}}</div>
+                <div class="result-details">
+                  <span class="matricula">Matrícula: {{colaborador.matricula}}</span>
+                  <span class="email" *ngIf="colaborador.email">• {{colaborador.email}}</span>
+                </div>
+              </div>
+              <div class="result-info" *ngIf="colaboradoresFiltrados.length > 10">
+                Mostrando 10 de {{colaboradoresFiltrados.length}} resultados
+              </div>
+            </div>
+            
+            <!-- Mensagem quando não há resultados -->
+            <div class="no-results" *ngIf="pesquisaSuperior.value && colaboradoresFiltrados.length === 0">
+              <i class="material-icons">search_off</i>
+              <span>Nenhum colaborador encontrado</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Botões de Ação -->
+    <div class="form-actions">
+      <button
+        type="button"
+        class="btn btn-secondary"
+        (click)="cancelar()"
+        [disabled]="carregando"
+      >
+        <i class="fas fa-times"></i>
+        Cancelar
+      </button>
+      
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="!form.valid || carregando"
+      >
+        <i class="fas fa-save" *ngIf="!carregando"></i>
+        <i class="fas fa-spinner fa-spin" *ngIf="carregando"></i>
+        {{ getBotaoTexto() }}
+      </button>
+    </div>
+  </form>
+</div>
+
+<!-- 🎯 MODAL PARA REPROGRAMAR DESLIGAMENTO -->
+<div class="modal-overlay" *ngIf="modalReprogramarAberto" (click)="fecharModalReprogramar()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Reprogramar Desligamento</h3>
+      <button type="button" class="btn-close" (click)="fecharModalReprogramar()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    
+    <div class="modal-body">
+      <div class="form-group">
+        <label for="novaDataDesligamento" class="form-label">
+          Nova Data de Desligamento <span class="required">*</span>
+        </label>
+        <input 
+          id="novaDataDesligamento"
+          type="date"
+          [(ngModel)]="novaDataDesligamento"
+          class="form-control"
+          [min]="dataAtual"
+          required
+        />
+        <small class="form-text text-muted">
+          Data atual: {{ dataAtual | date:'dd/MM/yyyy' }}
+        </small>
+      </div>
+      
+      <div class="form-group">
+        <label for="motivoReprogramacao" class="form-label">
+          Motivo da Reprogramação
+        </label>
+        <textarea 
+          id="motivoReprogramacao"
+          [(ngModel)]="motivoReprogramacao"
+          class="form-control"
+          rows="3"
+          placeholder="Descreva o motivo da reprogramação (opcional)"
+        ></textarea>
+      </div>
+    </div>
+    
+    <div class="modal-footer">
+      <button 
+        type="button" 
+        class="btn btn-secondary" 
+        (click)="fecharModalReprogramar()"
+      >
+        Cancelar
+      </button>
+      <button 
+        type="button" 
+        class="btn btn-primary" 
+        (click)="confirmarReprogramacao()"
+        [disabled]="!novaDataDesligamento"
+      >
+        <i class="fas fa-calendar-check"></i>
+        Reprogramar
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 🎯 MODAL PARA REATIVAR COLABORADOR (CONSULTORES E TERCEIROS) -->
+<div class="modal-overlay" *ngIf="modalReativarAberto" (click)="fecharModalReativar()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Reativar Colaborador</h3>
+      <button type="button" class="btn-close" (click)="fecharModalReativar()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    
+    <div class="modal-body">
+      <div class="alert alert-info">
+        <i class="fas fa-info-circle"></i>
+        <strong>Consultores e Terceirizados</strong> precisam ter uma data de término de contrato definida.
+        Por favor, informe a nova data de término para reativar este colaborador.
+      </div>
+      
+      <div class="form-group">
+        <label for="novaDataTermino" class="form-label">
+          Nova Data de Término do Contrato <span class="required">*</span>
+        </label>
+        <input 
+          type="date" 
+          id="novaDataTermino"
+          [(ngModel)]="novaDataTermino"
+          class="form-control"
+          [min]="dataAtual"
+          required
+        />
+        <small class="form-text text-muted">
+          <i class="fas fa-calendar"></i> Data deve ser futura
+        </small>
+      </div>
+      
+      <div class="form-group">
+        <label for="motivoReativacao" class="form-label">
+          Motivo da Reativação <span class="text-muted">(opcional)</span>
+        </label>
+        <textarea 
+          id="motivoReativacao"
+          [(ngModel)]="motivoReativacao"
+          class="form-control"
+          rows="3"
+          placeholder="Ex: Renovação de contrato, extensão do projeto..."
+        ></textarea>
+      </div>
+    </div>
+    
+    <div class="modal-footer">
+      <button 
+        type="button" 
+        class="btn btn-secondary" 
+        (click)="fecharModalReativar()"
+        [disabled]="carregando"
+      >
+        <i class="fas fa-times"></i>
+        Cancelar
+      </button>
+      
+      <button 
+        type="button" 
+        class="btn btn-success" 
+        (click)="confirmarReativacao()"
+        [disabled]="!novaDataTermino || carregando"
+      >
+        <i class="fas fa-user-check" *ngIf="!carregando"></i>
+        <i class="fas fa-spinner fa-spin" *ngIf="carregando"></i>
+        Reativar Colaborador
+      </button>
+    </div>
+  </div>
+</div>

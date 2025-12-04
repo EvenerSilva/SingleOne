@@ -1,0 +1,158 @@
+o <!-- 🎯 HEADER MODERNO DA EMPRESA -->
+<div class="empresa-header">
+  <div class="header-content">
+    <div class="header-left">
+      <button class="back-button" [routerLink]="['/empresas']" matTooltip="Voltar para Empresas">
+        <i class="cil-arrow-left"></i>
+      </button>
+      <div class="header-title">
+        <div class="title-icon">
+          <i class="cil-building"></i>
+        </div>
+        <div class="title-text">
+          <h1>{{ empresa.id ? 'Editar' : 'Nova' }} Empresa</h1>
+          <p>{{ empresa.id ? 'Atualizar dados da empresa' : 'Cadastrar nova empresa no sistema' }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="action-btn secondary-btn" (click)="limparFormulario()" matTooltip="Limpar formulário">
+        <i class="cil-refresh"></i>
+        <span>Limpar</span>
+      </button>
+      <button class="action-btn primary-btn" (click)="salvar()" matTooltip="Salvar empresa">
+        <i class="cil-save"></i>
+        <span>Salvar</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 🍞 BREADCRUMB MODERNO -->
+<nav class="modern-breadcrumb">
+  <div class="breadcrumb-container">
+    <a [routerLink]="['/dashboard']" class="breadcrumb-item">
+      <i class="cil-home"></i>
+      <span>Dashboard</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a [routerLink]="['/cadastros']" class="breadcrumb-item">
+      <i class="cil-cog"></i>
+      <span>Cadastros</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a [routerLink]="['/empresas']" class="breadcrumb-item">
+      <i class="cil-building"></i>
+      <span>Empresas</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <span class="breadcrumb-item active">{{ empresa.id ? 'Editar' : 'Nova' }} Empresa</span>
+  </div>
+</nav>
+
+<!-- 📋 CONTEÚDO PRINCIPAL -->
+<div class="empresa-content">
+  <form [formGroup]="form" (ngSubmit)="salvar()" class="form-container">
+    
+    <!-- 🏢 SEÇÃO DE DADOS BÁSICOS -->
+    <div class="form-section">
+      <div class="section-header">
+        <div class="section-icon">
+          <i class="cil-building"></i>
+        </div>
+        <div class="section-title">
+          <h3>Dados da Empresa</h3>
+          <p>Informações básicas para identificação da empresa</p>
+        </div>
+      </div>
+      
+      <div class="form-grid">
+        <!-- Razão Social -->
+        <div class="form-field full-width">
+          <label class="field-label">
+            <i class="cil-briefcase"></i>
+            Razão Social *
+          </label>
+          <input
+            type="text"
+            formControlName="razaosocial"
+            class="modern-input"
+            placeholder="Digite a razão social da empresa">
+        </div>
+
+        <!-- CNPJ -->
+        <div class="form-field">
+          <label class="field-label">
+            <i class="cil-credit-card"></i>
+            CNPJ *
+          </label>
+          <input
+            type="text"
+            formControlName="cnpj"
+            class="modern-input"
+            [class.error]="hasCnpjError()"
+            placeholder="00.000.000/0000-00"
+            appCnpjMask>
+          
+          <!-- Mensagens de erro do CNPJ -->
+          <div class="error-message" *ngIf="hasCnpjError()">
+            <div *ngIf="hasCnpjRequiredError()" class="error-text">
+              <i class="cil-warning"></i>
+              CNPJ é obrigatório
+            </div>
+            <div *ngIf="hasCnpjInvalidError()" class="error-text">
+              <i class="cil-warning"></i>
+              {{ getCnpjErrorMessage() }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Localidade -->
+        <div class="form-field">
+          <label class="field-label">
+            <i class="cil-location-pin"></i>
+            Localidade
+          </label>
+          <select
+            formControlName="localidade_id"
+            class="modern-select localidade-select"
+            (change)="onLocalidadeChange($event)">
+            <option value="">Selecione uma localidade</option>
+            <option *ngFor="let loc of localidadesDisponiveis" [value]="loc.id">
+              {{ formatarLocalidade(loc) }}
+            </option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- ℹ️ INFORMAÇÃO SOBRE WIZARD -->
+    <div class="info-section">
+      <div class="info-content">
+        <div class="info-icon">
+          <i class="cil-info"></i>
+        </div>
+        <div class="info-text">
+          <h3>Cadastro Completo via Wizard</h3>
+          <p>Para cadastrar empresa com filiais e localizações, use o <strong>Cadastro Rápido</strong> na tela de Cadastros.</p>
+          <button type="button" class="action-btn secondary-btn" routerLink="/empresa-wizard" matTooltip="Ir para Cadastro Rápido">
+            <i class="cil-magic-wand"></i>
+            <span>Ir para Cadastro Rápido</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 🎯 BOTÕES DE AÇÃO -->
+    <div class="form-actions">
+      <button type="button" class="action-btn secondary-btn" (click)="limparFormulario()">
+        <i class="cil-refresh"></i>
+        <span>Limpar</span>
+      </button>
+      <button type="submit" class="action-btn primary-btn" [disabled]="!form.valid">
+        <i class="cil-save"></i>
+        <span>Salvar Empresa</span>
+      </button>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,203 @@
+<!-- 🎯 FORMULÁRIO MODAL DE FILIAL -->
+<div class="formulario-overlay">
+  <div class="formulario-container">
+    <div class="filial-form-container">
+      <div class="form-header">
+        <h2 class="form-title">{{ getTitulo() }}</h2>
+        <p class="form-subtitle">
+          {{ modo === 'criar' ? 'Crie uma nova filial para sua empresa' : 'Edite as informações da filial selecionada' }}
+        </p>
+      </div>
+
+      <form [formGroup]="filialForm" (ngSubmit)="salvar()" class="filial-form">
+        
+        <!-- Primeira linha: Nome da Filial e CNPJ -->
+        <div class="form-row">
+          <!-- Campo Nome da Filial -->
+          <div class="form-group">
+            <label for="nome" class="form-label">
+              Nome da Filial <span class="required">*</span>
+            </label>
+            <input 
+              type="text" 
+              id="nome"
+              formControlName="nome" 
+              class="form-control"
+              [class.is-invalid]="filialForm.get('nome')?.invalid && filialForm.get('nome')?.touched"
+              placeholder="Digite o nome da filial"
+              maxlength="100"
+            >
+            <div class="invalid-feedback" *ngIf="filialForm.get('nome')?.invalid && filialForm.get('nome')?.touched">
+              <span *ngIf="filialForm.get('nome')?.errors?.required">Nome da filial é obrigatório</span>
+              <span *ngIf="filialForm.get('nome')?.errors?.maxlength">Nome deve ter no máximo 100 caracteres</span>
+            </div>
+            <small class="form-text text-muted">
+              Nome único para identificar a filial
+            </small>
+          </div>
+
+          <!-- Campo CNPJ -->
+          <div class="form-group">
+            <label for="cnpj" class="form-label">CNPJ</label>
+            <div class="input-group">
+              <input 
+                type="text" 
+                id="cnpj"
+                formControlName="cnpj" 
+                class="form-control"
+                [class.is-invalid]="filialForm.get('cnpj')?.invalid && filialForm.get('cnpj')?.touched"
+                placeholder="00.000.000/0000-00"
+                (input)="formatarCNPJ($event)"
+                maxlength="18"
+              >
+              <button 
+                class="btn btn-outline-secondary" 
+                type="button" 
+                (click)="limparCNPJ()">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+            <div class="invalid-feedback" *ngIf="filialForm.get('cnpj')?.invalid && filialForm.get('cnpj')?.touched">
+              <span *ngIf="filialForm.get('cnpj')?.errors?.maxlength">CNPJ deve ter no máximo 18 caracteres</span>
+            </div>
+            <small class="form-text text-muted">
+              CNPJ da filial (opcional)
+            </small>
+          </div>
+        </div>
+
+        <!-- Segunda linha: Empresa e Localidade -->
+        <div class="form-row">
+          <!-- Campo Empresa -->
+          <div class="form-group">
+            <label for="empresaId" class="form-label">
+              Empresa <span class="required">*</span>
+            </label>
+            <select 
+              id="empresaId"
+              formControlName="empresaId" 
+              class="form-control"
+              [class.is-invalid]="filialForm.get('empresaId')?.invalid && filialForm.get('empresaId')?.touched"
+            >
+              <option value="">Selecione uma empresa</option>
+              <option *ngFor="let empresa of empresas" [value]="empresa.id">{{empresa.nome}}</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="filialForm.get('empresaId')?.invalid && filialForm.get('empresaId')?.touched">
+              <span *ngIf="filialForm.get('empresaId')?.errors?.required">Empresa é obrigatória</span>
+            </div>
+            <small class="form-text text-muted">
+              Selecione a empresa à qual a filial pertence
+            </small>
+          </div>
+
+          <!-- Campo Localidade -->
+          <div class="form-group">
+            <label for="localidadeId" class="form-label">
+              Localidade <span class="required">*</span>
+            </label>
+            <select 
+              id="localidadeId"
+              formControlName="localidadeId" 
+              class="form-control"
+              [class.is-invalid]="filialForm.get('localidadeId')?.invalid && filialForm.get('localidadeId')?.touched"
+            >
+              <option value="">Selecione uma localidade</option>
+              <option *ngFor="let localidade of localidades" [value]="localidade.id">{{localidade.descricao || localidade.nome}}</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="filialForm.get('localidadeId')?.invalid && filialForm.get('localidadeId')?.touched">
+              <span *ngIf="filialForm.get('localidadeId')?.errors?.required">Localidade é obrigatória</span>
+            </div>
+            <small class="form-text text-muted">
+              Selecione a localidade da filial
+            </small>
+          </div>
+        </div>
+
+        <!-- Terceira linha: Telefone e Email -->
+        <div class="form-row">
+          <!-- Campo Telefone -->
+          <div class="form-group">
+            <label for="telefone" class="form-label">Telefone</label>
+            <input 
+              type="text" 
+              id="telefone"
+              formControlName="telefone" 
+              class="form-control"
+              [class.is-invalid]="filialForm.get('telefone')?.invalid && filialForm.get('telefone')?.touched"
+              placeholder="(00) 00000-0000"
+              maxlength="20"
+            >
+            <div class="invalid-feedback" *ngIf="filialForm.get('telefone')?.invalid && filialForm.get('telefone')?.touched">
+              <span *ngIf="filialForm.get('telefone')?.errors?.maxlength">Telefone deve ter no máximo 20 caracteres</span>
+            </div>
+            <small class="form-text text-muted">
+              Telefone de contato da filial (opcional)
+            </small>
+          </div>
+
+          <!-- Campo Email -->
+          <div class="form-group">
+            <label for="email" class="form-label">Email</label>
+            <input 
+              type="email" 
+              id="email"
+              formControlName="email" 
+              class="form-control"
+              [class.is-invalid]="filialForm.get('email')?.invalid && filialForm.get('email')?.touched"
+              placeholder="email@exemplo.com"
+              maxlength="100"
+            >
+            <div class="invalid-feedback" *ngIf="filialForm.get('email')?.invalid && filialForm.get('email')?.touched">
+              <span *ngIf="filialForm.get('email')?.errors?.email">Email inválido</span>
+              <span *ngIf="filialForm.get('email')?.errors?.maxlength">Email deve ter no máximo 100 caracteres</span>
+            </div>
+            <small class="form-text text-muted">
+              Email de contato da filial (opcional)
+            </small>
+          </div>
+        </div>
+
+        <!-- Quarta linha: Endereço (largura total) -->
+        <div class="form-row">
+          <!-- Campo Endereço -->
+          <div class="form-group full-width">
+            <label for="endereco" class="form-label">Endereço</label>
+            <input 
+              type="text" 
+              id="endereco"
+              formControlName="endereco" 
+              class="form-control"
+              placeholder="Digite o endereço completo"
+            >
+            <small class="form-text text-muted">
+              Endereço completo da filial (opcional)
+            </small>
+          </div>
+        </div>
+
+        <!-- Botões de Ação -->
+        <div class="form-actions">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="cancelar()"
+            [disabled]="saving"
+          >
+            <i class="fas fa-times"></i>
+            Cancelar
+          </button>
+        
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="filialForm.invalid || saving"
+          >
+            <i class="fas fa-save" *ngIf="!saving"></i>
+            <i class="fas fa-spinner fa-spin" *ngIf="saving"></i>
+            {{ getBotaoTexto() }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

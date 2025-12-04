@@ -1,0 +1,972 @@
+/* 🎯 HEADER MODERNO DAS NOTAS FISCAIS */
+.notas-fiscais-header {
+  background: linear-gradient(135deg, #080039 0%, #1a1a2e 100%);
+  color: white;
+  padding: 2rem 2rem 2.5rem 2rem;
+  margin-bottom: 2rem;
+  border-radius: 0 0 20px 20px;
+  box-shadow: 0 8px 32px rgba(8, 0, 57, 0.3);
+  
+  .header-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    
+    .back-button {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      padding: 0.75rem;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      
+      &:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-2px);
+      }
+      
+      i {
+        font-size: 20px;
+      }
+    }
+    
+    .header-title {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      
+      .title-icon {
+        background: linear-gradient(135deg, #FF3A0F 0%, #ff6b3d 100%);
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 8px 25px rgba(255, 58, 15, 0.3);
+        animation: float 3s ease-in-out infinite;
+        
+        i {
+          font-size: 32px;
+          color: white;
+          font-weight: bold;
+          text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+          display: block;
+        }
+      }
+      
+      .title-text {
+        h1 {
+          font-size: 3.2rem;
+          font-weight: 700;
+          margin: 0;
+          text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+          
+          @media (max-width: 768px) {
+            font-size: 2.2rem;
+          }
+        }
+        
+        p {
+          font-size: 1.2rem;
+          margin: 0.5rem 0 0 0;
+          opacity: 0.9;
+          font-weight: 300;
+        }
+      }
+    }
+  }
+  
+  .header-right {
+    .action-btn {
+      background: linear-gradient(135deg, #FF3A0F 0%, #ff6b3d 100%);
+      border: none;
+      border-radius: 12px;
+      padding: 0.875rem 1.5rem;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(255, 58, 15, 0.4);
+      }
+      
+      i {
+        font-size: 18px;
+      }
+      
+      span {
+        font-size: 1rem;
+      }
+    }
+  }
+}
+}
+
+/* 🍞 BREADCRUMB MODERNO */
+.modern-breadcrumb {
+  background: white;
+  padding: 1rem 2rem;
+  margin-bottom: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  
+  .breadcrumb-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.9rem;
+  
+  .breadcrumb-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #6c757d;
+    text-decoration: none;
+    transition: color 0.3s ease;
+    
+    &:hover {
+      color: #FF3A0F;
+    }
+    
+    &.active {
+      color: #080039;
+      font-weight: 600;
+    }
+    
+    i {
+      font-size: 16px;
+    }
+  }
+  
+  i.cil-chevron-right {
+    color: #dee2e6;
+    font-size: 14px;
+  }
+}
+}
+
+/* 📋 CONTEÚDO PRINCIPAL */
+.notas-fiscais-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+
+/* 🔍 SEÇÃO DE BUSCA */
+.search-section {
+  margin-bottom: 2rem;
+  
+  .search-box {
+    position: relative;
+    max-width: 500px;
+    
+    .search-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #6c757d;
+      font-size: 18px;
+      z-index: 2;
+    }
+    
+    input {
+      width: 100%;
+      height: 44px;
+      padding: 0 1rem 0 3rem;
+      border: 2px solid #e9ecef;
+      border-radius: 12px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      background: white;
+      box-sizing: border-box;
+      
+      &:focus {
+        outline: none;
+        border-color: #FF3A0F;
+        box-shadow: 0 0 0 3px rgba(255, 58, 15, 0.1);
+      }
+      
+      &::placeholder {
+        color: #adb5bd;
+      }
+    }
+    
+    /* 🧹 BOTÃO DE LIMPAR */
+    .clear-btn {
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #6c757d;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      z-index: 2;
+      
+      &:hover {
+        background: #495057;
+        transform: translateY(-50%) scale(1.1);
+      }
+      
+      i {
+        font-size: 12px;
+        font-weight: bold;
+      }
+    }
+  }
+}
+
+/* 📊 TABELA MODERNA */
+.table-section {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  margin-bottom: 2rem;
+  
+  .table-container {
+    overflow-x: auto;
+    
+    .modern-table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: auto;
+      
+      thead {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        
+        th {
+          padding: 0.75rem 1rem;
+          text-align: left;
+          font-weight: 600;
+          color: #495057;
+          font-size: 0.9rem;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          border-bottom: 2px solid #dee2e6;
+        
+          &:first-child {
+            padding-left: 2rem;
+          }
+          
+          &:nth-child(6) {
+            text-align: center;
+          }
+          
+          &:last-child {
+            padding-right: 2rem;
+            text-align: center;
+          }
+          
+          &.text-center {
+            text-align: center;
+          }
+        }
+      }
+      
+      tbody {
+        tr {
+          transition: all 0.3s ease;
+          border-bottom: 1px solid #f1f3f4;
+          
+          &:hover {
+            background: #f8f9fa;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+          }
+          
+          &:last-child {
+            border-bottom: none;
+          }
+          
+          td {
+            padding: 0.75rem 1rem;
+            vertical-align: middle;
+            
+            &:first-child {
+              padding-left: 2rem;
+            }
+            
+            &:nth-child(6) {
+              text-align: center;
+            }
+            
+            &:last-child {
+              padding-right: 2rem;
+              text-align: center;
+            }
+            
+            &.text-center {
+              text-align: center;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+/* 📄 INFORMAÇÕES DAS NOTAS FISCAIS */
+.nota-fornecedor {
+  .fornecedor-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    
+    .fornecedor-avatar {
+      background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(233, 236, 239, 0.2);
+      
+      i {
+        font-size: 18px;
+        color: #6c757d;
+      }
+    }
+    
+    span {
+      font-weight: 600;
+      color: #2c3e50;
+      font-size: 1rem;
+    }
+  }
+}
+
+.nota-numero {
+  font-weight: 600;
+  color: #495057;
+  font-size: 1rem;
+}
+
+.nota-emissao {
+  font-weight: 500;
+  color: #495057;
+  font-size: 0.95rem;
+}
+
+.nota-valor {
+  font-weight: 600;
+  color: #28a745;
+  font-size: 1rem;
+}
+
+.nota-descricao {
+  font-weight: 500;
+  color: #495057;
+  font-size: 0.95rem;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 🏷️ BADGES DE STATUS */
+.nota-status {
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    
+    i {
+      font-size: 0.9rem;
+    }
+    
+    &.pendente {
+      background: linear-gradient(135deg, #ffc107 0%, #ffb300 100%);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(255, 193, 7, 0.3);
+      
+      &:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(255, 193, 7, 0.4);
+      }
+    }
+    
+    &.processada {
+      background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+      
+      &:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+      }
+    }
+  }
+}
+
+.nota-actions {
+  .action-buttons {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    flex-direction: row;
+    align-items: center;
+    
+    .action-btn {
+      width: 40px;
+      height: 40px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      
+      &.resources-btn {
+        background: linear-gradient(135deg, #9C27B0 0%, #BA68C8 100%);
+        color: white;
+        
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(156, 39, 176, 0.3);
+        }
+      }
+      
+      &.view-btn {
+        background: linear-gradient(135deg, #17a2b8 0%, #20c997 100%);
+        color: white;
+        border: 2px solid #17a2b8;
+        
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(23, 162, 184, 0.4);
+          background: linear-gradient(135deg, #138496 0%, #1e7e34 100%);
+        }
+        
+        i {
+          font-size: 18px;
+          font-weight: bold;
+        }
+      }
+      
+      &.edit-btn {
+        background: linear-gradient(135deg, #2196F3 0%, #42A5F5 100%);
+        color: white;
+        
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(33, 150, 243, 0.3);
+        }
+      }
+      
+      &.delete-btn {
+        background: linear-gradient(135deg, #f44336 0%, #ef5350 100%);
+        color: white;
+        
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(244, 67, 54, 0.3);
+        }
+      }
+      
+      i {
+        font-size: 16px;
+      }
+    }
+  }
+}
+
+/* 📄 PAGINAÇÃO */
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  background: white;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+}
+
+/* 🎨 ANIMAÇÕES */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* 📱 RESPONSIVIDADE */
+@media (max-width: 768px) {
+  .notas-fiscais-header {
+    padding: 1.5rem 1rem 2rem 1rem;
+    
+    .header-content {
+      flex-direction: column;
+      gap: 1.5rem;
+      text-align: center;
+      
+      .header-left {
+        flex-direction: column;
+        gap: 1rem;
+      }
+    }
+  }
+  
+  .modern-breadcrumb {
+    padding: 1rem;
+    
+    .breadcrumb-container {
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+  }
+  
+  .notas-fiscais-content {
+    padding: 0 1rem;
+    
+    .table-section {
+      .table-container {
+        .modern-table {
+          width: 100%;
+          
+          thead th,
+          tbody td {
+            padding: 0.75rem 0.5rem;
+           
+            &:first-child {
+              padding-left: 1rem;
+            }
+            
+            &:last-child {
+              padding-right: 1rem;
+            }
+          }
+          
+          thead th {
+            font-weight: 600;
+          }
+        }
+      }
+    }
+  }
+}
+
+/* 🎯 MODAL OVERLAY */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.3s ease;
+}
+
+.modal-container {
+  width: 90%;
+  max-width: 900px;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* 🚀 MODAL DE PROGRESSO PARA CADASTRO DE RECURSOS */
+.modal-progresso-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(5px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease;
+}
+
+.modal-progresso-container {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-width: 500px;
+  width: 90%;
+  max-height: 90vh;
+  overflow: hidden;
+  animation: slideInFromTop 0.4s ease;
+}
+
+.modal-progresso-header {
+  background: linear-gradient(135deg, #080039 0%, #1a1a2e 100%);
+  color: white;
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  
+  .progresso-icon {
+    background: rgba(255, 255, 255, 0.2);
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    i {
+      font-size: 24px;
+      color: white;
+      
+      &.rotating {
+        animation: rotate 2s linear infinite;
+      }
+    }
+  }
+  
+  .progresso-title {
+    h2 {
+      margin: 0;
+      font-size: 1.8rem;
+      font-weight: 700;
+    }
+    
+    p {
+      margin: 0.5rem 0 0 0;
+      opacity: 0.9;
+      font-size: 1rem;
+    }
+  }
+}
+
+.modal-progresso-content {
+  padding: 2rem;
+  
+  .progresso-bar-container {
+    margin-bottom: 2rem;
+    
+    .progresso-bar {
+      width: 100%;
+      height: 12px;
+      background: #f0f0f0;
+      border-radius: 6px;
+      overflow: hidden;
+      margin-bottom: 0.5rem;
+      
+      .progresso-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #FF3A0F 0%, #ff6b3d 100%);
+        border-radius: 6px;
+        transition: width 0.3s ease;
+        position: relative;
+        
+        &::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%);
+          animation: shimmer 2s infinite;
+        }
+      }
+    }
+    
+    .progresso-percentual {
+      text-align: center;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #333;
+    }
+  }
+  
+  .progresso-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+    
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 1rem;
+      background: #f8f9fa;
+      border-radius: 12px;
+      
+      i {
+        font-size: 24px;
+        color: #FF3A0F;
+        margin-bottom: 0.5rem;
+      }
+      
+      .stat-label {
+        font-size: 0.9rem;
+        color: #666;
+        margin-bottom: 0.25rem;
+      }
+      
+      .stat-value {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #333;
+      }
+    }
+  }
+  
+  .progresso-status {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: #e3f2fd;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    
+    i {
+      color: #2196f3;
+      font-size: 18px;
+    }
+    
+    span {
+      color: #1976d2;
+      font-weight: 500;
+    }
+  }
+  
+  .progresso-tempo-restante {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: #fff3e0;
+    border-radius: 12px;
+    
+    i {
+      color: #ff9800;
+      font-size: 18px;
+    }
+    
+    span {
+      color: #f57c00;
+      font-weight: 500;
+    }
+  }
+}
+
+.modal-progresso-footer {
+  background: #f8f9fa;
+  padding: 1.5rem 2rem;
+  border-top: 1px solid #e9ecef;
+  
+  .progresso-warning {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: #dc3545;
+    font-weight: 500;
+    
+    i {
+      font-size: 18px;
+    }
+  }
+}
+
+/* Animações */
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .modal-progresso-container {
+    width: 95%;
+    margin: 1rem;
+  }
+  
+  .modal-progresso-header {
+    padding: 1.5rem;
+    
+    .progresso-icon {
+      width: 50px;
+      height: 50px;
+      
+      i {
+        font-size: 20px;
+      }
+    }
+    
+    .progresso-title h2 {
+      font-size: 1.5rem;
+    }
+  }
+  
+  .modal-progresso-content {
+    padding: 1.5rem;
+    
+    .progresso-stats {
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+    }
+  }
+}
+
+/* 📎 COLUNA DE ARQUIVO - ESTILOS */
+.nota-arquivo {
+  min-width: 120px;
+
+  .arquivo-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+
+    .upload-btn {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      border: none;
+      border-radius: 8px;
+      padding: 0.5rem 0.75rem;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+      }
+
+      i {
+        font-size: 18px;
+      }
+    }
+
+    .download-btn {
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      border: none;
+      border-radius: 8px;
+      padding: 0.5rem 0.75rem;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+      }
+
+      i {
+        font-size: 18px;
+      }
+    }
+
+    .delete-btn-file {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      border: none;
+      border-radius: 8px;
+      padding: 0.5rem 0.75rem;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+      }
+
+      i {
+        font-size: 18px;
+      }
+    }
+  }
+}

@@ -1,0 +1,78 @@
+{
+  "numero-serie": {
+    "CampoId": "numero-serie",
+    "Nome": "Número de Série",
+    "Descricao": "Identificador único do equipamento fornecido pelo fabricante",
+    "Tipo": "texto",
+    "Obrigatorio": true,
+    "Dica": "Geralmente encontrado na etiqueta do equipamento ou na nota fiscal",
+    "Exemplo": "ABC123XYZ456",
+    "Validacao": "Deve ser único no sistema"
+  },
+  
+  "patrimonio": {
+    "CampoId": "patrimonio",
+    "Nome": "Número de Patrimônio",
+    "Descricao": "Código de identificação patrimonial da empresa",
+    "Tipo": "texto",
+    "Obrigatorio": false,
+    "Dica": "Use o padrão de patrimônio da sua empresa",
+    "Exemplo": "PAT-2025-0001",
+    "Validacao": "Pode ser único ou permitir duplicatas conforme configuração"
+  },
+  
+  "cpf": {
+    "CampoId": "cpf",
+    "Nome": "CPF",
+    "Descricao": "Cadastro de Pessoa Física do colaborador",
+    "Tipo": "texto",
+    "Obrigatorio": true,
+    "Dica": "Digite apenas números",
+    "Exemplo": "12345678900",
+    "Validacao": "Deve ser um CPF válido e único"
+  },
+  
+  "email": {
+    "CampoId": "email",
+    "Nome": "Email Corporativo",
+    "Descricao": "Endereço de email do colaborador para comunicações",
+    "Tipo": "email",
+    "Obrigatorio": true,
+    "Dica": "Use sempre o email corporativo",
+    "Exemplo": "colaborador@empresa.com.br",
+    "Validacao": "Deve ser um email válido"
+  },
+  
+  "data-garantia": {
+    "CampoId": "data-garantia",
+    "Nome": "Data de Garantia",
+    "Descricao": "Data de término da garantia do equipamento",
+    "Tipo": "data",
+    "Obrigatorio": false,
+    "Dica": "Verifique na nota fiscal ou site do fabricante",
+    "Exemplo": "31/12/2025",
+    "Validacao": "Formato: DD/MM/AAAA"
+  },
+  
+  "localidade": {
+    "CampoId": "localidade",
+    "Nome": "Localidade",
+    "Descricao": "Local físico onde o equipamento está alocado",
+    "Tipo": "selecao",
+    "Obrigatorio": true,
+    "Dica": "Facilita a localização física do equipamento",
+    "Exemplo": "Matriz - Sala 101",
+    "Validacao": "Deve ser uma localidade cadastrada"
+  },
+  
+  "centro-custo": {
+    "CampoId": "centro-custo",
+    "Nome": "Centro de Custo",
+    "Descricao": "Centro de custo ao qual o equipamento/colaborador pertence",
+    "Tipo": "selecao",
+    "Obrigatorio": true,
+    "Dica": "Importante para rateio e controle financeiro",
+    "Exemplo": "TI - Infraestrutura",
+    "Validacao": "Deve estar vinculado a uma empresa"
+  }
+}

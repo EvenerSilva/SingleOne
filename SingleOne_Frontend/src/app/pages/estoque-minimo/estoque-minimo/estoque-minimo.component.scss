@@ -1,0 +1,319 @@
+/* 🎯 HEADER MODERNO DO ESTOQUE MÍNIMO */
+.estoque-minimo-header {
+  background: linear-gradient(135deg, #080039 0%, #1a1a2e 100%);
+  color: white;
+  padding: 2rem 2rem 2.5rem 2rem;
+  margin-bottom: 2rem;
+  border-radius: 0 0 20px 20px;
+  box-shadow: 0 8px 32px rgba(8, 0, 57, 0.3);
+  
+  .header-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      
+      .back-button {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        padding: 0.75rem;
+        color: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        
+        &:hover {
+          background: rgba(255, 255, 255, 0.2);
+          transform: translateY(-2px);
+        }
+        
+        i {
+          font-size: 20px;
+        }
+      }
+      
+      .header-title {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        
+        .title-icon {
+          background: linear-gradient(135deg, #FF3A0F 0%, #ff6b3d 100%);
+          width: 70px;
+          height: 70px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 8px 25px rgba(255, 58, 15, 0.3);
+          animation: float 3s ease-in-out infinite;
+          
+          i {
+            font-size: 32px;
+            color: white;
+          }
+        }
+        
+        .title-text {
+          h1 {
+            font-size: 3.2rem;
+            font-weight: 700;
+            margin: 0;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            
+            @media (max-width: 768px) {
+              font-size: 2.2rem;
+            }
+          }
+          
+          p {
+            font-size: 1.1rem;
+            margin: 0.5rem 0 0 0;
+            opacity: 0.9;
+            font-weight: 300;
+            
+            @media (max-width: 768px) {
+              font-size: 1rem;
+            }
+          }
+        }
+      }
+    }
+    
+    .header-right {
+      .action-btn {
+        background: linear-gradient(135deg, #FF3A0F 0%, #ff6b3d 100%);
+        border: none;
+        color: white;
+        padding: 0.8rem 1.5rem;
+        border-radius: 12px;
+        font-size: 0.95rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 25px rgba(255, 58, 15, 0.3);
+        }
+        
+        i {
+          font-size: 16px;
+        }
+      }
+    }
+  }
+}
+
+/* 🍞 BREADCRUMB MODERNO */
+.modern-breadcrumb {
+  background: white;
+  padding: 1rem 2rem;
+  margin-bottom: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+  .breadcrumb-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.9rem;
+
+    .breadcrumb-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #6c757d;
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color 0.3s ease;
+
+      &:hover {
+        color: #FF3A0F;
+      }
+
+      &.active {
+        color: #080039;
+        font-weight: 600;
+      }
+
+      i {
+        font-size: 1rem;
+      }
+    }
+
+    i.cil-chevron-right {
+      color: #dee2e6;
+      font-size: 14px;
+    }
+  }
+}
+
+/* 📋 CONTEÚDO PRINCIPAL */
+.estoque-minimo-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  
+  /* 🎯 NAVEGAÇÃO POR TABS */
+  .tab-navigation {
+    background: white;
+    border-radius: 16px;
+    padding: 1rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e9ecef;
+    
+    .tab-container {
+      display: flex;
+      gap: 0.5rem;
+      
+      .tab-button {
+        flex: 1;
+        background: transparent;
+        border: none;
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: #6c757d;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+        position: relative;
+        cursor: pointer;
+        
+        &:hover {
+          background: #f8f9fa;
+          color: #495057;
+        }
+        
+        &.active {
+          background: linear-gradient(135deg, #ff9a56 0%, #ff6b3d 100%);
+          color: white;
+          font-weight: 600;
+          box-shadow: 0 4px 15px rgba(255, 107, 61, 0.3);
+          
+          .tab-indicator {
+            opacity: 1;
+            transform: scaleX(1);
+          }
+        }
+        
+        i {
+          font-size: 18px;
+        }
+        
+        .tab-indicator {
+          position: absolute;
+          bottom: 0;
+          left: 50%;
+          transform: translateX(-50%) scaleX(0);
+          width: 60%;
+          height: 3px;
+          background: rgba(255, 255, 255, 0.8);
+          border-radius: 2px;
+          opacity: 0;
+          transition: all 0.3s ease;
+        }
+      }
+    }
+  }
+  
+  /* 📊 CONTEÚDO DINÂMICO */
+  .tab-content {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e9ecef;
+    min-height: 500px;
+  }
+}
+
+/* 🎨 ANIMAÇÕES */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* 📱 RESPONSIVIDADE */
+@media (max-width: 768px) {
+  .estoque-minimo-header {
+    padding: 1.5rem 1rem 2rem 1rem;
+    
+    .header-content {
+      flex-direction: column;
+      gap: 1.5rem;
+      text-align: center;
+      
+      .header-left {
+        flex-direction: column;
+        gap: 1rem;
+        
+        .back-button {
+          align-self: flex-start;
+        }
+      }
+      
+      .header-right {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+      }
+    }
+  }
+  
+  .modern-breadcrumb {
+    padding: 1rem;
+    
+    .breadcrumb-container {
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      
+      .breadcrumb-item {
+        font-size: 0.85rem;
+      }
+    }
+  }
+  
+  .estoque-minimo-content {
+    padding: 0 1rem;
+    
+    .tab-navigation {
+      .tab-container {
+        flex-direction: column;
+        
+        .tab-button {
+          padding: 0.8rem 1rem;
+          font-size: 0.9rem;
+        }
+      }
+    }
+    
+    .tab-content {
+      padding: 1.5rem;
+    }
+  }
+}

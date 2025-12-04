@@ -1,0 +1,141 @@
+<div class="two-factor-container">
+  <div class="verification-card">
+    <div class="card-header">
+      <h2>Verificação de Duplo Fator</h2>
+      <p class="subtitle">Olá, {{ usuario?.nome }}! Por favor, complete a verificação de segurança.</p>
+    </div>
+
+    <div class="verification-tabs">
+      <button 
+        class="tab-button" 
+        [class.active]="verificationType === 'totp'"
+        (click)="onVerificationTypeChange('totp')">
+        <i class="fas fa-mobile-alt"></i>
+        Aplicativo
+      </button>
+      <button 
+        class="tab-button" 
+        [class.active]="verificationType === 'backup'"
+        (click)="onVerificationTypeChange('backup')">
+        <i class="fas fa-key"></i>
+        Códigos de Backup
+      </button>
+      <button 
+        class="tab-button" 
+        [class.active]="verificationType === 'email'"
+        (click)="onVerificationTypeChange('email')">
+        <i class="fas fa-envelope"></i>
+        Email
+      </button>
+    </div>
+
+    <div class="verification-content">
+      <!-- TOTP - Aplicativo -->
+      <div *ngIf="verificationType === 'totp'" class="verification-method">
+        <div class="method-info">
+          <i class="fas fa-mobile-alt method-icon"></i>
+          <div class="method-details">
+            <h3>Usar Aplicativo Autenticador</h3>
+            <p>Digite o código de 6 dígitos do seu aplicativo autenticador (Google Authenticator, Authy, etc.)</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Backup Codes -->
+      <div *ngIf="verificationType === 'backup'" class="verification-method">
+        <div class="method-info">
+          <i class="fas fa-key method-icon"></i>
+          <div class="method-details">
+            <h3>Usar Código de Backup</h3>
+            <p>Digite um dos seus códigos de backup de 8 dígitos</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Email -->
+      <div *ngIf="verificationType === 'email'" class="verification-method">
+        <div class="method-info">
+          <i class="fas fa-envelope method-icon"></i>
+          <div class="method-details">
+            <h3>Verificação por Email</h3>
+            <p>Um código de verificação foi enviado para {{ usuario?.email }}</p>
+            <button class="resend-button" type="button" (click)="onResendCode()" [disabled]="isLoading">
+              <i class="fas fa-paper-plane"></i>
+              {{ isLoading ? 'Reenviando...' : 'Reenviar Código' }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Formulário de Verificação -->
+      <form [formGroup]="verificationForm" (ngSubmit)="onSubmit()" class="verification-form">
+        <div class="form-group">
+          <label for="code" class="form-label">
+            Código de Verificação
+            <span class="required">*</span>
+          </label>
+          <input
+            type="text"
+            id="code"
+            formControlName="code"
+            class="form-control"
+            [placeholder]="verificationType === 'totp' ? '000000' : verificationType === 'backup' ? '00000000' : '000000'"
+            maxlength="8"
+            autocomplete="off"
+            [class.error]="verificationForm.get('code')?.invalid && verificationForm.get('code')?.touched">
+          
+          <div class="error-message" *ngIf="verificationForm.get('code')?.invalid && verificationForm.get('code')?.touched">
+            <span *ngIf="verificationForm.get('code')?.errors && verificationForm.get('code')?.errors['required']">Código é obrigatório</span>
+            <span *ngIf="verificationForm.get('code')?.errors && verificationForm.get('code')?.errors['minlength']">Código deve ter pelo menos 6 caracteres</span>
+            <span *ngIf="verificationForm.get('code')?.errors && verificationForm.get('code')?.errors['maxlength']">Código deve ter no máximo 8 caracteres</span>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" (click)="onGoBack()">
+            <i class="fas fa-arrow-left"></i>
+            Voltar
+          </button>
+          
+          <button 
+            type="submit" 
+            class="btn btn-primary" 
+            [disabled]="verificationForm.invalid || isLoading">
+            <i class="fas fa-check" *ngIf="!isLoading"></i>
+            <i class="fas fa-spinner fa-spin" *ngIf="isLoading"></i>
+            {{ isLoading ? 'Verificando...' : 'Verificar' }}
+          </button>
+        </div>
+      </form>
+
+      <!-- Mensagens de Status -->
+      <div class="status-messages">
+        <div class="error-message" *ngIf="errorMessage">
+          <i class="fas fa-exclamation-triangle"></i>
+          {{ errorMessage }}
+        </div>
+        
+        <div class="success-message" *ngIf="successMessage">
+          <i class="fas fa-check-circle"></i>
+          {{ successMessage }}
+        </div>
+      </div>
+
+      <!-- Ajuda -->
+      <div class="help-section">
+        <h4>Precisa de Ajuda?</h4>
+        <ul>
+          <li>
+            <strong>Google Authenticator:</strong> Abra o app e digite o código de 6 dígitos
+          </li>
+          <li>
+            <strong>Códigos de Backup:</strong> Use um dos códigos que você salvou quando ativou o 2FA
+          </li>
+          <li>
+            <strong>Verificação por Email:</strong> Verifique sua caixa de entrada e spam
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

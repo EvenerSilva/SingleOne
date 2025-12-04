@@ -1,0 +1,77 @@
+<!-- 🎯 HEADER MODERNO DO ESTOQUE MÍNIMO -->
+<div class="estoque-minimo-header">
+  <div class="header-content">
+    <div class="header-left">
+      <button class="back-button" [routerLink]="['/cadastros']" matTooltip="Voltar para Cadastros">
+        <i class="cil-arrow-left"></i>
+      </button>
+      <div class="header-title">
+        <div class="title-icon">
+          <i class="cil-devices"></i>
+        </div>
+        <div class="title-text">
+          <h1>Controle de Estoque Mínimo</h1>
+          <p>Configure níveis mínimos de recursos e linhas por localidade</p>
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="action-btn primary-btn" (click)="novoEquipamento()" matTooltip="Adicionar novo recurso" *ngIf="activeTab === 'equipamentos'">
+        <i class="cil-plus"></i>
+        <span>Novo</span>
+      </button>
+      <button class="action-btn primary-btn" (click)="novaLinha()" matTooltip="Adicionar nova linha" *ngIf="activeTab === 'linhas'">
+        <i class="cil-plus"></i>
+        <span>Nova</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 🍞 BREADCRUMB MODERNO -->
+<nav class="modern-breadcrumb">
+  <div class="breadcrumb-container">
+    <a [routerLink]="['/dashboard']" class="breadcrumb-item">
+      <i class="cil-home"></i>
+      <span>Dashboard</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a [routerLink]="['/cadastros']" class="breadcrumb-item">
+      <i class="cil-cog"></i>
+      <span>Cadastros</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <span class="breadcrumb-item active">Estoque Mínimo</span>
+  </div>
+</nav>
+
+<!-- 📋 CONTEÚDO PRINCIPAL -->
+<div class="estoque-minimo-content">
+  
+  <!-- 🎯 NAVEGAÇÃO POR TABS -->
+  <div class="tab-navigation">
+    <div class="tab-container">
+      <button class="tab-button" 
+              [class.active]="activeTab === 'equipamentos'"
+              (click)="navigateToTab('equipamentos')">
+        <i class="cil-laptop"></i>
+        <span>Recursos</span>
+        <div class="tab-indicator"></div>
+      </button>
+      
+      <button class="tab-button" 
+              [class.active]="activeTab === 'linhas'"
+              (click)="navigateToTab('linhas')">
+        <i class="cil-phone"></i>
+        <span>Linhas</span>
+        <div class="tab-indicator"></div>
+      </button>
+    </div>
+  </div>
+
+  <!-- 📊 CONTEÚDO DINÂMICO -->
+  <div class="tab-content">
+    <router-outlet></router-outlet>
+  </div>
+
+</div>

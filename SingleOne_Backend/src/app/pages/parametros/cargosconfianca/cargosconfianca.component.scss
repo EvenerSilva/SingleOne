@@ -1,0 +1,751 @@
+/* 🎯 HEADER MODERNO DOS CARGOS DE CONFIANÇA */
+.cargosconfianca-header {
+  background: linear-gradient(135deg, #080039 0%, #1a1a2e 100%);
+  color: white;
+  padding: 2rem 2rem 2.5rem 2rem;
+  margin-bottom: 2rem;
+  border-radius: 0 0 20px 20px;
+  box-shadow: 0 8px 32px rgba(8, 0, 57, 0.3);
+
+  .header-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+
+      .back-button {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        padding: 0.75rem;
+        color: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.2);
+          transform: translateY(-2px);
+        }
+
+        i {
+          font-size: 20px;
+        }
+      }
+
+      .header-title {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+
+        .title-icon {
+          background: linear-gradient(135deg, #FF3A0F 0%, #ff6b3d 100%);
+          width: 70px;
+          height: 70px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 8px 25px rgba(255, 58, 15, 0.3);
+          animation: float 3s ease-in-out infinite;
+
+          i {
+            font-size: 32px;
+            color: white;
+          }
+        }
+
+        .title-text {
+          h1 {
+            font-size: 3.2rem;
+            font-weight: 700;
+            margin: 0;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+
+            @media (max-width: 768px) {
+              font-size: 2.2rem;
+            }
+          }
+
+          p {
+            font-size: 1.2rem;
+            margin: 0.5rem 0 0 0;
+            opacity: 0.9;
+            font-weight: 300;
+          }
+        }
+      }
+    }
+
+    .header-right {
+      .header-stats {
+        display: flex;
+        gap: 2rem;
+
+        .stat-item {
+          text-align: center;
+          background: rgba(255, 255, 255, 0.1);
+          padding: 1rem 1.5rem;
+          border-radius: 12px;
+          border: 1px solid rgba(255, 255, 255, 0.2);
+
+          .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #FF3A0F;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            line-height: 1;
+            margin-bottom: 0.25rem;
+          }
+
+          .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            font-weight: 300;
+          }
+        }
+      }
+    }
+  }
+}
+
+/* 🍞 BREADCRUMB MODERNO */
+.modern-breadcrumb {
+  background: white;
+  padding: 1rem 2rem;
+  margin-bottom: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+  .breadcrumb-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.9rem;
+
+    .breadcrumb-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #6c757d;
+      text-decoration: none;
+      transition: color 0.3s ease;
+
+      &:hover {
+        color: #FF3A0F;
+      }
+
+      &.active {
+        color: #080039;
+        font-weight: 600;
+      }
+
+      i {
+        font-size: 16px;
+      }
+    }
+
+    i {
+      color: #dee2e6;
+      font-size: 14px;
+    }
+  }
+}
+
+/* 📋 CONTEÚDO PRINCIPAL */
+.cargosconfianca-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem 2rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+
+  /* 🔒 CONFIGURAÇÃO DE NOVO CARGO */
+  .config-section {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    border: 1px solid #e9ecef;
+
+    .section-header {
+      background: linear-gradient(135deg, #FF3A0F 0%, #ff6b3d 100%);
+      color: white;
+      padding: 1.5rem 2rem;
+
+      .header-content {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+
+        .header-icon {
+          background: rgba(255, 255, 255, 0.2);
+          border-radius: 12px;
+          width: 48px;
+          height: 48px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          i {
+            font-size: 24px;
+            color: white;
+          }
+        }
+
+        .header-text {
+          h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+            line-height: 1.3;
+          }
+
+          p {
+            margin: 0.25rem 0 0 0;
+            opacity: 0.9;
+            font-weight: 300;
+          }
+        }
+      }
+    }
+
+    .config-content {
+      padding: 2rem;
+
+      .form-row {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+
+        @media (max-width: 768px) {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .processos-section {
+        margin-bottom: 2rem;
+
+        h3 {
+          font-size: 1.2rem;
+          font-weight: 600;
+          color: #495057;
+          margin: 0 0 1rem 0;
+        }
+
+        .processos-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 1rem;
+
+          .processo-checkbox {
+            padding: 1rem;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+
+            &:hover {
+              border-color: #FF3A0F;
+              background: rgba(255, 58, 15, 0.05);
+            }
+
+            .processo-info {
+              display: flex;
+              align-items: center;
+              gap: 0.75rem;
+
+              i {
+                color: #FF3A0F;
+                font-size: 20px;
+              }
+
+              span {
+                font-weight: 500;
+                color: #495057;
+              }
+            }
+          }
+        }
+      }
+
+      .form-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+
+        @media (max-width: 768px) {
+          flex-direction: column;
+        }
+
+        .btn-cancel {
+          background: #6c757d;
+          border: none;
+          border-radius: 8px;
+          padding: 0.75rem 1.5rem;
+          color: white;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+
+          &:hover {
+            background: #5a6268;
+            transform: translateY(-1px);
+          }
+
+          i {
+            font-size: 18px;
+          }
+        }
+
+        .btn-primary {
+          background: linear-gradient(135deg, #FF3A0F 0%, #ff6b3d 100%);
+          border: none;
+          border-radius: 8px;
+          padding: 0.75rem 1.5rem;
+          color: white;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          box-shadow: 0 4px 15px rgba(255, 58, 15, 0.3);
+
+          &:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 25px rgba(255, 58, 15, 0.4);
+          }
+
+          &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+          }
+
+          i {
+            font-size: 18px;
+          }
+        }
+      }
+    }
+  }
+
+  /* 📊 LISTA DE CARGOS CONFIGURADOS */
+  .cargos-section {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    border: 1px solid #e9ecef;
+
+    .section-header {
+      background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+      color: white;
+      padding: 1.5rem 2rem;
+
+      .header-content {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+
+        .header-icon {
+          background: rgba(255, 255, 255, 0.2);
+          border-radius: 12px;
+          width: 48px;
+          height: 48px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          i {
+            font-size: 24px;
+            color: white;
+          }
+        }
+
+        .header-text {
+          h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+            line-height: 1.3;
+          }
+
+          p {
+            margin: 0.25rem 0 0 0;
+            opacity: 0.9;
+            font-weight: 300;
+          }
+        }
+      }
+    }
+
+    .cargos-content {
+      padding: 2rem;
+
+      .loading-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 3rem;
+
+        .loading-spinner {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 1rem;
+          color: #6c757d;
+
+          i {
+            font-size: 2rem;
+            color: #FF3A0F;
+          }
+        }
+      }
+
+      .cargos-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 1.5rem;
+
+        .cargo-card {
+          border: 1px solid #e9ecef;
+          border-radius: 12px;
+          padding: 1.5rem;
+          transition: all 0.3s ease;
+          background: white;
+
+          &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+          }
+
+          &.inativo {
+            opacity: 0.6;
+            background: #f8f9fa;
+          }
+
+          .cargo-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+
+            .cargo-info {
+              h3 {
+                margin: 0 0 0.5rem 0;
+                font-size: 1.3rem;
+                font-weight: 600;
+                color: #495057;
+              }
+
+              .nivel-criticidade {
+                padding: 0.25rem 0.75rem;
+                border-radius: 20px;
+                font-size: 0.8rem;
+                font-weight: 600;
+                text-transform: uppercase;
+
+                &.criticidade-alto {
+                  background: #dc3545;
+                  color: white;
+                }
+
+                &.criticidade-medio {
+                  background: #ffc107;
+                  color: #212529;
+                }
+
+                &.criticidade-baixo {
+                  background: #28a745;
+                  color: white;
+                }
+              }
+            }
+
+            .cargo-actions {
+              display: flex;
+              gap: 0.5rem;
+
+              .toggle-button {
+                color: #17a2b8;
+              }
+
+              .edit-button {
+                color: #ffc107;
+              }
+
+              .delete-button {
+                color: #dc3545;
+              }
+            }
+          }
+
+          .cargo-details {
+            margin-bottom: 1rem;
+
+            .processos-obrigatorios {
+              h4 {
+                font-size: 0.9rem;
+                font-weight: 600;
+                color: #6c757d;
+                margin: 0 0 0.5rem 0;
+                text-transform: uppercase;
+              }
+
+              .processos-list {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+
+                .processo-tag {
+                  background: #e3f2fd;
+                  color: #1565c0;
+                  padding: 0.25rem 0.5rem;
+                  border-radius: 12px;
+                  font-size: 0.8rem;
+                  font-weight: 500;
+                }
+              }
+            }
+          }
+
+          .cargo-footer {
+            .cargo-meta {
+              color: #6c757d;
+              font-size: 0.8rem;
+            }
+          }
+        }
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 3rem;
+        color: #6c757d;
+
+        .empty-icon {
+          margin-bottom: 1rem;
+
+          i {
+            font-size: 4rem;
+            color: #dee2e6;
+          }
+        }
+
+        h3 {
+          margin: 0 0 0.5rem 0;
+          font-size: 1.5rem;
+          font-weight: 600;
+        }
+
+        p {
+          margin: 0;
+          font-size: 1rem;
+        }
+      }
+    }
+  }
+}
+
+/* 🚫 ACESSO NEGADO */
+.access-denied {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 4rem 2rem;
+  text-align: center;
+
+  .denied-content {
+    background: white;
+    border-radius: 16px;
+    padding: 3rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e9ecef;
+
+    .denied-icon {
+      margin-bottom: 2rem;
+
+      i {
+        font-size: 5rem;
+        color: #dc3545;
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+    }
+
+    h2 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #dc3545;
+      margin: 0 0 1rem 0;
+    }
+
+    p {
+      font-size: 1.1rem;
+      color: #6c757d;
+      margin: 0 0 0.5rem 0;
+      line-height: 1.6;
+    }
+
+    .btn-back {
+      background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+      border: none;
+      border-radius: 8px;
+      padding: 1rem 2rem;
+      color: white;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 2rem;
+      font-size: 1rem;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(108, 117, 125, 0.3);
+      }
+
+      i {
+        font-size: 20px;
+      }
+    }
+  }
+}
+
+/* 📱 RESPONSIVIDADE */
+@media (max-width: 768px) {
+  .cargosconfianca-header {
+    padding: 1.5rem 1rem 2rem 1rem;
+
+    .header-content {
+      flex-direction: column;
+      gap: 1.5rem;
+      text-align: center;
+
+      .header-left {
+        flex-direction: column;
+        gap: 1rem;
+
+        .header-title {
+          flex-direction: column;
+          text-align: center;
+
+          .title-text h1 {
+            font-size: 2.2rem;
+          }
+        }
+      }
+
+      .header-right .header-stats {
+        gap: 1rem;
+      }
+    }
+  }
+
+  .modern-breadcrumb {
+    padding: 1rem;
+    margin: 0 1rem 2rem 1rem;
+
+    .breadcrumb-container {
+      flex-wrap: wrap;
+      gap: 0.25rem;
+    }
+  }
+
+  .cargosconfianca-content {
+    padding: 0 1rem 2rem 1rem;
+
+    .config-section .config-content,
+    .cargos-section .cargos-content {
+      padding: 1.5rem;
+    }
+  }
+
+  .access-denied {
+    padding: 2rem 1rem;
+
+    .denied-content {
+      padding: 2rem 1.5rem;
+
+      h2 {
+        font-size: 2rem;
+      }
+
+      p {
+        font-size: 1rem;
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .cargosconfianca-header .header-content .header-left .header-title .title-text h1 {
+    font-size: 1.75rem;
+  }
+
+  .cargosconfianca-content {
+    .config-section .section-header,
+    .cargos-section .section-header {
+      padding: 1rem 1.5rem;
+    }
+
+    .config-section .config-content,
+    .cargos-section .cargos-content {
+      padding: 1rem;
+    }
+  }
+
+  .access-denied .denied-content {
+    padding: 1.5rem 1rem;
+
+    h2 {
+      font-size: 1.75rem;
+    }
+
+    .btn-back {
+      padding: 0.75rem 1.5rem;
+      font-size: 0.9rem;
+    }
+  }
+}
+
+/* 🎯 ANIMAÇÕES */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.rotating {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

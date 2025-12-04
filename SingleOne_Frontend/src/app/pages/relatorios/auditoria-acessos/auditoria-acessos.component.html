@@ -1,0 +1,279 @@
+<!-- 🎯 HEADER MODERNO DA AUDITORIA DE ACESSOS -->
+<div class="auditoria-acessos-header">
+  <div class="header-content">
+    <div class="header-left">
+      <button class="back-button" [routerLink]="['/relatorios']" matTooltip="Voltar para Relatórios">
+        <i class="cil-arrow-left"></i>
+      </button>
+      <div class="header-title">
+        <div class="title-icon">
+          <i class="cil-shield-alt"></i>
+        </div>
+        <div class="title-text">
+          <h1>Auditoria de Acessos</h1>
+          <p>Relatório de auditoria de acessos às páginas Meu Patrimônio e Portaria</p>
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="btn-exportar" (click)="exportarDados()" matTooltip="Exportar Dados" [disabled]="!logs || logs.length === 0">
+        <i class="cil-cloud-download"></i>
+        <span>Exportar Dados</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 🍞 BREADCRUMB MODERNO -->
+<nav class="modern-breadcrumb">
+  <div class="breadcrumb-container">
+    <a [routerLink]="['/dashboard']" class="breadcrumb-item">
+      <i class="cil-home"></i>
+      <span>Dashboard</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a [routerLink]="['/relatorios']" class="breadcrumb-item">
+      <i class="cil-timeline"></i>
+      <span>Relatórios e Timeline</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <span class="breadcrumb-item active">Auditoria de Acessos</span>
+  </div>
+</nav>
+
+<!-- 📋 CONTEÚDO PRINCIPAL -->
+<div class="auditoria-acessos-content">
+  <!-- 🔍 SEÇÃO DE FILTROS -->
+  <div class="filters-section">
+    <div class="filters-container">
+      <div class="filters-header">
+        <button class="toggle-filters-btn">
+          <i class="cil-filter"></i>
+          <span>Filtros de Pesquisa</span>
+        </button>
+      </div>
+      <div class="filters-content">
+        <div class="filters-grid">
+          <!-- Data Início -->
+          <div class="filter-field">
+            <label>Data Início</label>
+            <input type="date" class="modern-input" [(ngModel)]="filtros.dataInicio" />
+          </div>
+
+          <!-- Data Fim -->
+          <div class="filter-field">
+            <label>Data Fim</label>
+            <input type="date" class="modern-input" [(ngModel)]="filtros.dataFim" />
+          </div>
+
+          <!-- Tipo de Acesso -->
+          <div class="filter-field">
+            <label>Tipo de Acesso</label>
+            <select class="modern-select" [(ngModel)]="filtros.tipoAcesso">
+              <option [ngValue]="null">Todos os tipos</option>
+              <option *ngFor="let tipo of tiposAcesso" [ngValue]="tipo.valor">
+                {{ tipo.descricao }}
+              </option>
+            </select>
+          </div>
+
+          <!-- CPF Consultado -->
+          <div class="filter-field">
+            <label>CPF Consultado</label>
+            <input type="text" class="modern-input" [(ngModel)]="filtros.cpfConsultado" 
+                   placeholder="Digite o CPF" maxlength="11" />
+          </div>
+
+          <div class="filter-actions">
+            <button class="action-btn primary-btn" (click)="consultar()" [disabled]="loading">
+              <i class="cil-search"></i>
+              <span>Pesquisar</span>
+            </button>
+            <button class="action-btn secondary-btn" (click)="limparBusca()">
+              <i class="cil-x-circle"></i>
+              <span>Limpar</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 📊 SEÇÃO DE MÉTRICAS -->
+  <div class="metrics-section" *ngIf="dataSource?.data && dataSource.data.length > 0">
+    <div class="metrics-grid">
+      <div class="metric-card primary">
+        <div class="metric-icon">
+          <i class="cil-list"></i>
+        </div>
+        <div class="metric-info">
+          <div class="metric-value">{{ getTotalAcessos() }}</div>
+          <div class="metric-label">Total de Acessos</div>
+        </div>
+      </div>
+      
+      <div class="metric-card info">
+        <div class="metric-icon">
+          <i class="cil-door"></i>
+        </div>
+        <div class="metric-info">
+          <div class="metric-value">{{ getTotalPassCheck() }}</div>
+          <div class="metric-label">Portaria (PassCheck)</div>
+        </div>
+      </div>
+      
+      <div class="metric-card warning">
+        <div class="metric-icon">
+          <i class="cil-user"></i>
+        </div>
+        <div class="metric-info">
+          <div class="metric-value">{{ getTotalMeuPatrimonio() }}</div>
+          <div class="metric-label">Meu Patrimônio</div>
+        </div>
+      </div>
+
+      <div class="metric-card success">
+        <div class="metric-icon">
+          <i class="cil-check-circle"></i>
+        </div>
+        <div class="metric-info">
+          <div class="metric-value">{{ getTotalSucesso() }}</div>
+          <div class="metric-label">Acessos com Sucesso</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🔄 CONTAINER DE LOADING -->
+  <div class="loading-container" *ngIf="loading">
+    <div class="loading-spinner"></div>
+    <p>Carregando dados...</p>
+  </div>
+
+  <!-- 📋 SEÇÃO DA TABELA -->
+  <div class="table-section" *ngIf="!loading && dataSource?.data">
+    <div class="table-container">
+      <div class="scroll-indicator" *ngIf="dataSource.data.length > 0">
+        <i class="cil-arrow-left"></i>
+        <span>Deslize horizontalmente para ver mais colunas</span>
+        <i class="cil-arrow-right"></i>
+      </div>
+      
+      <table class="modern-table detailed-table">
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Hora</th>
+            <th>Tipo de Acesso</th>
+            <th>CPF Consultado</th>
+            <th>Colaborador</th>
+            <th>IP Address</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let log of dadosPagina">
+            <td class="text-center">
+              <span class="data-badge">{{ formatarData(log.createdAt) }}</span>
+            </td>
+            <td class="text-center">
+              <span class="hora-badge">{{ formatarHora(log.createdAt) }}</span>
+            </td>
+            <td class="text-center">
+              <span class="tipo-acesso-badge" [class.passcheck]="log.tipoAcesso === 'passcheck'" 
+                    [class.patrimonio]="log.tipoAcesso === 'patrimonio'">
+                {{ getTipoAcessoDescricao(log.tipoAcesso) }}
+              </span>
+            </td>
+            <td class="text-center">
+              <span class="cpf-badge">{{ log.cpfConsultado || 'N/A' }}</span>
+            </td>
+            <td class="text-center">
+              <span class="colaborador-info">{{ log.colaboradorNome || 'N/A' }}</span>
+            </td>
+            <td class="text-center">
+              <span class="ip-badge">{{ log.ipAddress || 'N/A' }}</span>
+            </td>
+            <td class="text-center">
+              <span class="status-badge" [ngClass]="getStatusClass(log.sucesso)">
+                <i class="cil-check-circle" *ngIf="log.sucesso"></i>
+                <i class="cil-x-circle" *ngIf="!log.sucesso"></i>
+                {{ log.sucesso ? 'Sucesso' : 'Falha' }}
+              </span>
+              <div *ngIf="!log.sucesso && log.mensagemErro" class="erro-detalhe">
+                {{ log.mensagemErro }}
+              </div>
+            </td>
+          </tr>
+          
+          <!-- Mensagem quando não há dados -->
+          <tr *ngIf="!loading && (!dadosPagina || dadosPagina.length === 0) && totalLength === 0">
+            <td colspan="7" class="no-data-row">
+              <div class="no-data-message">
+                <i class="cil-inbox"></i>
+                <p>Nenhum log de acesso encontrado</p>
+                <small>Selecione um período e clique em "Pesquisar" para carregar dados</small>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <div class="pagination-container">
+      <mat-paginator 
+        [length]="totalLength" 
+        [pageSize]="pageSize" 
+        [pageSizeOptions]="[10, 25, 50, 100]" 
+        (page)="onPageChange($event)"
+        showFirstLastButtons>
+      </mat-paginator>
+    </div>
+  </div>
+</div>
+
+<!-- 🚀 MODAL DE EXPORTAÇÃO -->
+<div class="export-modal" *ngIf="showExportModal" (click)="closeExportModal($event)">
+  <div class="export-modal-content" (click)="$event.stopPropagation()">
+    <div class="export-modal-header">
+      <h3><i class="cil-download"></i> Exportar Dados</h3>
+      <button class="close-btn" (click)="closeExportModal($event)">
+        <i class="cil-x"></i>
+      </button>
+    </div>
+    
+    <div class="export-modal-body">
+      <p>Escolha o formato de exportação para os logs de auditoria de acessos:</p>
+      
+      <div class="export-options">
+        <div class="export-option" (click)="exportar('excel')">
+          <div class="export-icon excel">
+            <i class="cil-file"></i>
+          </div>
+          <div class="export-info">
+            <h4>Excel (.xlsx)</h4>
+            <p>Formato ideal para análise e manipulação de dados</p>
+          </div>
+          <i class="cil-chevron-right"></i>
+        </div>
+        
+        <div class="export-option" (click)="exportar('csv')">
+          <div class="export-icon csv">
+            <i class="cil-file"></i>
+          </div>
+          <div class="export-info">
+            <h4>CSV (.csv)</h4>
+            <p>Formato universal compatível com qualquer planilha</p>
+          </div>
+          <i class="cil-chevron-right"></i>
+        </div>
+      </div>
+    </div>
+    
+    <div class="export-modal-footer">
+      <button class="btn-secondary" (click)="closeExportModal($event)">
+        Cancelar
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,39 @@
+.verificar-container { max-width: 900px; margin: 1rem auto; padding: 1rem; }
+.header { text-align: center; margin-bottom: 1rem; }
+.loading { text-align: center; }
+.erro { color: #b00020; background: #ffebee; padding: .75rem; border-radius: 8px; }
+.card { background: #fff; border-radius: 12px; padding: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,.06); }
+.status { display: flex; align-items: center; gap: 8px; font-weight: 600; margin-bottom: .5rem; }
+.status.ok { color: #2e7d32; }
+.status.no { color: #b26a00; }
+.detalhes { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: .5rem 1rem; margin-bottom: .75rem; }
+.detalhes .col { display: flex; flex-direction: column; gap: 6px; }
+.detalhes .qr { text-align: center; }
+.detalhes .qr .qr-link { display: inline-flex; flex-direction: column; align-items: center; text-decoration: none; color: inherit; }
+.detalhes .qr .qr-caption { margin-top: 6px; font-size: 12px; color: #555; }
+.recursos ul { margin: 0; padding-left: 1rem; }
+.cta { margin-top: .75rem; }
+.link-site { color: #1e88e5; text-decoration: none; }
+
+// Estilos para dados de auditoria
+.auditoria-section {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e0e0e0;
+}
+
+.auditoria-title {
+  margin-bottom: 0.5rem;
+  color: #424242;
+}
+
+.auditoria-item {
+  font-size: 0.9rem;
+  color: #616161;
+  margin-left: 0.5rem;
+  
+  strong {
+    color: #424242;
+  }
+}
+

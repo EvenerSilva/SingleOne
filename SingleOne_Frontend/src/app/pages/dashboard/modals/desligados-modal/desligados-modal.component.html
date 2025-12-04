@@ -1,0 +1,58 @@
+<div class="modern-dialog">
+  <!-- Header com ícone e título -->
+  <div class="dialog-header">
+    <div class="header-icon">
+      <i class="material-icons">person_off</i>
+    </div>
+    <h2 class="dialog-title">Recursos com Colaboradores Desligados</h2>
+  </div>
+
+  <!-- Conteúdo do modal -->
+  <div class="dialog-content">
+    <p class="subtitle">Lista detalhada para ação imediata</p>
+
+    <div class="table-container">
+      <table class="desligados-table">
+        <thead>
+          <tr>
+            <th>Colaborador</th>
+            <th>Data Desligamento</th>
+            <th class="text-center">Recursos</th>
+            <th class="text-center">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let it of data.itens">
+            <td>
+              <strong>{{ it.nome }}</strong>
+              <br>
+              <small>{{ it.qtde || 0 }} recurso(s)</small>
+            </td>
+            <td>{{ it.dtdemissao | date:'dd/MM/yyyy' }}</td>
+            <td class="text-center">
+              <span class="badge-qtde">{{ it.qtde || 0 }}</span>
+            </td>
+            <td class="text-center">
+              <button 
+                class="btn-action" 
+                (click)="navegarParaEntregasDevolucoes(it.colaboradorId, it.nome, it.matricula)"
+                matTooltip="Devolver recursos">
+                <i class="material-icons">assignment_return</i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Botões de ação -->
+  <div class="dialog-actions">
+    <button 
+      class="btn btn-secondary" 
+      (click)="fechar()">
+      <i class="material-icons">close</i>
+      Fechar
+    </button>
+  </div>
+</div>

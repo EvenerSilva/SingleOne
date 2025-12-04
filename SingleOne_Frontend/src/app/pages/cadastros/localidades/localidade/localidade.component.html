@@ -1,0 +1,201 @@
+<!-- 🎯 FORMULÁRIO MODAL DE LOCALIDADE -->
+<div class="formulario-overlay">
+  <div class="formulario-container">
+    <div class="localidade-form-container">
+      <div class="form-header">
+        <h2 class="form-title">{{ getTitulo() }}</h2>
+        <p class="form-subtitle">
+          {{ modo === 'criar' ? 'Crie uma nova localidade para o sistema' : 'Edite as informações da localidade selecionada' }}
+        </p>
+      </div>
+
+      <form [formGroup]="localidadeForm" (ngSubmit)="salvar()" class="localidade-form">
+        
+        <!-- Primeira linha: Descrição -->
+        <div class="form-row">
+          <div class="form-group full-width">
+            <label for="descricao" class="form-label">
+              Descrição <span class="required">*</span>
+            </label>
+            <input 
+              type="text" 
+              id="descricao"
+              formControlName="descricao" 
+              class="form-control"
+              [class.is-invalid]="localidadeForm.get('descricao')?.invalid && localidadeForm.get('descricao')?.touched"
+              placeholder="Digite a descrição da localidade"
+              maxlength="100"
+            >
+            <div class="invalid-feedback" *ngIf="localidadeForm.get('descricao')?.invalid && localidadeForm.get('descricao')?.touched">
+              <span *ngIf="localidadeForm.get('descricao')?.errors?.required">Descrição é obrigatória</span>
+              <span *ngIf="localidadeForm.get('descricao')?.errors?.maxlength">Descrição deve ter no máximo 100 caracteres</span>
+            </div>
+            <small class="form-text text-muted">
+              Nome da localidade (bairro, região, etc.)
+            </small>
+          </div>
+        </div>
+
+        <!-- Segunda linha: Estado e Cidade -->
+        <div class="form-row">
+          <!-- Campo Estado -->
+          <div class="form-group estado-dropdown-container">
+            <label for="estado" class="form-label">
+              Estado
+            </label>
+            <div class="search-input-container">
+              <input 
+                type="text" 
+                id="estado"
+                class="form-control search-input"
+                [class.is-invalid]="localidadeForm.get('estado')?.invalid && localidadeForm.get('estado')?.touched"
+                [placeholder]="carregandoEstados ? 'Carregando...' : 'Digite para buscar estado'"
+                [disabled]="carregandoEstados"
+                [value]="buscaEstado"
+                (input)="onBuscaEstadoChange($event)"
+                (focus)="onEstadoFocus()"
+                (click)="onEstadoFocus()"
+                autocomplete="off"
+              >
+              <i class="fas fa-chevron-down search-arrow"></i>
+              
+              <!-- Dropdown de Estados -->
+              <div class="search-dropdown" *ngIf="mostrarDropdownEstado && estadosFiltrados.length > 0">
+                <div class="dropdown-header">
+                  <span>Estados disponíveis</span>
+                  <small>{{ estadosFiltrados.length }} encontrado(s)</small>
+                </div>
+                <div class="dropdown-items">
+                  <div 
+                    class="dropdown-item" 
+                    *ngFor="let estado of estadosFiltrados"
+                    (click)="selecionarEstado(estado)"
+                  >
+                    <span class="estado-sigla">{{ estado.sigla }}</span>
+                    <span class="estado-nome">{{ estado.nome }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="invalid-feedback" *ngIf="localidadeForm.get('estado')?.invalid && localidadeForm.get('estado')?.touched">
+              <span *ngIf="localidadeForm.get('estado')?.errors?.required">Estado é obrigatório</span>
+            </div>
+            <small class="form-text text-muted">
+              Digite para buscar o estado da localidade
+            </small>
+            <div *ngIf="carregandoEstados" class="loading-indicator">
+              <i class="fas fa-spinner fa-spin"></i> Carregando estados...
+            </div>
+          </div>
+
+          <!-- Campo Cidade -->
+          <div class="form-group cidade-dropdown-container">
+            <label for="cidade" class="form-label">
+              Cidade
+            </label>
+            <div class="search-input-container">
+              <input 
+                type="text" 
+                id="cidade"
+                class="form-control search-input"
+                [class.is-invalid]="localidadeForm.get('cidade')?.invalid && localidadeForm.get('cidade')?.touched"
+                [placeholder]="!localidadeForm.get('estado')?.value ? 'Selecione um estado primeiro' : (carregandoCidades ? 'Carregando...' : 'Digite para buscar cidade')"
+                [disabled]="!localidadeForm.get('estado')?.value || carregandoCidades"
+                [value]="buscaCidade"
+                (input)="onBuscaCidadeChange($event)"
+                (focus)="onCidadeFocus()"
+                (click)="onCidadeFocus()"
+                autocomplete="off"
+              >
+              <i class="fas fa-chevron-down search-arrow"></i>
+              
+              <!-- Dropdown de Cidades -->
+              <div class="search-dropdown" *ngIf="mostrarDropdownCidade && cidadesFiltradas.length > 0">
+                <div class="dropdown-header">
+                  <span>Cidades disponíveis</span>
+                  <small>{{ cidadesFiltradas.length }} encontrado(s)</small>
+                </div>
+                <div class="dropdown-items">
+                  <div 
+                    class="dropdown-item" 
+                    *ngFor="let cidade of cidadesFiltradas"
+                    (click)="selecionarCidade(cidade)"
+                  >
+                    <span class="cidade-nome">{{ cidade.nome }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="invalid-feedback" *ngIf="localidadeForm.get('cidade')?.invalid && localidadeForm.get('cidade')?.touched">
+              <span *ngIf="localidadeForm.get('cidade')?.errors?.required">Cidade é obrigatória</span>
+            </div>
+            <small class="form-text text-muted">
+              Digite para buscar a cidade (dependente do estado)
+            </small>
+            <div *ngIf="carregandoCidades" class="loading-indicator">
+              <i class="fas fa-spinner fa-spin"></i> Carregando cidades...
+            </div>
+            <div *ngIf="!localidadeForm.get('estado')?.value" class="form-text text-muted">
+              <i class="fas fa-info-circle"></i> Selecione um estado primeiro
+            </div>
+          </div>
+        </div>
+
+        <!-- Terceira linha: Status -->
+        <div class="form-row">
+          <div class="form-group full-width">
+            <div class="toggle-group">
+              <label class="toggle-label">
+                <span class="toggle-text">Localidade ativa no sistema</span>
+                <div class="toggle-switch">
+                  <input 
+                    type="checkbox" 
+                    id="ativo"
+                    formControlName="ativo"
+                    class="toggle-input">
+                  <span class="toggle-slider"></span>
+                </div>
+              </label>
+            </div>
+            <small class="form-text text-muted">
+              Localidades inativas não aparecem nas listagens principais
+            </small>
+          </div>
+        </div>
+
+        <!-- Botões de Ação -->
+        <div class="form-actions">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="cancelar()"
+            [disabled]="salvando"
+          >
+            <i class="fas fa-times"></i>
+            Cancelar
+          </button>
+        
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="localidadeForm.invalid || salvando"
+          >
+            <i class="fas fa-save" *ngIf="!salvando"></i>
+            <i class="fas fa-spinner fa-spin" *ngIf="salvando"></i>
+            {{ getBotaoTexto() }}
+          </button>
+        </div>
+
+        <!-- Mensagem de Erro -->
+        <div class="error-alert" *ngIf="errorMessage">
+          <div class="error-content">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span>{{ errorMessage }}</span>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

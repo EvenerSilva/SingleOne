@@ -1,0 +1,87 @@
+<mat-toolbar color="accent">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-6 text-start" style="margin-top:20px; color:#080039">
+                <button mat-icon-button [routerLink]="['/recursos']"><mat-icon>chevron_left</mat-icon></button>Telefonia
+            </div>
+            <div class="col-sm-6 text-end">
+                <button mat-mini-fab color="accent" class="m-3" (click)="exportarExcel()" matTooltip="Baixar planilha em excel"><mat-icon style="color:black">file_download</mat-icon></button>
+            </div>
+        </div>
+    </div>
+</mat-toolbar>
+<div class="container p-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <!--  <li class="breadcrumb-item"><a [routerLink]="['/dashboard']">Home</a></li>
+            <li class="breadcrumb-item"><a [routerLink]="['/cadastros']">Cadastros</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Telefonia</li> -->
+        </ol>
+    </nav>
+    <div class="row">
+        <div class="col-md-3">
+            <a [routerLink]="['/operadoras']" style="text-decoration: none; color: #FF3A0F">
+                <mat-card>
+                    <mat-card-content>
+                        <div class="row">
+                            <div class="col-sm-8" style="margin-top:6px">
+                                Operadoras
+                            </div>
+                            <div class="col-sm-4 text-end">
+                                <img src="../../../../assets/Cadastros/operadoras.png">
+                            </div>
+                        </div>
+                    </mat-card-content>
+                </mat-card>
+            </a>
+        </div>
+        <div class="col-md-3">
+            <a [routerLink]="['/contratos-telefonia']" style="text-decoration: none; color: #FF3A0F">
+                <mat-card>
+                    <mat-card-content>
+                        <div class="row">
+                            <div class="col-sm-8" style="margin-top:6px">
+                                Contas
+                            </div>
+                            <div class="col-sm-4 text-end">
+                                <img src="../../../../assets/Cadastros/contratos.png">
+                            </div>
+                        </div>
+                    </mat-card-content>
+                </mat-card>
+            </a>
+        </div>
+        <div class="col-md-3">
+            <a [routerLink]="['/planos']" style="text-decoration: none; color: #FF3A0F">
+                <mat-card>
+                    <mat-card-content>
+                        <div class="row">
+                            <div class="col-sm-8" style="margin-top:6px">
+                                Planos
+                            </div>
+                            <div class="col-sm-4 text-end">
+                                <img src="../../../../assets/Cadastros/planos.png">
+                            </div>
+                        </div>
+                    </mat-card-content>
+                </mat-card>
+            </a>
+        </div>
+        <div class="col-md-3">
+            <a [routerLink]="['/linhas']" style="text-decoration: none; color: #FF3A0F">
+                <mat-card>
+                    <mat-card-content>
+                        <div class="row">
+                            <div class="col-sm-8" style="margin-top:6px">
+                                Linhas
+                            </div>
+                            <div class="col-sm-4 text-end">
+                                <img src="../../../../assets/Cadastros/linhas.png">
+                            </div>
+                        </div>
+                    </mat-card-content>
+                </mat-card>
+            </a>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,706 @@
+<!-- 🎯 HEADER MODERNO DOS RECURSOS -->
+<div class="recursos-header">
+  <div class="header-content">
+    <div class="header-left">
+      <button class="back-button" [routerLink]="['/dashboard']" matTooltip="Voltar para Dashboard">
+        <i class="cil-arrow-left"></i>
+      </button>
+      <div class="header-title">
+        <div class="title-icon">
+          <i class="cil-devices"></i>
+        </div>
+        <div class="title-text">
+          <h1>Gestão de Recursos</h1>
+          <p>Gerenciar equipamentos, status e localizações</p>
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="action-btn clear-filters-btn" (click)="limparTodosFiltros()" matTooltip="Limpar todos os filtros e recarregar recursos">
+        <i class="cil-filter-x"></i>
+        <span>Limpar Filtros</span>
+      </button>
+      <button class="action-btn secondary-btn" (click)="exportarDados()" matTooltip="Exportar dados">
+        <i class="cil-download"></i>
+        <span>Exportar</span>
+      </button>
+      <button class="action-btn primary-btn" routerLink="/recurso" matTooltip="Adicionar novo recurso">
+        <i class="cil-plus"></i>
+        <span>Novo Recurso</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 🍞 BREADCRUMB MODERNO -->
+<nav class="modern-breadcrumb">
+  <div class="breadcrumb-container">
+    <a [routerLink]="['/dashboard']" class="breadcrumb-item">
+      <i class="cil-home"></i>
+      <span>Dashboard</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a [routerLink]="['/cadastros']" class="breadcrumb-item">
+      <i class="cil-settings"></i>
+      <span>Cadastros</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <span class="breadcrumb-item active">Recursos</span>
+  </div>
+</nav>
+
+
+<!-- 📋 CONTEÚDO PRINCIPAL -->
+<div class="recursos-content">
+  <!-- 📊 RESUMO ESTATÍSTICO - CARDS CLICÁVEIS -->
+  <div class="resumo-container" *ngIf="recursosResumo">
+    <!-- 1️⃣ TOTAL DE RECURSOS -->
+    <div class="resumo-card" 
+         [class.active]="filtroStatus.value === null"
+         (click)="filtrarPorCard(null)"
+         matTooltip="Mostrar todos os recursos">
+      <div class="resumo-item">
+        <div class="resumo-valor">{{ recursosResumo.total }}</div>
+        <div class="resumo-label">Total</div>
+      </div>
+    </div>
+    
+    <!-- 2️⃣ RECURSOS SELECIONADOS -->
+    <div class="resumo-card selecionados" 
+         [class.active]="filtroStatus.value !== null"
+         matTooltip="Recursos selecionados no filtro atual">
+      <div class="resumo-item">
+        <div class="resumo-valor">{{ getSelecionados() }}</div>
+        <div class="resumo-label">Selecionados</div>
+      </div>
+    </div>
+    
+    <!-- 3️⃣ RECURSOS ENTREGUES -->
+    <div class="resumo-card ativos" 
+         [class.active]="filtroStatus.value === 'ativos'"
+         (click)="filtrarPorCard('ativos')"
+         matTooltip="Filtrar apenas recursos entregues">
+      <div class="resumo-item">
+        <div class="resumo-valor">{{ recursosResumo.ativos }}</div>
+        <div class="resumo-label">✅ Entregues</div>
+      </div>
+    </div>
+    
+    <!-- 4️⃣ EM TRÂNSITO (MAIS PREOCUPANTES) -->
+    <div class="resumo-card em-transito" 
+         [class.active]="filtroStatus.value === 'em_transito'"
+         (click)="filtrarPorCard('em_transito')"
+         matTooltip="Filtrar recursos em trânsito (requisitados/devolvidos)">
+      <div class="resumo-item">
+        <div class="resumo-valor">{{ recursosResumo.emTransito }}</div>
+        <div class="resumo-label">🚚 Em Trânsito</div>
+      </div>
+    </div>
+    
+    <!-- 5️⃣ INATIVOS -->
+    <div class="resumo-card inativos" 
+         [class.active]="filtroStatus.value === 'inativos'"
+         (click)="filtrarPorCard('inativos')"
+         matTooltip="Filtrar recursos inativos">
+      <div class="resumo-item">
+        <div class="resumo-valor">{{ recursosResumo.inativos }}</div>
+        <div class="resumo-label">❌ Inativos</div>
+      </div>
+    </div>
+    
+    <!-- 6️⃣ EM LANÇAMENTO -->
+    <div class="resumo-card em-lancamento" 
+         [class.active]="filtroStatus.value === 'em_lancamento'"
+         (click)="filtrarPorCard('em_lancamento')"
+         matTooltip="Filtrar recursos em lançamento (novos)">
+      <div class="resumo-item">
+        <div class="resumo-valor">{{ recursosResumo.emLancamento }}</div>
+        <div class="resumo-label">🆕 Em Lançamento</div>
+      </div>
+    </div>
+    
+    <!-- 7️⃣ EM ESTOQUE -->
+    <div class="resumo-card em-estoque" 
+         [class.active]="filtroStatus.value === 'estoque'"
+         (click)="filtrarPorCard('estoque')"
+         matTooltip="Filtrar recursos em estoque">
+      <div class="resumo-item">
+        <div class="resumo-valor">{{ recursosResumo.emEstoque }}</div>
+        <div class="resumo-label">📦 Em Estoque</div>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- 🔍 SEÇÃO DE BUSCA E FILTROS -->
+  <div class="search-section">
+    <div class="search-filters-container">
+      <!-- 🔍 CAIXA DE BUSCA -->
+      <div class="search-box">
+        <i class="cil-magnifying-glass search-icon"></i>
+        <input type="text" 
+               placeholder="Buscar por fabricante, modelo, número de série, patrimônio ou status..." 
+               [formControl]="consulta">
+        <button 
+          *ngIf="consulta.value" 
+          class="clear-btn" 
+          (click)="limparBusca()"
+          type="button"
+          matTooltip="Limpar busca">
+          <i class="cil-x"></i>
+        </button>
+      </div>
+      
+      <!-- 🏷️ CARDS DE TIPOS DE AQUISIÇÃO -->
+      <div class="tipos-aquisicao-container" *ngIf="tiposAquisicao.length > 0">
+        <div class="tipos-aquisicao-header">
+          <h4>Filtrar por Tipo de Aquisição</h4>
+        </div>
+        <div class="tipos-aquisicao-cards">
+          <!-- Card "Todos" -->
+          <div class="tipo-aquisicao-card" 
+               [class.active]="filtroTipoAquisicao.value === null"
+               (click)="filtrarPorTipoAquisicao(null)"
+               matTooltip="Mostrar todos os tipos">
+            <div class="card-icon">
+              <i class="cil-layers"></i>
+            </div>
+            <div class="card-content">
+              <div class="card-title">Todos</div>
+              <div class="card-count">{{ dadosOriginais?.length || 0 }}</div>
+            </div>
+          </div>
+          
+          <!-- Cards dos tipos de aquisição -->
+          <div class="tipo-aquisicao-card" 
+               *ngFor="let tipo of tiposAquisicao"
+               [class.active]="filtroTipoAquisicao.value === tipo.id"
+               (click)="filtrarPorTipoAquisicao(tipo.id)"
+               [matTooltip]="'Filtrar apenas recursos ' + tipo.nome.toLowerCase()">
+            <div class="card-icon" [ngClass]="'tipo-' + tipo.id">
+              <i [class]="getTipoAquisicaoIcon(tipo.id)"></i>
+            </div>
+            <div class="card-content">
+              <div class="card-title">{{ tipo.nome }}</div>
+              <div class="card-count">{{ getContagemPorTipoAquisicao(tipo.id) }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+
+  <!-- 📊 TABELA MODERNA -->
+  <div class="table-section">
+    
+
+    <!-- ✅ NOVO: Mensagem quando não há dados mas carregou com sucesso -->
+    <div class="no-data-message" *ngIf="dadosVazios">
+      <div class="no-data-content">
+        <div class="no-data-icon">
+          <i class="cil-info"></i>
+        </div>
+        <div class="no-data-text">
+          <h3>Nenhum recurso encontrado</h3>
+          <p>Não há recursos cadastrados no sistema no momento.</p>
+        </div>
+        <div class="no-data-actions">
+          <button class="action-btn primary-btn" routerLink="/recurso">
+            <i class="cil-plus"></i>
+            <span>Adicionar Primeiro Recurso</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-container" *ngIf="deveMostrarTabela">
+      <table class="modern-table">
+        <thead>
+          <tr>
+            <th>Recurso</th>
+            <th>Situação</th>
+            <th>Localização</th>
+            <th>Empresa</th>
+            <th>Centro Custo</th>
+            <th class="text-center">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of dadosPagina; let i = index">
+            <td class="recurso-info">
+              <div class="recurso-detalhes">
+                <div class="recurso-avatar">
+                  <i class="cil-devices"></i>
+                </div>
+                <div class="recurso-texto">
+                  <div class="recurso-tipo">{{ row.tipoequipamentoNavigation?.descricao || row.tipoequipamento }} {{ row.fabricanteNavigation?.descricao || row.fabricante }} {{ row.modeloNavigation?.descricao || row.modelo }}</div>
+                  <div class="recurso-serial">S/N: {{ row.numeroserie }}</div>
+                  <div class="recurso-patrimonio">Patrimônio: {{ row.patrimonio }}</div>
+          <div class="recurso-tipo-aquisicao" [class]="getTipoAquisicaoClass(row)">
+            <i class="cil-tag"></i>
+            {{ getTipoAquisicaoText(row) }}
+          </div>
+                </div>
+              </div>
+            </td>
+            <td class="recurso-status">
+              <!-- Status com link para requisições quando requisitado -->
+              <div *ngIf="(row.equipamentostatus || '').toString().toLowerCase() === 'requisitado'" class="status-with-link">
+                <div class="status-actions">
+                  <a [routerLink]="['/movimentacoes/requisicoes']" 
+                     [queryParams]="{ search: row.numeroserie }"
+                     class="status-link"
+                     matTooltip="Ver requisição ativa para este recurso">
+                    <div class="status-label requisitado-link" 
+                         [class.ativo]="row.ativo" 
+                         [class.inativo]="!row.ativo">
+                      <i class="material-icons">link</i>
+                      {{ row.equipamentostatus }}
+                    </div>
+                  </a>
+                </div>
+              </div>
+              
+              <!-- Status com link para entregas e devoluções quando entregue -->
+              <div *ngIf="(row.equipamentostatus || '').toString().toLowerCase() === 'entregue'" class="status-with-link">
+                <div class="status-actions">
+                  <a [routerLink]="['/movimentacoes/entregas-devolucoes']" 
+                     [queryParams]="{ search: row.numeroserie }"
+                     class="status-link"
+                     matTooltip="Ver entregas e devoluções para este recurso">
+                    <div class="status-label entregue-link" 
+                         [class.ativo]="row.ativo" 
+                         [class.inativo]="!row.ativo">
+                      <i class="material-icons">link</i>
+                      {{ row.equipamentostatus }}
+                    </div>
+                  </a>
+                </div>
+              </div>
+              
+              <!-- Status normal para outros casos -->
+              <div *ngIf="(row.equipamentostatus || '').toString().toLowerCase() !== 'requisitado' && (row.equipamentostatus || '').toString().toLowerCase() !== 'entregue'" 
+                   class="status-label" 
+                   [class.ativo]="row.ativo" 
+                   [class.inativo]="!row.ativo"
+                   [class.problema]="row.equipamentostatusid == 4 || row.equipamentostatusid == 8">
+                {{ row.ativo ? row.equipamentostatus : 'DESATIVADO' }}
+              </div>
+            </td>
+            <td class="recurso-localizacao">{{ (row.localizacao === 'Nao definido' || !row.localizacao) ? 'Não definido' : row.localizacao }}</td>
+            <td class="recurso-empresa">{{ (row.empresa === 'Nao definido' || !row.empresa) ? 'Não definido' : row.empresa }}</td>
+            <td class="recurso-centrocusto">{{ (row.centrocusto === 'Nao definido' || !row.centrocusto) ? 'Não definido' : row.centrocusto }}</td>
+            <td class="recurso-actions text-center">
+              <div class="action-buttons">
+                <!-- Boletim de Ocorrência -->
+                <button class="action-btn bo-btn" 
+                        matTooltip="Boletim de Ocorrência" 
+                        (click)="abrirModalBO(row)"
+                        *ngIf="(row.ativo && row.equipamentostatusid == 4) || row.equipamentostatusid == 8"
+                        [class.com-bo]="row.possuibo == true">
+                  <i class="cil-warning"></i>
+                </button>
+                
+                <!-- Liberar para Estoque -->
+                <button class="action-btn estoque-btn" 
+                        matTooltip="Liberar para estoque" 
+                        (click)="abrirModalLiberarEstoque(row)"
+                        *ngIf="(row.equipamentostatusid == 2 || row.equipamentostatusid == 5 || row.equipamentostatusid == 6) && row.numeroserie != 'Não cadastrado' && row.ativo">
+                  <i class="cil-inbox"></i>
+                </button>
+                
+                <!-- Timeline -->
+                <button class="action-btn timeline-btn" 
+                        matTooltip="Ver Timeline" 
+                        (click)="redirectToTimeline(row.id)">
+                  <i class="material-icons">history</i>
+                </button>
+                
+                <!-- Editar Recurso -->
+                <!-- Oculto quando: Requisitado(7), Entregue(4), Roubado(8), Descartado(10) ou Inativo -->
+                <button class="action-btn edit-btn" 
+                        matTooltip="Editar Recurso" 
+                        [routerLink]="['/recurso', row.id]"
+                        *ngIf="row.equipamentostatusid != 7 && row.equipamentostatusid != 4 && row.equipamentostatusid != 8 && row.equipamentostatusid != 10 && row.ativo">
+                  <i class="cil-pencil"></i>
+                </button>
+                
+                <!-- Visualizar Recurso -->
+                <button class="action-btn view-btn" 
+                        matTooltip="Visualizar Recurso" 
+                        (click)="abrirModalVisualizar(row)">
+                  <i class="cil-magnifying-glass"></i>
+                </button>
+                
+                <!-- Reativar Recurso -->
+                <button class="action-btn reactivate-btn" 
+                        matTooltip="Reativar Recurso" 
+                        (click)="reativarEquipamento(row)"
+                        *ngIf="!row.ativo && session.usuario.adm">
+                  <i class="cil-reload"></i>
+                </button>
+                
+                <!-- Botão para ir direto para entrega (apenas para recursos requisitados) -->
+                <button class="action-btn entrega-btn"
+                        (click)="irParaEntrega(row)"
+                        matTooltip="Ir direto para entrega deste recurso"
+                        matTooltipPosition="above"
+                        *ngIf="(row.equipamentostatus || '').toString().toLowerCase() === 'requisitado'">
+                  <i class="cil-arrow-right"></i>
+                </button>
+                
+                <!-- Botão para requisitar (apenas para recursos em estoque) -->
+                <button class="action-btn requisitar-btn"
+                        (click)="requisitarEquipamento(row)"
+                        matTooltip="Criar requisição para este recurso"
+                        matTooltipPosition="above"
+                        *ngIf="(row.equipamentostatus || '').toString().toLowerCase() === 'em estoque' && row.ativo">
+                  <i class="cil-plus"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 📄 PAGINAÇÃO -->
+  <div class="pagination-container">
+    <mat-paginator 
+      [length]="totalLength" 
+      [pageSize]="pageSize" 
+      [pageSizeOptions]="[5, 10, 25, 100]" 
+      (page)="onPageChange($event)"
+      showFirstLastButtons>
+    </mat-paginator>
+  </div>
+</div>
+
+<!-- 📦 MODAL DE LIBERAÇÃO PARA ESTOQUE -->
+<div class="modal-overlay" *ngIf="showLiberacaoModal" (click)="closeLiberacaoModal($event)">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3><i class="cil-inbox"></i> Liberar para Estoque</h3>
+      <button class="modal-close" (click)="closeLiberacaoModal($event)">
+        <i class="cil-x"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <p>Confirma a liberação do recurso para estoque?</p>
+
+      <div class="info-section" *ngIf="liberacaoRequerInfo">
+        <h4 class="section-title">Complementar Informações</h4>
+        <div class="section-content">
+          <div class="form-field">
+            <mat-form-field appearance="outline" class="resource-select">
+              <mat-label>Localização</mat-label>
+              <mat-select [(ngModel)]="liberacaoData.localizacaoId" name="localidade">
+                <mat-option [ngValue]="undefined">Selecione...</mat-option>
+                <mat-option *ngFor="let loc of opcoesLocalidades" [value]="loc.id">{{ loc.descricao || loc.nome }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="form-field">
+            <mat-form-field appearance="outline" class="resource-select">
+              <mat-label>Empresa</mat-label>
+              <mat-select [(ngModel)]="liberacaoData.empresaId" (ngModelChange)="onEmpresaLiberacaoChange()" name="empresa">
+                <mat-option [ngValue]="undefined">Selecione...</mat-option>
+                <mat-option *ngFor="let emp of opcoesEmpresas" [value]="emp.id">{{ emp.nome || emp.razaosocial || emp.descricao }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="form-field">
+            <mat-form-field appearance="outline" class="resource-select">
+              <mat-label>Centro de Custo</mat-label>
+              <mat-select [(ngModel)]="liberacaoData.centroCustoId" [disabled]="!liberacaoData.empresaId" name="centroCusto">
+                <mat-option [ngValue]="undefined">Selecione...</mat-option>
+                <mat-option *ngFor="let cc of opcoesCentrosCusto" [value]="cc.id">{{ cc.nome || cc.descricao }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <small class="form-help">Obrigatório selecionar Localização e Empresa. Centro de Custo é opcional.</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn-secondary" (click)="closeLiberacaoModal($event)">
+        <i class="cil-x"></i>
+        <span>Cancelar</span>
+      </button>
+      <button type="button" class="btn-primary" [disabled]="!liberacaoValida" (click)="confirmarLiberacaoEstoque()">
+        <i class="cil-check"></i>
+        <span>Confirmar</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 🚀 MODAL DE EXPORTAÇÃO -->
+<div class="export-modal" *ngIf="showExportModal" (click)="closeExportModal($event)">
+  <div class="export-modal-content" (click)="$event.stopPropagation()">
+    <div class="export-modal-header">
+      <h3><i class="cil-download"></i> Exportar Recursos</h3>
+      <button class="close-btn" (click)="closeExportModal($event)">
+        <i class="cil-x"></i>
+      </button>
+    </div>
+    
+    <div class="export-modal-body">
+      <p>Escolha o formato de exportação para os dados de recursos:</p>
+      
+      <div class="export-options">
+        <div class="export-option" (click)="exportarParaExcel()">
+          <div class="export-icon excel">
+            <i class="cil-file"></i>
+          </div>
+          <div class="export-info">
+            <h4>Excel (.xlsx)</h4>
+            <p>Formato ideal para análise e manipulação de dados</p>
+          </div>
+          <i class="cil-chevron-right"></i>
+        </div>
+        
+        <div class="export-option" (click)="exportarParaCSV()">
+          <div class="export-icon csv">
+            <i class="cil-file"></i>
+          </div>
+          <div class="export-info">
+            <h4>CSV (.csv)</h4>
+            <p>Formato universal compatível com qualquer planilha</p>
+          </div>
+          <i class="cil-chevron-right"></i>
+        </div>
+      </div>
+    </div>
+    
+    <div class="export-modal-footer">
+      <button class="btn-secondary" (click)="closeExportModal($event)">
+        Cancelar
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 🚨 MODAL DE BOLETIM DE OCORRÊNCIA -->
+<div class="bo-modal" *ngIf="showBoModal" (click)="closeBoModal($event)">
+  <div class="bo-modal-content" (click)="$event.stopPropagation()">
+    <div class="bo-modal-header">
+      <h3><i class="cil-warning"></i> Boletim de Ocorrência</h3>
+      <button class="modal-close" (click)="closeBoModal($event)">
+        <i class="cil-x"></i>
+      </button>
+    </div>
+    
+    <div class="bo-modal-body">
+      <div class="equipamento-info">
+        <h4>Equipamento Selecionado:</h4>
+        <div class="equipamento-details">
+          <div class="equipamento-avatar">
+            <i class="cil-devices"></i>
+          </div>
+          <div class="equipamento-text">
+            <div class="equipamento-tipo">{{ selectedEquipamento?.tipoequipamento }} {{ selectedEquipamento?.fabricante }} {{ selectedEquipamento?.modelo }}</div>
+            <div class="equipamento-serial">S/N: {{ selectedEquipamento?.numeroserie }}</div>
+            <div class="equipamento-patrimonio">Patrimônio: {{ selectedEquipamento?.patrimonio }}</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="form-field">
+        <label class="field-label">Descrição do Problema *</label>
+        <textarea 
+          class="form-textarea" 
+          [(ngModel)]="boData.descricao" 
+          placeholder="Descreva detalhadamente o que aconteceu com o equipamento..."
+          rows="4"></textarea>
+      </div>
+      
+      <div class="form-field">
+        <label class="field-label">Anexos</label>
+        <input 
+          type="file" 
+          class="form-file" 
+          (change)="onFileSelected($event)"
+          multiple
+          accept="image/*,.pdf,.doc,.docx">
+        <small class="form-help">Formatos aceitos: imagens, PDF, Word. Máximo 5 arquivos.</small>
+      </div>
+      
+      <div class="selected-files" *ngIf="selectedFiles.length > 0">
+        <h5>Arquivos Selecionados:</h5>
+        <div class="file-list">
+          <div class="file-item" *ngFor="let file of selectedFiles; let i = index">
+            <i class="cil-file"></i>
+            <span>{{ file.name }}</span>
+            <button class="remove-file" (click)="removeFile(i)">
+              <i class="cil-x"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="bo-modal-footer">
+      <button class="btn-secondary" (click)="closeBoModal($event)">
+        <i class="cil-x"></i>
+        <span>Cancelar</span>
+      </button>
+      <button class="btn-primary" (click)="salvarBO()" [disabled]="!boData.descricao || saving">
+        <i class="cil-check" *ngIf="!saving"></i>
+        <i class="cil-reload" *ngIf="saving"></i>
+        <span>{{ saving ? 'Salvando...' : 'Salvar BO' }}</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 👁️ MODAL DE VISUALIZAÇÃO DO RECURSO -->
+<div class="modal-overlay" *ngIf="showVisualizarModal" (click)="closeVisualizarModal($event)">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3><i class="cil-eye"></i> Visualizar Recurso</h3>
+      <button class="modal-close" (click)="closeVisualizarModal($event)">
+        <i class="cil-x"></i>
+      </button>
+    </div>
+    
+    <div class="modal-body">
+      <!-- 🔧 IDENTIFICAÇÃO DO EQUIPAMENTO -->
+      <div class="info-section">
+        <h4 class="section-title">
+          <i class="cil-devices"></i>
+          Identificação do Equipamento
+        </h4>
+        <div class="section-content">
+          <div class="form-field">
+            <label class="field-label">Tipo de Equipamento</label>
+            <div class="field-value">{{ visualizarRecurso?.tipoequipamento || 'N/A' }}</div>
+          </div>
+          
+          <div class="form-field">
+            <label class="field-label">Fabricante</label>
+            <div class="field-value">{{ visualizarRecurso?.fabricante || 'N/A' }}</div>
+          </div>
+          
+          <div class="form-field">
+            <label class="field-label">Modelo</label>
+            <div class="field-value">{{ visualizarRecurso?.modelo || 'N/A' }}</div>
+          </div>
+          
+          <div class="form-field">
+            <label class="field-label">Número de Série</label>
+            <div class="field-value">{{ visualizarRecurso?.numeroserie || 'N/A' }}</div>
+          </div>
+          
+          <div class="form-field">
+            <label class="field-label">Patrimônio</label>
+            <div class="field-value">{{ visualizarRecurso?.patrimonio || 'N/A' }}</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 📍 LOCALIZAÇÃO E ASSOCIAÇÕES -->
+      <div class="info-section">
+        <h4 class="section-title">
+          <i class="cil-location-pin"></i>
+          Localização e Associações
+        </h4>
+        <div class="section-content">
+          <div class="form-field">
+            <label class="field-label">Localidade</label>
+            <div class="field-value">{{ visualizarRecurso?.localizacao || 'N/A' }}</div>
+          </div>
+          
+          <div class="form-field">
+            <label class="field-label">Empresa</label>
+            <div class="field-value">{{ visualizarRecurso?.empresa || 'N/A' }}</div>
+          </div>
+          
+          <div class="form-field">
+            <label class="field-label">Centro de Custo</label>
+            <div class="field-value">{{ visualizarRecurso?.centrocusto || 'N/A' }}</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 💰 INFORMAÇÕES FINANCEIRAS -->
+      <div class="info-section">
+        <h4 class="section-title">
+          <i class="cil-dollar"></i>
+          Informações Financeiras
+        </h4>
+        <div class="section-content">
+          <div class="form-field">
+            <label class="field-label">Contrato</label>
+            <div class="field-value">{{ getContratoDisplay(visualizarRecurso) }}</div>
+          </div>
+          
+          <div class="form-field">
+            <label class="field-label">Nota Fiscal</label>
+            <div class="field-value">{{ visualizarRecurso?.notafiscal || 'N/A' }}</div>
+          </div>
+          
+          <div class="form-field">
+            <label class="field-label">Tipo de Aquisição</label>
+            <div class="field-value">{{ visualizarRecurso?.tipoAquisicaoNome || getTipoAquisicaoNome(visualizarRecurso?.tipoaquisicao) || 'N/A' }}</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 📅 DATAS E PRAZOS -->
+      <div class="info-section">
+        <h4 class="section-title">
+          <i class="cil-calendar"></i>
+          Datas e Prazos
+        </h4>
+        <div class="section-content">
+          <div class="form-field">
+            <label class="field-label">
+              Data Limite Garantia
+              <span *ngIf="getStatusGarantiaVisualizar(visualizarRecurso?.dtlimitegarantia)" 
+                    class="field-info" 
+                    [ngClass]="getStatusGarantiaVisualizar(visualizarRecurso?.dtlimitegarantia).class">
+                {{ getStatusGarantiaVisualizar(visualizarRecurso?.dtlimitegarantia).text }}
+              </span>
+            </label>
+            <div class="field-value" [class.garantia-vencida]="dataMenorQueHoje(visualizarRecurso?.dtlimitegarantia)">
+              {{ (visualizarRecurso?.dtlimitegarantia | dateFormat:2) || 'N/A' }}
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 🚦 STATUS E SITUAÇÃO -->
+      <div class="info-section">
+        <h4 class="section-title">
+          <i class="cil-check-circle"></i>
+          Status e Situação
+        </h4>
+        <div class="section-content">
+          <div class="form-field">
+            <label class="field-label">Status Atual</label>
+            <div class="field-value">
+              <span class="status-badge" [ngClass]="getStatusClass(visualizarRecurso?.equipamentostatus)">
+                {{ visualizarRecurso?.equipamentostatus || 'N/A' }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+
+    </div>
+    
+    <div class="modal-footer">
+      <button type="button" class="btn-secondary" (click)="closeVisualizarModal($event)">
+        <i class="cil-x"></i>
+        <span>Fechar</span>
+      </button>
+    </div>
+  </div>
+</div>

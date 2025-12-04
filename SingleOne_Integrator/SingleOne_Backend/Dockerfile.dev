@@ -1,0 +1,18 @@
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
+WORKDIR /app
+
+# Copiar arquivos de projeto
+COPY ["SingleOneAPI/SingleOneAPI.csproj", "SingleOneAPI/"]
+COPY ["SingleOne.sln", "./"]
+
+# Restaurar dependências
+RUN dotnet restore "SingleOneAPI/SingleOneAPI.csproj"
+
+# Copiar todo o código fonte
+COPY . .
+
+# Expor porta
+EXPOSE 5000
+
+# Comando padrão para desenvolvimento
+CMD ["dotnet", "watch", "run", "--project", "SingleOneAPI"] 

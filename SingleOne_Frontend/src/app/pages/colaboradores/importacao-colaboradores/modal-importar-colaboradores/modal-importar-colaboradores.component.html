@@ -1,0 +1,272 @@
+<div class="import-modal-content">
+  <div class="import-modal-header">
+    <h3><i class="cil-cloud-upload"></i> Importar Colaboradores</h3>
+    <button class="close-btn" (click)="fechar()" *ngIf="passoImportacao === 1">
+      <i class="cil-x"></i>
+    </button>
+  </div>
+
+  <div class="import-modal-body">
+    <div *ngIf="passoImportacao === 1" class="import-step">
+      <div class="step-header">
+        <div class="step-number">1</div>
+        <div class="step-title">
+          <h4>Selecione o arquivo</h4>
+          <p>Faça o download do template, preencha e faça upload</p>
+        </div>
+      </div>
+
+      <div class="template-download">
+        <button class="btn-download-template" (click)="baixarTemplate()">
+          <i class="cil-data-transfer-down"></i>
+          <span>Baixar Template Excel</span>
+        </button>
+        <p class="template-info">O template contém instruções e exemplos</p>
+      </div>
+
+      <div class="upload-area" 
+           [class.disabled]="uploadandoImportacao || importandoColaboradores"
+           (click)="!uploadandoImportacao && !importandoColaboradores && fileInputImport.click()">
+        <i class="cil-cloud-upload upload-icon"></i>
+        <h5>Clique para selecionar o arquivo</h5>
+        <p>Arquivos aceitos: .xlsx, .xls (Máximo: 10MB)</p>
+        <p class="text-muted small mt-2" *ngIf="uploadandoImportacao || importandoColaboradores">
+          <i class="cil-clock"></i> Processamento em andamento...
+        </p>
+        <input
+          #fileInputImport
+          type="file"
+          class="d-none"
+          accept=".xlsx,.xls"
+          [disabled]="uploadandoImportacao || importandoColaboradores"
+          (change)="onArquivoSelecionadoImportacao($event)">
+      </div>
+
+      <div class="info-box">
+        <i class="cil-info"></i>
+        <div>
+          <strong>O arquivo deve conter as colunas obrigatórias:</strong>
+          <ul>
+            <li>Nome, CPF, Matrícula, Email, Cargo, Setor</li>
+            <li>Data Admissão, Tipo Colaborador (F/T/C)</li>
+            <li>Empresa, CNPJ, Localidade, Cidade, Estado</li>
+            <li>Centro de Custo Código e Nome</li>
+          </ul>
+          <strong class="mt-2">Opcionais:</strong> Filial, CNPJ Filial, Data Demissão, Matrícula Superior
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="passoImportacao === 2" class="import-step">
+      <div *ngIf="uploadandoImportacao" class="loading-state">
+        <div class="spinner-border text-primary mb-3"></div>
+        <h5>Processando arquivo...</h5>
+        <p>Aguarde enquanto validamos os dados</p>
+      </div>
+
+      <div *ngIf="!uploadandoImportacao && resultadoValidacaoImport" class="validation-result">
+        <div class="step-header">
+          <div class="step-number">2</div>
+          <div class="step-title">
+            <h4>Validação Concluída</h4>
+            <p>{{ resultadoValidacaoImport.mensagem }}</p>
+          </div>
+        </div>
+
+        <div class="metrics-grid">
+          <div class="metric-card total">
+            <i class="cil-list"></i>
+            <div>
+              <span class="metric-value">{{ resultadoValidacaoImport.totalRegistros }}</span>
+              <span class="metric-label">Total de Registros</span>
+            </div>
+          </div>
+          <div class="metric-card success">
+            <i class="cil-check-circle"></i>
+            <div>
+              <span class="metric-value">{{ resultadoValidacaoImport.totalValidos }}</span>
+              <span class="metric-label">Válidos</span>
+            </div>
+          </div>
+          <div class="metric-card primary" *ngIf="resultadoValidacaoImport.totalNovos && resultadoValidacaoImport.totalNovos > 0">
+            <i class="cil-user-follow"></i>
+            <div>
+              <span class="metric-value">{{ resultadoValidacaoImport.totalNovos }}</span>
+              <span class="metric-label">Novos Colaboradores</span>
+            </div>
+          </div>
+          <div class="metric-card info" *ngIf="resultadoValidacaoImport.totalAtualizacoes && resultadoValidacaoImport.totalAtualizacoes > 0">
+            <i class="cil-loop"></i>
+            <div>
+              <span class="metric-value">{{ resultadoValidacaoImport.totalAtualizacoes }}</span>
+              <span class="metric-label">Atualizações Detectadas</span>
+            </div>
+          </div>
+          <div class="metric-card neutral" *ngIf="resultadoValidacaoImport.totalSemAlteracao && resultadoValidacaoImport.totalSemAlteracao > 0">
+            <i class="cil-minus-circle"></i>
+            <div>
+              <span class="metric-value">{{ resultadoValidacaoImport.totalSemAlteracao }}</span>
+              <span class="metric-label">Sem Movimentação</span>
+            </div>
+          </div>
+          <div class="metric-card warning" *ngIf="resultadoValidacaoImport.totalAvisos > 0">
+            <i class="cil-warning"></i>
+            <div>
+              <span class="metric-value">{{ resultadoValidacaoImport.totalAvisos }}</span>
+              <span class="metric-label">Avisos</span>
+            </div>
+          </div>
+          <div class="metric-card error" *ngIf="resultadoValidacaoImport.totalErros > 0">
+            <i class="cil-x-circle"></i>
+            <div>
+              <span class="metric-value">{{ resultadoValidacaoImport.totalErros }}</span>
+              <span class="metric-label">Erros</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="new-records" *ngIf="resultadoValidacaoImport.novasEmpresas > 0 || resultadoValidacaoImport.novasLocalidades > 0 || resultadoValidacaoImport.novoscentrosCusto > 0 || resultadoValidacaoImport.novasFiliais > 0">
+          <h5><i class="cil-plus-circle"></i> Serão criados automaticamente:</h5>
+          <div class="new-items">
+            <span class="badge badge-info" *ngIf="resultadoValidacaoImport.novasEmpresas > 0">
+              {{ resultadoValidacaoImport.novasEmpresas }} Empresa(s)
+            </span>
+            <span class="badge badge-info" *ngIf="resultadoValidacaoImport.novasLocalidades > 0">
+              {{ resultadoValidacaoImport.novasLocalidades }} Localidade(s)
+            </span>
+            <span class="badge badge-info" *ngIf="resultadoValidacaoImport.novoscentrosCusto > 0">
+              {{ resultadoValidacaoImport.novoscentrosCusto }} Centro(s) de Custo
+            </span>
+            <span class="badge badge-info" *ngIf="resultadoValidacaoImport.novasFiliais > 0">
+              {{ resultadoValidacaoImport.novasFiliais }} Filial(is)
+            </span>
+          </div>
+        </div>
+
+        <div class="critical-errors" *ngIf="resultadoValidacaoImport.errosCriticos?.length">
+          <h5><i class="cil-x-circle"></i> Erros que impedem a importação</h5>
+          <p class="text-muted">
+            Corrija os itens abaixo para liberar o botão de confirmação.
+            <ng-container *ngIf="resultadoValidacaoImport.possuiMaisErros">
+              Existem mais erros do que os exibidos aqui.
+              <button class="btn-link" [disabled]="baixandoErros" (click)="baixarErrosValidacao()">
+                <i class="cil-cloud-download"></i>
+                {{ baixandoErros ? 'Gerando arquivo...' : 'Baixar CSV completo' }}
+              </button>
+            </ng-container>
+          </p>
+
+          <div class="error-list">
+            <div class="error-item" *ngFor="let erro of resultadoValidacaoImport.errosCriticos">
+              <div class="error-header">
+                <span class="badge badge-danger">Linha {{ erro.linha }}</span>
+                <span class="error-identificacao">
+                  {{ erro.nome || 'Sem nome' }} |
+                  CPF: {{ erro.cpf || 'N/A' }} |
+                  Matrícula: {{ erro.matricula || 'N/A' }}
+                </span>
+              </div>
+              <ul class="error-messages">
+                <li *ngFor="let mensagem of erro.mensagens">{{ mensagem }}</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="action-buttons">
+          <button class="btn-secondary" (click)="cancelarImportacaoModal()">
+            <i class="cil-x"></i>
+            Cancelar
+          </button>
+          <button
+            class="btn-primary"
+            [disabled]="!resultadoValidacaoImport.podeImportar"
+            (click)="confirmarImportacao()">
+            <i class="cil-check"></i>
+            Confirmar Importação
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="passoImportacao === 3" class="import-step">
+      <div class="loading-state">
+        <div class="spinner-border text-success mb-3" style="width: 3rem; height: 3rem;"></div>
+        <h5>Importando dados...</h5>
+        <p>Aguarde enquanto criamos os registros</p>
+      </div>
+    </div>
+
+    <div *ngIf="passoImportacao === 4" class="import-step">
+      <div class="success-state">
+        <i class="cil-check-circle success-icon"></i>
+        <h4>Importação Concluída!</h4>
+        <p>{{ resultadoImportacaoFinal?.mensagem }}</p>
+
+        <div class="metrics-grid" *ngIf="resultadoImportacaoFinal">
+          <div class="metric-card">
+            <i class="cil-user-follow"></i>
+            <div>
+              <span class="metric-value">{{ resultadoImportacaoFinal.colaboradoresCriados }}</span>
+              <span class="metric-label">Colaboradores Criados</span>
+            </div>
+          </div>
+          <div class="metric-card" *ngIf="resultadoImportacaoFinal.colaboradoresAtualizados > 0">
+            <i class="cil-user"></i>
+            <div>
+              <span class="metric-value">{{ resultadoImportacaoFinal.colaboradoresAtualizados }}</span>
+              <span class="metric-label">Colaboradores Atualizados</span>
+            </div>
+          </div>
+          <div class="metric-card" *ngIf="resultadoImportacaoFinal.colaboradoresSemAlteracao > 0">
+            <i class="cil-minus-circle"></i>
+            <div>
+              <span class="metric-value">{{ resultadoImportacaoFinal.colaboradoresSemAlteracao }}</span>
+              <span class="metric-label">Sem Movimentação</span>
+            </div>
+          </div>
+          <div class="metric-card" *ngIf="resultadoImportacaoFinal.empresasCriadas > 0">
+            <i class="cil-building"></i>
+            <div>
+              <span class="metric-value">{{ resultadoImportacaoFinal.empresasCriadas }}</span>
+              <span class="metric-label">Empresas Criadas</span>
+            </div>
+          </div>
+          <div class="metric-card" *ngIf="resultadoImportacaoFinal.localidadesCriadas > 0">
+            <i class="cil-location-pin"></i>
+            <div>
+              <span class="metric-value">{{ resultadoImportacaoFinal.localidadesCriadas }}</span>
+              <span class="metric-label">Localidades Criadas</span>
+            </div>
+          </div>
+          <div class="metric-card" *ngIf="resultadoImportacaoFinal.centrosCustoCriados > 0">
+            <i class="cil-dollar"></i>
+            <div>
+              <span class="metric-value">{{ resultadoImportacaoFinal.centrosCustoCriados }}</span>
+              <span class="metric-label">Centros de Custo</span>
+            </div>
+          </div>
+          <div class="metric-card" *ngIf="resultadoImportacaoFinal.filiaisCriadas > 0">
+            <i class="cil-building"></i>
+            <div>
+              <span class="metric-value">{{ resultadoImportacaoFinal.filiaisCriadas }}</span>
+              <span class="metric-label">Filiais Criadas</span>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn-primary mt-3" (click)="fechar()">
+          <i class="cil-check"></i>
+          Concluir
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="import-modal-footer" *ngIf="passoImportacao === 1">
+    <button class="btn-secondary" (click)="fechar()">
+      Cancelar
+    </button>
+  </div>
+</div>
+

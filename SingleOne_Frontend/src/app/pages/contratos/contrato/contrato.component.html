@@ -1,0 +1,429 @@
+<!-- 🎯 HEADER MODERNO DO CONTRATO -->
+<div class="contrato-header">
+  <div class="header-content">
+    <div class="header-left">
+      <button class="back-button" [routerLink]="['/contratos']" matTooltip="Voltar para Contratos">
+        <i class="cil-arrow-left"></i>
+      </button>
+      <div class="header-title">
+        <div class="title-icon">
+          <i class="cil-file"></i>
+        </div>
+        <div class="title-text">
+          <h1>{{ contratoId ? 'Editar' : 'Novo' }} Contrato</h1>
+          <p>{{ contratoId ? 'Atualizar dados do contrato' : 'Cadastrar novo contrato no sistema' }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="action-btn secondary-btn" (click)="limparFormulario()" matTooltip="Limpar formulário">
+        <i class="cil-refresh"></i>
+        <span>Limpar</span>
+      </button>
+      <button class="action-btn primary-btn" (click)="salvarContrato()" matTooltip="Salvar contrato" [disabled]="!form.valid">
+        <i class="cil-save"></i>
+        <span>Salvar</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 🍞 BREADCRUMB MODERNO -->
+<nav class="modern-breadcrumb">
+  <div class="breadcrumb-container">
+    <a [routerLink]="['/dashboard']" class="breadcrumb-item">
+      <i class="cil-home"></i>
+      <span>Dashboard</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a [routerLink]="['/cadastros']" class="breadcrumb-item">
+      <i class="cil-cog"></i>
+      <span>Cadastros</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a [routerLink]="['/contratos']" class="breadcrumb-item">
+      <i class="cil-file"></i>
+      <span>Contratos</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <span class="breadcrumb-item active">{{ contratoId ? 'Editar' : 'Novo' }} Contrato</span>
+  </div>
+</nav>
+
+<!-- 📋 CONTEÚDO PRINCIPAL -->
+<div class="contrato-content">
+  <form [formGroup]="form" (ngSubmit)="salvarContrato()" class="form-container">
+    
+    <!-- 📄 SEÇÃO DE DADOS BÁSICOS -->
+    <div class="form-section">
+      <div class="section-header">
+        <div class="section-icon">
+          <i class="cil-file"></i>
+        </div>
+        <div class="section-title">
+          <h3>Dados do Contrato</h3>
+          <p>Informações básicas para identificação do contrato</p>
+        </div>
+      </div>
+      
+      <div class="form-grid">
+        <!-- Fornecedor -->
+        <div class="form-field">
+          <label class="field-label">
+            <i class="cil-truck"></i>
+            Fornecedor *
+          </label>
+          <div class="field-with-action">
+            <select
+              formControlName="fornecedor"
+              class="modern-select"
+              [class.error]="form.get('fornecedor')?.invalid && form.get('fornecedor')?.touched">
+              <option value="">Selecione um fornecedor</option>
+              <option *ngFor="let fornecedor of fornecedores" [value]="fornecedor.id">
+                {{ fornecedor.nome }}
+              </option>
+            </select>
+            <button type="button" class="btn-new" (click)="abrirModalNovoFornecedor()" title="Cadastrar novo fornecedor">
+              <i class="cil-plus"></i>
+              <span>Novo</span>
+            </button>
+          </div>
+          <div class="field-error" *ngIf="form.get('fornecedor')?.invalid && form.get('fornecedor')?.touched">
+            Fornecedor é obrigatório
+          </div>
+        </div>
+
+        <!-- Número do Contrato -->
+        <div class="form-field">
+          <label class="field-label">
+            <i class="cil-hashtag"></i>
+            Número *
+          </label>
+          <input
+            type="number"
+            formControlName="numero"
+            class="modern-input"
+            placeholder="Digite o número do contrato"
+            [class.error]="form.get('numero')?.invalid && form.get('numero')?.touched">
+          <div class="field-error" *ngIf="form.get('numero')?.invalid && form.get('numero')?.touched">
+            Número é obrigatório
+          </div>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <!-- Aditivo -->
+        <div class="form-field">
+          <label class="field-label">
+            <i class="cil-plus"></i>
+            Aditivo
+          </label>
+          <input
+            type="number"
+            formControlName="aditivo"
+            class="modern-input"
+            placeholder="Digite o número do aditivo (opcional)">
+        </div>
+
+        <!-- Valor -->
+        <div class="form-field">
+          <label class="field-label">
+            <i class="cil-dollar"></i>
+            Valor
+          </label>
+          <input
+            type="text"
+            formControlName="valor"
+            class="modern-input"
+            placeholder="R$ 0,00"
+            currencyMask
+            [options]="{ prefix: 'R$ ', thousands: '.', decimal: ',' }">
+        </div>
+      </div>
+
+      <!-- Descrição -->
+      <div class="form-field full-width">
+        <label class="field-label">
+          <i class="cil-description"></i>
+          Descrição
+        </label>
+        <textarea
+          formControlName="descricao"
+          class="modern-textarea"
+          placeholder="Descreva o contrato..."
+          rows="3"></textarea>
+      </div>
+    </div>
+
+    <!-- 📅 SEÇÃO DE VIGÊNCIA -->
+    <div class="form-section">
+      <div class="section-header">
+        <div class="section-icon">
+          <i class="cil-calendar"></i>
+        </div>
+        <div class="section-title">
+          <h3>Período de Vigência</h3>
+          <p>Defina as datas de início e fim da vigência do contrato</p>
+        </div>
+      </div>
+      
+      <div class="form-grid">
+        <!-- Data de Início -->
+        <div class="form-field">
+          <label class="field-label">
+            <i class="cil-calendar-check"></i>
+            Data de Início *
+          </label>
+          <input
+            type="date"
+            formControlName="dtInicioVigencia"
+            class="modern-input"
+            [class.error]="form.get('dtInicioVigencia')?.invalid && form.get('dtInicioVigencia')?.touched">
+          <div class="field-error" *ngIf="form.get('dtInicioVigencia')?.invalid && form.get('dtInicioVigencia')?.touched">
+            Data de início é obrigatória
+          </div>
+        </div>
+
+        <!-- Prazo do Contrato -->
+        <div class="form-group prazo-selector" style="margin: 1.5rem 0; padding: 1.25rem; background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%); border-radius: 20px; border: 2px solid #e8ecff; box-shadow: 0 4px 20px rgba(8, 0, 57, 0.08);">
+          <label class="field-label" style="font-size: 1.15rem; font-weight: 700; color: #080039; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+            <i class="cil-clock" style="font-size: 1.25rem; color: #080039;"></i>
+            Prazo do Contrato *
+          </label>
+          <select 
+            formControlName="prazoContrato"
+            class="modern-select"
+            style="padding: 1.5rem 1.5rem; font-size: 1.2rem; font-weight: 600; min-height: 70px; background: white; border: 2px solid #d0d7ff; border-radius: 14px; width: 100%; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);"
+            [class.error]="form.get('prazoContrato')?.invalid && form.get('prazoContrato')?.touched">
+            <option *ngFor="let opcao of opcoesPrazo" [value]="opcao.valor">
+              {{ opcao.label }}
+            </option>
+          </select>
+          <div class="field-error" *ngIf="form.get('prazoContrato')?.invalid && form.get('prazoContrato')?.touched">
+            Prazo do contrato é obrigatório
+          </div>
+        </div>
+
+        <!-- Data de Fim -->
+        <div class="form-field" *ngIf="mostrarDataPersonalizada">
+          <label class="field-label">
+            <i class="cil-calendar-x"></i>
+            Data de Fim *
+          </label>
+          <input
+            type="date"
+            formControlName="dtFinalVigencia"
+            class="modern-input"
+            [class.error]="form.get('dtFinalVigencia')?.invalid && form.get('dtFinalVigencia')?.touched">
+          <div class="field-error" *ngIf="form.get('dtFinalVigencia')?.invalid && form.get('dtFinalVigencia')?.touched">
+            Data de fim é obrigatória
+          </div>
+        </div>
+
+        <!-- Data de Fim Calculada (somente leitura) -->
+        <div class="form-field" *ngIf="!mostrarDataPersonalizada && form.get('dtFinalVigencia')?.value">
+          <label class="field-label">
+            <i class="cil-calendar-x"></i>
+            Data de Fim (Calculada)
+          </label>
+          <input
+            type="date"
+            formControlName="dtFinalVigencia"
+            class="modern-input readonly"
+            readonly>
+          <div class="field-info">
+            <i class="cil-info"></i>
+            Data calculada automaticamente baseada no prazo selecionado
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ⚙️ SEÇÃO DE CONFIGURAÇÕES -->
+    <div class="form-section">
+      <div class="section-header">
+        <div class="section-icon">
+          <i class="cil-settings"></i>
+        </div>
+        <div class="section-title">
+          <h3>Configurações</h3>
+          <p>Defina as configurações específicas do contrato</p>
+        </div>
+      </div>
+      
+      <div class="form-field">
+        <div class="toggle-field">
+          <label class="field-label">
+            <i class="cil-sync"></i>
+            Contrato Renovável
+          </label>
+          <div class="toggle-container">
+            <label class="modern-toggle">
+              <input type="checkbox" formControlName="renovavel">
+              <span class="toggle-slider"></span>
+            </label>
+            <span class="toggle-label">{{ form.get('renovavel')?.value ? 'Sim' : 'Não' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 📎 SEÇÃO DE ANEXOS -->
+    <div class="form-section" *ngIf="contratoId">
+      <div class="section-header">
+        <div class="section-icon">
+          <i class="cil-paperclip"></i>
+        </div>
+        <div class="section-title">
+          <h3>Arquivo do Contrato</h3>
+          <p>Anexe o documento do contrato (PDF, DOC ou DOCX até 10MB)</p>
+        </div>
+      </div>
+      
+      <!-- Arquivo Atual -->
+      <div class="arquivo-atual" *ngIf="arquivoAtual?.temArquivo && !arquivoSelecionado">
+        <div class="arquivo-card">
+          <div class="arquivo-icon">
+            <i class="cil-file-pdf"></i>
+          </div>
+          <div class="arquivo-info">
+            <h4>{{ arquivoAtual.nome }}</h4>
+            <p *ngIf="arquivoAtual.dataUpload">
+              <i class="cil-calendar"></i>
+              Enviado em {{ arquivoAtual.dataUpload | date: 'dd/MM/yyyy HH:mm' }}
+            </p>
+          </div>
+          <div class="arquivo-actions">
+            <button type="button" class="btn-icon download-btn" (click)="downloadArquivo()" matTooltip="Baixar arquivo">
+              <i class="cil-cloud-download"></i>
+            </button>
+            <button type="button" class="btn-icon delete-btn" (click)="removerArquivo()" matTooltip="Remover arquivo">
+              <i class="cil-trash"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Arquivo Selecionado (preview antes do upload) -->
+      <div class="arquivo-selecionado" *ngIf="arquivoSelecionado">
+        <div class="arquivo-card novo">
+          <div class="arquivo-icon">
+            <i class="cil-file"></i>
+          </div>
+          <div class="arquivo-info">
+            <h4>{{ arquivoSelecionado.name }}</h4>
+            <p>
+              <i class="cil-info"></i>
+              Tamanho: {{ (arquivoSelecionado.size / 1024 / 1024).toFixed(2) }} MB
+            </p>
+          </div>
+          <div class="arquivo-actions">
+            <button type="button" class="btn-icon cancel-btn" (click)="cancelarArquivoSelecionado()" matTooltip="Cancelar">
+              <i class="cil-x"></i>
+            </button>
+            <button type="button" class="btn-icon upload-btn" (click)="uploadArquivo()" matTooltip="Enviar arquivo">
+              <i class="cil-cloud-upload"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Upload de Novo Arquivo -->
+      <div class="upload-area" *ngIf="!arquivoAtual?.temArquivo && !arquivoSelecionado">
+        <label class="upload-label">
+          <input type="file" accept=".pdf,.doc,.docx" (change)="selecionarArquivo($event)" style="display: none;">
+          <div class="upload-content">
+            <i class="cil-cloud-upload"></i>
+            <h4>Clique para selecionar um arquivo</h4>
+            <p>PDF, DOC ou DOCX até 10MB</p>
+          </div>
+        </label>
+      </div>
+
+      <!-- Botão para trocar arquivo -->
+      <div class="upload-actions" *ngIf="arquivoAtual?.temArquivo && !arquivoSelecionado">
+        <label class="btn-trocar-arquivo">
+          <input type="file" accept=".pdf,.doc,.docx" (change)="selecionarArquivo($event)" style="display: none;">
+          <i class="cil-sync"></i>
+          <span>Substituir Arquivo</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Aviso para contratos não salvos -->
+    <div class="form-section alert-info" *ngIf="!contratoId">
+      <div class="alert-content">
+        <i class="cil-info"></i>
+        <p>Salve o contrato primeiro para poder anexar documentos.</p>
+      </div>
+    </div>
+
+    <!-- 🎯 BOTÕES DE AÇÃO -->
+    <div class="form-actions">
+      <button type="button" class="action-btn secondary-btn" (click)="limparFormulario()">
+        <i class="cil-refresh"></i>
+        <span>Limpar</span>
+      </button>
+      <button type="button" class="action-btn cancel-btn" (click)="cancelarContrato()">
+        <i class="cil-x"></i>
+        <span>Cancelar</span>
+      </button>
+      <button type="submit" class="action-btn primary-btn" [disabled]="!form.valid">
+        <i class="cil-save"></i>
+        <span>Salvar Contrato</span>
+      </button>
+    </div>
+  </form>
+</div>
+
+<!-- 🆕 MODAL NOVO FORNECEDOR -->
+<div class="modal-overlay" *ngIf="mostrarModalFornecedor" (click)="fecharModalFornecedor()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3><i class="cil-truck"></i> Novo Fornecedor</h3>
+      <button class="modal-close" (click)="fecharModalFornecedor()">
+        <i class="cil-x"></i>
+      </button>
+    </div>
+    
+    <div class="modal-body">
+      <div class="form-field">
+        <label class="field-label">Nome *</label>
+        <input type="text" class="form-input" [(ngModel)]="novoFornecedor.nome" 
+               placeholder="Ex: Empresa ABC Ltda">
+      </div>
+      
+      <div class="form-row">
+        <div class="form-field">
+          <label class="field-label">CNPJ *</label>
+          <input type="text" class="form-input" [(ngModel)]="novoFornecedor.cnpj" 
+                 placeholder="00.000.000/0000-00" appCnpjMask>
+        </div>
+        
+        <div class="form-field">
+          <label class="field-label">Telefone</label>
+          <input type="text" class="form-input" [(ngModel)]="novoFornecedor.telefone" 
+                 placeholder="(11) 99999-9999">
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label class="field-label">Email</label>
+        <input type="email" class="form-input" [(ngModel)]="novoFornecedor.email" 
+               placeholder="contato@empresa.com">
+      </div>
+    </div>
+    
+    <div class="modal-footer">
+      <button type="button" class="btn-secondary" (click)="fecharModalFornecedor()">
+        <i class="cil-x"></i>
+        <span>Cancelar</span>
+      </button>
+      <button type="button" class="btn-primary" (click)="salvarNovoFornecedor()" 
+              [disabled]="!novoFornecedor.nome || !novoFornecedor.cnpj">
+        <i class="cil-check"></i>
+        <span>Salvar</span>
+      </button>
+    </div>
+  </div>
+</div>

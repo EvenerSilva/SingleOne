@@ -1,0 +1,132 @@
+<!-- 🎯 HEADER MODERNO DAS LOCALIDADES -->
+<div class="localidades-header">
+  <div class="header-content">
+    <div class="header-left">
+      <button class="back-button" [routerLink]="['/cadastros']" matTooltip="Voltar para Cadastros">
+        <i class="cil-arrow-left"></i>
+      </button>
+      <div class="header-title">
+        <div class="title-icon">
+          <i class="cil-location-pin"></i>
+        </div>
+        <div class="title-text">
+          <h1>Localidades</h1>
+          <p>Gerenciar localidades do sistema</p>
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="action-btn primary-btn" (click)="novaLocalidade()" matTooltip="Adicionar nova localidade">
+        <i class="cil-plus"></i>
+        <span>Nova Localidade</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 🍞 BREADCRUMB MODERNO -->
+<nav class="modern-breadcrumb">
+  <div class="breadcrumb-container">
+    <a [routerLink]="['/dashboard']" class="breadcrumb-item">
+      <i class="cil-home"></i>
+      <span>Dashboard</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a [routerLink]="['/cadastros']" class="breadcrumb-item">
+      <i class="cil-cog"></i>
+      <span>Cadastros</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <span class="breadcrumb-item active">Localidades</span>
+  </div>
+</nav>
+
+<!-- 📋 CONTEÚDO PRINCIPAL -->
+<div class="localidades-content">
+  <!-- 🔍 SEÇÃO DE BUSCA -->
+  <div class="search-section">
+    <div class="search-box">
+      <i class="cil-magnifying-glass search-icon"></i>
+      <input type="text" placeholder="Buscar localidade pela descrição, cidade ou estado..." [formControl]="consulta">
+      <button 
+        *ngIf="consulta.value" 
+        class="clear-btn" 
+        (click)="limparBusca()"
+        type="button">
+        <i class="cil-x"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- 📊 TABELA MODERNA -->
+  <div class="table-section">
+    <div class="table-container">
+      <table class="modern-table">
+        <thead>
+          <tr>
+            <th>Descrição</th>
+            <th>Cidade</th>
+            <th>Estado</th>
+            <th class="text-center">Status</th>
+            <th class="text-center">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of dadosPaginados" [class.localidade-padrao]="row.id === 1">
+            <td class="localidade-descricao">
+              <div class="localidade-info">
+                <div class="localidade-avatar">
+                  <i class="cil-location-pin"></i>
+                </div>
+                <span>{{row.descricao}}</span>
+                <span *ngIf="row.id === 1" class="badge-padrao">SISTEMA</span>
+              </div>
+            </td>
+            <td class="localidade-cidade">{{getNomeCidade(row.cidade)}}</td>
+            <td class="localidade-estado">{{getNomeEstado(row.estado)}}</td>
+            <td class="localidade-status text-center">
+              <div class="status-label" [class.active]="row.ativo" [class.inactive]="!row.ativo">
+                {{ row.ativo ? 'ATIVO' : 'INATIVO' }}
+              </div>
+            </td>
+            <td class="localidade-actions text-center">
+              <div class="action-buttons">
+                <!-- Botão Editar (inclui opção de ativar/desativar) -->
+                <button class="action-btn edit-btn" matTooltip="Editar Localidade" (click)="editar(row)">
+                  <i class="cil-pencil"></i>
+                </button>
+                
+                <!-- Botão Ativar/Desativar REMOVIDO - Funcionalidade já existe no formulário de edição -->
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <!-- Mensagem quando não há dados -->
+      <div *ngIf="dadosPaginados.length === 0" class="no-data-message">
+        <i class="cil-inbox"></i>
+        <p>Nenhuma localidade encontrada.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 📄 PAGINAÇÃO -->
+  <div class="pagination-container">
+    <mat-paginator 
+      [pageSizeOptions]="[5, 10, 25, 100]" 
+      [pageSize]="10" 
+      showFirstLastButtons>
+    </mat-paginator>
+  </div>
+</div>
+
+<!-- 🎯 FORMULÁRIO DE LOCALIDADE (MODAL) -->
+<div class="formulario-overlay" *ngIf="mostrarFormulario">
+  <app-localidade
+    [localidade]="localidadeEditando"
+    [modo]="modoFormulario"
+    (localidadeSalva)="onLocalidadeSalva($event)"
+    (cancelado)="onCancelado()"
+  ></app-localidade>
+</div>

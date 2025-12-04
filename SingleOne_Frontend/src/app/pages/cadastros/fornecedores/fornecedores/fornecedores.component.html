@@ -1,0 +1,132 @@
+<!-- 🎯 HEADER MODERNO DOS FORNECEDORES -->
+<div class="fornecedores-header">
+  <div class="header-content">
+    <div class="header-left">
+      <button class="back-button" [routerLink]="['/cadastros']" matTooltip="Voltar para Cadastros">
+        <i class="cil-arrow-left"></i>
+      </button>
+      <div class="header-title">
+        <div class="title-icon">
+          <i class="cil-truck"></i>
+        </div>
+        <div class="title-text">
+          <h1>Fornecedores</h1>
+          <p>Gerenciar fornecedores do sistema</p>
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="action-btn primary-btn" (click)="novoFornecedor()" matTooltip="Adicionar novo fornecedor">
+        <i class="cil-plus"></i>
+        <span>Novo Fornecedor</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 🍞 BREADCRUMB MODERNO -->
+<nav class="modern-breadcrumb">
+  <div class="breadcrumb-container">
+    <a [routerLink]="['/dashboard']" class="breadcrumb-item">
+      <i class="cil-home"></i>
+      <span>Dashboard</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a [routerLink]="['/cadastros']" class="breadcrumb-item">
+      <i class="cil-cog"></i>
+      <span>Cadastros</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <span class="breadcrumb-item active">Fornecedores</span>
+  </div>
+</nav>
+
+<!-- 📋 CONTEÚDO PRINCIPAL -->
+<div class="fornecedores-content">
+  <!-- 🔍 SEÇÃO DE BUSCA -->
+  <div class="search-section">
+    <div class="search-box">
+      <i class="cil-magnifying-glass search-icon"></i>
+      <input type="text" placeholder="Buscar fornecedor pela razão social ou CNPJ..." [formControl]="consulta">
+      <button 
+        *ngIf="consulta.value" 
+        class="clear-btn" 
+        (click)="limparBusca()"
+        type="button">
+        <i class="cil-x"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- 📊 TABELA MODERNA -->
+  <div class="table-section">
+    <div class="table-container">
+      <table class="modern-table">
+        <thead>
+          <tr>
+            <th>Razão Social</th>
+            <th>CNPJ</th>
+            <th class="text-center">Destinador</th>
+            <th class="text-center">Status</th>
+            <th class="text-center">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of dadosPaginados">
+            <td class="fornecedor-razao">
+              <div class="fornecedor-info">
+                <div class="fornecedor-avatar">
+                  <i class="cil-truck"></i>
+                </div>
+                <span>{{row.nome}}</span>
+              </div>
+            </td>
+            <td class="fornecedor-cnpj">{{row.cnpj | cnpjFormat}}</td>
+            <td class="fornecedor-destinador text-center">
+              <div class="destinador-badge" *ngIf="row.destinadorResiduos" matTooltip="Este fornecedor é destinador de resíduos">
+                <i class="fas fa-recycle"></i>
+                <span>Destinador</span>
+              </div>
+              <div class="nao-destinador" *ngIf="!row.destinadorResiduos">
+                <span>-</span>
+              </div>
+            </td>
+            <td class="fornecedor-status text-center">
+              <div class="status-label" [class.active]="row.ativo" [class.inactive]="!row.ativo">
+                {{ row.ativo ? 'ATIVO' : 'INATIVO' }}
+              </div>
+            </td>
+            <td class="fornecedor-actions text-center">
+              <div class="action-buttons">
+                <button class="action-btn edit-btn" matTooltip="Editar Fornecedor" (click)="editar(row)">
+                  <i class="cil-pencil"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 📄 PAGINAÇÃO -->
+  <div class="pagination-container">
+    <mat-paginator 
+      [pageSizeOptions]="[5, 10, 25, 100]" 
+      [pageSize]="10" 
+      showFirstLastButtons>
+    </mat-paginator>
+  </div>
+</div>
+
+<!-- 🎯 FORMULÁRIO DE FORNECEDOR (MODAL) -->
+<div class="formulario-overlay" *ngIf="mostrarFormulario">
+  <div class="formulario-container">
+    <app-fornecedor
+      [fornecedor]="fornecedorEditando"
+      [modo]="modoFormulario"
+      (fornecedorSalvo)="onFornecedorSalvo($event)"
+      (cancelado)="onCancelado()"
+    ></app-fornecedor>
+  </div>
+</div>

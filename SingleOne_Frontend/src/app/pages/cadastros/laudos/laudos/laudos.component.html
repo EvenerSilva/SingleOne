@@ -1,0 +1,305 @@
+<!-- 🎯 HEADER MODERNO DOS LAUDOS -->
+<div class="laudos-header">
+  <div class="header-content">
+    <div class="header-left">
+      <button class="back-button" [routerLink]="['/movimentacoes']" matTooltip="Voltar para Movimentações">
+        <i class="cil-arrow-left"></i>
+      </button>
+      <div class="header-title">
+        <div class="title-icon">
+          <i class="cil-clipboard"></i>
+        </div>
+                     <div class="title-text">
+               <h1>Sinistros</h1>
+               <p>Gerenciar sinistros técnicos e relatórios de recursos</p>
+             </div>
+      </div>
+    </div>
+    <div class="header-right">
+                   <button class="action-btn primary-btn" (click)="novoSinistro()" matTooltip="Criar novo sinistro técnico">
+               <i class="cil-plus"></i>
+               <span>Novo Sinistro</span>
+             </button>
+    </div>
+  </div>
+</div>
+
+<!-- 🍞 BREADCRUMB MODERNO -->
+<nav class="modern-breadcrumb">
+  <div class="breadcrumb-container">
+    <a [routerLink]="['/dashboard']" class="breadcrumb-item">
+      <i class="cil-home"></i>
+      <span>Dashboard</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a [routerLink]="['/movimentacoes']" class="breadcrumb-item">
+      <i class="cil-arrow-circle-up"></i>
+      <span>Solicitações</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+               <span class="breadcrumb-item active">Sinistros</span>
+  </div>
+</nav>
+
+<!-- 📋 CONTEÚDO PRINCIPAL -->
+<div class="laudos-content">
+  <!-- 🔍 SEÇÃO DE BUSCA -->
+  <div class="search-section">
+    <div class="search-box">
+      <i class="cil-magnifying-glass search-icon"></i>
+      <input type="text" 
+             placeholder="Buscar por: equipamento, SN, patrimônio, empresa, centro custo, usuário, técnico ou descrição..." 
+             [formControl]="consulta"
+             matTooltip="Digite qualquer informação para buscar: nome do equipamento, número de série, patrimônio, empresa, centro de custo, usuário, técnico ou descrição do problema"
+             matTooltipPosition="below">
+      <button 
+        *ngIf="consulta.value" 
+        class="clear-btn" 
+        (click)="limparBusca()"
+        type="button">
+        <i class="cil-x"></i>
+      </button>
+      
+
+      
+
+    </div>
+  </div>
+
+  <!-- 📊 TABELA MODERNA -->
+  <div class="table-section">
+
+    
+    <div class="table-container">
+      <table class="modern-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Recurso</th>
+            <th>Data Entrada</th>
+            <th>Data Finalização</th>
+            <th>Empresa</th>
+            <th>Centro Custo</th>
+            <th>Usuário</th>
+            <th>Técnico</th>
+            <th class="text-center">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of dadosPaginados">
+            <td class="laudo-id">
+              <span>{{row.id}}</span>
+            </td>
+            <td class="recurso-info">
+              <div class="recurso-details">
+                <div class="recurso-avatar">
+                  <i class="cil-devices"></i>
+                </div>
+                <div class="recurso-text">
+                  <div class="recurso-nome">{{row.equipamento}}</div>
+                  <div class="recurso-sn">
+                    S/N: 
+                    <a 
+                      class="serial-number-link"
+                      [routerLink]="['/recursos']"
+                      [queryParams]="{search: row.numeroserie}"
+                      [matTooltip]="'Clique para ver detalhes do recurso: ' + row.equipamento + ' (S/N: ' + row.numeroserie + ')'"
+                      [matTooltipClass]="'resource-tooltip'"
+                      [matTooltipPosition]="'above'"
+                      [matTooltipShowDelay]="500">
+                      {{row.numeroserie}}
+                      <i class="cil-external-link"></i>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </td>
+            <td class="data-entrada">
+              <span>{{row.dtentrada | dateFormat:1}}</span>
+            </td>
+            <td class="data-finalizacao">
+              <span *ngIf="row.dtlaudo">{{row.dtlaudo | dateFormat:1}}</span>
+              <span *ngIf="!row.dtlaudo" class="status-label em-andamento">Em andamento</span>
+            </td>
+            <td class="empresa-info">
+              <span>{{row.empresanome || 'N/A'}}</span>
+            </td>
+            <td class="centrocusto-info">
+              <span>{{row.centrocustonome || 'N/A'}}</span>
+            </td>
+            <td class="usuario-info">
+              <span>{{row.usuarionome}}</span>
+            </td>
+            <td class="tecnico-info">
+              <span>{{row.tecniconome}}</span>
+            </td>
+            <td class="laudo-actions">
+              <div class="action-buttons">
+                <!-- Botão Encerrar (apenas se não finalizado) -->
+                <button 
+                  *ngIf="!row.dtlaudo"
+                  class="action-btn success-btn" 
+                  matTooltip="Finalizar Sinistro" 
+                  (click)="encerrar(row)"
+                  style="background: #28a745 !important; color: white !important; border: none !important; border-radius: 10px !important; width: 40px !important; height: 40px !important; display: flex !important; align-items: center !important; justify-content: center !important; cursor: pointer !important;">
+                  <i class="cil-check-circle" style="color: white !important; display: block !important; font-size: 18px !important; opacity: 1 !important; visibility: visible !important; font-weight: normal !important; text-align: center !important; line-height: 1 !important;"></i>
+                </button>
+                
+                <!-- Botão Visualizar -->
+                <button 
+                  class="action-btn primary-btn" 
+                  matTooltip="Visualizar Sinistro" 
+                  (click)="visualizar(row)"
+                  style="background: #1976d2 !important; color: white !important; border: none !important; border-radius: 10px !important; width: 40px !important; height: 40px !important; display: flex !important; align-items: center !important; justify-content: center !important; cursor: pointer !important;">
+                  <i class="cil-search" style="color: white !important; display: block !important; font-size: 18px !important; opacity: 1 !important; visibility: visible !important; font-weight: normal !important; text-align: center !important; line-height: 1 !important;"></i>
+                </button>
+                
+                <!-- Botão Imprimir (apenas se finalizado e sem conserto) -->
+                <button 
+                  *ngIf="row.dtlaudo && !row.temconserto"
+                  class="action-btn print-btn" 
+                  matTooltip="Imprimir Sinistro" 
+                  (click)="imprimir(row)"
+                  style="background: #6c757d !important; color: white !important; border: none !important; border-radius: 10px !important; width: 40px !important; height: 40px !important; display: flex !important; align-items: center !important; justify-content: center !important; cursor: pointer !important;">
+                  <i class="cil-print" style="color: white !important; display: block !important; font-size: 18px !important; opacity: 1 !important; visibility: visible !important; font-weight: normal !important; text-align: center !important; line-height: 1 !important;"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 📄 PAGINAÇÃO -->
+  <div class="pagination-container">
+    <mat-paginator 
+      [pageSizeOptions]="[5, 10, 25, 100]" 
+      [pageSize]="10" 
+      showFirstLastButtons>
+    </mat-paginator>
+  </div>
+</div>
+
+<!-- 🎯 FORMULÁRIO DE LAUDO (MODAL) -->
+<div class="formulario-overlay" *ngIf="mostrarFormulario">
+  <div class="formulario-container">
+           <app-laudo
+         [laudo]="laudoEditando"
+         [modo]="modoFormulario"
+         (laudoSalvo)="onSinistroSalvo($event)"
+         (cancelado)="onCancelado()"
+       ></app-laudo>
+  </div>
+</div>
+
+<!-- 🎯 VISUALIZAÇÃO DO LAUDO (MODAL) -->
+<div class="formulario-overlay" *ngIf="mostrarVisualizacao">
+  <div class="formulario-container">
+    <app-laudo-visualizar
+      [laudo]="laudoVisualizando"
+      [mostrar]="mostrarVisualizacao"
+      (fechar)="fecharVisualizacao()"
+    ></app-laudo-visualizar>
+  </div>
+</div>
+
+<!-- 🎯 FINALIZAR SINISTRO (MODAL) -->
+<div class="formulario-overlay" *ngIf="mostrarModalFinalizar">
+  <div class="formulario-container">
+    <app-laudo-final
+      [laudo]="laudoFinalizando"
+      [mostrar]="mostrarModalFinalizar"
+      (fechar)="fecharModalFinalizar()"
+      (finalizado)="onSinistroFinalizado($event)"
+    ></app-laudo-final>
+  </div>
+</div>
+
+
+
+<!-- Modal de templates removido - agora é automático -->
+
+<!-- 🎯 MODAL DE ADIÇÃO DE EVIDÊNCIAS -->
+<div class="formulario-overlay" *ngIf="mostrarModalEvidencias">
+  <div class="formulario-container">
+    <div class="evidencias-form-container">
+      <div class="form-header">
+        <h2 class="form-title">{{ tituloEvidencias }}</h2>
+        <p class="form-subtitle">
+          Adicione evidências fotográficas e documentos para o sinistro técnico
+        </p>
+      </div>
+      
+      <div class="evidencias-form">
+        <div class="form-group">
+          <div class="upload-area" 
+               (click)="triggerFileInput()"
+               [class.dragover]="isDragOver"
+               (dragover)="onDragOver($event)"
+               (dragleave)="onDragLeave($event)"
+               (drop)="onDrop($event)">
+            
+            <div class="upload-icon">
+              <i class="cil-cloud-upload"></i>
+            </div>
+            
+            <div class="upload-text">
+              <p>Clique para selecionar arquivos ou arraste e solte aqui</p>
+              <span class="upload-hint">Formatos aceitos: JPG, PNG, PDF (máx. 5MB cada)</span>
+            </div>
+            
+            <input #fileInput 
+                   type="file" 
+                   multiple 
+                   accept=".jpg,.jpeg,.png,.pdf"
+                   (change)="onFileSelected($event)"
+                   style="display: none;">
+          </div>
+          
+          <div class="file-list" *ngIf="arquivosSelecionados.length > 0">
+            <h4>Arquivos Selecionados ({{arquivosSelecionados.length}})</h4>
+            
+            <div class="file-item" *ngFor="let arquivo of arquivosSelecionados; let i = index">
+              <div class="file-info">
+                <div class="file-preview">
+                  <!-- Miniatura para imagens -->
+                  <div class="image-thumbnail" *ngIf="isImageFile(arquivo)">
+                    <img [src]="getFilePreview(arquivo)" [alt]="arquivo.name" />
+                  </div>
+                  <!-- Ícone para PDFs e outros arquivos -->
+                  <div class="file-icon" *ngIf="!isImageFile(arquivo)">
+                    <i [class]="getFileIcon(arquivo.name)"></i>
+                  </div>
+                </div>
+                <div class="file-details">
+                  <span class="file-name">{{arquivo.name}}</span>
+                  <span class="file-size">{{formatFileSize(arquivo.size)}}</span>
+                </div>
+              </div>
+              
+              <div class="file-actions">
+                <button class="btn-remove" (click)="removerArquivo(i)">
+                  <i class="cil-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-actions">
+          <button class="btn-cancel" (click)="fecharModalEvidencias()">
+            Cancelar
+          </button>
+          <button class="btn-upload" 
+                  [disabled]="arquivosSelecionados.length === 0 || fazendoUpload"
+                  (click)="fazerUpload()">
+            <i class="cil-cloud-upload" *ngIf="!fazendoUpload"></i>
+            <i class="cil-reload" *ngIf="fazendoUpload" class="spinning"></i>
+            {{fazendoUpload ? 'Enviando...' : 'Enviar Evidências'}}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

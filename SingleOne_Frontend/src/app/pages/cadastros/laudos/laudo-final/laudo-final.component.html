@@ -1,0 +1,126 @@
+<!-- 📋 CONTEÚDO PRINCIPAL -->
+<div class="laudo-form-container">
+  <form [formGroup]="form" (ngSubmit)="salvar()">
+    <!-- 🎯 HEADER DO FORMULÁRIO -->
+    <div class="form-header">
+      <h2 class="form-title">Finalização do Sinistro #{{laudo?.id}}</h2>
+      <p class="form-subtitle">
+        Complete as informações finais para encerrar o sinistro técnico
+      </p>
+    </div>
+
+    <!-- 📝 FORMULÁRIO PRINCIPAL -->
+    <div class="info-grid">
+      <!-- 📋 SEÇÃO DO LAUDO FINAL -->
+      <div class="info-section">
+        <h3>Laudo Técnico Final</h3>
+        <div class="form-group">
+          <label class="form-label">Descrição Técnica Completa *</label>
+          <textarea 
+            class="form-textarea" 
+            formControlName="laudo" 
+            placeholder="Descreva detalhadamente a análise técnica, conclusões e recomendações..."
+            rows="6"
+
+          ></textarea>
+          <div class="form-error" *ngIf="form.get('laudo')?.invalid && form.get('laudo')?.touched">
+            Laudo técnico é obrigatório
+          </div>
+
+        </div>
+      </div>
+
+      <!-- 💰 SEÇÃO DE VALORES -->
+      <div class="info-section">
+        <h3>Informações Financeiras</h3>
+        <div class="form-group">
+          <label class="form-label">
+            Valor da Manutenção 
+            <span *ngIf="form.get('temconserto')?.value" class="required-asterisk">*</span>
+            <span *ngIf="!form.get('temconserto')?.value" class="optional-label">(Opcional)</span>
+          </label>
+          <div class="input-group">
+            <span class="input-prefix">R$</span>
+            <input 
+              type="text" 
+              class="form-input" 
+              formControlName="valormanutencao" 
+              [placeholder]="form.get('temconserto')?.value ? '0,00' : 'Deixe vazio se sem custo'"
+              currencyMask 
+              [options]="{ prefix: '', thousands: '.', decimal: ',' }"
+              [disabled]="!form.get('temconserto')?.value"
+            />
+          </div>
+          <div class="form-help" *ngIf="!form.get('temconserto')?.value">
+            <i class="material-icons">info</i>
+            Quando não há conserto, o valor é opcional
+          </div>
+          <div class="form-error" *ngIf="form.get('valormanutencao')?.invalid && form.get('valormanutencao')?.touched">
+            <span *ngIf="form.get('valormanutencao')?.errors && form.get('valormanutencao')?.errors['required']">Valor da manutenção é obrigatório quando há conserto</span>
+            <span *ngIf="form.get('valormanutencao')?.errors && form.get('valormanutencao')?.errors['valorInvalido']">Valor deve ser maior que zero</span>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ✅ SEÇÃO DE AVALIAÇÕES -->
+      <div class="info-section">
+        <h3>Avaliações Técnicas</h3>
+        <div class="evaluation-grid">
+          <div class="evaluation-item">
+            <label class="evaluation-label">
+              <span class="label-text">Tem Conserto?</span>
+              <span class="label-description">O equipamento pode ser reparado?</span>
+            </label>
+            <div class="toggle-container">
+              <mat-slide-toggle 
+                color="primary" 
+                formControlName="temconserto" 
+                class="modern-toggle"
+              >
+                <span class="toggle-text">{{form.get('temconserto')?.value ? 'Sim' : 'Não'}}</span>
+              </mat-slide-toggle>
+            </div>
+          </div>
+
+          <div class="evaluation-item">
+            <label class="evaluation-label">
+              <span class="label-text">Caracteriza Mau Uso?</span>
+              <span class="label-description">O dano foi causado por uso inadequado?</span>
+            </label>
+            <div class="toggle-container">
+              <mat-slide-toggle 
+                color="warn" 
+                formControlName="mauuso" 
+                class="modern-toggle"
+              >
+                <span class="toggle-text">{{form.get('mauuso')?.value ? 'Sim' : 'Não'}}</span>
+              </mat-slide-toggle>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 🎯 FOOTER DO FORMULÁRIO -->
+    <div class="form-footer">
+      <button 
+        type="button" 
+        class="btn-cancel" 
+        (click)="cancelar()"
+      >
+        <i class="cil-x"></i>
+        Cancelar
+      </button>
+      <button 
+        type="submit" 
+        class="btn-primary" 
+        [disabled]="form.invalid || salvando"
+      >
+        <i class="cil-check" *ngIf="!salvando"></i>
+        <i class="cil-reload spinning" *ngIf="salvando"></i>
+        {{salvando ? 'Salvando...' : 'Finalizar Sinistro'}}
+      </button>
+    </div>
+  </form>
+</div>

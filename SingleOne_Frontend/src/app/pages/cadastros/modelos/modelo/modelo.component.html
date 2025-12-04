@@ -1,0 +1,139 @@
+<!-- 🎯 FORMULÁRIO MODAL DE MODELO -->
+<div class="formulario-overlay">
+  <div class="formulario-container">
+    <div class="modelo-form-container">
+      <div class="form-header">
+        <h2 class="form-title">{{ getTitulo() }}</h2>
+        <p class="form-subtitle">
+          {{ modo === 'criar' ? 'Crie um novo modelo para seus recursos' : 'Edite as informações do modelo selecionado' }}
+        </p>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="salvar()" class="modelo-form">
+        
+        <!-- Campo Categoria -->
+        <div class="form-group">
+          <label for="categoria" class="form-label">
+            Categoria <span class="required">*</span>
+          </label>
+          <select 
+            id="categoria"
+            formControlName="categoria" 
+            [(ngModel)]="modelo.categoria"
+            (change)="onCategoriaChange()"
+            class="form-control"
+            [class.is-invalid]="form.get('categoria')?.invalid && form.get('categoria')?.touched"
+            required
+          >
+            <option value="">Selecione a categoria</option>
+            <option *ngFor="let row of categorias" [value]="row.id">{{row.nome}}</option>
+          </select>
+          <div class="invalid-feedback" *ngIf="form.get('categoria')?.invalid && form.get('categoria')?.touched">
+            <span *ngIf="form.get('categoria')?.errors?.required">Categoria é obrigatória</span>
+          </div>
+          <small class="form-text text-muted">
+            Selecione a categoria do recurso
+          </small>
+        </div>
+
+        <!-- Campo Tipo de Recurso -->
+        <div class="form-group">
+          <label for="tipo" class="form-label">
+            Tipo de Recurso <span class="required">*</span>
+          </label>
+          <select 
+            id="tipo"
+            formControlName="tipo" 
+            [(ngModel)]="modelo.tipo"
+            (change)="onTipoRecursoChange()"
+            class="form-control"
+            [class.is-invalid]="form.get('tipo')?.invalid && form.get('tipo')?.touched"
+            required
+          >
+            <option value="">Selecione o tipo de recurso</option>
+            <option *ngFor="let row of tiporecursos" [value]="row.id">{{row.descricao}}</option>
+          </select>
+          <div class="invalid-feedback" *ngIf="form.get('tipo')?.invalid && form.get('tipo')?.touched">
+            <span *ngIf="form.get('tipo')?.errors?.required">Tipo de recurso é obrigatório</span>
+          </div>
+          <small class="form-text text-muted">
+            Selecione o tipo de recurso para este modelo
+          </small>
+        </div>
+
+        <!-- Campo Fabricante -->
+        <div class="form-group">
+          <label for="fabricante" class="form-label">
+            Fabricante <span class="required">*</span>
+          </label>
+          <select 
+            id="fabricante"
+            formControlName="fabricante" 
+            [(ngModel)]="modelo.fabricante"
+            class="form-control"
+            [class.is-invalid]="form.get('fabricante')?.invalid && form.get('fabricante')?.touched"
+            required
+          >
+            <option value="">Selecione o fabricante</option>
+            <option *ngFor="let row of fabricantes" [value]="row.id">{{row.descricao}}</option>
+          </select>
+          <div class="invalid-feedback" *ngIf="form.get('fabricante')?.invalid && form.get('fabricante')?.touched">
+            <span *ngIf="form.get('fabricante')?.errors?.required">Fabricante é obrigatório</span>
+          </div>
+          <small class="form-text text-muted">
+            Selecione o fabricante para este modelo
+          </small>
+        </div>
+
+        <!-- Campo Nome do Modelo -->
+        <div class="form-group">
+          <label for="descricao" class="form-label">
+            Nome do Modelo <span class="required">*</span>
+          </label>
+          <input 
+            type="text" 
+            id="descricao"
+            formControlName="descricao" 
+            [(ngModel)]="modelo.descricao"
+            class="form-control"
+            placeholder="Ex: OptiPlex 7090, ThinkPad X1..."
+            [class.is-invalid]="form.get('descricao')?.invalid && form.get('descricao')?.touched"
+            maxlength="100"
+            required
+          >
+          <div class="invalid-feedback" *ngIf="form.get('descricao')?.invalid && form.get('descricao')?.touched">
+            <span *ngIf="form.get('descricao')?.errors?.required">Nome do modelo é obrigatório</span>
+            <span *ngIf="form.get('descricao')?.errors?.minlength">Nome deve ter pelo menos 2 caracteres</span>
+            <span *ngIf="form.get('descricao')?.errors?.maxlength">Nome deve ter no máximo 100 caracteres</span>
+          </div>
+          <small class="form-text text-muted">
+            Nome único para identificar o modelo do recurso
+          </small>
+        </div>
+
+        <!-- Botões de Ação -->
+        <div class="form-actions">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            [routerLink]="['/modelos']"
+            [disabled]="carregando"
+          >
+            <i class="fas fa-times"></i>
+            Cancelar
+          </button>
+          
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="form.invalid || carregando"
+          >
+            <i class="fas fa-save" *ngIf="!carregando"></i>
+            <i class="fas fa-spinner fa-spin" *ngIf="carregando"></i>
+            {{ getBotaoTexto() }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

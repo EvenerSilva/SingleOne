@@ -1,0 +1,449 @@
+<!-- 🎯 HEADER MODERNO DO WIZARD -->
+<div class="wizard-header">
+  <div class="header-content">
+    <div class="header-left">
+      <button class="back-button" [routerLink]="['/cadastros']" matTooltip="Voltar para Cadastros">
+        <i class="cil-arrow-left"></i>
+      </button>
+      <div class="header-title">
+        <div class="title-icon">
+          <i class="cil-building"></i>
+        </div>
+        <div class="title-text">
+          <h1>Cadastro Rápido de Empresa</h1>
+          <p>Configure sua empresa em poucos passos</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 🍞 BREADCRUMB MODERNO -->
+<nav class="modern-breadcrumb">
+  <div class="breadcrumb-container">
+    <a [routerLink]="['/dashboard']" class="breadcrumb-item">
+      <i class="cil-home"></i>
+      <span>Dashboard</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a [routerLink]="['/cadastros']" class="breadcrumb-item">
+      <i class="cil-building"></i>
+      <span>Cadastros</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <span class="breadcrumb-item active">Nova Empresa</span>
+  </div>
+</nav>
+
+<!-- 📋 CONTEÚDO PRINCIPAL -->
+<div class="wizard-content">
+  
+  <!-- 🚀 PROGRESS BAR MODERNO SIMPLIFICADO -->
+  <div class="progress-section">
+    <div class="progress-container">
+      <div class="progress-steps">
+        <div class="progress-step" 
+             [class.active]="currentStep === 1"
+             [class.completed]="isStepComplete(1)">
+          <div class="step-number">1</div>
+          <div class="step-label">Dados Básicos</div>
+          <div class="step-icon">
+            <i class="cil-building"></i>
+          </div>
+        </div>
+        
+        <div class="progress-connector" [class.active]="currentStep >= 2"></div>
+        
+        <div class="progress-step" 
+             [class.active]="currentStep === 2"
+             [class.completed]="isStepComplete(2)">
+          <div class="step-number">2</div>
+          <div class="step-label">Filiais & Custos</div>
+          <div class="step-icon">
+            <i class="cil-office-building"></i>
+          </div>
+        </div>
+        
+        <div class="progress-connector" [class.active]="currentStep >= 3"></div>
+        
+        <div class="progress-step" 
+             [class.active]="currentStep === 3"
+             [class.completed]="isStepComplete(3)">
+          <div class="step-number">3</div>
+          <div class="step-label">Revisão</div>
+          <div class="step-icon">
+            <i class="cil-check-circle"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 📝 FORMULÁRIO DO WIZARD -->
+  <div class="wizard-form-container">
+    <form [formGroup]="wizardForm" (ngSubmit)="submitForm()" class="wizard-form">
+      
+      <!-- 🎯 PASSO 1: DADOS BÁSICOS + LOCALIZAÇÃO -->
+      <div class="form-step" [class.active]="currentStep === 1">
+        <div class="step-header">
+          <h3>Dados Básicos da Empresa</h3>
+          <p>Informações principais e localização da empresa</p>
+        </div>
+        
+        <div class="form-grid">
+          <div class="form-field">
+            <label class="field-label">
+              <i class="cil-briefcase"></i>
+              Razão Social *
+            </label>
+            <input type="text" class="form-input" formControlName="razaosocial" 
+                   placeholder="Digite a razão social da empresa"
+                   [class.error]="wizardForm.get('razaosocial')?.invalid && wizardForm.get('razaosocial')?.touched">
+            <div class="field-error" *ngIf="wizardForm.get('razaosocial')?.invalid && wizardForm.get('razaosocial')?.touched">
+              Razão social é obrigatória
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label class="field-label">
+              <i class="cil-credit-card"></i>
+              CNPJ *
+            </label>
+            <input type="text" class="form-input" formControlName="cnpj" 
+                   placeholder="00.000.000/0000-00" appCnpjMask
+                   (blur)="buscarDadosCNPJ()"
+                   [class.error]="wizardForm.get('cnpj')?.invalid && wizardForm.get('cnpj')?.touched">
+            <div class="field-error" *ngIf="wizardForm.get('cnpj')?.invalid && wizardForm.get('cnpj')?.touched">
+              CNPJ é obrigatório
+            </div>
+            <div class="field-help" *ngIf="cnpjCarregando">
+              <i class="cil-reload"></i>
+              Buscando dados do CNPJ...
+            </div>
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label class="field-label">
+            <i class="cil-location-pin"></i>
+            Localização *
+          </label>
+          <div class="field-with-action">
+            <select class="form-select" formControlName="localizacaoId" 
+                    [class.error]="wizardForm.get('localizacaoId')?.invalid && wizardForm.get('localizacaoId')?.touched">
+              <option value="">Selecione uma localização</option>
+              <option *ngFor="let loc of localizacoes" [value]="loc.id">
+                {{ formatarLocalizacaoDropdown(loc) }}
+              </option>
+            </select>
+            <button type="button" class="btn-new" (click)="abrirModalNovaLocalizacao()" title="Cadastrar nova localização">
+              <i class="cil-plus"></i>
+              <span>Nova</span>
+            </button>
+          </div>
+          <div class="field-error" *ngIf="wizardForm.get('localizacaoId')?.invalid && wizardForm.get('localizacaoId')?.touched">
+            Localização é obrigatória
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label class="field-label">
+            <i class="cil-dollar"></i>
+            Centro de Custo Principal
+            <span style="color: #999; font-weight: 400; font-size: 0.85rem;">(Opcional)</span>
+          </label>
+          <input type="text" class="form-input" formControlName="centroCustoPrincipal" 
+                 placeholder="Deixe vazio para criar como 'Centro Principal' automaticamente">
+          <div class="field-help" style="color: #28a745;">
+            <i class="cil-check-circle"></i>
+            <strong>Pode deixar vazio!</strong> Será criado automaticamente como "Centro Principal"
+          </div>
+        </div>
+      </div>
+
+      <!-- 🎯 PASSO 2: FILIAIS & CENTROS DE CUSTO -->
+      <div class="form-step" [class.active]="currentStep === 2">
+        <div class="step-header">
+          <h3>Filiais e Centros de Custo</h3>
+          <p>Configure filiais e seus respectivos centros de custo</p>
+          <div style="background: #f0f9ff; padding: 1rem; border-radius: 8px; margin-top: 1rem; border-left: 4px solid #667eea;">
+            <p style="margin: 0; color: #666; font-size: 0.9rem;">
+              <i class="cil-info" style="color: #667eea;"></i>
+              <strong>Este passo é totalmente OPCIONAL!</strong> Você pode pular direto para a revisão se não precisar cadastrar filiais agora.
+            </p>
+          </div>
+        </div>
+        
+        <!-- Lista de Filiais Adicionadas -->
+        <div class="filiais-list" *ngIf="empresa.filiais && empresa.filiais.length > 0">
+          <div class="filial-item" *ngFor="let filial of empresa.filiais; let i = index">
+            <div class="filial-info">
+              <div class="filial-header">
+                <h4>{{ filial.nome }}</h4>
+                <button type="button" class="remove-btn" (click)="removerFilial(i)">
+                  <i class="cil-trash"></i>
+                </button>
+              </div>
+              <p><i class="cil-location-pin"></i> {{ filial.localizacao }}</p>
+              <p><i class="cil-dollar"></i> Centro: {{ filial.centroCusto || 'Não definido' }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Formulário para Nova Filial -->
+        <div class="add-filial-section">
+          <h4>Adicionar Nova Filial</h4>
+          <div class="form-grid">
+            <div class="form-field">
+              <label class="field-label">
+                <i class="cil-office-building"></i>
+                Nome da Filial
+              </label>
+              <input type="text" class="form-input" [(ngModel)]="novaFilial.nome" 
+                     [ngModelOptions]="{standalone: true}"
+                     placeholder="Ex: Filial São Paulo, Matriz, Sede...">
+            </div>
+            
+            <div class="form-field">
+              <label class="field-label">
+                <i class="cil-location-pin"></i>
+                Localização
+              </label>
+              <div class="field-with-action">
+                <select class="form-select" [(ngModel)]="novaFilial.localizacaoId" 
+                        [ngModelOptions]="{standalone: true}">
+                  <option value="">Selecione uma localização</option>
+                  <option *ngFor="let loc of localizacoes" [value]="loc.id">
+                    {{ formatarLocalizacaoDropdown(loc) }}
+                  </option>
+                </select>
+                <button type="button" class="btn-new" (click)="abrirModalNovaLocalizacao()" title="Nova localização">
+                  <i class="cil-plus"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label class="field-label">
+              <i class="cil-dollar"></i>
+              Centro de Custo da Filial
+            </label>
+            <input type="text" class="form-input" [(ngModel)]="novaFilial.centroCusto" 
+                   [ngModelOptions]="{standalone: true}"
+                   placeholder="Ex: Centro SP, Filial RJ, Regional Sul...">
+            <div class="field-help">
+              <i class="cil-info"></i>
+              Será criado automaticamente se não informado
+            </div>
+          </div>
+          
+          <button type="button" class="btn-secondary" (click)="adicionarFilial()" 
+                  [disabled]="!novaFilial.nome || !novaFilial.localizacaoId">
+            <i class="cil-plus"></i>
+            <span>Adicionar Filial</span>
+          </button>
+        </div>
+
+        <!-- Seção de Centros de Custo Globais -->
+        <div class="centros-custo-section" *ngIf="empresa.centrosCusto && empresa.centrosCusto.length > 0">
+          <h4>Centros de Custo Globais</h4>
+          <div class="centros-list">
+            <div class="centro-item" *ngFor="let centro of empresa.centrosCusto; let i = index">
+              <div class="centro-info">
+                <h5>{{ centro.nome }}</h5>
+                <p>{{ centro.descricao || 'Sem descrição' }}</p>
+                <button type="button" class="remove-btn" (click)="removerCentroCusto(i)">
+                  <i class="cil-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Adicionar Centro de Custo Global -->
+        <div class="add-centro-section">
+          <h4>Adicionar Centro de Custo Global</h4>
+          <div class="form-grid">
+            <div class="form-field">
+              <label class="field-label">
+                <i class="cil-dollar"></i>
+                Nome do Centro
+              </label>
+              <input type="text" class="form-input" [(ngModel)]="novoCentroCusto.nome" 
+                     [ngModelOptions]="{standalone: true}"
+                     placeholder="Ex: Administrativo, Comercial, TI...">
+            </div>
+            
+            <div class="form-field">
+              <label class="field-label">
+                <i class="cil-description"></i>
+                Descrição
+              </label>
+              <input type="text" class="form-input" [(ngModel)]="novoCentroCusto.descricao" 
+                     [ngModelOptions]="{standalone: true}"
+                     placeholder="Descrição opcional do centro de custo">
+            </div>
+          </div>
+          
+          <button type="button" class="btn-secondary" (click)="adicionarCentroCusto()" 
+                  [disabled]="!novoCentroCusto.nome">
+            <i class="cil-plus"></i>
+            <span>Adicionar Centro</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 🎯 PASSO 3: REVISÃO -->
+      <div class="form-step" [class.active]="currentStep === 3">
+        <div class="step-header">
+          <h3>Revisão dos Dados</h3>
+          <p>Confirme as informações antes de salvar</p>
+        </div>
+        
+        <div class="review-section">
+          <div class="review-item">
+            <h4><i class="cil-building"></i> Dados da Empresa</h4>
+            <div class="review-content">
+              <p><strong>Razão Social:</strong> {{ wizardForm.get('razaosocial')?.value }}</p>
+              <p><strong>CNPJ:</strong> {{ wizardForm.get('cnpj')?.value }}</p>
+              <p><strong>Localização:</strong> {{ getLocalizacaoNome() }}</p>
+              <p><strong>Centro de Custo Principal:</strong> {{ wizardForm.get('centroCustoPrincipal')?.value || 'Será criado automaticamente' }}</p>
+            </div>
+          </div>
+          
+          <div class="review-item" *ngIf="empresa.filiais && empresa.filiais.length > 0">
+            <h4><i class="cil-office-building"></i> Filiais ({{ empresa.filiais.length }})</h4>
+            <div class="review-content">
+              <div class="filial-review" *ngFor="let filial of empresa.filiais">
+                <div class="filial-review-item">
+                  <h5>{{ filial.nome }}</h5>
+                  <p><i class="cil-location-pin"></i> {{ getLocalizacaoNomeById(filial.localizacaoId) }}</p>
+                  <p><i class="cil-dollar"></i> Centro: {{ filial.centroCusto || 'Será criado automaticamente' }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="review-item" *ngIf="empresa.centrosCusto && empresa.centrosCusto.length > 0">
+            <h4><i class="cil-dollar"></i> Centros de Custo Globais ({{ empresa.centrosCusto.length }})</h4>
+            <div class="review-content">
+              <div class="centro-review" *ngFor="let centro of empresa.centrosCusto">
+                <div class="centro-review-item">
+                  <h5>{{ centro.nome }}</h5>
+                  <p>{{ centro.descricao || 'Sem descrição' }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Resumo da Estrutura -->
+          <div class="review-item estrutura-resumo">
+            <h4><i class="cil-list"></i> Resumo da Estrutura</h4>
+            <div class="review-content">
+              <div class="estrutura-stats">
+                <div class="stat-item">
+                  <span class="stat-number">1</span>
+                  <span class="stat-label">Empresa</span>
+                </div>
+                <div class="stat-item" *ngIf="empresa.filiais && empresa.filiais.length > 0">
+                  <span class="stat-number">{{ empresa.filiais.length }}</span>
+                  <span class="stat-label">Filiais</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-number">{{ (empresa.centrosCusto?.length || 0) + 1 + (empresa.filiais?.length || 0) }}</span>
+                  <span class="stat-label">Centros de Custo</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 🎯 AÇÕES DO WIZARD -->
+      <div class="wizard-actions">
+        <div class="actions-left">
+          <button type="button" class="btn-secondary" (click)="cancel()">
+            <i class="cil-x"></i>
+            <span>Cancelar</span>
+          </button>
+        </div>
+        
+        <div class="actions-center">
+          <button type="button" class="btn-secondary" (click)="previousStep()" [disabled]="currentStep === 1">
+            <i class="cil-arrow-left"></i>
+            <span>Anterior</span>
+          </button>
+          
+          <button type="button" class="btn-primary" (click)="nextStep()" 
+                  [disabled]="!canGoToNextStep() || currentStep === totalSteps">
+            <i class="cil-arrow-right"></i>
+            <span>Próximo</span>
+          </button>
+        </div>
+        
+        <div class="actions-right">
+          <button type="submit" class="btn-success" [disabled]="wizardForm.invalid || submitting" *ngIf="currentStep === totalSteps">
+            <i class="cil-check" *ngIf="!submitting"></i>
+            <i class="cil-reload" *ngIf="submitting"></i>
+            <span>{{ submitting ? 'Salvando...' : 'Criar Estrutura Completa' }}</span>
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- 🎨 SPINNER DE CARREGAMENTO -->
+<div class="loading-overlay" *ngIf="loading">
+  <div class="loading-spinner">
+    <i class="cil-reload"></i>
+    <p>Carregando dados...</p>
+  </div>
+</div>
+
+<!-- 🆕 MODAL NOVA LOCALIZAÇÃO -->
+<div class="modal-overlay" *ngIf="mostrarModalLocalizacao" (click)="fecharModalLocalizacao()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3><i class="cil-location-pin"></i> Nova Localização</h3>
+      <button class="modal-close" (click)="fecharModalLocalizacao()">
+        <i class="cil-x"></i>
+      </button>
+    </div>
+    
+    <div class="modal-body">
+      <div class="form-field">
+        <label class="field-label">Descrição *</label>
+        <input type="text" class="form-input" [(ngModel)]="novaLocalizacao.descricao" 
+               placeholder="Ex: Matriz, Centro, Zona Sul...">
+      </div>
+      
+      <div class="form-row">
+        <div class="form-field">
+          <label class="field-label">Cidade *</label>
+          <input type="text" class="form-input" [(ngModel)]="novaLocalizacao.cidade" 
+                 placeholder="Ex: São Paulo">
+        </div>
+        
+        <div class="form-field">
+          <label class="field-label">Estado *</label>
+          <input type="text" class="form-input" [(ngModel)]="novaLocalizacao.estado" 
+                 placeholder="Ex: SP">
+        </div>
+      </div>
+    </div>
+    
+    <div class="modal-footer">
+      <button type="button" class="btn-secondary" (click)="fecharModalLocalizacao()">
+        <i class="cil-x"></i>
+        <span>Cancelar</span>
+      </button>
+      <button type="button" class="btn-primary" (click)="salvarNovaLocalizacao()" 
+              [disabled]="!novaLocalizacao.descricao || !novaLocalizacao.cidade || !novaLocalizacao.estado">
+        <i class="cil-check"></i>
+        <span>Salvar</span>
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:13
+    container_name: singleone-postgres-dev
+    environment:
+      POSTGRES_DB: singleone
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data
+    networks:
+      - singleone-network-dev
+
+  # Backend API (Development with hot reload)
+  backend-dev:
+    build:
+      context: ./SingleOne_Backend
+      dockerfile: Dockerfile.dev
+    container_name: singleone-backend-dev
+    environment:
+      - DB_HOST=postgres
+      - DB_USER=postgres
+      - DB_PASSWORD=password
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - "5000:5000"
+    depends_on:
+      - postgres
+    networks:
+      - singleone-network-dev
+    volumes:
+      - ./SingleOne_Backend:/app
+      - /app/bin
+      - /app/obj
+    command: dotnet watch run
+
+  # Frontend (Development with hot reload)
+  frontend-dev:
+    build:
+      context: ./SingleOne_Frontend
+      dockerfile: Dockerfile.dev
+    container_name: singleone-frontend-dev
+    environment:
+      - API_URL=http://localhost:5000/api/
+    ports:
+      - "4200:4200"
+    depends_on:
+      - backend-dev
+    networks:
+      - singleone-network-dev
+    volumes:
+      - ./SingleOne_Frontend:/app
+      - /app/node_modules
+    command: npm start
+
+volumes:
+  postgres_data_dev:
+
+networks:
+  singleone-network-dev:
+    driver: bridge 

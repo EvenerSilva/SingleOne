@@ -1,0 +1,31 @@
+<div class="modern-dialog">
+  <!-- Header com ícone e título -->
+  <div class="dialog-header">
+    <div class="header-icon">
+      <i class="cil-exclamation-triangle"></i>
+    </div>
+    <h2 class="dialog-title">Atenção</h2>
+  </div>
+
+  <!-- Conteúdo da mensagem -->
+  <div class="dialog-content">
+    <p class="dialog-message" [innerHTML]="data.mensagem"></p>
+  </div>
+
+  <!-- Botões de ação -->
+  <div class="dialog-actions">
+    <button 
+      class="btn btn-secondary" 
+      (click)="dialogRef.close(false)" 
+      *ngIf="data.exibeCancelar">
+      <i class="cil-x"></i>
+      Cancelar
+    </button>
+    <button 
+      class="btn btn-primary" 
+      (click)="dialogRef.close(true)">
+      <i class="cil-check"></i>
+      Confirmar
+    </button>
+  </div>
+</div>

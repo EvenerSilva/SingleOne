@@ -1,0 +1,103 @@
+<div class="forgot-password-container">
+  <!-- Background com imagem representativa -->
+  <div class="background-image">
+    <div class="image-overlay"></div>
+    <div class="floating-shapes">
+      <div class="shape shape-1"></div>
+      <div class="shape shape-2"></div>
+      <div class="shape shape-3"></div>
+      <div class="shape shape-4"></div>
+    </div>
+  </div>
+
+  <!-- Container principal -->
+  <div class="forgot-password-wrapper">
+    <!-- Logo e título -->
+    <div class="brand-section">
+      <div class="logo-container">
+        <img src="../../../../assets/Branding/logo.png" alt="SingleOne" class="logo">
+      </div>
+      <h1 class="welcome-title">Recuperação de Senha</h1>
+      <p class="welcome-subtitle">Sistema de Gestão de Recursos</p>
+    </div>
+
+    <!-- Formulário de recuperação -->
+    <div class="forgot-password-form-container">
+      <div class="forgot-password-card">
+        <div class="card-header">
+          <h2 class="form-title">
+            <span class="icon">🔑</span>
+            Esqueci Minha Senha
+          </h2>
+          <p class="form-subtitle">Informe seu e-mail para receber instruções de recuperação</p>
+        </div>
+
+        <form [formGroup]="form" (ngSubmit)="entrar()" class="forgot-password-form">
+          <!-- Campo E-mail -->
+          <div class="form-group">
+            <label class="form-label">
+              <span class="icon">📧</span>
+              E-mail
+            </label>
+            <div class="input-container">
+              <input 
+                type="email" 
+                formControlName="usuario" 
+                [(ngModel)]="usuario.email"
+                placeholder="Digite seu e-mail cadastrado"
+                class="form-input"
+                [class.error]="form.get('usuario')?.invalid && form.get('usuario')?.touched"
+                required>
+              <div class="input-focus-border"></div>
+            </div>
+            <div class="error-message" *ngIf="form.get('usuario')?.invalid && form.get('usuario')?.touched">
+              <span *ngIf="form.get('usuario')?.errors?.required">❌ E-mail é obrigatório</span>
+              <span *ngIf="form.get('usuario')?.errors?.email">❌ Digite um e-mail válido</span>
+            </div>
+          </div>
+
+          <!-- Botão de Recuperação -->
+          <button type="submit" class="recovery-button" [disabled]="!form.valid || enviando">
+            <span class="button-text" *ngIf="!enviando">
+              <span class="icon">📤</span>
+              Enviar Instruções
+            </span>
+            <span class="button-text" *ngIf="enviando">
+              <span class="icon">⏳</span>
+              Enviando...
+            </span>
+          </button>
+
+          <!-- Links de navegação -->
+          <div class="navigation-links">
+            <a routerLink="/login" class="nav-link">
+              <span class="icon">⬅️</span>
+              Voltar ao Login
+            </a>
+          </div>
+        </form>
+
+        <!-- Footer do card -->
+        <div class="card-footer">
+          <p class="footer-text">
+            <span class="icon">ℹ️</span>
+            Verifique sua caixa de entrada e spam
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Informações adicionais -->
+    <div class="info-section">
+      <div class="info-card">
+        <h3 class="info-title">💡 Como Funciona</h3>
+        <ul class="info-list">
+          <li>Digite seu e-mail cadastrado no sistema</li>
+          <li>Receba um link de recuperação por e-mail</li>
+          <li>Clique no link para redefinir sua senha</li>
+          <li>Escolha uma nova senha segura</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

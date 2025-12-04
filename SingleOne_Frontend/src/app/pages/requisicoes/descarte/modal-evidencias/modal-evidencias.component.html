@@ -1,0 +1,147 @@
+<div class="modal-container">
+  <div class="form-header">
+    <h2 class="form-title">
+      <i class="material-icons">photo_camera</i>
+      Evidências de Descarte
+    </h2>
+    <p class="form-subtitle">
+      Recurso: {{data.equipamento.tipoequipamento}} {{data.equipamento.fabricante}} - SN: {{data.equipamento.numeroserie}}
+    </p>
+  </div>
+  
+  <!-- SEÇÃO DE UPLOAD -->
+  <div class="upload-section">
+    <h3><i class="material-icons">cloud_upload</i> Enviar Novas Evidências</h3>
+    
+    <div class="upload-form">
+      <!-- Tipo de Processo -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Tipo de Processo</mat-label>
+        <mat-select [(ngModel)]="tipoProcesso">
+          <mat-option *ngFor="let tipo of tiposProcesso" [value]="tipo.valor">
+            {{tipo.label}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <!-- Descrição -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Descrição (opcional)</mat-label>
+        <input matInput [(ngModel)]="descricao" placeholder="Ex: Foto frontal do equipamento após sanitização">
+      </mat-form-field>
+
+      <!-- Seleção de Arquivos -->
+      <div class="file-input-container">
+        <input 
+          type="file" 
+          #fileInput 
+          (change)="onFileSelected($event)" 
+          multiple 
+          accept="image/*,.pdf"
+          style="display: none">
+        
+        <button mat-raised-button color="primary" class="select-files-button" (click)="fileInput.click()">
+          <i class="material-icons">add_photo_alternate</i>
+          Escolher Arquivos
+        </button>
+        
+        <div class="file-hint">
+          <i class="material-icons">info</i>
+          Aceito: JPG, PNG, GIF, WEBP, PDF (máx 10MB por arquivo)
+        </div>
+      </div>
+
+      <!-- Lista de Arquivos Selecionados -->
+      <div class="selected-files" *ngIf="arquivosSelecionados.length > 0">
+        <h4>Arquivos selecionados ({{arquivosSelecionados.length}})</h4>
+        <div class="file-list">
+          <div class="file-item" *ngFor="let arquivo of arquivosSelecionados; let i = index">
+            <div class="file-info">
+              <i class="material-icons">{{isImagem(arquivo.name) ? 'image' : 'description'}}</i>
+              <div class="file-details">
+                <span class="file-name">{{arquivo.name}}</span>
+                <span class="file-size">{{formatarTamanho(arquivo.size)}}</span>
+              </div>
+            </div>
+            <button mat-icon-button color="warn" (click)="removerArquivo(i)" matTooltip="Remover">
+              <i class="material-icons">close</i>
+            </button>
+          </div>
+        </div>
+
+        <button mat-raised-button color="accent" class="upload-button" (click)="uploadArquivos()">
+          <i class="material-icons">cloud_upload</i>
+          Enviar {{arquivosSelecionados.length}} Arquivo(s)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEÇÃO DE EVIDÊNCIAS ANEXADAS -->
+  <div class="evidencias-section">
+    <h3><i class="material-icons">folder</i> Evidências Anexadas ({{evidencias.length}})</h3>
+    
+    <div class="carregando" *ngIf="carregando">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>Carregando evidências...</p>
+    </div>
+
+    <div class="sem-evidencias" *ngIf="!carregando && evidencias.length === 0">
+      <i class="material-icons">inbox</i>
+      <p>Nenhuma evidência anexada ainda</p>
+    </div>
+
+    <div class="evidencias-grid" *ngIf="!carregando && evidencias.length > 0">
+      <div class="evidencia-card" *ngFor="let evidencia of evidencias">
+        <div class="card-header">
+          <span class="tipo-badge" [ngClass]="'tipo-' + evidencia.tipoprocesso.toLowerCase()">
+            {{getTipoProcessoLabel(evidencia.tipoprocesso)}}
+          </span>
+          <button mat-icon-button [matMenuTriggerFor]="menu" class="menu-button">
+            <i class="material-icons">more_vert</i>
+          </button>
+          <mat-menu #menu="matMenu">
+            <button mat-menu-item (click)="downloadEvidencia(evidencia)">
+              <i class="material-icons">download</i>
+              <span>Download</span>
+            </button>
+            <button mat-menu-item (click)="excluirEvidencia(evidencia)">
+              <i class="material-icons">delete</i>
+              <span>Excluir</span>
+            </button>
+          </mat-menu>
+        </div>
+        
+        <div class="card-preview">
+          <i class="material-icons" *ngIf="!isImagem(evidencia.nomearquivo)">description</i>
+          <i class="material-icons" *ngIf="isImagem(evidencia.nomearquivo)">image</i>
+        </div>
+        
+        <div class="card-info">
+          <div class="file-name" [matTooltip]="evidencia.nomearquivo">{{evidencia.nomearquivo}}</div>
+          <div class="file-meta">
+            <span class="file-size">{{formatarTamanho(evidencia.tamanhoarquivo)}}</span>
+            <span class="file-date">{{formatarData(evidencia.dataupload)}}</span>
+          </div>
+          <div class="file-description" *ngIf="evidencia.descricao">
+            <i class="material-icons">notes</i>
+            {{evidencia.descricao}}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="form-footer">
+    <div class="footer-info">
+      <i class="material-icons">check_circle</i>
+      <span>Total: {{evidencias.length}} evidência(s) anexada(s)</span>
+    </div>
+    <button type="button" mat-raised-button color="primary" (click)="fechar()">
+      <i class="material-icons">close</i>
+      Fechar
+    </button>
+  </div>
+</div>
+

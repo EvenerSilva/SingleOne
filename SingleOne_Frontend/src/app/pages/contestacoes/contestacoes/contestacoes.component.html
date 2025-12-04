@@ -1,0 +1,321 @@
+<!-- 🎯 HEADER MODERNO DAS CONTESTAÇÕES -->
+<div class="contestacoes-header">
+  <div class="header-content">
+    <div class="header-left">
+      <button class="back-button" [routerLink]="['/movimentacoes']">
+        <i class="cil-arrow-left"></i>
+      </button>
+      <div class="header-title">
+        <div class="title-icon">
+          <i class="cil-clipboard"></i>
+        </div>
+        <div class="title-text">
+          <h1>Gestão de Contestações</h1>
+          <p>Atendimento e controle de contestações patrimoniais</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 🍞 BREADCRUMB MODERNO -->
+<nav class="modern-breadcrumb">
+  <div class="breadcrumb-container">
+    <a [routerLink]="['/dashboard']" class="breadcrumb-item">
+      <i class="cil-home"></i>
+      <span>Dashboard</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a [routerLink]="['/movimentacoes']" class="breadcrumb-item">
+      <i class="cil-transfer"></i>
+      <span>Solicitações</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <span class="breadcrumb-item active">Contestações</span>
+  </div>
+</nav>
+
+<!-- 🎯 ABAS PARA DIVIDIR POR TIPO -->
+<div class="tabs-section">
+  <mat-tab-group #tabGroup (selectedTabChange)="trocarAba($event)" class="modern-tabs">
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <span class="tab-label"><span>Contestações</span><span class="tab-badge" [class.zero]="getPendentesContestacoes() === 0">{{getPendentesContestacoes()}}</span></span>
+      </ng-template>
+      <div class="tab-content">
+        <!-- 📊 CARDS DE ESTATÍSTICAS - CONTESTAÇÕES -->
+        <div class="stats-section">
+          <div class="stats-grid">
+            <div class="stat-card total" (click)="filtrarPorStatusCard('Total')" title="Clique para ver todas as contestações">
+              <div class="stat-content">
+                <div class="stat-number">{{getTotalContestacoes()}}</div>
+                <div class="stat-label">Total de Contestações</div>
+              </div>
+            </div>
+            
+            <div class="stat-card pending" (click)="filtrarPorStatusCard('pendente')" title="Clique para ver contestações pendentes">
+              <div class="stat-content">
+                <div class="stat-number">{{getContestacoesPendentes()}}</div>
+                <div class="stat-label">Pendentes</div>
+              </div>
+            </div>
+            
+            <div class="stat-card resolved" (click)="filtrarPorStatusCard('resolvida')" title="Clique para ver contestações resolvidas">
+              <div class="stat-content">
+                <div class="stat-number">{{getContestacoesResolvidas()}}</div>
+                <div class="stat-label">Resolvidas</div>
+              </div>
+            </div>
+            
+            <div class="stat-card cancelled" (click)="filtrarPorStatusCard('cancelada')" title="Clique para ver contestações canceladas">
+              <div class="stat-content">
+                <div class="stat-number">{{getContestacoesCanceladas()}}</div>
+                <div class="stat-label">Canceladas</div>
+              </div>
+            </div>
+            
+            <div class="stat-card denied" (click)="filtrarPorStatusCard('negada')" title="Clique para ver contestações negadas">
+              <div class="stat-content">
+                <div class="stat-number">{{getContestacoesNegadas()}}</div>
+                <div class="stat-label">Negadas</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+    
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <span class="tab-label"><span>Auto Inventário</span><span class="tab-badge" [class.zero]="getPendentesAutoInventario() === 0">{{getPendentesAutoInventario()}}</span></span>
+      </ng-template>
+      <div class="tab-content">
+        <!-- 📊 CARDS DE ESTATÍSTICAS - AUTO INVENTÁRIO -->
+        <div class="stats-section">
+          <div class="stats-grid">
+            <div class="stat-card total" (click)="filtrarPorStatusCard('Total')" title="Clique para ver todas as solicitações de auto inventário">
+              <div class="stat-content">
+                <div class="stat-number">{{getTotalContestacoes()}}</div>
+                <div class="stat-label">Total de Solicitações</div>
+              </div>
+            </div>
+            
+            <div class="stat-card pending" (click)="filtrarPorStatusCard('pendente')" title="Clique para ver solicitações pendentes">
+              <div class="stat-content">
+                <div class="stat-number">{{getContestacoesPendentes()}}</div>
+                <div class="stat-label">Pendentes</div>
+              </div>
+            </div>
+            
+            <div class="stat-card resolved" (click)="filtrarPorStatusCard('resolvida')" title="Clique para ver solicitações resolvidas">
+              <div class="stat-content">
+                <div class="stat-number">{{getContestacoesResolvidas()}}</div>
+                <div class="stat-label">Resolvidas</div>
+              </div>
+            </div>
+            
+            <div class="stat-card cancelled" (click)="filtrarPorStatusCard('cancelada')" title="Clique para ver solicitações canceladas">
+              <div class="stat-content">
+                <div class="stat-number">{{getContestacoesCanceladas()}}</div>
+                <div class="stat-label">Canceladas</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+    
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <span class="tab-label"><span>Inventário Forçado</span><span class="tab-badge" [class.zero]="getPendentesInventarioForcado() === 0">{{getPendentesInventarioForcado()}}</span></span>
+      </ng-template>
+      <div class="tab-content">
+        <!-- 📊 CARDS DE ESTATÍSTICAS - INVENTÁRIO FORÇADO -->
+        <div class="stats-section">
+          <div class="stats-grid">
+            <div class="stat-card total" (click)="filtrarPorStatusCard('Total')" title="Clique para ver todos os inventários forçados">
+              <div class="stat-content">
+                <div class="stat-number">{{getTotalContestacoes()}}</div>
+                <div class="stat-label">Total de Inventários</div>
+              </div>
+            </div>
+            
+            <div class="stat-card pending" (click)="filtrarPorStatusCard('pendente')" title="Clique para ver inventários pendentes">
+              <div class="stat-content">
+                <div class="stat-number">{{getContestacoesPendentes()}}</div>
+                <div class="stat-label">Pendentes</div>
+              </div>
+            </div>
+            
+            <div class="stat-card resolved" (click)="filtrarPorStatusCard('resolvida')" title="Clique para ver inventários resolvidos">
+              <div class="stat-content">
+                <div class="stat-number">{{getContestacoesResolvidas()}}</div>
+                <div class="stat-label">Concluídos</div>
+              </div>
+            </div>
+            
+            <div class="stat-card cancelled" (click)="filtrarPorStatusCard('cancelada')" title="Clique para ver inventários cancelados">
+              <div class="stat-content">
+                <div class="stat-number">{{getContestacoesCanceladas()}}</div>
+                <div class="stat-label">Cancelados</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>
+
+<!-- 🔍 SEÇÃO DE BUSCA E FILTROS -->
+<div class="search-filters-section">
+  <div class="search-filters-content">
+    <!-- 🔍 Campo de Busca -->
+    <div class="search-box">
+      <i class="cil-magnifying-glass search-icon"></i>
+      <input 
+        type="text" 
+        placeholder="Buscar por número da contestação, colaborador, equipamento ou status..." 
+        [formControl]="consulta">
+      <button 
+        *ngIf="consulta.value" 
+        class="clear-btn" 
+        (click)="limparBusca()"
+        type="button">
+        <i class="cil-x"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 📋 TABELA MODERNA DE CONTESTAÇÕES -->
+<div class="table-section">
+  <div class="table-container">
+    <table class="modern-table">
+      <thead>
+        <tr>
+          <th>{{tipoFiltro === 'auto_inventario' ? 'Solicitação' : tipoFiltro === 'inventario_forcado' ? 'Inventário Forçado' : 'Contestação'}}</th>
+          <th>Status</th>
+          <th>Colaborador</th>
+          <th>{{tipoFiltro === 'auto_inventario' ? 'Número de Série' : 'Equipamento'}}</th>
+          <th>{{tipoFiltro === 'auto_inventario' ? 'Data Solicitação' : tipoFiltro === 'inventario_forcado' ? 'Data Inventário' : 'Data Contestação'}}</th>
+          <th>Técnico Responsável</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of dadosPaginados" 
+            class="table-row" 
+            [class.contestacao-urgente]="isContestacaoUrgente(row)"
+            [matTooltip]="getAlertaContestacao(row)"
+            [matTooltipDisabled]="!isContestacaoUrgente(row)"
+            matTooltipClass="alerta-tooltip"
+            [matTooltipPosition]="'above'"
+            [matTooltipShowDelay]="500">
+          <td class="id-cell">
+            <span class="contestacao-id">{{ tipoFiltro === 'auto_inventario' ? 'Auto Inventário ' + getContestacaoId(row) : tipoFiltro === 'inventario_forcado' ? 'Inventário Forçado ' + getContestacaoId(row) : getContestacaoNome(row) }}</span>
+          </td>
+          
+          <td class="status-cell">
+            <span class="status-badge" [class]="getStatusClass(getContestacaoStatus(row))">
+              {{ getContestacaoStatus(row) }}
+            </span>
+          </td>
+          
+          <td class="user-cell">
+            <div class="user-info clickable" 
+                 (click)="navegarParaTimelineColaborador(row)" 
+                 [matTooltip]="'Ver timeline de ' + getContestacaoColaborador(row)"
+                 matTooltipPosition="above">
+              <i class="cil-user"></i>
+              <span class="link-text">{{ getContestacaoColaborador(row) }}</span>
+              <i class="cil-external-link link-icon"></i>
+            </div>
+          </td>
+          
+          <td class="equipment-cell">
+            <div class="equipment-info">
+              <i class="cil-devices"></i>
+              <div class="equipment-details clickable" 
+                   *ngIf="tipoFiltro === 'contestacao'"
+                   (click)="navegarParaTimelineRecurso(row)"
+                   [matTooltip]="'Ver timeline de ' + getContestacaoEquipamentoFormatado(row)"
+                   matTooltipPosition="above">
+                <span class="equipment-name link-text">{{ getContestacaoEquipamentoFormatado(row) }}</span>
+                <small class="equipment-serial">{{ getLabelNumeroSerie(row) }}: {{ getContestacaoNumeroSerie(row) }}</small>
+                <i class="cil-external-link link-icon-small"></i>
+              </div>
+              <div class="equipment-details" *ngIf="tipoFiltro === 'auto_inventario' || tipoFiltro === 'inventario_forcado'">
+                <span class="equipment-name">{{ row?.descricao || row?.Descricao || 'N/A' }}</span>
+                <small class="equipment-serial">Número de Série</small>
+              </div>
+            </div>
+          </td>
+          
+          <td class="date-cell">
+            <div class="date-info">
+              <i class="cil-calendar"></i>
+              <span>{{ getContestacaoDataCriacao(row) }}</span>
+            </div>
+          </td>
+          
+          <td class="responsible-cell">
+            <div class="user-info">
+              <i class="cil-user-follow"></i>
+              <span>{{ getContestacaoTecnico(row) }}</span>
+            </div>
+          </td>
+          
+          <td class="actions-cell">
+            <div class="action-buttons">
+              <button 
+                class="btn btn-sm btn-primary" 
+                [matTooltip]="getContestacaoStatusId(row) == 1 || getContestacaoStatusId(row) == 2 ? 'Atender Contestação' : 'Ver Detalhes'"
+                (click)="editarContestacao(row)"
+              >
+                <i [class]="getContestacaoStatusId(row) == 1 || getContestacaoStatusId(row) == 2 ? 'cil-clipboard' : 'cil-search'"></i>
+                <span class="btn-text">{{ getContestacaoStatusId(row) == 1 || getContestacaoStatusId(row) == 2 ? 'Atender' : 'Visualizar' }}</span>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <!-- 📊 INFORMAÇÕES DA TABELA -->
+    <div class="table-info" *ngIf="dataSource?.data">
+      <div class="info-text">
+        <div class="info-left">
+          <span>Mostrando {{dadosPaginados.length}} de {{dataSource.data.length}} registros</span>
+          <span class="info-total" *ngIf="dadosCompletos.length > 0">
+            | Total no sistema: {{dadosCompletos.length}} contestações
+          </span>
+        </div>
+        <div class="info-right">
+          <span class="info-historico" *ngIf="temFiltroAtivo()">
+            <i class="cil-info"></i>
+            Filtro ativo: {{ getFiltroAtivo() }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 📄 PAGINAÇÃO -->
+<div class="pagination-container" *ngIf="dataSource?.data?.length > 0">
+  <mat-paginator 
+    [pageSizeOptions]="[5, 10, 25, 50, 100]" 
+    [pageSize]="10" 
+    showFirstLastButtons>
+  </mat-paginator>
+</div>
+
+<!-- Estado vazio -->
+<div class="empty-state" *ngIf="!dataSource?.data || dataSource.data.length === 0">
+  <div class="empty-icon">
+    <i [class]="tipoFiltro === 'auto_inventario' ? 'cil-devices' : tipoFiltro === 'inventario_forcado' ? 'cil-clipboard' : 'cil-clipboard'"></i>
+  </div>
+  <h3>Nenhum{{tipoFiltro === 'inventario_forcado' ? '' : 'a'}} {{tipoFiltro === 'auto_inventario' ? 'solicitação de auto inventário' : tipoFiltro === 'inventario_forcado' ? 'inventário forçado' : 'contestação'}} encontrad{{tipoFiltro === 'inventario_forcado' ? 'o' : 'a'}}</h3>
+  <p>Não há {{tipoFiltro === 'auto_inventario' ? 'solicitações' : tipoFiltro === 'inventario_forcado' ? 'inventários forçados' : 'contestações'}} cadastrados ou ajuste os filtros de busca</p>
+</div>

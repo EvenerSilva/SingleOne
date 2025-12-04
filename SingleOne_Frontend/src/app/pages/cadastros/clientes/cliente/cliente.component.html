@@ -1,0 +1,165 @@
+<!-- 🎯 HEADER MODERNO DO CLIENTE -->
+<div class="cliente-header">
+  <div class="header-content">
+    <div class="header-left">
+      <button class="back-button" [routerLink]="['/clientes']" matTooltip="Voltar para Clientes">
+        <i class="cil-arrow-left"></i>
+      </button>
+      <div class="header-title">
+        <div class="title-icon">
+          <i class="cil-building"></i>
+        </div>
+        <div class="title-text">
+          <h1>{{ cliente.id ? 'Editar Cliente' : 'Novo Cliente' }}</h1>
+          <p>{{ cliente.id ? 'Modificar dados do cliente' : 'Criar novo cliente no sistema' }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 🍞 BREADCRUMB MODERNO -->
+<nav class="modern-breadcrumb">
+  <div class="breadcrumb-container">
+    <a [routerLink]="['/dashboard']" class="breadcrumb-item">
+      <i class="cil-home"></i>
+      <span>Dashboard</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a [routerLink]="['/cadastros']" class="breadcrumb-item">
+      <i class="cil-settings"></i>
+      <span>Cadastros</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a [routerLink]="['/clientes']" class="breadcrumb-item">
+      <i class="cil-building"></i>
+      <span>Clientes</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <span class="breadcrumb-item active">{{ cliente.id ? 'Editar' : 'Novo' }}</span>
+  </div>
+</nav>
+
+<!-- 📋 CONTEÚDO PRINCIPAL -->
+<div class="cliente-content">
+  <form [formGroup]="form" (ngSubmit)="salvar()" class="cliente-form">
+    
+    <!-- 🎯 CARD DE INFORMAÇÕES BÁSICAS -->
+    <div class="form-card">
+      <div class="card-header">
+        <div class="header-icon">
+          <i class="cil-building"></i>
+        </div>
+        <div class="header-content">
+          <h3>Informações do Cliente</h3>
+          <p>Dados principais da empresa</p>
+        </div>
+      </div>
+      
+      <div class="card-body">
+        <div class="form-row">
+          <div class="form-field full-width">
+            <label class="field-label">
+              <i class="cil-building"></i>
+              Razão Social
+            </label>
+            <input 
+              type="text" 
+              class="form-input" 
+              required 
+              formControlName="razaosocial" 
+              [(ngModel)]="cliente.razaosocial"
+              placeholder="Digite a razão social da empresa">
+            <div class="field-error" *ngIf="form.get('razaosocial')?.invalid && form.get('razaosocial')?.touched">
+              Razão Social é obrigatória
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-field">
+            <label class="field-label">
+              <i class="cil-credit-card"></i>
+              CNPJ
+            </label>
+            <input 
+              type="text" 
+              class="form-input" 
+              required 
+              formControlName="cnpj" 
+              [(ngModel)]="cliente.cnpj"
+              appCnpjMask
+              placeholder="00.000.000/0000-00">
+            <div class="field-error" *ngIf="form.get('cnpj')?.invalid && form.get('cnpj')?.touched">
+              CNPJ é obrigatório
+            </div>
+          </div>
+        </div>
+
+        <!-- 🖼️ CAMPO DE LOGO -->
+        <div class="form-row">
+          <div class="form-field full-width">
+            <label class="field-label">
+              <i class="cil-image"></i>
+              Logo da Empresa
+            </label>
+            <div class="logo-upload-container">
+              <!-- Preview da logo atual -->
+              <div class="logo-preview" *ngIf="cliente.logo || logoPreview">
+                <img [src]="logoPreview || getLogoUrl(cliente.logo)" alt="Logo da empresa" class="logo-image">
+                <button type="button" class="remove-logo-btn" (click)="removerLogo()" *ngIf="cliente.logo">
+                  <i class="cil-trash"></i>
+                </button>
+              </div>
+              
+              <!-- Upload de nova logo -->
+              <div class="upload-area" [class.has-logo]="cliente.logo || logoPreview">
+                <input 
+                  type="file" 
+                  #logoInput
+                  (change)="onLogoSelected($event)"
+                  accept="image/*"
+                  class="file-input"
+                  [style.display]="(cliente.logo || logoPreview) ? 'none' : 'block'">
+                
+                <div class="upload-placeholder" *ngIf="!cliente.logo && !logoPreview">
+                  <i class="cil-cloud-upload"></i>
+                  <p>Clique para selecionar uma logo</p>
+                  <small>Formatos: JPG, PNG, GIF (máx. 5MB)</small>
+                </div>
+                
+                <button 
+                  type="button" 
+                  class="change-logo-btn" 
+                  (click)="logoInput.click()"
+                  *ngIf="cliente.logo || logoPreview">
+                  <i class="cil-pencil"></i>
+                  Alterar Logo
+                </button>
+              </div>
+            </div>
+            
+            <div class="field-info">
+              <i class="cil-info"></i>
+              <span>A logo será exibida na tela de login quando disponível</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 🎯 CARD DE AÇÕES -->
+    <div class="actions-card">
+      <div class="actions-content">
+        <button type="button" class="btn-secondary" [routerLink]="['/clientes']">
+          <i class="cil-x"></i>
+          <span>Cancelar</span>
+        </button>
+        <button type="submit" class="btn-primary" [disabled]="form.invalid">
+          <i class="cil-check"></i>
+          <span>Salvar Cliente</span>
+        </button>
+      </div>
+    </div>
+  </form>
+</div>

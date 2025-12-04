@@ -1,0 +1,535 @@
+.tinone-chat-window {
+  position: fixed; // Fixed para posicionar relativo à viewport, não ao container pai
+  bottom: 150px; // 70px (widget) + 80px (espaço)
+  width: 380px;
+  height: 600px;
+  max-height: calc(100vh - 120px);
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-top: 4px solid;
+  animation: slideUp 0.3s ease;
+  z-index: 9998; // Um pouco abaixo do widget (9999)
+
+  // Chat abre à direita (quando widget está à esquerda)
+  &.position-right {
+    right: 20px; // Mesma margem do widget
+  }
+
+  // Chat abre à esquerda (quando widget está à direita)
+  &.position-left {
+    left: 20px; // Mesma margem do widget
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Header
+.tinone-chat-header {
+  padding: 16px;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tinone-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tinone-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tinone-header-info {
+  .tinone-name {
+    font-weight: 600;
+    font-size: 16px;
+  }
+  .tinone-status {
+    font-size: 12px;
+    opacity: 0.9;
+  }
+}
+
+.tinone-header-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.tinone-btn-icon {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+}
+
+// Mensagens
+.tinone-chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: #f9f9f9;
+}
+
+.tinone-message {
+  display: flex;
+  
+  &.tinone-message-usuario {
+    justify-content: flex-end;
+  }
+
+  &.tinone-message-assistente {
+    justify-content: flex-start;
+  }
+}
+
+.tinone-message-bubble {
+  max-width: 70%;
+  padding: 10px 14px;
+  border-radius: 16px;
+  animation: fadeIn 0.3s ease;
+
+  &.tinone-loading {
+    padding: 12px 20px;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.tinone-message-text {
+  line-height: 1.5;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+.tinone-message-time {
+  font-size: 11px;
+  margin-top: 4px;
+  text-align: right;
+}
+
+// Typing indicator
+.tinone-typing-indicator {
+  display: flex;
+  gap: 4px;
+  
+  span {
+    width: 8px;
+    height: 8px;
+    background: #999;
+    border-radius: 50%;
+    animation: typing 1.4s infinite;
+
+    &:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    &:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+  }
+}
+
+@keyframes typing {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: 0.7;
+  }
+  30% {
+    transform: translateY(-10px);
+    opacity: 1;
+  }
+}
+
+// Input
+.tinone-chat-input {
+  padding: 16px;
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  gap: 8px;
+  background: white;
+
+  textarea {
+    flex: 1;
+    border: 1px solid #e0e0e0;
+    border-radius: 20px;
+    padding: 10px 16px;
+    font-family: inherit;
+    font-size: 14px;
+    resize: none;
+    outline: none;
+    max-height: 100px;
+
+    &:focus {
+      border-color: #ccc;
+    }
+
+    &:disabled {
+      background: #f5f5f5;
+      cursor: not-allowed;
+    }
+  }
+}
+
+.tinone-btn-send {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s, transform 0.1s;
+
+  &:hover:not(:disabled) {
+    opacity: 0.9;
+    transform: scale(1.05);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// Scrollbar
+.tinone-chat-messages::-webkit-scrollbar {
+  width: 6px;
+}
+
+.tinone-chat-messages::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.tinone-chat-messages::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 3px;
+
+  &:hover {
+    background: #999;
+  }
+}
+
+// Guias passo a passo
+.tinone-guia-container {
+  margin-top: 12px;
+}
+
+.tinone-btn-guia {
+  width: 100%;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: opacity 0.2s, transform 0.1s;
+  font-size: 14px;
+
+  &:hover {
+    opacity: 0.9;
+    transform: scale(1.02);
+  }
+
+  svg {
+    flex-shrink: 0;
+  }
+}
+
+.tinone-passos {
+  margin-top: 12px;
+  animation: expandDown 0.3s ease;
+}
+
+@keyframes expandDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    max-height: 1000px;
+  }
+}
+
+.tinone-processo-header {
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #e0e0e0;
+
+  h4 {
+    margin: 0 0 8px 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+  }
+
+  .tempo-estimado {
+    margin: 0;
+    font-size: 13px;
+    color: #666;
+    font-style: italic;
+  }
+}
+
+.tinone-passo {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 8px;
+  border-left: 3px solid #4a90e2;
+  transition: transform 0.2s, box-shadow 0.2s;
+
+  &:hover {
+    transform: translateX(4px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.tinone-passo-numero {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  background: #4a90e2;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.tinone-passo-conteudo {
+  flex: 1;
+
+  h5 {
+    margin: 0 0 6px 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+  }
+
+  p {
+    margin: 0 0 8px 0;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #555;
+  }
+}
+
+.tinone-passo-dica {
+  padding: 8px 12px;
+  background: #fff8e1;
+  border-left: 3px solid #ffc107;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #795548;
+  line-height: 1.4;
+  margin-top: 8px;
+}
+
+// Responsivo
+@media (max-width: 480px) {
+  .tinone-chat-window {
+    width: calc(100vw - 40px);
+    height: calc(100vh - 120px);
+  }
+
+  .tinone-message-bubble {
+    max-width: 85%;
+  }
+
+  .tinone-passo {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .tinone-passo-numero {
+    align-self: flex-start;
+  }
+}
+
+// 🔔 ALERTA DE MUDANÇA DE TELA (FIXO APÓS HEADER)
+.alerta-mudanca-tela-fixo {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 0; // Sem border radius para ficar colado no header
+  padding: 16px;
+  margin: 0; // Sem margem para ficar colado
+  color: white;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+  animation: slideDown 0.3s ease;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  position: relative; // Para ficar no fluxo, não sobrepondo mensagens
+  z-index: 10; // Acima das mensagens
+  
+  .alerta-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    
+    .alerta-icon {
+      font-size: 24px;
+      animation: bounce 1s infinite;
+    }
+    
+    .alerta-titulo {
+      font-weight: 600;
+      font-size: 15px;
+    }
+  }
+  
+  .alerta-corpo {
+    margin-bottom: 12px;
+    
+    p {
+      margin: 4px 0;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+    
+    .alerta-tela {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 8px 12px;
+      border-radius: 6px;
+      margin: 8px 0;
+      font-size: 14px;
+      
+      strong {
+        color: #fff;
+        font-weight: 600;
+      }
+    }
+    
+    .alerta-pergunta {
+      margin-top: 8px;
+      font-weight: 500;
+    }
+  }
+  
+  .alerta-acoes {
+    display: flex;
+    gap: 8px;
+    
+    .btn-alerta {
+      flex: 1;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+      
+      &.btn-sim {
+        background: white;
+        color: #667eea;
+        
+        &:hover {
+          background: #f8f9fa;
+          transform: translateY(-1px);
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+      }
+      
+      &.btn-nao {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        
+        &:hover {
+          background: rgba(255, 255, 255, 0.3);
+        }
+      }
+    }
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    max-height: 300px;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+

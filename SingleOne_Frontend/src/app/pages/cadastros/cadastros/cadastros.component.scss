@@ -1,0 +1,944 @@
+/* 🎯 HEADER MODERNO DOS CADASTROS */
+.cadastros-header {
+  background: linear-gradient(135deg, #080039 0%, #1a1a2e 100%);
+  color: white;
+  padding: 2rem 2rem 2.5rem 2rem;
+  margin-bottom: 2rem;
+  border-radius: 0 0 20px 20px;
+  box-shadow: 0 8px 32px rgba(8, 0, 57, 0.3);
+  
+  .header-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+    .header-left {
+      .header-title {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        
+        .title-icon {
+          background: linear-gradient(135deg, #FF3A0F 0%, #ff6b3d 100%);
+          width: 70px;
+          height: 70px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 8px 25px rgba(255, 58, 15, 0.3);
+          animation: float 3s ease-in-out infinite;
+          
+          i {
+            font-size: 32px;
+            color: white;
+          }
+        }
+        
+        .title-text {
+          h1 {
+            font-size: 3.2rem;
+            font-weight: 700;
+            margin: 0;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            
+            @media (max-width: 768px) {
+              font-size: 2.2rem;
+            }
+          }
+          
+          p {
+            font-size: 1.2rem;
+            margin: 0.5rem 0 0 0;
+            opacity: 0.9;
+            font-weight: 300;
+          }
+        }
+      }
+    }
+  }
+}
+
+/* 🍞 BREADCRUMB MODERNO */
+.modern-breadcrumb {
+  background: white;
+  padding: 1rem 2rem;
+  margin-bottom: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  
+  .breadcrumb-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.9rem;
+    
+    .breadcrumb-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #6c757d;
+      text-decoration: none;
+      transition: color 0.3s ease;
+      
+      &:hover {
+        color: #FF3A0F;
+      }
+      
+      &.active {
+        color: #080039;
+        font-weight: 600;
+      }
+      
+      i {
+        font-size: 16px;
+      }
+    }
+    
+    i {
+      color: #dee2e6;
+      font-size: 14px;
+    }
+  }
+}
+
+/* 📋 CONTEÚDO PRINCIPAL */
+.cadastros-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem 2rem 2rem;
+}
+
+/* 🔧 SEÇÕES */
+.section-container {
+  margin-bottom: 3rem;
+  
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    
+    .section-icon {
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      
+      i {
+        font-size: 24px;
+        color: #6c757d;
+      }
+    }
+    
+    .section-title {
+      h2 {
+        font-size: 1.8rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin: 0 0 0.25rem 0;
+      }
+      
+      p {
+        font-size: 1rem;
+        color: #6c757d;
+        margin: 0;
+        font-weight: 400;
+      }
+    }
+  }
+  
+  .section-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); // ✅ AJUSTADO: Cards mais compactos
+    gap: 1.5rem;
+    
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+  }
+}
+
+/* 🎯 CARDS DE AÇÃO */
+.action-card {
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e9ecef;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  display: flex; // ✅ NOVO: Layout flexbox
+  align-items: flex-start; // ✅ NOVO: Alinhar no topo
+  gap: 1rem; // ✅ NOVO: Espaçamento entre ícone e conteúdo
+  
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+    
+    .card-icon i {
+      transform: scale(1.1);
+    }
+  }
+  
+  // 🚀 HOVER ESPECIAL PARA CARDS DE CADASTRO RÁPIDO
+  &.cadastro-rapido:hover {
+    transform: scale(1.05) translateY(-4px);
+    box-shadow: 0 16px 32px rgba(76, 175, 80, 0.3);
+    
+    .card-icon i {
+      transform: scale(1.15);
+    }
+    
+    &::after {
+      opacity: 0.8;
+      animation: pulse 1s infinite;
+    }
+  }
+  
+  // 🎨 EFEITOS HOVER ESPECÍFICOS PARA CARDS DE RECURSOS
+  &.categoria:hover {
+    box-shadow: 0 12px 24px rgba(156, 39, 176, 0.2);
+  }
+  
+  &.fabricante:hover {
+    box-shadow: 0 12px 24px rgba(255, 87, 34, 0.2);
+  }
+  
+  &.tipo:hover {
+    box-shadow: 0 12px 24px rgba(96, 125, 139, 0.2);
+  }
+  
+  &.modelo:hover {
+    box-shadow: 0 12px 24px rgba(121, 85, 72, 0.2);
+  }
+  
+  &.cadastro-rapido:hover {
+    box-shadow: 0 12px 24px rgba(76, 175, 80, 0.2);
+  }
+  
+  // 🎨 EFEITOS HOVER ESPECÍFICOS PARA CARDS ORGANIZACIONAIS
+  // NOTA: cadastro-rapido tem estilos específicos acima
+  &.empresa:hover {
+    box-shadow: 0 12px 24px rgba(33, 150, 243, 0.2);
+  }
+  
+  &.filial:hover {
+    box-shadow: 0 12px 24px rgba(255, 152, 0, 0.2);
+  }
+  
+  &.localidade:hover {
+    box-shadow: 0 12px 24px rgba(156, 39, 176, 0.2);
+  }
+  
+  &.centro-custo:hover {
+    box-shadow: 0 12px 24px rgba(244, 67, 54, 0.2);
+  }
+  
+  &.cliente:hover {
+    box-shadow: 0 12px 24px rgba(96, 125, 139, 0.2);
+  }
+  
+  &:active {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  }
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    transition: all 0.3s ease;
+  }
+  
+  // ✅ CORES POR SEÇÃO
+  &.sistema::before {
+    background: linear-gradient(90deg, #FF3A0F 0%, #ff6b3d 100%);
+  }
+  
+  &.empresas::before {
+    background: linear-gradient(90deg, #4caf50 0%, #66bb6a 100%);
+  }
+  
+  &.recursos::before {
+    background: linear-gradient(90deg, #2196f3 0%, #42a5f5 100%);
+  }
+  
+  // 🎨 ESTILOS ESPECÍFICOS PARA CARDS DE RECURSOS
+  &.categoria::before {
+    background: linear-gradient(90deg, #9c27b0 0%, #ba68c8 100%);
+  }
+  
+  &.fabricante::before {
+    background: linear-gradient(90deg, #ff5722 0%, #ff8a65 100%);
+  }
+  
+  &.tipo::before {
+    background: linear-gradient(90deg, #607d8b 0%, #90a4ae 100%);
+  }
+  
+  &.modelo::before {
+    background: linear-gradient(90deg, #795548 0%, #a1887f 100%);
+  }
+  
+  // 🚀 CARD DE CADASTRO RÁPIDO EM DESTAQUE
+  &.cadastro-rapido {
+    position: relative;
+    transform: scale(1.02);
+    z-index: 2;
+    
+    &::before {
+      background: linear-gradient(90deg, #4caf50 0%, #66bb6a 100%);
+      height: 6px; // Barra mais grossa
+    }
+    
+    .card-icon {
+      background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1rem auto;
+      
+      i {
+        color: white !important;
+        font-size: 1.8rem;
+      }
+    }
+    
+    .card-content {
+      text-align: center;
+      
+      h3 {
+        color: #4caf50;
+        font-weight: 700;
+        font-size: 1.4rem;
+      }
+      
+      p {
+        color: #2c3e50;
+        font-weight: 500;
+      }
+    }
+    
+    // 🎯 EFEITO DE BRILHO
+    &::after {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: linear-gradient(45deg, #4caf50, #66bb6a, #4caf50);
+      border-radius: 16px;
+      z-index: -1;
+      opacity: 0.3;
+      animation: pulse 2s infinite;
+    }
+  }
+  
+  &.fornecedores::before {
+    background: linear-gradient(90deg, #ff9800 0%, #ffb74d 100%);
+  }
+  
+  &.organizacional::before {
+    background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+  }
+  
+  // 🎨 ESTILOS ESPECÍFICOS PARA CARDS ORGANIZACIONAIS
+  // 🚀 CARD DE CADASTRO RÁPIDO ORGANIZACIONAL EM DESTAQUE
+  &.cadastro-rapido {
+    position: relative;
+    transform: scale(1.02);
+    z-index: 2;
+    
+    &::before {
+      background: linear-gradient(90deg, #4caf50 0%, #66bb6a 100%);
+      height: 6px; // Barra mais grossa
+    }
+    
+    .card-icon {
+      background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1rem auto;
+      
+      i {
+        color: white !important;
+        font-size: 1.8rem;
+      }
+    }
+    
+    .card-content {
+      text-align: center;
+      
+      h3 {
+        color: #4caf50;
+        font-weight: 700;
+        font-size: 1.4rem;
+      }
+      
+      p {
+        color: #2c3e50;
+        font-weight: 500;
+      }
+    }
+    
+    // 🎯 EFEITO DE BRILHO
+    &::after {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: linear-gradient(45deg, #4caf50, #66bb6a, #4caf50);
+      border-radius: 16px;
+      z-index: -1;
+      opacity: 0.3;
+      animation: pulse 2s infinite;
+    }
+  }
+  
+  &.empresa::before {
+    background: linear-gradient(90deg, #2196f3 0%, #42a5f5 100%);
+  }
+  
+  &.filial::before {
+    background: linear-gradient(90deg, #ff9800 0%, #ffb74d 100%);
+  }
+  
+  &.localidade::before {
+    background: linear-gradient(90deg, #9c27b0 0%, #ba68c8 100%);
+  }
+  
+  &.centro-custo::before {
+    background: linear-gradient(90deg, #f44336 0%, #ef5350 100%);
+  }
+  
+  &.cliente::before {
+    background: linear-gradient(90deg, #607d8b 0%, #90a4ae 100%);
+  }
+
+  &.telefonia::before {
+    background: linear-gradient(90deg, #a8edea 0%, #fed6e3 100%);
+  }
+
+  &.documentos::before {
+    background: linear-gradient(90deg, #ffecd2 0%, #fcb69f 100%);
+  }
+  
+  .card-icon {
+    flex-shrink: 0; // ✅ NOVO: Ícone não encolhe
+    margin-bottom: 0; // ✅ REMOVIDO: margin-bottom desnecessário
+    
+    i {
+      font-size: 2rem;
+      color: #6c757d;
+      transition: all 0.3s ease;
+    }
+  }
+  
+  // 🎨 ESTILOS ESPECÍFICOS PARA ÍCONES DOS CARDS DE RECURSOS
+  &.categoria .card-icon i {
+    color: #9c27b0;
+  }
+  
+  &.fabricante .card-icon i {
+    color: #ff5722;
+  }
+  
+  &.tipo .card-icon i {
+    color: #607d8b;
+  }
+  
+  &.modelo .card-icon i {
+    color: #795548;
+  }
+  
+  // 🎨 ESTILOS ESPECÍFICOS PARA ÍCONES DOS CARDS ORGANIZACIONAIS
+  
+  &.empresa .card-icon i {
+    color: #2196f3;
+  }
+  
+  &.filial .card-icon i {
+    color: #ff9800;
+  }
+  
+  &.localidade .card-icon i {
+    color: #9c27b0;
+  }
+  
+  &.centro-custo .card-icon i {
+    color: #f44336;
+  }
+  
+  &.cliente .card-icon i {
+    color: #607d8b;
+  }
+  
+  .card-content {
+    flex: 1; // ✅ NOVO: Conteúdo ocupa espaço restante
+    margin-bottom: 0;
+    
+    h3 {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #2c3e50;
+      margin: 0 0 0.5rem 0;
+    }
+    
+    p {
+      font-size: 0.9rem;
+      color: #6c757d;
+      margin: 0;
+      line-height: 1.4;
+    }
+  }
+}
+
+/* 🎬 ANIMAÇÕES */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.05);
+  }
+}
+
+/* 📱 RESPONSIVIDADE */
+@media (max-width: 768px) {
+  .cadastros-header {
+    padding: 1.5rem 0;
+
+    .header-content {
+      padding: 0 1rem;
+
+      .header-left .header-title {
+        .title-icon {
+          width: 50px;
+          height: 50px;
+
+          i {
+            font-size: 1.5rem;
+          }
+        }
+
+        .title-text h1 {
+          font-size: 2rem;
+        }
+      }
+    }
+  }
+
+  .modern-breadcrumb .breadcrumb-container {
+    padding: 0 1rem;
+  }
+
+  .cadastros-content {
+    padding: 0 1rem;
+
+    .section-container {
+      .section-header {
+        padding: 1rem 1.5rem;
+      }
+
+      .section-grid {
+        padding: 1.5rem;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+
+        .action-card {
+          padding: 1.25rem;
+          
+          // 🆕 CARD INTEGRADO RESPONSIVO
+          &.recursos-integrado {
+            grid-column: span 1;
+            
+            .recursos-resumo {
+              flex-direction: column;
+              gap: 1rem;
+              
+              .resumo-item {
+                .resumo-valor {
+                  font-size: 1.5rem;
+                }
+              }
+            }
+            
+            .acoes-rapidas {
+              justify-content: center;
+              
+              .btn-rapido {
+                flex: 1;
+                justify-content: center;
+              }
+            }
+          }
+
+          // 📞 CARD TELEFONIA RESPONSIVO
+          &.telefonia-integrado {
+            grid-column: span 1;
+            
+            .telefonia-resumo {
+              flex-direction: column;
+              gap: 1rem;
+              
+              .resumo-item {
+                .resumo-valor {
+                  font-size: 1.5rem;
+                }
+              }
+            }
+            
+            .acoes-telefonia {
+              grid-template-columns: 1fr;
+              
+              .btn-telefonia {
+                padding: 0.5rem;
+                
+                i {
+                  font-size: 1rem;
+                }
+                
+                span {
+                  font-size: 0.75rem;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .cadastros-header .header-content .header-left .header-title {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.5rem;
+
+    .title-text h1 {
+      font-size: 1.75rem;
+    }
+  }
+
+  .section-container .section-header {
+    text-align: center;
+
+    .section-icon {
+      margin: 0 0 1rem 0;
+    }
+  }
+}
+
+// 🆕 CARD INTEGRADO DE RECURSOS
+.action-card.recursos-integrado {
+  grid-column: span 2;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 35px rgba(102, 126, 234, 0.3);
+    border-color: transparent;
+  }
+
+  .card-icon {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    
+    i {
+      color: white;
+    }
+  }
+
+  .card-content {
+    h3 {
+      color: white;
+      font-size: 1.4rem;
+      margin-bottom: 0.75rem;
+    }
+
+    p {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 1rem;
+      margin-bottom: 1.5rem;
+    }
+  }
+
+  // 📈 RESUMO ESTATÍSTICO
+  .recursos-resumo {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    backdrop-filter: blur(10px);
+
+    .resumo-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+
+      .resumo-valor {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+        color: white;
+
+        &.ativo {
+          color: #4ade80;
+        }
+
+        &.inativo {
+          color: #f87171;
+        }
+      }
+
+      .resumo-label {
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.8);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+    }
+  }
+
+  // 🔍 AÇÕES RÁPIDAS
+  .acoes-rapidas {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+
+    .btn-rapido {
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.3);
+        border-color: rgba(255, 255, 255, 0.5);
+        transform: translateY(-2px);
+      }
+
+      i {
+        font-size: 1rem;
+      }
+
+      span {
+        font-weight: 500;
+      }
+    }
+  }
+}
+
+// 📊 CARD DE ESTOQUE MÍNIMO E MÁXIMO
+.action-card.estoque-minimo {
+  // Usa o estilo base do .action-card
+  // Apenas customizações específicas se necessário
+  
+  .card-icon {
+    // Remove o fundo gradiente para seguir o padrão dos outros cards
+    background: none;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    
+    i {
+      font-size: 2rem;
+      color: #667eea; // Cor azul para representar estoque
+      transition: all 0.3s ease;
+    }
+  }
+  
+  .card-content {
+    h3 {
+      font-size: 1.4rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #2c3e50;
+    }
+    
+    p {
+      font-size: 0.95rem;
+      color: #6c757d;
+      margin-bottom: 1.5rem;
+      line-height: 1.4;
+    }
+  }
+}
+
+.action-card.telefonia-integrado {
+  grid-column: span 2;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 35px rgba(102, 126, 234, 0.3);
+    border-color: transparent;
+  }
+
+  .card-icon {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    
+    i {
+      color: white;
+    }
+  }
+
+  .card-content {
+    h3 {
+      color: white;
+      font-size: 1.4rem;
+      margin-bottom: 0.75rem;
+    }
+
+    p {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 1rem;
+      margin-bottom: 1.5rem;
+    }
+  }
+
+  // 📊 RESUMO TELEFONIA
+  .recursos-resumo {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    backdrop-filter: blur(10px);
+
+    .resumo-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+
+      .resumo-valor {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+        color: white;
+
+        &.ativo {
+          color: #4ade80;
+        }
+
+        &.inativo {
+          color: #f87171;
+        }
+      }
+
+      .resumo-label {
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.8);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+    }
+  }
+
+  // 🔧 AÇÕES DE TELEFONIA
+  .acoes-rapidas {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+
+    .btn-rapido {
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.3);
+        border-color: rgba(255, 255, 255, 0.5);
+        transform: translateY(-2px);
+      }
+
+      i {
+        font-size: 1rem;
+      }
+
+      span {
+        font-weight: 500;
+      }
+    }
+  }
+}

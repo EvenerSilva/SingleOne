@@ -1,0 +1,255 @@
+[
+  {
+    "ProcessoId": 1,
+    "Nome": "Criar Nova Requisição",
+    "Descricao": "Processo completo para criar uma nova requisição de equipamento no sistema",
+    "TempoEstimado": "5-10 minutos",
+    "Palavras-chave": ["requisicao", "criar", "nova", "solicitar", "pedir equipamento"],
+    "Passos": [
+      {
+        "Numero": 1,
+        "Titulo": "Acessar o menu de requisições",
+        "Descricao": "No menu lateral, clique em 'Requisições' e depois em 'Nova Requisição'",
+        "Dica": "Você também pode usar o atalho no dashboard"
+      },
+      {
+        "Numero": 2,
+        "Titulo": "Selecionar o colaborador",
+        "Descricao": "Digite o CPF ou nome do colaborador que receberá o equipamento. O sistema mostrará os dados cadastrais e a política de elegibilidade",
+        "Dica": "Verifique se o colaborador tem direito ao tipo de equipamento desejado"
+      },
+      {
+        "Numero": 3,
+        "Titulo": "Escolher o tipo de equipamento",
+        "Descricao": "Selecione o tipo de equipamento na lista (Notebook, Desktop, Celular, etc.). O sistema mostrará apenas os tipos permitidos pela política",
+        "Dica": "Se o tipo desejado não aparecer, verifique a política de elegibilidade do colaborador"
+      },
+      {
+        "Numero": 4,
+        "Titulo": "Adicionar justificativa",
+        "Descricao": "Preencha o campo de justificativa explicando o motivo da requisição. Isso ajuda na aprovação",
+        "Dica": "Seja claro e objetivo. Ex: 'Equipamento atual danificado' ou 'Nova contratação'"
+      },
+      {
+        "Numero": 5,
+        "Titulo": "Revisar e salvar",
+        "Descricao": "Revise todos os dados preenchidos e clique em 'Salvar Requisição'. O sistema enviará para o fluxo de aprovação",
+        "Dica": "Você pode acompanhar o status da requisição no painel de requisições"
+      }
+    ]
+  },
+  {
+    "ProcessoId": 2,
+    "Nome": "Entregar Equipamento",
+    "Descricao": "Processo para fazer a entrega de um equipamento a um colaborador",
+    "TempoEstimado": "10-15 minutos",
+    "Palavras-chave": ["entregar", "entrega", "movimentacao", "termo", "atribuir"],
+    "Passos": [
+      {
+        "Numero": 1,
+        "Titulo": "Acessar movimentações",
+        "Descricao": "No menu lateral, clique em 'Equipamentos' → 'Movimentações' → 'Nova Entrega'",
+        "Dica": "Certifique-se de que o equipamento está com status 'Disponível'"
+      },
+      {
+        "Numero": 2,
+        "Titulo": "Selecionar o equipamento",
+        "Descricao": "Digite o número de patrimônio ou escaneie o código de barras do equipamento",
+        "Dica": "O sistema mostrará as informações do equipamento para conferência"
+      },
+      {
+        "Numero": 3,
+        "Titulo": "Informar o colaborador",
+        "Descricao": "Digite o CPF ou nome do colaborador que receberá o equipamento",
+        "Dica": "Verifique se os dados estão corretos antes de prosseguir"
+      },
+      {
+        "Numero": 4,
+        "Titulo": "Gerar termo de responsabilidade",
+        "Descricao": "O sistema gera automaticamente o termo. Revise as informações e clique em 'Gerar Termo'",
+        "Dica": "Você pode personalizar cláusulas nas configurações de templates"
+      },
+      {
+        "Numero": 5,
+        "Titulo": "Coletar assinatura",
+        "Descricao": "Solicite que o colaborador assine o termo (digital ou físico)",
+        "Dica": "Para assinatura digital, use o campo de assinatura eletrônica"
+      },
+      {
+        "Numero": 6,
+        "Titulo": "Finalizar entrega",
+        "Descricao": "Clique em 'Finalizar Entrega'. O equipamento mudará automaticamente para status 'Em Uso'",
+        "Dica": "Um e-mail de confirmação será enviado ao colaborador"
+      }
+    ]
+  },
+  {
+    "ProcessoId": 3,
+    "Nome": "Receber Devolução",
+    "Descricao": "Processo para receber um equipamento devolvido por um colaborador",
+    "TempoEstimado": "8-12 minutos",
+    "Palavras-chave": ["devolucao", "devolver", "receber", "retorno"],
+    "Passos": [
+      {
+        "Numero": 1,
+        "Titulo": "Acessar devoluções",
+        "Descricao": "No menu lateral, clique em 'Equipamentos' → 'Movimentações' → 'Receber Devolução'",
+        "Dica": null
+      },
+      {
+        "Numero": 2,
+        "Titulo": "Identificar o equipamento",
+        "Descricao": "Digite o número de patrimônio ou escaneie o código de barras",
+        "Dica": "O sistema mostrará quem está com o equipamento atualmente"
+      },
+      {
+        "Numero": 3,
+        "Titulo": "Inspecionar o equipamento",
+        "Descricao": "Verifique o estado físico do equipamento. Marque se há danos ou problemas",
+        "Dica": "Tire fotos de danos para registro no sistema"
+      },
+      {
+        "Numero": 4,
+        "Titulo": "Definir próximo status",
+        "Descricao": "Escolha o status do equipamento: 'Disponível' (se está ok) ou 'Manutenção' (se precisa reparo)",
+        "Dica": "Equipamentos com danos devem ir para manutenção primeiro"
+      },
+      {
+        "Numero": 5,
+        "Titulo": "Finalizar devolução",
+        "Descricao": "Adicione observações se necessário e clique em 'Finalizar Devolução'",
+        "Dica": "O termo de entrega original será automaticamente encerrado"
+      }
+    ]
+  },
+  {
+    "ProcessoId": 4,
+    "Nome": "Cadastrar Equipamento",
+    "Descricao": "Processo para cadastrar um novo equipamento no sistema",
+    "TempoEstimado": "5-8 minutos",
+    "Palavras-chave": ["cadastrar", "novo", "equipamento", "patrimonio", "adicionar"],
+    "Passos": [
+      {
+        "Numero": 1,
+        "Titulo": "Acessar cadastro de equipamentos",
+        "Descricao": "No menu lateral, clique em 'Equipamentos' → 'Cadastrar Novo'",
+        "Dica": null
+      },
+      {
+        "Numero": 2,
+        "Titulo": "Preencher dados básicos",
+        "Descricao": "Informe: Número de Patrimônio, Tipo de Equipamento, Fabricante e Modelo",
+        "Dica": "O número de patrimônio deve ser único no sistema"
+      },
+      {
+        "Numero": 3,
+        "Titulo": "Adicionar dados técnicos",
+        "Descricao": "Preencha: Número de Série, Processador, Memória RAM, Armazenamento, etc.",
+        "Dica": "Quanto mais detalhes, melhor para o controle patrimonial"
+      },
+      {
+        "Numero": 4,
+        "Titulo": "Informar dados fiscais",
+        "Descricao": "Adicione: Nota Fiscal, Data de Aquisição, Valor, Fornecedor",
+        "Dica": "Esses dados são importantes para garantia e controle financeiro"
+      },
+      {
+        "Numero": 5,
+        "Titulo": "Definir localização",
+        "Descricao": "Selecione a Localidade onde o equipamento será armazenado inicialmente",
+        "Dica": "Status inicial é sempre 'Disponível'"
+      },
+      {
+        "Numero": 6,
+        "Titulo": "Salvar cadastro",
+        "Descricao": "Revise todas as informações e clique em 'Salvar'",
+        "Dica": "Você poderá editar os dados posteriormente se necessário"
+      }
+    ]
+  },
+  {
+    "ProcessoId": 5,
+    "Nome": "Configurar Política de Elegibilidade",
+    "Descricao": "Processo para definir quais equipamentos cada cargo pode solicitar",
+    "TempoEstimado": "10-15 minutos",
+    "Palavras-chave": ["politica", "elegibilidade", "regra", "permissao", "cargo"],
+    "Passos": [
+      {
+        "Numero": 1,
+        "Titulo": "Acessar políticas",
+        "Descricao": "No menu lateral, clique em 'Configurações' → 'Políticas de Elegibilidade'",
+        "Dica": "Apenas administradores têm acesso a esta funcionalidade"
+      },
+      {
+        "Numero": 2,
+        "Titulo": "Criar nova política",
+        "Descricao": "Clique em 'Nova Política' e defina um nome descritivo (ex: 'Gerentes - Tecnologia')",
+        "Dica": "Use nomes claros que identifiquem o público-alvo"
+      },
+      {
+        "Numero": 3,
+        "Titulo": "Definir critérios",
+        "Descricao": "Selecione os critérios: Cargo, Departamento, Centro de Custo, etc.",
+        "Dica": "Você pode combinar múltiplos critérios (ex: 'Gerente' E 'TI')"
+      },
+      {
+        "Numero": 4,
+        "Titulo": "Selecionar equipamentos permitidos",
+        "Descricao": "Marque os tipos de equipamentos que o grupo pode solicitar",
+        "Dica": "Considere a necessidade real de cada cargo"
+      },
+      {
+        "Numero": 5,
+        "Titulo": "Definir limites",
+        "Descricao": "Configure quantidades máximas por tipo (se necessário)",
+        "Dica": "Ex: 'Máximo de 2 monitores por colaborador'"
+      },
+      {
+        "Numero": 6,
+        "Titulo": "Ativar política",
+        "Descricao": "Revise todas as configurações e clique em 'Salvar e Ativar'",
+        "Dica": "A política entra em vigor imediatamente para novos colaboradores"
+      }
+    ]
+  },
+  {
+    "ProcessoId": 6,
+    "Nome": "Exportar Relatório",
+    "Descricao": "Processo para exportar dados de relatórios para Excel",
+    "TempoEstimado": "2-3 minutos",
+    "Palavras-chave": ["exportar", "relatorio", "excel", "planilha", "download", "baixar"],
+    "Passos": [
+      {
+        "Numero": 1,
+        "Titulo": "Acessar o relatório desejado",
+        "Descricao": "No menu 'Relatórios', escolha o tipo que deseja exportar",
+        "Dica": "Ex: Gestão de Garantias, Equipamentos por Status, etc."
+      },
+      {
+        "Numero": 2,
+        "Titulo": "Aplicar filtros",
+        "Descricao": "Configure os filtros para obter exatamente os dados que precisa",
+        "Dica": "Quanto mais específico, menor e mais útil será o arquivo"
+      },
+      {
+        "Numero": 3,
+        "Titulo": "Aguardar carregamento",
+        "Descricao": "Clique em 'Buscar' ou 'Aplicar Filtros' e aguarde os resultados",
+        "Dica": "O botão de exportar só fica ativo após o carregamento"
+      },
+      {
+        "Numero": 4,
+        "Titulo": "Exportar dados",
+        "Descricao": "Clique no botão 'Exportar Dados' (ícone de download)",
+        "Dica": "O arquivo será baixado automaticamente em formato .xlsx"
+      },
+      {
+        "Numero": 5,
+        "Titulo": "Abrir no Excel",
+        "Descricao": "Localize o arquivo na pasta de downloads e abra no Excel ou similar",
+        "Dica": "Você pode fazer análises adicionais na planilha exportada"
+      }
+    ]
+  }
+]
+

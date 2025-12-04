@@ -1,0 +1,138 @@
+<!-- 🎯 HEADER MODERNO DOS USUÁRIOS -->
+<div class="usuarios-header">
+  <div class="header-content">
+    <div class="header-left">
+      <button class="back-button" [routerLink]="['/configuracoes']" matTooltip="Voltar para Configurações">
+        <i class="cil-arrow-left"></i>
+      </button>
+      <div class="header-title">
+        <div class="title-icon">
+          <i class="cil-user"></i>
+        </div>
+        <div class="title-text">
+          <h1>Usuários</h1>
+          <p>Gerenciar usuários do sistema</p>
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="action-btn primary-btn" routerLink="/usuario" matTooltip="Adicionar novo usuário">
+        <i class="cil-plus"></i>
+        <span>Novo Usuário</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 🍞 BREADCRUMB MODERNO -->
+<nav class="modern-breadcrumb">
+  <div class="breadcrumb-container">
+    <a [routerLink]="['/dashboard']" class="breadcrumb-item">
+      <i class="cil-home"></i>
+      <span>Dashboard</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a [routerLink]="['/configuracoes']" class="breadcrumb-item">
+      <i class="cil-cog"></i>
+      <span>Configurações</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <span class="breadcrumb-item active">Usuários</span>
+  </div>
+</nav>
+
+<!-- 📋 CONTEÚDO PRINCIPAL -->
+<div class="usuarios-content">
+  <!-- 🔍 SEÇÃO DE BUSCA -->
+  <div class="search-section">
+    <div class="search-box">
+      <i class="cil-magnifying-glass search-icon"></i>
+      <input type="text" placeholder="Buscar usuário pelo nome..." [formControl]="consulta">
+      <button 
+        *ngIf="consulta.value" 
+        class="clear-btn" 
+        (click)="limparBusca()"
+        type="button">
+        <i class="cil-x"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- 📊 TABELA MODERNA -->
+  <div class="table-section">
+    <div class="table-container">
+      <table class="modern-table">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>E-mail</th>
+            <th>Administrador</th>
+            <th>Operador</th>
+            <th>Consulta</th>
+            <th>2FA</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of dadosPaginados">
+            <td class="user-name">
+              <div class="user-info">
+                <div class="user-avatar">
+                  <i class="cil-user"></i>
+                </div>
+                <span>{{row.nome}}</span>
+              </div>
+            </td>
+            <td class="user-email">{{row.email}}</td>
+            <td class="user-role">
+              <div class="role-toggle">
+                <mat-slide-toggle color="primary" [checked]="row.adm" disabled readonly></mat-slide-toggle>
+              </div>
+            </td>
+            <td class="user-role">
+              <div class="role-toggle">
+                <mat-slide-toggle color="primary" [checked]="row.operador" disabled readonly></mat-slide-toggle>
+              </div>
+            </td>
+            <td class="user-role">
+              <div class="role-toggle">
+                <mat-slide-toggle color="primary" [checked]="row.consulta" disabled readonly></mat-slide-toggle>
+              </div>
+            </td>
+            <td class="user-2fa">
+              <div class="two-factor-toggle">
+                <mat-slide-toggle color="primary" 
+                  [checked]="row.twoFactorEnabled" 
+                  [disabled]="!session.usuario.adm || !row.email"
+                  (click)="toggleTwoFactor(row, $event)"
+                  matTooltip="{{ row.twoFactorEnabled ? 'Desabilitar 2FA' : 'Habilitar 2FA' }}">
+                </mat-slide-toggle>
+              </div>
+            </td>
+            <td class="user-actions">
+              <div class="action-buttons">
+                <button class="action-btn edit-btn" 
+                  matTooltip="Editar usuário" 
+                  [routerLink]="['/usuario', row.id]" 
+                  *ngIf="session.usuario.adm || session.usuario.su || session.usuario.id == row.id">
+                  <i class="cil-pencil"></i>
+                </button>
+                <button class="action-btn delete-btn" 
+                  matTooltip="Desativar usuário (marca como inativo para auditoria)" 
+                  (click)="excluir(row)" 
+                  *ngIf="session.usuario.adm || session.usuario.su">
+                  <i class="cil-ban"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 📄 PAGINAÇÃO -->
+  <div class="pagination-container">
+    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [pageSize]="10" showFirstLastButtons></mat-paginator>
+  </div>
+</div>

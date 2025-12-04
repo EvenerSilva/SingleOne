@@ -1,0 +1,608 @@
+// 🎯 ESTILOS DO FORMULÁRIO DE LAUDO
+.laudo-form-container {
+  width: 100%;
+  padding: 2rem;
+  background: transparent;
+  min-height: 400px; /* Garantir altura mínima para o formulário */
+}
+
+// Header do Formulário
+.form-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid #f0f0f0;
+
+  .form-title {
+    color: #2c3e50;
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  .form-subtitle {
+    color: #7f8c8d;
+    font-size: 1rem;
+    margin: 0;
+    line-height: 1.5;
+  }
+}
+
+// Formulário
+.laudo-form {
+  .form-group {
+    margin-bottom: 1.5rem;
+    
+    /* Estilo específico para o primeiro campo */
+    &:first-child {
+      margin-bottom: 2rem; /* Mais espaço para o primeiro campo */
+    }
+
+    .form-label {
+      display: block;
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 0.5rem;
+      font-size: 0.95rem;
+
+      .required {
+        color: #e74c3c;
+        font-weight: 700;
+      }
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 2px solid #e1e8ed;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      background: #fafbfc;
+
+      &:focus {
+        outline: none;
+        border-color: #3498db;
+        background: #ffffff;
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+      }
+
+      &.is-invalid {
+        border-color: #e74c3c;
+        background: #fdf2f2;
+
+        &:focus {
+          box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+        }
+      }
+
+      &::placeholder {
+        color: #bdc3c7;
+      }
+    }
+
+    select.form-control {
+      cursor: pointer;
+      height: auto;
+      min-height: 48px; /* Garantir altura mínima para o texto */
+      line-height: 1.5;
+      padding: 0.75rem 1rem;
+      color: #2c3e50; /* ✅ COR DO TEXTO VISÍVEL */
+      font-weight: 500; /* ✅ PESO DA FONTE PARA MELHOR VISIBILIDADE */
+      
+      /* Garantir que o texto seja exibido completamente */
+      white-space: nowrap;
+      overflow: visible;
+      text-overflow: clip;
+      
+      /* Estilizar as opções */
+      option {
+        padding: 0.5rem;
+        font-size: 0.95rem;
+        background: #ffffff;
+        color: #2c3e50;
+        font-weight: 500; /* ✅ PESO DA FONTE PARA OPÇÕES */
+        
+        &:hover {
+          background: #f8f9fa;
+        }
+      }
+      
+      /* ✅ ESTILO PARA O TEXTO SELECIONADO */
+      &:focus {
+        color: #2c3e50;
+        font-weight: 600;
+      }
+    }
+
+    textarea.form-control {
+      resize: vertical;
+      min-height: 120px;
+      font-family: inherit;
+      line-height: 1.6;
+    }
+
+    .invalid-feedback {
+      display: block;
+      color: #e74c3c;
+      font-size: 0.85rem;
+      margin-top: 0.5rem;
+      font-weight: 500;
+    }
+
+    .form-text {
+      color: #7f8c8d;
+      font-size: 0.85rem;
+      margin-top: 0.5rem;
+      line-height: 1.4;
+    }
+  }
+
+  // Botões de Ação
+  .form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #f0f0f0;
+
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      min-width: 120px;
+      justify-content: center;
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none !important;
+      }
+
+      i {
+        font-size: 1rem;
+      }
+
+      &.btn-secondary {
+        background: #95a5a6;
+        color: white;
+
+        &:hover:not(:disabled) {
+          background: #7f8c8d;
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(149, 165, 166, 0.3);
+        }
+      }
+
+      &.btn-primary {
+        background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+
+        &:hover:not(:disabled) {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+        }
+      }
+    }
+  }
+}
+
+// Responsividade
+@media (max-width: 768px) {
+  .laudo-form-container {
+    padding: 1rem;
+  }
+
+  .form-header {
+    .form-title {
+      font-size: 1.5rem;
+    }
+
+    .form-subtitle {
+      font-size: 0.9rem;
+    }
+  }
+
+  .laudo-form {
+    .form-actions {
+      flex-direction: column;
+      
+      .btn {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  }
+}
+
+// Animações
+.laudo-form-container {
+  animation: slideInUp 0.4s ease-out;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Estados de loading
+.form-control:disabled {
+  background: #f8f9fa;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+// ✅ ESTILOS ESPECÍFICOS PARA SELECTS
+select.form-control {
+  background-color: #ffffff !important;
+  color: #2c3e50 !important;
+  font-weight: 500 !important;
+  
+  option {
+    background-color: #ffffff !important;
+    color: #2c3e50 !important;
+    font-weight: 500 !important;
+  }
+  
+  &:focus {
+    background-color: #ffffff !important;
+    color: #2c3e50 !important;
+  }
+}
+
+// ✅ FORÇAR VISIBILIDADE DO TEXTO
+select, option {
+  color: #2c3e50 !important;
+  background-color: #ffffff !important;
+}
+
+// ✅ ESTILO ESPECÍFICO PARA O SELECT DE TÉCNICOS
+select#tecnico {
+  color: #2c3e50 !important;
+  background-color: #ffffff !important;
+  
+  option {
+    color: #2c3e50 !important;
+    background-color: #ffffff !important;
+  }
+}
+
+// Melhorias de acessibilidade
+.form-label:focus-within {
+  color: #3498db;
+}
+
+// Hover states para elementos interativos
+.form-control:hover:not(:focus):not(:disabled) {
+  border-color: #bdc3c7;
+  background: #f8f9fa;
+}
+
+// Estilo para campos obrigatórios
+.form-label .required {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+// ✅ ESTILOS PARA O DROPDOWN DE RECURSOS
+.dropdown-recursos {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  border: 2px solid #e1e8ed;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 1000;
+  
+  .dropdown-item-recurso {
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background-color 0.2s ease;
+    
+    &:hover {
+      background-color: #f8f9fa;
+    }
+    
+    &:last-child {
+      border-bottom: none;
+    }
+    
+    strong {
+      color: #2c3e50;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    
+    small {
+      color: #7f8c8d;
+      font-size: 0.85rem;
+      line-height: 1.4;
+    }
+  }
+}
+
+// Container com posição relativa para o dropdown
+.form-group {
+  position: relative;
+}
+
+// 📸 ESTILOS PARA EVIDÊNCIAS FOTOGRÁFICAS
+.evidencias-section {
+  .form-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    i {
+      color: #3498db;
+    }
+
+    .evidencias-counter {
+      background: #3498db;
+      color: white;
+      padding: 0.2rem 0.6rem;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+  }
+
+  .upload-area {
+    border: 2px dashed #bdc3c7;
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #f8f9fa;
+    margin-bottom: 1rem;
+
+    &:hover, &.drag-over {
+      border-color: #3498db;
+      background: #e3f2fd;
+      transform: translateY(-2px);
+    }
+
+    .upload-content {
+      .upload-icon {
+        font-size: 2.5rem;
+        color: #3498db;
+        margin-bottom: 1rem;
+      }
+
+      .upload-text {
+        font-size: 1.1rem;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+      }
+
+      .upload-hint {
+        color: #7f8c8d;
+        font-size: 0.9rem;
+      }
+    }
+  }
+
+  .evidencias-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+
+    .evidencia-item {
+      position: relative;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+      cursor: move;
+
+      &:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+      }
+
+      .evidencia-preview {
+        position: relative;
+        aspect-ratio: 1;
+        overflow: hidden;
+
+        .evidencia-imagem {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          transition: transform 0.3s ease;
+        }
+
+        .evidencia-overlay {
+          position: absolute;
+          top: 0;
+          right: 0;
+          left: 0;
+          bottom: 0;
+          background: rgba(0, 0, 0, 0.7);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          opacity: 0;
+          transition: opacity 0.3s ease;
+
+          .evidencia-remove {
+            background: #e74c3c;
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+
+            &:hover {
+              background: #c0392b;
+              transform: scale(1.1);
+            }
+          }
+        }
+
+        &:hover .evidencia-overlay {
+          opacity: 1;
+        }
+      }
+
+      .evidencia-info {
+        padding: 0.5rem;
+        background: white;
+        
+        .evidencia-nome {
+          display: block;
+          font-weight: 500;
+          color: #2c3e50;
+          margin-bottom: 0.2rem;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .evidencia-ordem {
+          display: block;
+          color: #7f8c8d;
+          font-size: 0.8rem;
+          margin-bottom: 0.2rem;
+        }
+
+        .evidencia-drag-hint {
+          display: block;
+          color: #3498db;
+          font-size: 0.75rem;
+          font-style: italic;
+          
+          i {
+            margin-right: 0.3rem;
+            opacity: 0.7;
+          }
+        }
+      }
+
+      // Efeito de drag
+      &[draggable="true"] {
+        cursor: grab;
+        
+        &:active {
+          cursor: grabbing;
+          opacity: 0.7;
+          transform: rotate(2deg);
+        }
+        
+        &.dragging {
+          opacity: 0.5;
+          transform: scale(0.95);
+          z-index: 1000;
+        }
+        
+        &.drag-over {
+          border: 2px dashed #3498db;
+          background: #e3f2fd;
+          transform: scale(1.05);
+        }
+      }
+    }
+  }
+
+  .upload-progress {
+    margin-bottom: 1rem;
+
+    .progress {
+      height: 8px;
+      background: #ecf0f1;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 0.5rem;
+
+      .progress-bar {
+        height: 100%;
+        background: linear-gradient(90deg, #3498db, #2980b9);
+        transition: width 0.3s ease;
+        border-radius: 4px;
+      }
+    }
+
+    small {
+      color: #3498db;
+      font-weight: 500;
+    }
+  }
+}
+
+// Responsividade para evidências
+@media (max-width: 768px) {
+  .evidencias-section {
+    .evidencias-grid {
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 0.8rem;
+    }
+
+    .upload-area {
+      padding: 1.5rem 1rem;
+
+      .upload-content {
+        .upload-icon {
+          font-size: 2rem;
+        }
+
+        .upload-text {
+          font-size: 1rem;
+        }
+
+        .upload-hint {
+          font-size: 0.8rem;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .evidencias-section {
+    .evidencias-grid {
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 0.6rem;
+    }
+  }
+}

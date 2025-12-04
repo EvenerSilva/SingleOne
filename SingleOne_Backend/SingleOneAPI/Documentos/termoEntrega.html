@@ -1,0 +1,179 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <!--<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">-->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+</head>
+<body>
+    <table class="cabecalho">
+        <thead>
+            <tr>
+                <th rowspan="2">
+                    <img src="@imageLogo" />
+                </th>
+                <th>
+                    <b>FORMULÁRIO</b>
+                </th>
+                <th>
+                    <small>Código documento</small><br />
+                    <b>FM-001</b>
+                </th>
+                <th>
+                    <small>Data revisão</small><br />
+                    <b>01/01/2023</b>
+                </th>
+                <th>
+                    <small>Revisão</small><br />
+                    <b>00</b>
+                </th>
+            </tr>
+            <tr>
+                <th colspan="4" style="text-align:center">
+                    <small>Área</small><br />
+                    <b>Operações de TI</b>
+                </th>
+            </tr>
+            <tr>
+                <th colspan="5">
+                    <small>Titulo</small><br />
+                    <b>Termo de entrega de recursos</b>
+                </th>
+            </tr>
+        </thead>
+    </table>
+    <br /><br />
+    <table>
+        <!--<table class="cabecalho">-->
+        <tbody>
+            <tr>
+                <td style="width:100%" colspan="6">
+                    Pelo presente termo firmado entre:<br />
+                    (I) <b>@nomeEmpresa</b><br />
+                    Inscrita no CNPJ nº <b>@cnpjEmpresa</b>,  doravante denominada <b>EMPRESA</b>, e
+                </td>
+            </tr>
+            <tr>
+                <td style="width:50%" colspan="3">
+                    <b>Matricula:</b>  @matricula
+                </td>
+                <td style="width:50%" colspan="3">
+                    <b>Centro de Custo: </b> @centroCusto
+                </td>
+            </tr>
+            <tr>
+                <td colspan="6">
+                    <b>Nome: </b> @nomeColaborador
+                </td>
+            </tr>
+            <tr>
+                <td colspan="6">
+                    <b>Cargo: </b> @cargo
+                </td>
+            </tr>
+            <tr><td><br /><br /></td></tr>
+            <tr>
+                <td colspan="6">
+                    , doravante denominado <b>FUNCIONÁRIO</b>
+                </td>
+            </tr>
+            <tr><td><br /></td></tr>
+            <tr>
+                <td colspan="6">
+                    <span>Considerando a decisão das mesmas de estabelecer cláusulas e condições visando a cessão temporária de equipamento de TI (Tecnologia da Informação), o <b>FUNCIONÁRIO</b> dá ciência e concorda com os termos a seguir:</span>
+                    <br /><br />
+                </td>
+            </tr>
+            <tr>
+                <td colspan="6">
+                    <span>
+                        <b>a)</b> O equipamento não deverá deixar as dependências da <b>EMPRESA</b> a não ser em casos específicos, validados e autorizados previamente pela Diretoria do usuário e a Gerência de TI.
+                    </span><br />
+                    <span>
+                        <b>b)</b> No caso de danos ocorridos ao equipamento, a área de TI realizará a troca ou reparos necessários. Entretanto,
+                        caso seja constatado mau uso, através de laudo do fornecedor responsável pela garantia ou analista de TI, as
+                        despesas envolvidas no reparo ou substituição do equipamento serão descontadas do <b>FUNCIONÁRIO</b> ou centro de
+                        custo ao qual o <b>FUNCIONÁRIO</b> esteja alocado.
+                    </span><br />
+                    <span>
+                        <b>c)</b> O equipamento só deverá ser utilizado para fins profissionais.
+                    </span><br />
+                    <span>
+                        <b>d)</b> Em respeito ao direito à propriedade e ao poder diretivo do empregador, não haverá expectativa de privacidade na
+                        utilização da infraestrutura tecnológica e ambiente digital corporativo da <b>EMPRESA</b>. Sendo assim, todo conteúdo
+                        gerado a partir do equipamento listado neste termo está sujeito ao monitoramento e fiscalização.
+                    </span><br />
+                    <span>
+                        <b>e)</b> A <b>EMPRESA</b> poderá substituir ou recolher os equipamentos a qualquer momento e a seu exclusivo critério.
+                    </span><br /><br />
+                </td>
+            </tr>
+            <tr>
+                <td colspan="6">
+                    <b>1. DURAÇÃO</b><br />
+                    <b>1.1.</b> A cessão do equipamento tem validade a partir da presente data por tempo indeterminado, findando após
+                    encerrados os serviços que originaram sua assinatura, onde o Protocolo de Devolução de Equipamentos de TI deverá ser assinado e o equipamento devolvido.
+                </td>
+            </tr>
+            <tr><td><br /></td></tr>
+            <tr>
+                <td style="width:100%" colspan="6"><label>Lista de equipamentos</label><br /><hr style="width:100%" /></td>
+            </tr>
+            @equipamentos
+            <tr><td><br /></td></tr>
+            <tr>
+                <td colspan="6">
+                    <span>
+                        Atesto que li e concordo com as ações acima listadas, assim como aquelas contidas na Política de Segurança de TI e
+                        demais documentos relacionados à <b>EMPRESA.</b>
+                    </span><br /><br />
+                    <span>
+                        Declaro ainda estar ciente de que uma violação deste Termo, da Política de Segurança de TI e documentos
+                        relacionados poderá resultar em uma ação disciplinar, incluindo possível rescisão do meu contrato de trabalho, com ou
+                        sem justa causa, dependendo dos fatores envolvidos, assim como obrigações cíveis e criminais.
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td style="width:50%;text-align:center" colspan="3">
+                    <!--____________________________________________<br />-->
+                    <hr style="width:90%;border:1px solid" /><br />
+                    @nomeColaborador<br />
+                    (Funcionário)
+                </td>
+                <td style="width:50%;text-align:center" colspan="3">
+                    <!--____________________________________________<br />-->
+                    <hr style="width:90%;border:1px solid"/><br />
+                    @usuarioLogado<br />
+                    Responsável pela Entrega
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <footer class="footer mt-auto py-3">
+        <div class="container">
+            <span class="text-muted">Place sticky footer content here.</span>
+        </div>
+    </footer>
+</body>
+</html>
+
+<style>
+    /*body {
+        font-family: 'Roboto', sans-serif;
+    }*/
+    small {
+        font-size: 11px;
+        font-weight: normal
+    }
+
+    .cabecalho {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    /*.cabecalho > table, th, tr {
+        border: 1px solid black;
+    }*/
+
+</style>

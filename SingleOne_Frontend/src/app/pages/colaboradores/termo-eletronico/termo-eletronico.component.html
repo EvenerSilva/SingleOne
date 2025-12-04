@@ -1,0 +1,636 @@
+<!-- 🎯 HEADER MODERNO DAS CAMPANHAS DE ASSINATURAS -->
+<div class="campanhas-assinaturas-header">
+  <div class="header-content">
+    <div class="header-left">
+      <button class="back-button" [routerLink]="['/relatorios']" matTooltip="Voltar para Relatórios">
+        <i class="cil-arrow-left"></i>
+      </button>
+      <div class="header-title">
+        <div class="title-icon">
+          <i class="cil-paper-plane"></i>
+        </div>
+        <div class="title-text">
+          <h1>Campanhas de Assinaturas</h1>
+          <p>Gerenciamento de termos de responsabilidade e adesão de colaboradores</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 🍞 BREADCRUMB MODERNO -->
+<nav class="modern-breadcrumb">
+  <div class="breadcrumb-container">
+    <a [routerLink]="['/dashboard']" class="breadcrumb-item">
+      <i class="cil-home"></i>
+      <span>Dashboard</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a [routerLink]="['/relatorios']" class="breadcrumb-item">
+      <i class="cil-timeline"></i>
+      <span>Relatórios e Timeline</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <span class="breadcrumb-item active">Campanhas de Assinaturas</span>
+  </div>
+</nav>
+
+<!-- 📋 CONTEÚDO PRINCIPAL -->
+<div class="campanhas-assinaturas-content">
+  
+  <!-- 🔍 SEÇÃO DE FILTROS -->
+  <div class="filters-section">
+    <div class="filters-container">
+      <div class="filters-header">
+        <button class="toggle-filters-btn" (click)="abrirModalCampanha()">
+          <i class="cil-plus"></i>
+          <span>Nova Campanha</span>
+        </button>
+        <button class="toggle-filters-btn btn-processar-vencidas" 
+                (click)="processarCampanhasVencidas()"
+                title="Processar manualmente campanhas com prazo vencido">
+          <i class="cil-task"></i>
+          <span>Processar Vencidas</span>
+        </button>
+      </div>
+      <div class="filters-content">
+        <div class="filters-grid">
+          <!-- Modo de Visualização -->
+          <div class="filter-field">
+            <label>Modo de Visualização</label>
+            <select class="modern-select" [(ngModel)]="filtro" (change)="alternarModoSelect()">
+              <option value="Em aberto">Pendentes</option>
+              <option value="Assinado">Assinados</option>
+            </select>
+          </div>
+
+          <!-- Busca por Nome -->
+          <div class="filter-field">
+            <label>Buscar Colaborador</label>
+            <input type="text" class="modern-input" [formControl]="consulta" 
+                   placeholder="Digite o nome do colaborador" />
+          </div>
+
+          <div class="filter-actions">
+            <button class="action-btn secondary-btn" (click)="limparBusca()">
+              <i class="cil-x-circle"></i>
+              <span>Limpar</span>
+            </button>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 📋 SEÇÃO DE CAMPANHAS ATIVAS -->
+  <div class="campanhas-section">
+    <!-- Header sempre visível -->
+    <div class="section-header">
+      <div class="header-content">
+        <h3><i class="cil-calendar"></i> Campanhas de Assinaturas</h3>
+        <span class="badge-count">{{ campanhas.length }} campanha(s)</span>
+      </div>
+      <div class="header-actions">
+        <button class="filter-btn" (click)="filtrarCampanhasPorStatus('TODAS')" 
+                [class.active]="campanhasFiltradas.length === campanhas.length"
+                *ngIf="mostrarSecaoCampanhas">
+          <i class="cil-view-module"></i> Todas
+        </button>
+        <button class="filter-btn" (click)="filtrarCampanhasPorStatus('A')"
+                *ngIf="mostrarSecaoCampanhas">
+          <i class="cil-media-play"></i> Ativas
+        </button>
+        <button class="filter-btn" (click)="filtrarCampanhasPorStatus('C')"
+                *ngIf="mostrarSecaoCampanhas">
+          <i class="cil-check-circle"></i> Concluídas
+        </button>
+        <button class="toggle-section-btn" (click)="toggleSecaoCampanhas()" 
+                [matTooltip]="mostrarSecaoCampanhas ? 'Ocultar campanhas' : 'Mostrar campanhas'">
+          <i [class]="mostrarSecaoCampanhas ? 'cil-chevron-top' : 'cil-chevron-bottom'"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Conteúdo colapsável -->
+    <div class="campanhas-content" *ngIf="mostrarSecaoCampanhas">
+      <!-- Loading State -->
+      <div class="loading-campanhas" *ngIf="loadingCampanhas">
+        <div class="spinner"></div>
+        <p>Carregando campanhas...</p>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-campanhas" *ngIf="!loadingCampanhas && campanhas.length === 0">
+        <i class="cil-inbox"></i>
+        <p>Nenhuma campanha encontrada</p>
+        <small>Crie sua primeira campanha clicando em "Nova Campanha"</small>
+      </div>
+
+      <!-- Lista de Campanhas -->
+      <div class="campanhas-grid" *ngIf="!loadingCampanhas && campanhasFiltradas.length > 0">
+      <div class="campanha-card" 
+           *ngFor="let campanha of campanhasFiltradas" 
+           [class.active]="campanhaAtiva?.id === campanha.id"
+           (click)="selecionarCampanha(campanha)">
+        <!-- Header do Card -->
+        <div class="campanha-card-header">
+          <div class="campanha-title">
+            <i class="cil-paper-plane"></i>
+            <h4>{{ campanha.nome }}</h4>
+          </div>
+          <span class="campanha-status-badge" [ngClass]="getStatusCampanhaClass(campanha.status)">
+            <i [ngClass]="getStatusCampanhaIcon(campanha.status)"></i>
+            {{ campanha.statusDescricao }}
+          </span>
+        </div>
+
+        <!-- Descrição -->
+        <p class="campanha-description" *ngIf="campanha.descricao">
+          {{ campanha.descricao }}
+        </p>
+
+        <!-- Métricas da Campanha -->
+        <div class="campanha-metrics">
+          <div class="campanha-metric">
+            <i class="cil-people"></i>
+            <div class="metric-data">
+              <span class="metric-label">Total</span>
+              <span class="metric-value">{{ campanha.totalColaboradores }}</span>
+            </div>
+          </div>
+          <div class="campanha-metric success">
+            <i class="cil-check-circle"></i>
+            <div class="metric-data">
+              <span class="metric-label">Assinados</span>
+              <span class="metric-value">{{ campanha.totalAssinados }}</span>
+            </div>
+          </div>
+          <div class="campanha-metric warning">
+            <i class="cil-clock"></i>
+            <div class="metric-data">
+              <span class="metric-label">Pendentes</span>
+              <span class="metric-value">{{ campanha.totalPendentes }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Barra de Progresso -->
+        <div class="campanha-progress">
+          <div class="progress-bar">
+            <div class="progress-fill" 
+                 [style.width.%]="campanha.percentualAdesao || 0"></div>
+          </div>
+          <span class="progress-label">{{ campanha.percentualAdesao || 0 }}% de adesão</span>
+        </div>
+
+        <!-- 📅 PRAZO DE CONCLUSÃO -->
+        <div class="campanha-prazo" *ngIf="campanha.dataFim">
+          <div class="prazo-info" [ngClass]="getPrazoClass(campanha.dataFim)">
+            <div class="prazo-icon">
+              <i [ngClass]="getPrazoIcon(campanha.dataFim)"></i>
+            </div>
+            <div class="prazo-content">
+              <span class="prazo-label">Prazo Final:</span>
+              <span class="prazo-data">{{ campanha.dataFim | date:'dd/MM/yyyy' }}</span>
+              <span class="prazo-dias" *ngIf="getDiasRestantes(campanha.dataFim) >= 0">
+                <strong>{{ getDiasRestantes(campanha.dataFim) }}</strong> 
+                {{ getDiasRestantes(campanha.dataFim) === 1 ? 'dia restante' : 'dias restantes' }}
+              </span>
+              <span class="prazo-dias vencido" *ngIf="getDiasRestantes(campanha.dataFim) < 0">
+                <strong>Vencido há {{ Math.abs(getDiasRestantes(campanha.dataFim)) }}</strong> 
+                {{ Math.abs(getDiasRestantes(campanha.dataFim)) === 1 ? 'dia' : 'dias' }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer do Card -->
+        <div class="campanha-card-footer">
+          <div class="campanha-info">
+            <i class="cil-user"></i>
+            <small>{{ campanha.usuarioCriacaoNome }}</small>
+          </div>
+          <div class="campanha-info">
+            <i class="cil-calendar"></i>
+            <small>{{ campanha.dataCriacao | date:'dd/MM/yyyy' }}</small>
+          </div>
+          <div class="campanha-actions">
+            <button class="icon-btn" 
+                    (click)="inativarCampanha(campanha.id); $event.stopPropagation()"
+                    *ngIf="campanha.status === 'A'"
+                    matTooltip="Inativar campanha">
+              <i class="cil-media-pause"></i>
+            </button>
+            <button class="icon-btn" 
+                    (click)="concluirCampanha(campanha.id); $event.stopPropagation()"
+                    *ngIf="campanha.status === 'A'"
+                    matTooltip="Concluir campanha">
+              <i class="cil-check"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+    <!-- Fim do conteúdo colapsável -->
+  </div>
+
+  <!-- Alerta de Campanha Ativa -->
+  <div class="campanha-ativa-alert" *ngIf="campanhaAtiva">
+    <div class="alert-content">
+      <i class="cil-info"></i>
+      <span>Visualizando colaboradores da campanha: <strong>{{ campanhaAtiva.nome }}</strong></span>
+    </div>
+    <button class="alert-close-btn" (click)="limparSelecaoCampanha()">
+      <i class="cil-x"></i> Voltar para visualização geral
+    </button>
+  </div>
+
+  <!-- 📊 SEÇÃO DE MÉTRICAS -->
+  <div class="metrics-section" *ngIf="dataSource?.data && dataSource.data.length >= 0">
+    <div class="metrics-grid">
+      <div class="metric-card primary">
+        <div class="metric-icon">
+          <i class="cil-people"></i>
+        </div>
+        <div class="metric-info">
+          <div class="metric-value">{{ metrics.totalColaboradores }}</div>
+          <div class="metric-label">Total de Colaboradores</div>
+        </div>
+      </div>
+      
+      <div class="metric-card success">
+        <div class="metric-icon">
+          <i class="cil-check-circle"></i>
+        </div>
+        <div class="metric-info">
+          <div class="metric-value">{{ metrics.totalAssinados }}</div>
+          <div class="metric-label">Assinados ({{metrics.percentualAssinado}}%)</div>
+        </div>
+      </div>
+      
+      <div class="metric-card warning">
+        <div class="metric-icon">
+          <i class="cil-clock"></i>
+        </div>
+        <div class="metric-info">
+          <div class="metric-value">{{ metrics.totalPendentes }}</div>
+          <div class="metric-label">Pendentes</div>
+        </div>
+                    </div>
+
+      <div class="metric-card info">
+        <div class="metric-icon">
+          <i class="cil-calendar"></i>
+        </div>
+        <div class="metric-info">
+          <div class="metric-value">{{ metrics.ultimoEnvio ? (metrics.ultimoEnvio | date:'dd/MM') : '-' }}</div>
+          <div class="metric-label">Último Envio</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ações em Massa -->
+  <div class="bulk-actions-section" *ngIf="colaboradoresSelecionados.size > 0">
+    <div class="bulk-actions-container">
+      <div class="selection-info">
+        <i class="cil-check-circle"></i>
+        <span><strong>{{colaboradoresSelecionados.size}}</strong> colaborador(es) selecionado(s)</span>
+      </div>
+      <div class="action-buttons">
+        <button class="action-btn primary-btn" (click)="enviarEmMassa()">
+          <i class="cil-paper-plane"></i>
+          <span>Enviar Termos em Massa</span>
+        </button>
+        <button class="action-btn secondary-btn" (click)="deselecionarTodos()">
+          <i class="cil-x-circle"></i>
+          <span>Limpar Seleção</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🔄 CONTAINER DE LOADING -->
+  <div class="loading-container" *ngIf="loading">
+    <div class="loading-spinner"></div>
+    <p>Carregando dados...</p>
+  </div>
+
+  <!-- 📋 SEÇÃO DA TABELA -->
+  <div class="table-section" *ngIf="!loading && dataSource?.data">
+    <div class="table-container">
+      <div class="scroll-indicator" *ngIf="dataSource.data.length > 0">
+        <i class="cil-arrow-left"></i>
+        <span>Deslize horizontalmente para ver mais colunas</span>
+        <i class="cil-arrow-right"></i>
+                    </div>
+      
+      <table class="modern-table detailed-table">
+        <thead>
+          <tr>
+            <th>
+              <input type="checkbox" 
+                     (change)="toggleTodosSelecionados($event)"
+                     [checked]="todosSelecionados()"
+                     [indeterminate]="algunsSelecionados()">
+            </th>
+            <th>Colaborador</th>
+            <th>Data de Envio</th>
+            <th>Situação</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of dadosPagina">
+            <td class="text-center">
+              <input type="checkbox" 
+                     (change)="toggleSelecao(row.colaboradorfinalid)"
+                     [checked]="estaSelecionado(row.colaboradorfinalid)">
+            </td>
+            <td>
+              <div class="colaborador-info">
+                <i class="cil-user"></i>
+                <span>{{ row.colaboradorfinal }}</span>
+                    </div>
+                </td>
+            <td class="text-center">
+              <span class="data-badge" *ngIf="row.dtenviotermo">
+                {{ row.dtenviotermo | date:'dd/MM/yyyy HH:mm' }}
+              </span>
+              <span class="no-data" *ngIf="!row.dtenviotermo">-</span>
+            </td>
+            <td class="text-center">
+              <span class="status-badge" [ngClass]="getStatusClass(row.situacao)">
+                <i [ngClass]="getStatusIcon(row.situacao)"></i>
+                {{ row.situacao }}
+              </span>
+            </td>
+            <td class="text-center">
+              <button class="action-icon-btn" (click)="enviar(row)" matTooltip="Enviar/Reenviar termo">
+                <i class="cil-paper-plane"></i>
+              </button>
+            </td>
+          </tr>
+          
+          <!-- Mensagem quando não há dados -->
+          <tr *ngIf="!loading && (!dadosPagina || dadosPagina.length === 0) && totalLength === 0">
+            <td colspan="5" class="no-data-row">
+              <div class="no-data-message">
+                <i class="cil-inbox"></i>
+                <p>Nenhum colaborador encontrado</p>
+                <small>Ajuste os filtros para buscar colaboradores</small>
+              </div>
+                </td>
+          </tr>
+        </tbody>
+        </table>
+    </div>
+    
+    <div class="pagination-container">
+      <mat-paginator 
+        [length]="totalLength" 
+        [pageSize]="pageSize" 
+        [pageSizeOptions]="[10, 25, 50, 100]" 
+        (page)="onPageChange($event)"
+        showFirstLastButtons>
+      </mat-paginator>
+    </div>
+  </div>
+</div>
+
+<!-- 🎯 MODAL DE NOVA CAMPANHA -->
+<div class="formulario-overlay" *ngIf="mostrarModalCampanha" (click)="fecharModalCampanha()">
+  <div class="formulario-container" (click)="$event.stopPropagation()">
+    <div class="fabricante-form-container">
+      
+      <!-- Header do Formulário -->
+      <div class="form-header">
+        <h2 class="form-title">
+          <i class="cil-paper-plane"></i>
+          Nova Campanha de Assinaturas
+        </h2>
+        <p class="form-subtitle">
+          Configure os filtros e selecione os colaboradores para esta campanha
+        </p>
+      </div>
+
+      <form [formGroup]="campanhaForm" class="fabricante-form">
+        <!-- Nome da Campanha -->
+        <div class="form-group">
+          <label class="form-label">
+            <i class="cil-bookmark"></i>
+            Nome da Campanha <span class="required">*</span>
+          </label>
+          <input type="text" 
+                 class="form-control" 
+                 formControlName="nomeCampanha" 
+                 placeholder="Ex: Campanha Q1 2025"
+                 maxlength="200">
+          <small class="form-text text-muted">Nome identificador da campanha</small>
+        </div>
+
+        <!-- Descrição -->
+        <div class="form-group">
+          <label class="form-label">
+            <i class="cil-notes"></i>
+            Descrição
+          </label>
+          <textarea class="form-control" 
+                    formControlName="descricao" 
+                    placeholder="Descreva o objetivo desta campanha..."
+                    rows="3"
+                    maxlength="500"></textarea>
+          <small class="form-text text-muted">Opcional - descreva o propósito desta campanha</small>
+        </div>
+
+        <!-- 📅 DATAS DA CAMPANHA -->
+        <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+          <!-- Data de Início -->
+          <div class="form-group">
+            <label class="form-label">
+              <i class="cil-calendar"></i>
+              Data de Início
+            </label>
+            <input 
+              type="date" 
+              class="form-control" 
+              formControlName="dataInicio"
+              style="max-width: 100%;">
+            <small class="form-text text-muted">Quando a campanha começa (opcional)</small>
+          </div>
+
+          <!-- Data de Conclusão/Fim -->
+          <div class="form-group">
+            <label class="form-label" style="display: flex; align-items: center; gap: 8px;">
+              <i class="cil-calendar-check"></i>
+              Data de Conclusão (Prazo Final) <span style="color: #ff5722;">⚠️</span>
+            </label>
+            <input 
+              type="date" 
+              class="form-control" 
+              formControlName="dataFim"
+              style="max-width: 100%;">
+            <small class="form-text text-muted" style="color: #ff5722; font-weight: 500;">
+              <i class="cil-warning"></i>
+              <strong>Prazo limite</strong> para que os colaboradores assinem o termo
+            </small>
+          </div>
+        </div>
+
+        <!-- 📍 FILTROS GRANULARES -->
+        <div class="filtros-granulares">
+          <h4><i class="cil-filter"></i> Filtros Granulares</h4>
+          <p class="filter-description">Selecione os critérios para direcionar a campanha de forma precisa</p>
+          
+          <!-- Loading State -->
+          <div class="loading-filtros" *ngIf="loadingFiltros">
+            <div class="spinner"></div>
+            <p>Carregando opções de filtros...</p>
+          </div>
+          
+          <div class="filtros-grid" *ngIf="!loadingFiltros">
+            <!-- Empresas -->
+            <div class="form-group">
+              <label class="form-label"><i class="cil-building"></i> Empresas</label>
+              <select class="form-control" formControlName="empresas" multiple size="4">
+                <option *ngFor="let empresa of empresas" [value]="empresa.id">
+                  {{ empresa.nome }}
+                </option>
+              </select>
+              <small class="form-text text-muted">{{ empresas.length }} empresa(s) disponível(is)</small>
+            </div>
+
+            <!-- Localidades -->
+            <div class="form-group">
+              <label class="form-label"><i class="cil-location-pin"></i> Localidades</label>
+              <select class="form-control" formControlName="localidades" multiple size="4">
+                <option *ngFor="let localidade of localidades" [value]="localidade.id">
+                  {{ localidade.nome }}
+                </option>
+              </select>
+              <small class="form-text text-muted">{{ localidades.length }} localidade(s) disponível(is)</small>
+            </div>
+
+            <!-- Centros de Custo -->
+            <div class="form-group">
+              <label class="form-label"><i class="cil-dollar"></i> Centros de Custo</label>
+              <select class="form-control" formControlName="centrosCusto" multiple size="4">
+                <option *ngFor="let centro of centrosCusto" [value]="centro.id">
+                  {{ centro.codigo ? (centro.codigo + ' - ' + centro.nome) : centro.nome }}
+                </option>
+              </select>
+              <small class="form-text text-muted">{{ centrosCusto.length }} centro(s) disponível(is)</small>
+            </div>
+            
+            <!-- ✅ SIMPLIFICADO: Filtros de Filiais, Tipos, Cargos e Setores removidos para simplificar -->
+          </div>
+        </div>
+
+        <!-- Info de Seleção -->
+        <div class="info-box" style="background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%); border-left-color: #28a745;" *ngIf="colaboradoresSelecionados.size > 0">
+          <div class="info-box-header">
+            <i class="cil-check-circle"></i>
+            <strong>{{colaboradoresSelecionados.size}} colaborador(es) selecionado(s)</strong>
+          </div>
+          <div class="info-box-content">
+            <p>Os colaboradores selecionados serão incluídos nesta campanha</p>
+          </div>
+        </div>
+
+        <!-- Alerta de Seleção -->
+        <div class="info-box" style="background: #fff3cd; border-left-color: #ffc107;" *ngIf="colaboradoresSelecionados.size === 0">
+          <div class="info-box-header">
+            <i class="cil-warning"></i>
+            <strong>Nenhum colaborador selecionado</strong>
+          </div>
+          <div class="info-box-content">
+            <p>Selecione colaboradores na tabela antes de criar a campanha</p>
+          </div>
+        </div>
+
+        <!-- 📧 SEÇÃO DE ENVIO AUTOMÁTICO -->
+        <div class="envio-automatico-section" style="margin-top: 20px; padding: 20px; background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); border-radius: 8px; border-left: 4px solid #2196f3;">
+          <h4 style="margin: 0 0 15px 0; color: #1976d2; display: flex; align-items: center; gap: 8px;">
+            <i class="cil-paper-plane"></i>
+            Opções de Envio
+          </h4>
+          
+          <!-- Checkbox: Enviar Automaticamente -->
+          <div class="form-group" style="margin-bottom: 15px;">
+            <label class="checkbox-label" style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 15px;">
+              <input 
+                type="checkbox" 
+                [(ngModel)]="enviarAutomaticamente"
+                (change)="toggleEnvioAutomatico()"
+                style="width: 18px; height: 18px; cursor: pointer;">
+              <span style="font-weight: 500;">
+                <i class="cil-envelope-closed"></i>
+                Enviar emails automaticamente após criar a campanha
+              </span>
+            </label>
+            <small class="form-text text-muted" style="margin-left: 28px; display: block; margin-top: 5px;">
+              Os termos serão enviados automaticamente para todos os colaboradores selecionados
+            </small>
+          </div>
+
+          <!-- Campo de Data/Hora de Agendamento (aparece quando checkbox marcado) -->
+          <div class="form-group" *ngIf="mostrarDataAgendamento" 
+               style="margin-top: 15px; padding: 15px; background: white; border-radius: 6px; border: 1px solid #90caf9;">
+            <label class="form-label" style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+              <i class="cil-calendar"></i>
+              Agendar Envio para Data/Hora Específica (Opcional)
+            </label>
+            <input 
+              type="datetime-local" 
+              class="form-control" 
+              formControlName="dataEnvioAgendado"
+              style="max-width: 300px;"
+              [min]="getMinDateTime()">
+            <small class="form-text text-muted" style="margin-top: 8px; display: block;">
+              <i class="cil-info"></i>
+              Deixe em branco para enviar <strong>imediatamente</strong> após criar a campanha, 
+              ou escolha uma data/hora futura para <strong>agendar o envio</strong>
+            </small>
+          </div>
+
+          <!-- Info sobre o comportamento -->
+          <div class="info-box" style="margin-top: 15px; padding: 12px; background: #fff9c4; border-left: 3px solid #fbc02d; border-radius: 4px;" 
+               *ngIf="enviarAutomaticamente">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <i class="cil-lightbulb" style="font-size: 20px; color: #f57c00;"></i>
+              <div>
+                <strong style="color: #e65100;">{{ campanhaForm.value.dataEnvioAgendado ? '📅 Envio Agendado' : '⚡ Envio Imediato' }}</strong>
+                <p style="margin: 5px 0 0 0; font-size: 13px; color: #555;">
+                  {{ campanhaForm.value.dataEnvioAgendado 
+                     ? 'Os emails serão enviados automaticamente na data/hora escolhida.' 
+                     : 'Os emails serão enviados imediatamente após a criação da campanha.' }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Botões de Ação -->
+        <div class="form-actions">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="fecharModalCampanha()">
+            <i class="fas fa-times"></i>
+            Cancelar
+          </button>
+        
+          <button
+            type="button"
+            class="btn btn-primary"
+            (click)="criarCampanha()"
+            [disabled]="colaboradoresSelecionados.size === 0">
+            <i class="fas fa-check"></i>
+            Criar Campanha
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

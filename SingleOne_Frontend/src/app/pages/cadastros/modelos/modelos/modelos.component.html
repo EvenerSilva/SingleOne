@@ -1,0 +1,149 @@
+<!-- 🎯 HEADER MODERNO DOS MODELOS -->
+<div class="modelos-header">
+  <div class="header-content">
+    <div class="header-left">
+      <button class="back-button" [routerLink]="['/cadastros']" matTooltip="Voltar para Cadastros">
+        <i class="cil-arrow-left"></i>
+      </button>
+      <div class="header-title">
+        <div class="title-icon">
+          <i class="cil-laptop"></i>
+        </div>
+        <div class="title-text">
+          <h1>Modelos</h1>
+          <p>Gerenciar modelos de recursos</p>
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="action-btn primary-btn" [routerLink]="['/modelo']">
+        <i class="cil-plus"></i>
+        <span>Novo Modelo</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 🍞 BREADCRUMB MODERNO -->
+<nav class="modern-breadcrumb">
+  <div class="breadcrumb-container">
+    <a [routerLink]="['/dashboard']" class="breadcrumb-item">
+      <i class="cil-home"></i>
+      <span>Dashboard</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a [routerLink]="['/cadastros']" class="breadcrumb-item">
+      <i class="cil-cog"></i>
+      <span>Cadastros</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <span class="breadcrumb-item active">Modelos</span>
+  </div>
+</nav>
+
+<!-- 📋 CONTEÚDO PRINCIPAL -->
+<div class="modelos-content">
+  <!-- 🔍 SEÇÃO DE BUSCA -->
+  <div class="search-section">
+    <div class="search-box">
+      <i class="cil-magnifying-glass search-icon"></i>
+      <input type="text" placeholder="Buscar categoria, tipo de recurso, fabricante ou modelo..." [formControl]="consulta">
+      <button 
+        *ngIf="consulta.value" 
+        class="clear-btn" 
+        (click)="limparBusca()"
+        type="button">
+        <i class="cil-x"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- 📊 TABELA MODERNA -->
+  <div class="table-section">
+    <div class="table-container">
+      <table class="modern-table">
+        <thead>
+          <tr>
+            <th>Categoria</th>
+            <th>Tipo</th>
+            <th>Fabricante</th>
+            <th>Modelo</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of dadosPaginados">
+            <td class="categoria-nome">
+              <div class="categoria-info">
+                <div class="categoria-avatar">
+                  <i [class]="getCategoriaIcon(row.categoriaInfo?.nome)"></i>
+                </div>
+                <span>{{row.categoriaInfo?.nome || 'N/A'}}</span>
+              </div>
+            </td>
+            <td class="tipo-nome">
+              <div class="tipo-info">
+                <div class="tipo-avatar">
+                  <i [class]="getTipoIcon(row.fabricanteNavigation?.tipoequipamentoNavigation?.descricao)"></i>
+                </div>
+                <span>{{row.fabricanteNavigation?.tipoequipamentoNavigation?.descricao || 'N/A'}}</span>
+              </div>
+            </td>
+            <td class="fabricante-nome">
+              <div class="fabricante-info">
+                <div class="fabricante-avatar">
+                  <i class="cil-industry"></i>
+                </div>
+                <span>{{row.fabricanteNavigation?.descricao || 'N/A'}}</span>
+              </div>
+            </td>
+            <td class="modelo-nome">
+              <div class="modelo-info">
+                <div class="modelo-avatar">
+                  <i class="cil-laptop"></i>
+                </div>
+                <span>{{row.descricao}}</span>
+              </div>
+            </td>
+            <td class="modelo-status">
+              <div class="status-label" [class.active]="row.ativo" [class.inactive]="!row.ativo">
+                {{ row.ativo ? 'ATIVO' : 'INATIVO' }}
+              </div>
+            </td>
+            <td class="modelo-actions">
+              <div class="action-buttons">
+                <button class="action-btn edit-btn" matTooltip="Editar Modelo" (click)="editar(row)">
+                  <i class="cil-pencil"></i>
+                </button>
+                <!-- Botão Desativar (mostra quando modelo está ativo) -->
+                <button class="action-btn delete-btn" 
+                  matTooltip="Desativar modelo (marca como inativo para auditoria)" 
+                  (click)="desativarModelo(row)"
+                  *ngIf="(session.usuario.adm || session.usuario.su) && row.ativo">
+                  <i class="cil-ban"></i>
+                </button>
+                <!-- Botão Reativar (mostra quando modelo está inativo) -->
+                <button class="action-btn reactivate-btn" 
+                  matTooltip="Reativar modelo" 
+                  (click)="reativarModelo(row)"
+                  *ngIf="(session.usuario.adm || session.usuario.su) && !row.ativo">
+                  <i class="cil-reload"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 📄 PAGINAÇÃO -->
+  <div class="pagination-container">
+    <mat-paginator 
+      [pageSizeOptions]="[5, 10, 25, 100]" 
+      [pageSize]="10" 
+      showFirstLastButtons>
+    </mat-paginator>
+  </div>
+</div>

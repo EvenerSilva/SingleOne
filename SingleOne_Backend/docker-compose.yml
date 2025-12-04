@@ -1,0 +1,96 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:14-alpine
+    container_name: singleone-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-singleone}
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      TZ: ${TZ:-America/Sao_Paulo}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d ${DB_NAME:-singleone} -U ${DB_USER:-postgres}"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - singleone-network
+
+  # Backend API
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: singleone-backend
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Production}
+      ASPNETCORE_URLS: ${ASPNETCORE_URLS:-http://+:5000}
+      DB_HOST: ${DB_HOST:-postgres}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      DB_NAME: ${DB_NAME:-singleone}
+      SITE_URL: ${SITE_URL:-http://localhost:3000}
+    ports:
+      - "${BACKEND_PORT:-5000}:5000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - singleone-network
+    volumes:
+      - ./SingleOneAPI/Documentos:/app/documentos
+
+  # Frontend
+  frontend:
+    build:
+      context: ../SingleOne_Frontend
+      dockerfile: Dockerfile
+    container_name: singleone-frontend
+    restart: unless-stopped
+    environment:
+      API_URL: ${PUBLIC_API_URL:-http://localhost:5000/api/}
+    ports:
+      - "${FRONTEND_PORT:-3000}:80"
+    depends_on:
+      backend:
+        condition: service_started
+    networks:
+      - singleone-network
+
+  # PgAdmin (opcional - ative com docker compose --profile tools up)
+  pgadmin:
+    image: dpage/pgadmin4:8
+    container_name: singleone-pgadmin
+    restart: unless-stopped
+    profiles:
+      - tools
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@singleone.local}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+    ports:
+      - "${PGADMIN_PORT:-8080}:80"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - singleone-network
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+
+volumes:
+  postgres_data:
+  pgadmin_data:
+
+networks:
+  singleone-network:
+    driver: bridge

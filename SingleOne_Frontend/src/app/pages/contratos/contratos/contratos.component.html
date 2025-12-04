@@ -1,0 +1,160 @@
+<!-- 🎯 HEADER MODERNO DOS CONTRATOS -->
+<div class="contratos-header">
+  <div class="header-content">
+    <div class="header-left">
+      <button class="back-button" [routerLink]="['/cadastros']" matTooltip="Voltar para Cadastros">
+        <i class="cil-arrow-left"></i>
+      </button>
+      <div class="header-title">
+        <div class="title-icon">
+          <i class="cil-file"></i>
+        </div>
+        <div class="title-text">
+          <h1>Contratos</h1>
+          <p>Gerenciar contratos e aditivos do sistema</p>
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="action-btn primary-btn" routerLink="/contrato" matTooltip="Adicionar novo contrato">
+        <i class="cil-plus"></i>
+        <span>Novo Contrato</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 🍞 BREADCRUMB MODERNO -->
+<nav class="modern-breadcrumb">
+  <div class="breadcrumb-container">
+    <a [routerLink]="['/dashboard']" class="breadcrumb-item">
+      <i class="cil-home"></i>
+      <span>Dashboard</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a [routerLink]="['/cadastros']" class="breadcrumb-item">
+      <i class="cil-cog"></i>
+      <span>Cadastros</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <span class="breadcrumb-item active">Contratos</span>
+  </div>
+</nav>
+
+<!-- 📋 CONTEÚDO PRINCIPAL -->
+<div class="contratos-content">
+  <!-- 🔍 SEÇÃO DE BUSCA -->
+  <div class="search-section">
+    <div class="search-box">
+      <i class="cil-magnifying-glass search-icon"></i>
+      <input type="text" placeholder="Buscar contrato, aditivo, descrição ou fornecedor..." [formControl]="consulta">
+      <button 
+        *ngIf="consulta.value" 
+        class="clear-btn" 
+        (click)="limparBusca()"
+        type="button">
+        <i class="cil-x"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- 📊 TABELA MODERNA -->
+  <div class="table-section">
+    <div class="table-container">
+      <table class="modern-table">
+        <thead>
+          <tr>
+            <th>Contrato/Aditivo</th>
+            <th>Fornecedor</th>
+            <th>Descrição</th>
+            <th>Final Vigência</th>
+            <th class="text-center">Status</th>
+            <th class="text-center">Arquivo</th>
+            <th class="text-center">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of dadosPaginados">
+            <td class="contrato-numero">
+              <div class="contrato-info">
+                <div class="contrato-avatar">
+                  <i class="cil-file"></i>
+                </div>
+                <span>{{ row.numero }}/{{ row.aditivo }}</span>
+              </div>
+            </td>
+            <td class="contrato-fornecedor">{{ row.fornecedor }}</td>
+            <td class="contrato-descricao">{{ row.descricao }}</td>
+            <td class="contrato-vigencia">{{ row.dtFinalVigencia | dateFormat : 2 }}</td>
+            <td class="contrato-status text-center">
+              <div class="status-label" [class.vigente]="row.status === 'Vigente'" [class.vencido]="row.status === 'Vencido'">
+                {{ row.status }}
+                <div *ngIf="row.status === 'Vigente' && row.diasParaVencimento !== null" class="countdown-info">
+                  <span class="countdown-text" [class.urgente]="row.diasParaVencimento <= 30">
+                    {{ row.diasParaVencimento }} {{ row.diasParaVencimento === 1 ? 'dia' : 'dias' }}
+                  </span>
+                </div>
+                <div *ngIf="row.renovavel !== undefined" class="renovavel-info">
+                  <i class="cil-reload" [class.renovavel-sim]="row.renovavel" [class.renovavel-nao]="!row.renovavel"></i>
+                  <span class="renovavel-text">{{ row.renovavel ? 'Renovável' : 'Não Renovável' }}</span>
+                </div>
+              </div>
+            </td>
+            <td class="contrato-arquivo text-center">
+              <div class="arquivo-actions">
+                <ng-container *ngIf="row.temArquivo">
+                  <button 
+                    class="action-btn download-btn" 
+                    matTooltip="Baixar contrato: {{ row.nomeArquivoOriginal }}" 
+                    (click)="downloadArquivo(row.id, row.nomeArquivoOriginal)">
+                    <i class="cil-cloud-download"></i>
+                  </button>
+                  <button 
+                    class="action-btn delete-btn" 
+                    matTooltip="Remover arquivo" 
+                    (click)="removerArquivo(row.id)">
+                    <i class="cil-trash"></i>
+                  </button>
+                </ng-container>
+                <ng-container *ngIf="!row.temArquivo">
+                  <label class="action-btn upload-btn" matTooltip="Anexar contrato">
+                    <i class="cil-cloud-upload"></i>
+                    <input 
+                      type="file" 
+                      accept=".pdf,.doc,.docx" 
+                      (change)="uploadArquivo($event, row.id)" 
+                      style="display: none;">
+                  </label>
+                </ng-container>
+              </div>
+            </td>
+            <td class="contrato-actions text-center">
+              <div class="action-buttons">
+                <button 
+                  *ngIf="row.qtdeRecursos > 0" 
+                  class="action-btn resources-btn" 
+                  matTooltip="Ver Equipamentos ({{ row.qtdeRecursos }})" 
+                  (click)="redirectToEquipamentos(row.id)">
+                  <i class="cil-devices"></i>
+                  <span class="badge-count">{{ row.qtdeRecursos }}</span>
+                </button>
+                <button class="action-btn edit-btn" matTooltip="Editar Contrato" (click)="editar(row.id)">
+                  <i class="cil-pencil"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 📄 PAGINAÇÃO -->
+  <div class="pagination-container">
+    <mat-paginator 
+      [pageSizeOptions]="[5, 10, 25, 100]" 
+      [pageSize]="10" 
+      showFirstLastButtons>
+    </mat-paginator>
+  </div>
+</div>

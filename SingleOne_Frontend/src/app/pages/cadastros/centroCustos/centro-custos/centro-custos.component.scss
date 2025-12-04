@@ -1,0 +1,522 @@
+/* 🎯 HEADER MODERNO DOS CENTROS DE CUSTO */
+.centro-custos-header {
+  background: linear-gradient(135deg, #080039 0%, #1a1a2e 100%);
+  color: white;
+  padding: 2rem 2rem 2.5rem 2rem;
+  margin-bottom: 2rem;
+  border-radius: 0 0 20px 20px;
+  box-shadow: 0 8px 32px rgba(8, 0, 57, 0.3);
+  
+  .header-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    
+    .back-button {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      padding: 0.75rem;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      
+      &:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-2px);
+      }
+      
+      i {
+        font-size: 20px;
+      }
+    }
+    
+    .header-title {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      
+      .title-icon {
+        background: linear-gradient(135deg, #FF3A0F 0%, #ff6b3d 100%);
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 8px 25px rgba(255, 58, 15, 0.3);
+        animation: float 3s ease-in-out infinite;
+        
+        i {
+          font-size: 32px;
+          color: white;
+        }
+      }
+      
+      .title-text {
+        h1 {
+          font-size: 3.2rem;
+          font-weight: 700;
+          margin: 0;
+          text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+          
+          @media (max-width: 768px) {
+            font-size: 2.2rem;
+          }
+        }
+        
+        p {
+          font-size: 1.2rem;
+          margin: 0.5rem 0 0 0;
+          opacity: 0.9;
+          font-weight: 300;
+        }
+      }
+    }
+  }
+  
+  .header-right {
+    .action-btn {
+      background: linear-gradient(135deg, #FF3A0F 0%, #ff6b3d 100%);
+      border: none;
+      border-radius: 12px;
+      padding: 0.875rem 1.5rem;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(255, 58, 15, 0.4);
+      }
+      
+      i {
+        font-size: 18px;
+      }
+      
+      span {
+        font-size: 1rem;
+      }
+    }
+  }
+}
+
+/* 🍞 BREADCRUMB MODERNO */
+.modern-breadcrumb {
+  background: white;
+  padding: 1rem 2rem;
+  margin-bottom: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  
+  .breadcrumb-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.9rem;
+  }
+  
+  .breadcrumb-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #6c757d;
+    text-decoration: none;
+    transition: color 0.3s ease;
+    
+    &:hover {
+      color: #FF3A0F;
+    }
+    
+    &.active {
+      color: #080039;
+      font-weight: 600;
+    }
+    
+    i {
+      font-size: 16px;
+    }
+  }
+  
+  i.cil-chevron-right {
+    color: #dee2e6;
+    font-size: 14px;
+  }
+}
+
+/* 📋 CONTEÚDO PRINCIPAL */
+.centro-custos-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* 🔍 SEÇÃO DE BUSCA */
+.search-section {
+  margin-bottom: 2rem;
+  
+  .search-box {
+    position: relative;
+    max-width: 500px;
+    
+    .search-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #6c757d;
+      font-size: 18px;
+      z-index: 2;
+    }
+    
+    input {
+      width: 100%;
+      height: 44px;
+      padding: 0 1rem 0 3rem;
+      border: 2px solid #e9ecef;
+      border-radius: 12px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      background: white;
+      box-sizing: border-box;
+      
+      &:focus {
+        outline: none;
+        border-color: #FF3A0F;
+        box-shadow: 0 0 0 3px rgba(255, 58, 15, 0.1);
+      }
+      
+      &::placeholder {
+        color: #adb5bd;
+      }
+    }
+    
+    .clear-btn {
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #6c757d;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      z-index: 2;
+      
+      &:hover {
+        background: #495057;
+        transform: translateY(-50%) scale(1.1);
+      }
+      
+      i {
+        font-size: 12px;
+        font-weight: bold;
+      }
+    }
+  }
+}
+
+/* 📊 TABELA MODERNA */
+.table-section {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  margin-bottom: 2rem;
+  
+  .table-container {
+    overflow-x: auto;
+    
+    .modern-table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: auto;
+      
+      thead {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        
+        th {
+          padding: 1.25rem 1rem;
+          text-align: left;
+          font-weight: 700;
+          color: #495057;
+          font-size: 0.875rem;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          border-bottom: 2px solid #dee2e6;
+          
+          &.text-center {
+            text-align: center;
+          }
+        }
+      }
+      
+      tbody {
+        tr {
+          transition: all 0.2s ease;
+          border-bottom: 1px solid #f1f3f4;
+          
+          &:hover {
+            background: rgba(255, 58, 15, 0.02);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+          }
+          
+          td {
+            padding: 1rem;
+            vertical-align: middle;
+            
+            &.text-center {
+              text-align: center;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.centro-custo-nome {
+  .centro-custo-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    
+    .centro-custo-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #FF3A0F 0%, #ff6b3d 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 18px;
+      box-shadow: 0 4px 12px rgba(255, 58, 15, 0.3);
+    }
+    
+    span {
+      font-weight: 600;
+      color: #2c3e50;
+      font-size: 1rem;
+    }
+  }
+}
+
+.centro-custo-codigo {
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.centro-custo-empresa {
+  color: #495057;
+  font-weight: 500;
+}
+
+.centro-custo-status {
+  .status-label {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    
+    &.active {
+      background: rgba(76, 175, 80, 0.1);
+      color: #4caf50;
+    }
+    
+    &.inactive {
+      background: rgba(244, 67, 54, 0.1);
+      color: #f44336;
+    }
+  }
+}
+
+.centro-custo-actions {
+  .action-buttons {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    
+    .action-btn {
+      width: 40px;
+      height: 40px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      
+      &.edit-btn {
+        background: linear-gradient(135deg, #2196F3 0%, #42A5F5 100%);
+        color: white;
+        
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(33, 150, 243, 0.3);
+        }
+      }
+      
+      i {
+        font-size: 16px;
+      }
+    }
+  }
+}
+
+/* 📄 PAGINAÇÃO */
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  background: white;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 🎨 ANIMAÇÕES */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* 📱 RESPONSIVIDADE */
+@media (max-width: 768px) {
+  .centro-custos-header {
+    padding: 1.5rem 1rem 2rem 1rem;
+    
+    .header-content {
+      flex-direction: column;
+      gap: 1.5rem;
+      text-align: center;
+      
+      .header-left {
+        flex-direction: column;
+        gap: 1rem;
+      }
+    }
+  }
+  
+  .modern-breadcrumb {
+    padding: 1rem;
+    
+    .breadcrumb-container {
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+  }
+  
+  .centro-custos-content {
+    padding: 0 1rem;
+    
+    .table-section {
+      .table-container {
+        .modern-table {
+          width: 100%;
+          
+          thead th,
+          tbody td {
+            padding: 0.75rem 0.5rem;
+           
+            &:first-child {
+              padding-left: 1rem;
+            }
+            
+            &:last-child {
+              padding-right: 1rem;
+            }
+          }
+          
+          thead th {
+            font-weight: 600;
+          }
+        }
+      }
+    }
+  }
+}
+
+/* 🎯 ESTILOS DO MODAL */
+.formulario-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+  padding: 2rem;
+  
+  .formulario-container {
+    background: white;
+    border-radius: 16px;
+    max-width: 1000px;
+    width: 100%;
+    max-height: 95vh;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: slideIn 0.3s ease;
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+/* 🎭 ANIMAÇÕES ADICIONAIS */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

@@ -1,0 +1,160 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+</head>
+<body class="d-flex flex-column min-vh-100">
+    <div class="container">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th rowspan="2" class="text-center">
+                        <img src="@imageLogo" />
+                        <!--<img src="data:image/png;base64, @imageLogo" />-->
+                    </th>
+                    <th class="text-center">
+                        <b>FORMULÁRIO</b>
+                    </th>
+                    <th class="text-center">
+                        <small>Código documento</small><br />
+                        <b>FM-001</b>
+                    </th>
+                    <th class="text-center">
+                        <small>Data revisão</small><br />
+                        <b>14/11/2019</b>
+                    </th>
+                    <th class="text-center">
+                        <small>Revisão</small><br />
+                        <b>00</b>
+                    </th>
+                </tr>
+                <tr>
+                    <th colspan="4" style="text-align:center">
+                        <small>Área</small><br />
+                        <b>Infraestrutura de TI</b>
+                    </th>
+                </tr>
+                <tr>
+                    <th colspan="5">
+                        <small>Titulo</small><br />
+                        <b>Termo de entrega de recursos</b>
+                    </th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                Pelo presente termo firmado entre:<br />
+                (I) <b>@nomeEmpresa</b><br />
+                Inscrita no CNPJ nº <b>@cnpjEmpresa</b>,  doravante denominada <b>EMPRESA</b>, e
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-md-12">
+                <div style="width:50%;float:left">
+                    <b>Matricula:</b>  @matricula
+                </div>
+                <div style="width:50%;float:left" class="text-justify">
+                    <b>Centro de Custo: </b> @centroCusto
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 text-justify">
+                <b>Nome: </b> @nomeColaborador<br />
+                <b>Cargo: </b> @cargo<br />
+                <br /><br />
+                , doravante denominado <b>FUNCIONÁRIO</b><br />
+                <span>Considerando a decisão das mesmas de estabelecer cláusulas e condições visando a cessão temporária de equipamento de TI (Tecnologia da Informação), o <b>FUNCIONÁRIO</b> dá ciência e concorda com os termos a seguir:</span>
+                <br /><br />
+                <span>
+                    <b>a)</b> O equipamento não deverá deixar as dependências da <b>EMPRESA</b> a não ser em casos específicos, validados e autorizados previamente pela Diretoria do usuário e a Gerência de TI.
+                </span><br />
+                <span>
+                    <b>b)</b> No caso de danos ocorridos ao equipamento, a área de TI realizará a troca ou reparos necessários. Entretanto,
+                    caso seja constatado mau uso, através de laudo do fornecedor responsável pela garantia ou analista de TI, as
+                    despesas envolvidas no reparo ou substituição do equipamento serão descontadas do <b>FUNCIONÁRIO</b> ou centro de
+                    custo ao qual o <b>FUNCIONÁRIO</b> esteja alocado.
+                </span><br />
+                <span>
+                    <b>c)</b> O equipamento só deverá ser utilizado para fins profissionais.
+                </span><br />
+                <span>
+                    <b>d)</b> Em respeito ao direito à propriedade e ao poder diretivo do empregador, não haverá expectativa de privacidade na
+                    utilização da infraestrutura tecnológica e ambiente digital corporativo da <b>EMPRESA</b>. Sendo assim, todo conteúdo
+                    gerado a partir do equipamento listado neste termo está sujeito ao monitoramento e fiscalização.
+                </span><br />
+                <span>
+                    <b>e)</b> A <b>EMPRESA</b> poderá substituir ou recolher os equipamentos a qualquer momento e a seu exclusivo critério.
+                </span><br /><br />
+                <b>1. DURAÇÃO</b><br />
+                <b>1.1.</b> A cessão do equipamento tem validade a partir da presente data por tempo indeterminado, findando após
+                encerrados os serviços que originaram sua assinatura, onde o Protocolo de Devolução de Equipamentos de TI deverá ser assinado e o equipamento devolvido.
+                <br /><br />
+                <label>Lista de equipamentos</label><br /><hr style="width:100%" />
+                <table style="width:100%">
+                    @equipamentos
+                </table>
+                <br /><br />
+                <span>
+                    Atesto que li e concordo com as ações acima listadas, assim como aquelas contidas na Política de Segurança de TI e
+                    demais documentos relacionados à <b>EMPRESA.</b>
+                </span><br /><br />
+                <span>
+                    Declaro ainda estar ciente de que uma violação deste Termo, da Política de Segurança de TI e documentos
+                    relacionados poderá resultar em uma ação disciplinar, incluindo possível rescisão do meu contrato de trabalho, com ou
+                    sem justa causa, dependendo dos fatores envolvidos, assim como obrigações cíveis e criminais.
+                </span>
+            </div>
+        </div>
+        <br /><br />
+        <div class="row">
+            <div class="col-md-12">
+                <div style="width:50%;float:left" class="text-center">
+                    <hr style="width:90%;" /><br />
+                    @nomeColaborador<br />
+                    (Funcionário)
+                </div>
+                <div style="width:50%;float:left" class="text-center">
+                    <hr style="width:90%;" /><br />
+                    @usuarioLogado<br />
+                    (Responsável pela Entrega)
+                </div>
+            </div>
+        </div>
+    </div>
+    <div style="height:250px"></div>
+    <footer class="footer" style="background-color:whitesmoke">
+        <div class="container">
+            <div class="text-center" style="width:50%;float:left">
+                <small>SingleOne - Inventário Permamente</small><br />
+                <small>Todos os direitos reservados</small>
+            </div>
+            <div class="text-center" style="width:50%;float:left">
+                <small>@dataAtual</small>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
+
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        line-height: 1;
+        font-size: 12pt;
+        /*height: 20mm;*/ /* set it to your bottom margin */
+        height:100%;
+    }
+
+    .footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+    }
+</style>

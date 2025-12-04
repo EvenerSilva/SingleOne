@@ -1,0 +1,326 @@
+// ============================================================
+// 📊 ESTILOS PARA CARD EXPANDIDO DE CAMPANHAS
+// ============================================================
+
+.expanded-card {
+  // Título com link inline
+  .title-with-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    gap: 1rem;
+    
+    .title-content {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex: 1;
+    }
+    
+    .details-link-inline {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #667eea;
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 500;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      background: rgba(102, 126, 234, 0.1);
+      
+      i {
+        font-size: 1.2rem;
+      }
+      
+      &:hover {
+        background: rgba(102, 126, 234, 0.2);
+        color: #764ba2;
+        transform: translateX(3px);
+      }
+    }
+  }
+  
+  .subsection-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #e9ecef;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    
+    i {
+      font-size: 1.2rem;
+      color: #667eea;
+    }
+  }
+  
+  // Métricas de Campanhas
+  .campanhas-metrics {
+    .metric-row {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      
+      .metric-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        
+        &:hover {
+          transform: translateX(5px);
+          background: #e9ecef;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        
+        .metric-icon {
+          width: 48px;
+          height: 48px;
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+          
+          &.success {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+          }
+          
+          &.completed {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+          }
+          
+          &.scheduled {
+            background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+            color: white;
+          }
+          
+          i {
+            font-size: 24px;
+          }
+        }
+        
+        .metric-info {
+          flex: 1;
+          
+          .metric-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #2c3e50;
+            line-height: 1;
+          }
+          
+          .metric-label {
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-top: 0.25rem;
+          }
+        }
+      }
+    }
+    
+    .adesao-box {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+      border: 1px solid rgba(102, 126, 234, 0.2);
+      border-radius: 12px;
+      padding: 1.25rem;
+      
+      .adesao-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-size: 1rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 1rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid rgba(102, 126, 234, 0.15);
+        
+        i {
+          font-size: 1.3rem;
+          color: #667eea;
+        }
+      }
+      
+      .adesao-stats {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        
+        .stat-item {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 0.5rem 0;
+          
+          &.highlight {
+            margin-top: 0.5rem;
+            padding-top: 1rem;
+            border-top: 2px solid rgba(102, 126, 234, 0.2);
+          }
+          
+          .stat-label {
+            font-size: 0.9rem;
+            color: #495057;
+            font-weight: 500;
+          }
+          
+          .stat-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2c3e50;
+          }
+          
+          .stat-value-large {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #667eea;
+          }
+        }
+      }
+    }
+  }
+  
+  // Lista de Campanhas
+  .campanhas-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-height: 500px;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+    
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    &::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 3px;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background: #667eea;
+      border-radius: 3px;
+      
+      &:hover {
+        background: #764ba2;
+      }
+    }
+    
+    .campanha-item {
+      background: white;
+      border: 1px solid #e9ecef;
+      border-radius: 12px;
+      padding: 1rem;
+      transition: all 0.3s ease;
+      
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        border-color: #667eea;
+      }
+      
+      .campanha-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 0.75rem;
+        
+        .campanha-status {
+          padding: 0.25rem 0.75rem;
+          border-radius: 20px;
+          font-size: 0.75rem;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          flex-shrink: 0;
+          
+          &.status-ativa {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+          }
+          
+          &.status-concluida {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+          }
+          
+          &.status-agendada {
+            background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+            color: white;
+          }
+          
+          &.status-inativa {
+            background: #6c757d;
+            color: white;
+          }
+        }
+        
+        .campanha-nome {
+          font-size: 0.95rem;
+          font-weight: 600;
+          color: #2c3e50;
+          flex: 1;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+      }
+      
+      .campanha-stats {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+        
+        .campanha-stat {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          font-size: 0.85rem;
+          color: #6c757d;
+          
+          i {
+            font-size: 1rem;
+            color: #667eea;
+          }
+        }
+      }
+      
+      .campanha-progress {
+        .progress-mini {
+          height: 6px;
+          background: #e9ecef;
+          border-radius: 3px;
+          overflow: hidden;
+          margin-bottom: 0.4rem;
+          
+          .progress-bar {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+          }
+        }
+        
+        .progress-label {
+          font-size: 0.75rem;
+          color: #6c757d;
+          font-weight: 600;
+        }
+      }
+    }
+  }
+}
+

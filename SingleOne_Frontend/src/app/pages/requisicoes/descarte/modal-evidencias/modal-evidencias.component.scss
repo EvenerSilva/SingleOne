@@ -1,0 +1,379 @@
+// Remover bordas do container do modal
+::ng-deep .custom-modal-panel .mat-dialog-container {
+  border-radius: 12px;
+  padding: 0;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+}
+
+// CONTAINER PRINCIPAL DO MODAL
+.modal-container {
+  margin: 0;
+  padding: 2rem;
+  background: #ffffff;
+  overflow-y: auto;
+  max-height: 85vh;
+}
+
+// Header do Formulário
+.form-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid #f0f0f0;
+
+  .form-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    color: #2c3e50;
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+
+    i {
+      color: #FF3A0F;
+      font-size: 2rem;
+    }
+  }
+
+  .form-subtitle {
+    color: #7f8c8d;
+    font-size: 0.95rem;
+    margin: 0;
+    line-height: 1.5;
+  }
+}
+
+// Títulos das seções
+h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 1.5rem 0 1rem 0;
+  font-size: 1.1rem;
+  color: #2c3e50;
+  font-weight: 600;
+
+  i {
+    font-size: 20px;
+    color: #FF3A0F;
+  }
+}
+
+// SEÇÃO DE UPLOAD
+.upload-section {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+
+  .upload-form {
+    .full-width {
+      width: 100%;
+      margin-bottom: 1rem;
+    }
+
+    .file-input-container {
+      text-align: center;
+      padding: 2rem;
+      border: none;
+      border-radius: 8px;
+      background: white;
+      margin-bottom: 1rem;
+
+      .select-files-button {
+        background: linear-gradient(135deg, #FF3A0F 0%, #ff6b3d 100%);
+        color: white;
+        padding: 0.75rem 2rem;
+        font-size: 1rem;
+
+        i {
+          margin-right: 0.5rem;
+        }
+      }
+
+      .file-hint {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 1rem;
+        color: #6c757d;
+        font-size: 0.85rem;
+
+        i {
+          font-size: 16px;
+        }
+      }
+    }
+
+    .selected-files {
+      h4 {
+        margin: 1rem 0 0.5rem 0;
+        font-size: 1rem;
+        color: #495057;
+      }
+
+      .file-list {
+        background: white;
+        border-radius: 8px;
+        padding: 0.5rem;
+        margin-bottom: 1rem;
+
+        .file-item {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 0.75rem;
+          border-bottom: none;
+
+          .file-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex: 1;
+
+            i {
+              color: #FF3A0F;
+              font-size: 24px;
+            }
+
+            .file-details {
+              display: flex;
+              flex-direction: column;
+
+              .file-name {
+                font-weight: 500;
+                color: #495057;
+                font-size: 0.9rem;
+              }
+
+              .file-size {
+                font-size: 0.75rem;
+                color: #6c757d;
+              }
+            }
+          }
+        }
+      }
+
+      .upload-button {
+        width: 100%;
+        padding: 0.75rem;
+        font-size: 1rem;
+
+        i {
+          margin-right: 0.5rem;
+        }
+      }
+    }
+  }
+}
+
+// SEÇÃO DE EVIDÊNCIAS
+.evidencias-section {
+  .carregando {
+    text-align: center;
+    padding: 3rem;
+
+    p {
+      margin-top: 1rem;
+      color: #6c757d;
+    }
+  }
+
+  .sem-evidencias {
+    text-align: center;
+    padding: 3rem;
+    color: #6c757d;
+
+    i {
+      font-size: 64px;
+      opacity: 0.3;
+      margin-bottom: 1rem;
+    }
+
+    p {
+      margin: 0;
+      font-size: 1rem;
+    }
+  }
+
+  .evidencias-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+
+    .evidencia-card {
+      background: white;
+      border: none;
+      border-radius: 12px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem;
+        background: #f8f9fa;
+
+        .tipo-badge {
+          padding: 0.25rem 0.75rem;
+          border-radius: 20px;
+          font-size: 0.7rem;
+          font-weight: 600;
+          text-transform: uppercase;
+
+          &.tipo-sanitizacao {
+            background: #d1ecf1;
+            color: #0c5460;
+          }
+
+          &.tipo-descaracterizacao {
+            background: #fff3cd;
+            color: #856404;
+          }
+
+          &.tipo-perfuracao_disco {
+            background: #f8d7da;
+            color: #721c24;
+          }
+
+          &.tipo-evidencias_gerais {
+            background: #d4edda;
+            color: #155724;
+          }
+        }
+
+        .menu-button {
+          width: 32px;
+          height: 32px;
+          line-height: 32px;
+        }
+      }
+
+      .card-preview {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 120px;
+        background: #f8f9fa;
+
+        i {
+          font-size: 48px;
+          color: #dee2e6;
+        }
+      }
+
+      .card-info {
+        padding: 1rem;
+
+        .file-name {
+          font-weight: 500;
+          color: #495057;
+          font-size: 0.9rem;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          margin-bottom: 0.5rem;
+        }
+
+        .file-meta {
+          display: flex;
+          justify-content: space-between;
+          font-size: 0.75rem;
+          color: #6c757d;
+          margin-bottom: 0.5rem;
+        }
+
+        .file-description {
+          display: flex;
+          align-items: flex-start;
+          gap: 0.25rem;
+          font-size: 0.75rem;
+          color: #6c757d;
+          padding: 0.5rem;
+          background: #f8f9fa;
+          border-radius: 4px;
+          margin-top: 0.5rem;
+
+          i {
+            font-size: 14px;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Footer do Formulário
+.form-footer {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 2px solid #f0f0f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+
+  .footer-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #28a745;
+    font-weight: 500;
+    font-size: 0.95rem;
+
+    i {
+      font-size: 20px;
+    }
+  }
+
+  button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+
+    i {
+      font-size: 18px;
+    }
+  }
+}
+
+// RESPONSIVO
+@media (max-width: 768px) {
+  .modal-container {
+    padding: 1.5rem;
+  }
+
+  .evidencias-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .form-footer {
+    flex-direction: column-reverse;
+    gap: 1rem;
+
+    .footer-info {
+      justify-content: center;
+    }
+
+    button {
+      width: 100%;
+    }
+  }
+}
+

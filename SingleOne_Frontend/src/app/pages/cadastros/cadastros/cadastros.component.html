@@ -1,0 +1,334 @@
+<!-- 🎯 HEADER MODERNO DOS CADASTROS -->
+<div class="cadastros-header">
+  <div class="header-content">
+    <div class="header-left">
+      <div class="header-title">
+        <div class="title-icon">
+          <i class="cil-building"></i>
+        </div>
+        <div class="title-text">
+          <h1>Cadastros do Sistema</h1>
+          <p>Gerenciar entidades e dados do sistema</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 🍞 BREADCRUMB MODERNO -->
+<nav class="modern-breadcrumb">
+  <div class="breadcrumb-container">
+    <a [routerLink]="['/dashboard']" class="breadcrumb-item">
+      <i class="cil-home"></i>
+      <span>Dashboard</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <span class="breadcrumb-item active">Cadastros</span>
+  </div>
+</nav>
+
+<!-- 📋 CONTEÚDO PRINCIPAL -->
+<div class="cadastros-content">
+  
+  <!-- 💻 SEÇÃO RECURSOS -->
+  <div class="section-container">
+    <div class="section-header">
+      <div class="section-icon">
+        <i class="cil-laptop"></i>
+      </div>
+      <div class="section-title">
+        <h2>Recursos</h2>
+        <p>Cadastros de equipamentos e recursos</p>
+      </div>
+    </div>
+    
+    <div class="section-grid">
+      <!-- 🆕 CARD INTEGRADO DE RECURSOS E TELEFONIA -->
+      <div class="action-card recursos-integrado" (click)="navegarParaRecursos()">
+        <div class="card-content">
+          <h3>📊 Visão Geral dos Recursos</h3>
+          <p>Visualizar e gerenciar todos os equipamentos do sistema</p>
+          
+          <!-- 📈 RESUMO ESTATÍSTICO -->
+          <div class="recursos-resumo" *ngIf="recursosResumo">
+            <div class="resumo-item">
+              <span class="resumo-valor">{{ recursosResumo.total }}</span>
+              <span class="resumo-label">Total</span>
+            </div>
+            <div class="resumo-item">
+              <span class="resumo-valor">{{ recursosResumo.emEstoque }}</span>
+              <span class="resumo-label">Em Estoque</span>
+            </div>
+            <div class="resumo-item">
+              <span class="resumo-valor">{{ recursosResumo.entregue }}</span>
+              <span class="resumo-label">Entregue</span>
+            </div>
+            <div class="resumo-item">
+              <span class="resumo-valor">{{ recursosResumo.novo }}</span>
+              <span class="resumo-label">Novo</span>
+            </div>
+            <div class="resumo-item">
+              <span class="resumo-valor">{{ recursosResumo.emTransito }}</span>
+              <span class="resumo-label">Em Trânsito</span>
+            </div>
+          </div>
+          
+          <!-- 🔍 FUNCIONALIDADES RÁPIDAS -->
+          <div class="acoes-rapidas">
+            <button class="btn-rapido" (click)="$event.stopPropagation(); novoRecurso()">
+              <i class="cil-plus"></i>
+              <span>Novo</span>
+            </button>
+            <button class="btn-rapido" (click)="$event.stopPropagation(); exportarRecursos()">
+              <i class="cil-cloud-download"></i>
+              <span>Exportar</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 📞 CARD INTEGRADO DE TELEFONIA -->
+      <div class="action-card telefonia-integrado" (click)="navegarParaTelecom()">
+        <div class="card-content">
+          <h3>📞 Gestão de Telefonia</h3>
+          <p>Gerenciar serviços, operadoras e linhas telefônicas</p>
+          
+          <!-- 📊 RESUMO TELEFONIA -->
+          <div class="recursos-resumo" *ngIf="telefoniaResumo">
+            <div class="resumo-item">
+              <span class="resumo-valor">{{ telefoniaResumo.operadoras }}</span>
+              <span class="resumo-label">Operadoras</span>
+            </div>
+            <div class="resumo-item">
+              <span class="resumo-valor">{{ telefoniaResumo.contratos || 0 }}</span>
+              <span class="resumo-label">Contas</span>
+            </div>
+            <div class="resumo-item">
+              <span class="resumo-valor">{{ telefoniaResumo.planos }}</span>
+              <span class="resumo-label">Planos</span>
+            </div>
+            <div class="resumo-item">
+              <span class="resumo-valor">{{ telefoniaResumo.linhas }}</span>
+              <span class="resumo-label">Linhas</span>
+            </div>
+          </div>
+          
+          <!-- 🔧 AÇÕES DE TELEFONIA -->
+          <div class="acoes-rapidas">
+            <button class="btn-rapido" (click)="$event.stopPropagation(); gerenciarOperadoras()">
+              <i class="cil-people"></i>
+              <span>Operadoras</span>
+            </button>
+            <button class="btn-rapido" (click)="$event.stopPropagation(); gerenciarContratosTelefonia()">
+              <i class="cil-user"></i>
+              <span>Contas</span>
+            </button>
+            <button class="btn-rapido" (click)="$event.stopPropagation(); gerenciarPlanos()">
+              <i class="cil-list"></i>
+              <span>Planos</span>
+            </button>
+            <button class="btn-rapido" (click)="$event.stopPropagation(); gerenciarLinhas()">
+              <i class="cil-phone"></i>
+              <span>Linhas</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 🆕 CARD DE CADASTRO RÁPIDO (TERCEIRO - PARA CRIAR RECURSOS) -->
+      <div class="action-card recursos cadastro-rapido" (click)="navegarParaEquipamentosWizard()">
+        <div class="card-icon">
+          <i class="cil-plus"></i>
+        </div>
+        <div class="card-content">
+          <h3>Cadastro Rápido</h3>
+          <p>Cadastrar novos equipamentos usando modelos existentes</p>
+        </div>
+      </div>
+      
+      <!-- 🏷️ CARD DE CATEGORIAS (QUARTO - BASE PARA CLASSIFICAÇÃO) -->
+      <div class="action-card recursos categoria" (click)="navegarParaCategorias()" *ngIf="session.usuario.su">
+        <div class="card-icon">
+          <i class="cil-tags"></i>
+        </div>
+        <div class="card-content">
+          <h3>Categorias</h3>
+          <p>Gerenciar categorias de equipamentos (Apenas ADMIN)</p>
+        </div>
+      </div>
+      
+      <!-- ⚙️ CARD DE TIPOS DE RECURSOS (QUINTO - QUE TIPO É) -->
+      <div class="action-card recursos tipo" (click)="navegarParaTiposRecursos()">
+        <div class="card-icon">
+          <i class="cil-settings"></i>
+        </div>
+        <div class="card-content">
+          <h3>Tipos de Recursos</h3>
+          <p>Definir tipos e características dos equipamentos</p>
+        </div>
+      </div>
+      
+      <!-- 🏭 CARD DE FABRICANTES (SEXTO - QUEM PRODUZ) -->
+      <div class="action-card recursos fabricante" (click)="navegarParaFabricantes()">
+        <div class="card-icon">
+          <i class="cil-industry"></i>
+        </div>
+        <div class="card-content">
+          <h3>Fabricantes</h3>
+          <p>Cadastrar e gerenciar fabricantes de equipamentos</p>
+        </div>
+      </div>
+      
+      <!-- 📱 CARD DE MODELOS (SÉTIMO - MODELO ESPECÍFICO) -->
+      <div class="action-card recursos modelo" (click)="navegarParaModelos()">
+        <div class="card-icon">
+          <i class="cil-devices"></i>
+        </div>
+        <div class="card-content">
+          <h3>Modelos</h3>
+          <p>Gerenciar modelos específicos de recursos</p>
+        </div>
+      </div>
+      
+      <!-- 📦 CARD DE ESTOQUE MÍNIMO E MÁXIMO (ÚLTIMO - CONTROLE DE ESTOQUE) -->
+      <div class="action-card recursos estoque-minimo" (click)="navegarParaEstoqueMinimo()">
+        <div class="card-icon">
+          <i class="cil-layers"></i>
+        </div>
+        <div class="card-content">
+          <h3>Estoque Mínimo e Máximo</h3>
+          <p>Configurar níveis mínimos e máximos de recursos e linhas por localidade</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🏢 SEÇÃO ORGANIZACIONAL -->
+  <div class="section-container">
+    <div class="section-header">
+      <div class="section-icon">
+        <i class="cil-building"></i>
+      </div>
+      <div class="section-title">
+        <h2>Organizacional</h2>
+        <p>Entidades organizacionais do sistema</p>
+      </div>
+    </div>
+    
+    <div class="section-grid">
+      <!-- 🆕 CARD DE CADASTRO RÁPIDO (PRIMEIRO - PARA CRIAR ESTRUTURA) -->
+      <div class="action-card organizacional cadastro-rapido" (click)="navegarParaEmpresaWizard()">
+        <div class="card-icon">
+          <i class="cil-plus"></i>
+        </div>
+        <div class="card-content">
+          <h3>Cadastro Rápido</h3>
+          <p>Cadastrar empresa, filiais e localizações em um wizard</p>
+        </div>
+      </div>
+      
+      <!-- 🏢 CARD DE EMPRESAS (SEGUNDO - ENTIDADE PRINCIPAL) -->
+      <div class="action-card organizacional empresa" (click)="navegarParaEmpresas()">
+        <div class="card-icon">
+          <i class="cil-briefcase"></i>
+        </div>
+        <div class="card-content">
+          <h3>Empresas</h3>
+          <p>Gerenciar empresas cadastradas no sistema</p>
+        </div>
+      </div>
+      
+      <!-- 🏢 CARD DE FILIAIS (TERCEIRO - DEPENDE DE EMPRESA) -->
+      <div class="action-card organizacional filial" (click)="navegarParaFiliais()">
+        <div class="card-icon">
+          <i class="cil-building"></i>
+        </div>
+        <div class="card-content">
+          <h3>Filiais</h3>
+          <p>Gerenciar filiais das empresas cadastradas</p>
+        </div>
+      </div>
+      
+      <!-- 📍 CARD DE LOCALIDADES (QUARTO - BASE GEOGRÁFICA) -->
+      <div class="action-card organizacional localidade" (click)="navegarParaLocalidades()">
+        <div class="card-icon">
+          <i class="cil-location-pin"></i>
+        </div>
+        <div class="card-content">
+          <h3>Localidades</h3>
+          <p>Gerenciar localidades e regiões geográficas</p>
+        </div>
+      </div>
+      
+      <!-- 💰 CARD DE CENTROS DE CUSTO (QUINTO - CONFIGURAÇÃO FINANCEIRA) -->
+      <div class="action-card organizacional centro-custo" (click)="navegarParaCentrosCustos()">
+        <div class="card-icon">
+          <i class="cil-dollar"></i>
+        </div>
+        <div class="card-content">
+          <h3>Centros de Custo</h3>
+          <p>Configurar e gerenciar centros de custo</p>
+        </div>
+      </div>
+      
+      <!-- 👥 CARD DE CLIENTES (ÚLTIMO - DEPENDE DA ESTRUTURA ORGANIZACIONAL) -->
+      <div class="action-card organizacional cliente" *ngIf="session.usuario.su" (click)="navegarParaClientes()">
+        <div class="card-icon">
+          <i class="cil-user"></i>
+        </div>
+        <div class="card-content">
+          <h3>Clientes</h3>
+          <p>Gerenciar clientes do sistema (Apenas ADMIN)</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🚚 SEÇÃO FORNECEDORES -->
+  <div class="section-container">
+    <div class="section-header">
+      <div class="section-icon">
+        <i class="cil-truck"></i>
+      </div>
+      <div class="section-title">
+        <h2>Fornecedores</h2>
+        <p>Gestão de fornecedores e documentos</p>
+      </div>
+    </div>
+    
+    <div class="section-grid">
+      <div class="action-card fornecedores" (click)="navegarParaFornecedores()">
+        <div class="card-icon">
+          <i class="cil-truck"></i>
+        </div>
+        <div class="card-content">
+          <h3>Fornecedores</h3>
+          <p>Cadastrar e gerenciar fornecedores</p>
+        </div>
+      </div>
+      
+      <div class="action-card fornecedores" (click)="navegarParaContratos()">
+        <div class="card-icon">
+          <i class="cil-folder"></i>
+        </div>
+        <div class="card-content">
+          <h3>Contratos</h3>
+          <p>Gerenciar contratos</p>
+        </div>
+      </div>
+      
+      <div class="action-card fornecedores" (click)="navegarParaNotasFiscais()">
+        <div class="card-icon">
+          <i class="cil-print"></i>
+        </div>
+        <div class="card-content">
+          <h3>Notas Fiscais</h3>
+          <p>Gerenciar notas fiscais</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+

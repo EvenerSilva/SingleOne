@@ -1,0 +1,169 @@
+<!-- 🎯 HEADER MODERNO DAS OPERADORAS -->
+<div class="operadoras-header">
+  <div class="header-content">
+    <div class="header-left">
+      <div class="back-button" (click)="voltarParaTelecom()">
+        <i class="cil-arrow-left"></i>
+      </div>
+      
+      <div class="header-title">
+        <div class="title-icon">
+          <i class="cil-phone"></i>
+        </div>
+        
+        <div class="title-text">
+          <h1>Operadoras</h1>
+          <p>Gestão de operadoras de telefonia</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="header-right">
+      <button class="action-btn" (click)="novo()">
+        <i class="cil-plus"></i>
+        <span>Nova Operadora</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 🍞 BREADCRUMB MODERNO -->
+<div class="modern-breadcrumb">
+  <div class="breadcrumb-container">
+    <a class="breadcrumb-item" (click)="voltarParaTelecom()">
+      <i class="cil-home"></i>
+      <span>Telecom</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <span class="breadcrumb-item active">Operadoras</span>
+    <i class="cil-chevron-right"></i>
+    <a class="breadcrumb-item" (click)="navegarParaContas()">
+      <i class="cil-credit-card"></i>
+      <span>Contas</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a class="breadcrumb-item" (click)="navegarParaPlanosGeral()">
+      <i class="cil-list"></i>
+      <span>Planos</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a class="breadcrumb-item" (click)="navegarParaLinhasGeral()">
+      <i class="cil-phone"></i>
+      <span>Linhas</span>
+    </a>
+  </div>
+</div>
+
+<!-- 📋 CONTEÚDO PRINCIPAL -->
+<div class="operadoras-content">
+  <!-- 🔍 SEÇÃO DE BUSCA -->
+  <div class="search-section">
+    <div class="search-box">
+      <i class="cil-magnifying-glass search-icon"></i>
+      <input 
+        type="text" 
+        placeholder="Buscar operadoras..." 
+        [formControl]="consulta"
+        class="form-control">
+      <button 
+        *ngIf="consulta.value" 
+        class="clear-btn" 
+        (click)="limparBusca()"
+        type="button">
+        <i class="cil-x"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- 📊 TABELA MODERNA -->
+  <div class="table-section">
+    <div class="table-container">
+      <table class="modern-table">
+        <thead>
+          <tr>
+            <th>Operadora</th>
+            <th>Totalizadores</th>
+            <th>Status</th>
+            <th class="text-center">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of dadosPaginados">
+            <td class="operadora-nome">
+              <div class="operadora-info">
+                <div class="operadora-avatar">
+                  <i class="cil-phone"></i>
+                </div>
+                <span>{{ row.nome }}</span>
+              </div>
+            </td>
+            <td class="totalizadores">
+              <div class="totalizadores-chips">
+                <a class="chip plano" 
+                   (click)="navegarParaPlanos(row.id, row.nome)"
+                   matTooltip="Ver planos desta operadora">
+                  {{ row.totalPlanos }} PLANOS
+                </a>
+                <a class="chip linha" 
+                   (click)="navegarParaLinhas(row.id, row.nome)"
+                   matTooltip="Ver linhas desta operadora">
+                  {{ row.totalLinhas }} LINHAS
+                </a>
+                <span class="chip emuso" matTooltip="Linhas em uso">
+                  {{ row.totalEmUso }} EM USO
+                </span>
+                <span class="chip livre" matTooltip="Linhas disponíveis">
+                  {{ row.totalLivre }} LIVRES
+                </span>
+              </div>
+            </td>            <td class="status">
+              <div class="status-indicator" [class.ativo]="row.ativo" [class.inativo]="!row.ativo">
+                <i [class]="row.ativo ? 'cil-check' : 'cil-ban'"></i>
+                <span>{{ row.ativo ? 'Ativo' : 'Inativo' }}</span>
+              </div>
+            </td>
+            <td class="acoes">
+              <div class="action-buttons">
+                <button 
+                  class="action-btn edit-btn" 
+                  matTooltip="Editar"
+                  (click)="editar(row)">
+                  <i class="cil-pencil"></i>
+                </button>
+                
+                <button 
+                  class="action-btn delete-btn" 
+                  matTooltip="Excluir"
+                  (click)="excluir(row)"
+                  *ngIf="row.totalPlanos == 0">
+                  <i class="cil-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 📄 PAGINAÇÃO -->
+  <div class="pagination-container">
+    <mat-paginator
+      [pageSizeOptions]="[5, 10, 25, 100]"
+      [pageSize]="10"
+      showFirstLastButtons>
+    </mat-paginator>
+  </div>
+</div>
+
+<!-- 🎯 FORMULÁRIO DE OPERADORA (MODAL) -->
+<div class="formulario-overlay" *ngIf="mostrarFormulario">
+  <div class="formulario-container">
+    <app-operadora
+      [operadora]="operadoraEditando"
+      [modo]="modoFormulario"
+      (operadoraSalva)="onOperadoraSalva($event)"
+      (cancelado)="onCancelado()"
+    ></app-operadora>
+  </div>
+</div>

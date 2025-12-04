@@ -1,0 +1,142 @@
+<!-- 🎯 HEADER MODERNO DAS CATEGORIAS -->
+<div class="categorias-header">
+  <div class="header-content">
+    <div class="header-left">
+      <button class="back-button" [routerLink]="['/cadastros']" matTooltip="Voltar para Cadastros">
+        <i class="cil-arrow-left"></i>
+      </button>
+      <div class="header-title">
+        <div class="title-icon">
+          <i class="cil-tags"></i>
+        </div>
+        <div class="title-text">
+          <h1>Categorias</h1>
+          <p>Gerenciar categorias de recursos do sistema</p>
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="action-btn primary-btn" (click)="novaCategoria()" matTooltip="Adicionar nova categoria">
+        <i class="cil-plus"></i>
+        <span>Nova Categoria</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 🍞 BREADCRUMB MODERNO -->
+<nav class="modern-breadcrumb">
+  <div class="breadcrumb-container">
+    <a [routerLink]="['/dashboard']" class="breadcrumb-item">
+      <i class="cil-home"></i>
+      <span>Dashboard</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a [routerLink]="['/cadastros']" class="breadcrumb-item">
+      <i class="cil-settings"></i>
+      <span>Cadastros</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <span class="breadcrumb-item active">Categorias</span>
+  </div>
+</nav>
+
+<!-- 📋 CONTEÚDO PRINCIPAL -->
+<div class="categorias-content">
+  <!-- 🔍 SEÇÃO DE BUSCA -->
+  <div class="search-section">
+    <div class="search-box">
+      <i class="cil-magnifying-glass search-icon"></i>
+      <input type="text" placeholder="Buscar pelo nome da categoria..." [formControl]="consulta">
+      <button 
+        *ngIf="consulta.value" 
+        class="clear-btn" 
+        (click)="limparBusca()"
+        type="button">
+        <i class="cil-x"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- 📊 TABELA MODERNA -->
+  <div class="table-section">
+    <div class="table-container">
+      <table class="modern-table">
+        <thead>
+          <tr>
+            <th>Categoria</th>
+            <th>Descrição</th>
+            <th class="text-center">Tipos de Recursos</th>
+            <th class="text-center">Status</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let categoria of dadosPaginados">
+            <td class="categoria-nome">
+              <div class="categoria-info">
+                <div class="categoria-avatar">
+                  <i class="cil-tag"></i>
+                </div>
+                <span>{{categoria.nome}}</span>
+              </div>
+            </td>
+            <td class="categoria-descricao">
+              {{categoria.descricao || '-'}}
+            </td>
+            <td class="categoria-tipos">
+              <span class="tipos-count">{{categoria.totalTiposEquipamento}}</span>
+            </td>
+            <td class="categoria-status text-center">
+              <div class="status-label" [class.active]="categoria.ativo" [class.inactive]="!categoria.ativo">
+                {{ categoria.ativo ? 'ATIVO' : 'INATIVO' }}
+              </div>
+            </td>
+            <td class="categoria-actions">
+              <div class="action-buttons">
+                <button class="action-btn edit-btn" matTooltip="Editar categoria" (click)="editar(categoria)">
+                  <i class="cil-pencil"></i>
+                </button>
+                <!-- Botão Desativar (mostra quando categoria está ativa) -->
+                <button class="action-btn delete-btn" 
+                  matTooltip="Desativar categoria (marca como inativo para auditoria)" 
+                  (click)="desativarCategoria(categoria)"
+                  *ngIf="(session.usuario.adm || session.usuario.su) && categoria.ativo">
+                  <i class="cil-ban"></i>
+                </button>
+                <!-- Botão Reativar (mostra quando categoria está inativa) -->
+                <button class="action-btn reactivate-btn" 
+                  matTooltip="Reativar categoria" 
+                  (click)="reativarCategoria(categoria)"
+                  *ngIf="(session.usuario.adm || session.usuario.su) && !categoria.ativo">
+                  <i class="cil-reload"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 📄 PAGINAÇÃO -->
+  <div class="pagination-container">
+    <mat-paginator 
+      [pageSizeOptions]="[5, 10, 25, 100]" 
+      [pageSize]="10" 
+      showFirstLastButtons>
+    </mat-paginator>
+  </div>
+</div>
+
+<!-- 🎯 FORMULÁRIO DE CATEGORIA (MODAL) -->
+<div class="formulario-overlay" *ngIf="mostrarFormulario">
+  <div class="formulario-container">
+    <app-categoria-form
+      [categoria]="categoriaEditando"
+      [modo]="modoFormulario"
+      (categoriaSalva)="onCategoriaSalva($event)"
+      (cancelado)="onCancelado()"
+    ></app-categoria-form>
+  </div>
+</div>

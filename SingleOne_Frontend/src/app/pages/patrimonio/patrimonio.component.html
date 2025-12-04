@@ -1,0 +1,662 @@
+<div class="portaria-container">
+  <!-- Header da Página -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-icon">
+        <i class="material-icons">inventory</i>
+      </div>
+      <div class="header-text">
+        <h1>Meu Patrimônio</h1>
+        <p>Portal do Colaborador</p>
+      </div>
+      <div class="header-logos light-bg">
+        <app-logo-display class="light-bg"></app-logo-display>
+      </div>
+    </div>
+  </div>
+
+  <!-- Formulário de Consulta -->
+  <div *ngIf="!isAuthenticated" class="form-section">
+    <div class="form-container">
+      <form [formGroup]="patrimonioForm" (ngSubmit)="autenticarPatrimonio()">
+        <div class="form-group">
+          <label for="patrimonio-cpf">CPF do Colaborador</label>
+          <div class="input-with-clear">
+            <input 
+              type="text" 
+              id="patrimonio-cpf"
+              formControlName="cpf"
+              placeholder="Digite o CPF"
+              class="form-control"
+              [class.is-invalid]="patrimonioForm.get('cpf')?.invalid && patrimonioForm.get('cpf')?.touched">
+            <button 
+              type="button" 
+              class="btn-clear" 
+              (click)="limparCpf()"
+              [disabled]="!patrimonioForm.get('cpf')?.value"
+              title="Limpar CPF"
+            >
+              <i class="material-icons">clear</i>
+            </button>
+          </div>
+          <div class="invalid-feedback" *ngIf="patrimonioForm.get('cpf')?.invalid && patrimonioForm.get('cpf')?.touched">
+            CPF é obrigatório
+          </div>
+        </div>
+
+        <!-- Tipo de Autenticação -->
+        <div class="form-group">
+          <label>Confirmar identidade com:</label>
+          <div class="radio-group radio-group-horizontal">
+            <label class="radio-option">
+              <input 
+                type="radio" 
+                formControlName="tipoAutenticacao" 
+                value="email"
+                class="radio-input">
+              <span class="radio-label">
+                <i class="material-icons">email</i>
+                Email
+              </span>
+            </label>
+            <label class="radio-option">
+              <input 
+                type="radio" 
+                formControlName="tipoAutenticacao" 
+                value="matricula"
+                class="radio-input">
+              <span class="radio-label">
+                <i class="material-icons">badge</i>
+                Matrícula
+              </span>
+            </label>
+          </div>
+        </div>
+        
+        <!-- Campo Email (visível quando tipo = email) -->
+        <div class="form-group" *ngIf="patrimonioForm.get('tipoAutenticacao')?.value === 'email'">
+          <label for="patrimonio-email">Email</label>
+          <input 
+            type="email" 
+            id="patrimonio-email"
+            formControlName="email"
+            placeholder="seu.email@empresa.com"
+            class="form-control"
+            [class.is-invalid]="patrimonioForm.get('email')?.invalid && patrimonioForm.get('email')?.touched">
+          <div class="invalid-feedback" *ngIf="patrimonioForm.get('email')?.invalid && patrimonioForm.get('email')?.touched">
+            Email é obrigatório e deve ser válido
+          </div>
+        </div>
+        
+        <!-- Campo Matrícula (visível quando tipo = matricula) -->
+        <div class="form-group" *ngIf="patrimonioForm.get('tipoAutenticacao')?.value === 'matricula'">
+          <label for="patrimonio-matricula">Matrícula</label>
+          <input 
+            type="text" 
+            id="patrimonio-matricula"
+            formControlName="matricula"
+            placeholder="Sua matrícula"
+            class="form-control"
+            [class.is-invalid]="patrimonioForm.get('matricula')?.invalid && patrimonioForm.get('matricula')?.touched">
+          <div class="invalid-feedback" *ngIf="patrimonioForm.get('matricula')?.invalid && patrimonioForm.get('matricula')?.touched">
+            Matrícula é obrigatória
+          </div>
+        </div>
+
+        <!-- Mensagem de erro geral -->
+        <div *ngIf="patrimonioError" class="error-message-general">
+          <i class="material-icons">person_off</i>
+          <div class="error-content">
+            <h4>Colaborador não identificado</h4>
+            <p>{{ patrimonioError }}</p>
+            <small>Verifique os dados informados e tente novamente.</small>
+          </div>
+        </div>
+        
+        <div class="form-actions">
+          <button 
+            type="submit" 
+            class="btn btn-consultar"
+            [disabled]="patrimonioForm.invalid || loading">
+            <i class="material-icons">{{ loading ? 'hourglass_empty' : 'search' }}</i>
+            {{ loading ? 'Consultando...' : 'Consultar' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Informações do Colaborador - Colapsável (movido para o topo) -->
+  <div *ngIf="patrimonioData" class="colaborador-section">
+    <div class="colaborador-header-collapsed" (click)="toggleColaboradorDetails()">
+      <div class="colaborador-info-compact">
+        <div class="colaborador-avatar" [ngClass]="getStatusClass(patrimonioData)">
+          {{ patrimonioData?.colaborador?.nome?.charAt(0)?.toUpperCase() }}
+          <div class="status-indicator" [ngClass]="getStatusClass(patrimonioData)"></div>
+        </div>
+        <div class="colaborador-details-compact">
+          <h3 class="colaborador-nome">{{ patrimonioData?.colaborador?.nome }}</h3>
+          <div class="colaborador-info-basic">
+            <span class="info-item">{{ patrimonioData?.colaborador?.cargo }}</span>
+            <span class="info-separator">•</span>
+            <span class="info-item">{{ patrimonioData?.colaborador?.setor }}</span>
+            <span class="info-separator">•</span>
+            <span class="info-item">{{ patrimonioData?.colaborador?.empresaNome }}</span>
+            <span class="info-separator" *ngIf="patrimonioData?.colaborador?.superiorImediatoNome">•</span>
+            <span class="info-item" *ngIf="patrimonioData?.colaborador?.superiorImediatoNome">Superior: {{ patrimonioData?.colaborador?.superiorImediatoNome }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="colaborador-actions-compact">
+        <div class="recursos-info-card">
+          <div class="recursos-icon">
+            <i class="material-icons">inventory_2</i>
+          </div>
+          <div class="recursos-content">
+            <div class="recursos-count">{{ getEquipamentosEmPosse().length }}</div>
+            <div class="recursos-label">Em Posse</div>
+          </div>
+        </div>
+
+        <div class="recursos-info-card">
+          <div class="recursos-icon">
+            <i class="material-icons">archive</i>
+          </div>
+          <div class="recursos-content">
+            <div class="recursos-count">{{ getRecursosHistoricos().length }}</div>
+            <div class="recursos-label">Histórico</div>
+          </div>
+        </div>
+
+        <div class="recursos-info-card">
+          <div class="recursos-icon">
+            <i class="material-icons">smartphone</i>
+          </div>
+          <div class="recursos-content">
+            <div class="recursos-count">{{ getRecursosParticulares().length }}</div>
+            <div class="recursos-label">BYOD</div>
+          </div>
+        </div>
+
+        <button class="btn btn-secondary" (click)="logout()" title="Sair do patrimônio">
+          <i class="fas fa-sign-out-alt"></i> Sair
+        </button>
+        <div class="expand-toggle">
+          <i class="material-icons" [class.rotated]="colaboradorDetailsExpanded">expand_more</i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Detalhes Expandidos do Colaborador (igual à portaria) -->
+    <div class="colaborador-details-expanded" *ngIf="colaboradorDetailsExpanded">
+      <div class="details-grid">
+        <div class="detail-item">
+          <span class="detail-label">Nome:</span>
+          <span class="detail-value">{{ patrimonioData?.colaborador?.nome }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">CPF:</span>
+          <span class="detail-value">{{ formatCpf(patrimonioData?.colaborador?.cpf) }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Matrícula:</span>
+          <span class="detail-value">{{ patrimonioData?.colaborador?.matricula }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Cargo:</span>
+          <span class="detail-value">{{ patrimonioData?.colaborador?.cargo }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Setor:</span>
+          <span class="detail-value">{{ patrimonioData?.colaborador?.setor }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Empresa:</span>
+          <span class="detail-value">{{ patrimonioData?.colaborador?.empresaNome }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Superior Imediato:</span>
+          <span class="detail-value">{{ patrimonioData?.colaborador?.superiorImediatoNome || 'Não informado' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Data de Admissão:</span>
+          <span class="detail-value">{{ formatarData(patrimonioData?.colaborador?.dtAdmissao) }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Status:</span>
+          <span class="detail-value">
+            {{ getColaboradorStatus() }}
+            <span *ngIf="getColaboradorStatus() === 'Desligado'" class="status-alert">
+              ⚠️ Colaborador com data de demissão - Recolher recursos
+            </span>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Orientações para o Colaborador -->
+  <div class="orientacoes-vigilante" *ngIf="patrimonioData">
+    <div class="orientacoes-header">
+      <i class="material-icons">security</i>
+      <span>Orientações para o Colaborador</span>
+    </div>
+    <div class="orientacoes-content">
+      <div class="orientacao-texto" [innerHTML]="getOrientacaoColaborador()"></div>
+    <!-- Botão Auto Inventário: SEMPRE visível para o colaborador informar recursos -->
+    <div class="orientacoes-actions">
+      <button class="btn modern-btn warning" (click)="abrirModalAutoInventario()" title="Informar recursos em sua posse">
+        <i class="material-icons">inventory_2</i>
+        Auto Inventário
+      </button>
+    </div>
+    </div>
+  </div>
+
+  <!-- Aviso de Pendências de Assinatura -->
+  <div *ngIf="patrimonioData && temPendenciasAssinatura()" class="aviso-pendencias-assinatura">
+    <div class="aviso-content">
+      <div class="aviso-icon">
+        <i class="material-icons">warning</i>
+      </div>
+      <div class="aviso-text">
+        <div class="aviso-title">⚠️ ATENÇÃO: Recursos que requerem assinatura de termo</div>
+        <div class="aviso-description">
+          Você possui <strong>{{ getTotalPendenciasAssinatura() }}</strong> recurso(s) que precisam de assinatura de termo de responsabilidade:
+          <br>• <strong>Recursos Corporativos:</strong> {{ getRecursosComPendenciaAssinatura().length }} pendente(s)
+          <br>• <strong>Recursos BYOD:</strong> {{ getRecursosByodComPendenciaAssinatura().length }} pendente(s)
+          <br><br>
+          <strong>IMPORTANTE:</strong>
+          <br>• Assine os termos de responsabilidade para regularizar sua situação
+          <br>• A assinatura é obrigatória para o uso adequado dos recursos
+          <br>• Use os botões "Assinar Termo" em cada recurso para assinar
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Seções de Recursos -->
+  <div *ngIf="patrimonioData" class="recursos-sections">
+    <!-- Seção BYOD - Recursos Particulares -->
+    <div class="secao-recursos byod-section" *ngIf="getRecursosParticulares().length > 0">
+      <div class="secao-header byod-header" (click)="toggleSection('byod')">
+        <div class="secao-info">
+          <div class="secao-icon">
+            <i class="material-icons">smartphone</i>
+          </div>
+          <div class="secao-details">
+            <div class="secao-title">BYOD - Recursos Particulares</div>
+            <div class="secao-subtitle">Recursos pessoais do colaborador ({{ getRecursosParticulares().length }})</div>
+          </div>
+        </div>
+        <div class="secao-actions">
+          <div class="secao-badge byod-badge">
+            <i class="material-icons">check_circle</i>
+            <span>Liberado</span>
+          </div>
+          <div class="secao-toggle">
+            <i class="material-icons" [class.rotated]="isSectionExpanded('byod')">expand_more</i>
+          </div>
+        </div>
+      </div>
+      
+      <div class="secao-content" *ngIf="isSectionExpanded('byod')">
+        <div class="recursos-grid">
+          <div class="recurso-card byod-card" *ngFor="let recurso of getRecursosParticulares()">
+            <div class="recurso-info">
+              <div class="recurso-nome">{{ recurso.tipoEquipamento }}</div>
+              <div class="recurso-detalhes">
+                <span class="patrimonio" *ngIf="recurso.tipoEquipamento !== 'Linha Telefônica'">Patrimônio: {{ recurso.patrimonio }}</span>
+                <span class="patrimonio" *ngIf="recurso.tipoEquipamento === 'Linha Telefônica'">Número: {{ recurso.patrimonio }}</span>
+                <span class="serial" *ngIf="recurso.tipoEquipamento !== 'Linha Telefônica'">S/N: {{ recurso.numeroSerie }}</span>
+                <span class="serial" *ngIf="recurso.tipoEquipamento === 'Linha Telefônica'">ICCID: {{ recurso.numeroSerie }}</span>
+                <span class="fabricante-modelo" *ngIf="!recurso.tipoEquipamento.toLowerCase().includes('linha telefônica')">Fabricante: {{ recurso.fabricante || 'Não informado' }} | Modelo: {{ recurso.modelo || 'Não informado' }}</span>
+                <span class="fabricante-modelo" *ngIf="recurso.tipoEquipamento.toLowerCase().includes('linha telefônica')">Tipo: {{ recurso.fabricante || 'Linha Telefônica' }} | Categoria: {{ recurso.modelo || 'Telefone' }}</span>
+                <span class="tipo-aquisicao">Tipo: {{ recurso.tipoAquisicao || 'Particular' }}</span>
+              </div>
+              
+              <!-- Status de Trânsito Livre -->
+              <div class="transito-status">
+                <span class="transito-livre-badge byod-ativo">
+                  <i class="material-icons">person</i>
+                  BYOD - Trânsito Livre
+                </span>
+              </div>
+            </div>
+
+            <!-- Ações - Termo (BYOD) -->
+            <div class="recurso-actions">
+              <div class="termo-actions">
+                <button class="btn btn-info action-btn" (click)="baixarTermoPDF(recurso)" title="Baixar PDF do Termo">
+                  <i class="material-icons">download</i>
+                  Baixar Termo
+                </button>
+                <button class="btn btn-success action-btn" *ngIf="!recurso.assinado" (click)="assinarTermo(recurso)" title="Assinar Termo de Responsabilidade">
+                  <i class="material-icons">edit</i>
+                  Assinar Termo
+                </button>
+                <span class="termo-status" *ngIf="recurso.assinado" title="Termo já assinado">
+                  <i class="material-icons">check_circle</i>
+                  Termo Assinado
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Seção Trânsito Livre -->
+    <div class="secao-recursos transito-livre-section" *ngIf="getRecursosTransitoLivre().length > 0">
+      <div class="secao-header transito-livre-header" (click)="toggleSection('transitoLivre')">
+        <div class="secao-info">
+          <div class="secao-icon">
+            <i class="material-icons">exit_to_app</i>
+          </div>
+          <div class="secao-details">
+            <div class="secao-title">Podem Sair Livremente</div>
+            <div class="secao-subtitle">Recursos ativos com trânsito livre ({{ getRecursosTransitoLivre().length }})</div>
+          </div>
+        </div>
+        <div class="secao-actions">
+          <div class="secao-badge transito-livre-badge">
+            <i class="material-icons">check_circle</i>
+            <span>Liberado</span>
+          </div>
+          <div class="secao-toggle">
+            <i class="material-icons" [class.rotated]="isSectionExpanded('transitoLivre')">expand_more</i>
+          </div>
+        </div>
+      </div>
+      
+      <div class="secao-content" *ngIf="isSectionExpanded('transitoLivre')">
+        <div class="recursos-grid">
+          <div class="recurso-card transito-livre-card" *ngFor="let recurso of getRecursosTransitoLivre()">
+            <div class="recurso-info">
+              <div class="recurso-nome">{{ recurso.tipoEquipamento }}</div>
+              <div class="recurso-detalhes">
+                <span class="patrimonio" *ngIf="recurso.tipoEquipamento !== 'Linha Telefônica'">Patrimônio: {{ recurso.patrimonio }}</span>
+                <span class="patrimonio" *ngIf="recurso.tipoEquipamento === 'Linha Telefônica'">Número: {{ recurso.patrimonio }}</span>
+                <span class="serial" *ngIf="recurso.tipoEquipamento !== 'Linha Telefônica'">S/N: {{ recurso.numeroSerie }}</span>
+                <span class="serial" *ngIf="recurso.tipoEquipamento === 'Linha Telefônica'">ICCID: {{ recurso.numeroSerie }}</span>
+                <span class="fabricante-modelo" *ngIf="!recurso.tipoEquipamento.toLowerCase().includes('linha telefônica')">Fabricante: {{ recurso.fabricante || 'Não informado' }} | Modelo: {{ recurso.modelo || 'Não informado' }}</span>
+                <span class="fabricante-modelo" *ngIf="recurso.tipoEquipamento.toLowerCase().includes('linha telefônica')">Tipo: {{ recurso.fabricante || 'Linha Telefônica' }} | Categoria: {{ recurso.modelo || 'Telefone' }}</span>
+                <span class="tipo-aquisicao">Tipo: {{ recurso.tipoAquisicao || 'Não informado' }}</span>
+              </div>
+              
+              <!-- Status de Trânsito Livre -->
+              <div class="transito-status">
+                <span class="transito-livre-badge transito-ativo">
+                  <i class="material-icons">check_circle</i>
+                  Trânsito Livre
+                </span>
+              </div>
+
+              <!-- Ações -->
+              <div class="recurso-actions">
+                <!-- Botões de Contestação -->
+                <div class="contestacao-actions" *ngIf="podeContestarRecurso(recurso)">
+                  <button class="btn btn-warning action-btn" (click)="abrirModalContestacao(recurso)">
+                    <i class="material-icons">report_problem</i>
+                    Contestar
+                  </button>
+                  <button class="btn btn-secondary action-btn" *ngIf="recurso.temContestacao" (click)="cancelarContestacao(recurso)">
+                    <i class="material-icons">cancel</i>
+                    Cancelar Contestação
+                  </button>
+                </div>
+                
+                <!-- Botões de Termo -->
+                <div class="termo-actions" *ngIf="!recurso.isByod">
+                  <button class="btn btn-info action-btn" (click)="baixarTermoPDF(recurso)" title="Baixar PDF do Termo">
+                    <i class="material-icons">download</i>
+                    Baixar Termo
+                  </button>
+                  <button class="btn btn-success action-btn" *ngIf="!recurso.assinado" (click)="assinarTermo(recurso)" title="Assinar Termo de Responsabilidade">
+                    <i class="material-icons">edit</i>
+                    Assinar Termo
+                  </button>
+                  <span class="termo-status" *ngIf="recurso.assinado" title="Termo já assinado">
+                    <i class="material-icons">check_circle</i>
+                    Termo Assinado
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Seção Requer Autorização -->
+    <div class="secao-recursos requer-autorizacao-section" *ngIf="getRecursosRequerAutorizacao().length > 0">
+      <div class="secao-header requer-autorizacao-header" (click)="toggleSection('requerAutorizacao')">
+        <div class="secao-info">
+          <div class="secao-icon">
+            <i class="material-icons">security</i>
+          </div>
+          <div class="secao-details">
+            <div class="secao-title">Requer Autorização</div>
+            <div class="secao-subtitle">Recursos ativos que precisam de autorização ({{ getRecursosRequerAutorizacao().length }})</div>
+          </div>
+        </div>
+        <div class="secao-actions">
+          <div class="secao-badge requer-autorizacao-badge">
+            <i class="material-icons">block</i>
+            <span>Bloqueado</span>
+          </div>
+          <div class="secao-toggle">
+            <i class="material-icons" [class.rotated]="isSectionExpanded('requerAutorizacao')">expand_more</i>
+          </div>
+        </div>
+      </div>
+      
+      <div class="secao-content" *ngIf="isSectionExpanded('requerAutorizacao')">
+        <div class="recursos-grid">
+          <div class="recurso-card requer-autorizacao-card" *ngFor="let recurso of getRecursosRequerAutorizacao()">
+            <div class="recurso-info">
+              <div class="recurso-nome">{{ recurso.tipoEquipamento }}</div>
+              <div class="recurso-detalhes">
+                <span class="patrimonio" *ngIf="recurso.tipoEquipamento !== 'Linha Telefônica'">Patrimônio: {{ recurso.patrimonio }}</span>
+                <span class="patrimonio" *ngIf="recurso.tipoEquipamento === 'Linha Telefônica'">Número: {{ recurso.patrimonio }}</span>
+                <span class="serial" *ngIf="recurso.tipoEquipamento !== 'Linha Telefônica'">S/N: {{ recurso.numeroSerie }}</span>
+                <span class="serial" *ngIf="recurso.tipoEquipamento === 'Linha Telefônica'">ICCID: {{ recurso.numeroSerie }}</span>
+                <span class="fabricante-modelo" *ngIf="!recurso.tipoEquipamento.toLowerCase().includes('linha telefônica')">Fabricante: {{ recurso.fabricante || 'Não informado' }} | Modelo: {{ recurso.modelo || 'Não informado' }}</span>
+                <span class="fabricante-modelo" *ngIf="recurso.tipoEquipamento.toLowerCase().includes('linha telefônica')">Tipo: {{ recurso.fabricante || 'Linha Telefônica' }} | Categoria: {{ recurso.modelo || 'Telefone' }}</span>
+                <span class="tipo-aquisicao">Tipo: {{ recurso.tipoAquisicao || 'Não informado' }}</span>
+              </div>
+              
+              <!-- Status de Requer Autorização -->
+              <div class="transito-status">
+                <span class="transito-livre-badge requer-ativo">
+                  <i class="material-icons">block</i>
+                  Requer Autorização
+                </span>
+              </div>
+
+                  <!-- Ações -->
+                  <div class="recurso-actions">
+                    <!-- Botões de Contestação -->
+                    <div class="contestacao-actions" *ngIf="podeContestarRecurso(recurso)">
+                      <button class="btn btn-warning action-btn" (click)="abrirModalContestacao(recurso)">
+                        <i class="material-icons">report_problem</i>
+                        Contestar
+                      </button>
+                      <button class="btn btn-secondary action-btn" *ngIf="recurso.temContestacao" (click)="cancelarContestacao(recurso)">
+                        <i class="material-icons">cancel</i>
+                        Cancelar Contestação
+                      </button>
+                    </div>
+                    
+                    <!-- Botões de Termo -->
+                    <div class="termo-actions" *ngIf="!recurso.isByod">
+                      <button class="btn btn-info action-btn" (click)="baixarTermoPDF(recurso)" title="Baixar PDF do Termo">
+                        <i class="material-icons">download</i>
+                        Baixar Termo
+                      </button>
+                      <button class="btn btn-success action-btn" *ngIf="!recurso.assinado" (click)="assinarTermo(recurso)" title="Assinar Termo de Responsabilidade">
+                        <i class="material-icons">edit</i>
+                        Assinar Termo
+                      </button>
+                      <span class="termo-status" *ngIf="recurso.assinado" title="Termo já assinado">
+                        <i class="material-icons">check_circle</i>
+                        Termo Assinado
+                      </span>
+                    </div>
+                  </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Seção Histórico -->
+    <div class="secao-recursos historico-section" *ngIf="getRecursosHistoricos().length > 0">
+      <div class="secao-header historico-header" (click)="toggleSection('historico')">
+        <div class="secao-info">
+          <div class="secao-icon">
+            <i class="material-icons">archive</i>
+          </div>
+          <div class="secao-details">
+            <div class="secao-title">Histórico de Recursos</div>
+            <div class="secao-subtitle">Recursos não ativos ou devolvidos ({{ getRecursosHistoricos().length }})</div>
+          </div>
+        </div>
+        <div class="secao-actions">
+          <div class="secao-badge historico-badge">
+            <i class="material-icons">info</i>
+            <span>Histórico</span>
+          </div>
+          <div class="secao-toggle">
+            <i class="material-icons" [class.rotated]="isSectionExpanded('historico')">expand_more</i>
+          </div>
+        </div>
+      </div>
+      
+      <div class="secao-content" *ngIf="isSectionExpanded('historico')">
+        <div class="recursos-grid">
+          <div class="recurso-card historico-card" *ngFor="let recurso of getRecursosHistoricos()">
+            <div class="recurso-info">
+              <div class="recurso-nome">{{ recurso.tipoEquipamento }}</div>
+              <div class="recurso-detalhes">
+                <span class="patrimonio" *ngIf="recurso.tipoEquipamento !== 'Linha Telefônica'">Patrimônio: {{ recurso.patrimonio }}</span>
+                <span class="patrimonio" *ngIf="recurso.tipoEquipamento === 'Linha Telefônica'">Número: {{ recurso.patrimonio }}</span>
+                <span class="serial" *ngIf="recurso.tipoEquipamento !== 'Linha Telefônica'">S/N: {{ recurso.numeroSerie }}</span>
+                <span class="serial" *ngIf="recurso.tipoEquipamento === 'Linha Telefônica'">ICCID: {{ recurso.numeroSerie }}</span>
+                <span class="fabricante-modelo" *ngIf="!recurso.tipoEquipamento.toLowerCase().includes('linha telefônica')">Fabricante: {{ recurso.fabricante || 'Não informado' }} | Modelo: {{ recurso.modelo || 'Não informado' }}</span>
+                <span class="fabricante-modelo" *ngIf="recurso.tipoEquipamento.toLowerCase().includes('linha telefônica')">Tipo: {{ recurso.fabricante || 'Linha Telefônica' }} | Categoria: {{ recurso.modelo || 'Telefone' }}</span>
+                <span class="tipo-aquisicao">Tipo: {{ recurso.tipoAquisicao || 'Não informado' }}</span>
+              </div>
+              
+              <!-- Status Histórico -->
+              <div class="transito-status">
+                <span class="transito-livre-badge historico-ativo">
+                  <i class="material-icons">history</i>
+                  Histórico - {{ recurso.status }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 🎯 NOVA SEÇÃO: MINHAS CONTESTAÇÕES -->
+    <app-minhas-contestacoes 
+      *ngIf="patrimonioData?.colaborador?.id" 
+      [contestoes]="minhasContestoes">
+    </app-minhas-contestacoes>
+
+  </div>
+</div>
+
+<!-- Modal de Contestação -->
+<div class="modal" *ngIf="showContestacaoModal">
+  <div class="modern-dialog">
+    <div class="dialog-header">
+      <div class="dialog-icon">
+        <i class="material-icons">report_problem</i>
+      </div>
+      <div class="dialog-title">
+        <h2>Contestar Recurso</h2>
+        <p>Registre uma contestação sobre este recurso</p>
+      </div>
+      <button class="dialog-close" (click)="fecharModalContestacao()">
+        <i class="material-icons">close</i>
+      </button>
+    </div>
+    <div class="dialog-content">
+      <form [formGroup]="contestacaoForm" (ngSubmit)="criarContestacao()">
+        <div class="form-group">
+          <label>Recurso</label>
+          <div class="field-readonly">{{ selectedEquipment?.tipoEquipamento }} - {{ selectedEquipment?.patrimonio || selectedEquipment?.numeroSerie }}</div>
+        </div>
+        <div class="form-group">
+          <label>Motivo</label>
+          <select class="form-control" formControlName="motivo">
+            <option value="" disabled>Selecione um motivo</option>
+            <option *ngFor="let m of motivosContestacao" [value]="m">{{ m }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Descrição</label>
+          <textarea class="form-control" rows="4" placeholder="Descreva o motivo" formControlName="descricao"></textarea>
+        </div>
+        <div class="dialog-actions">
+          <button type="button" class="btn btn-secondary" (click)="fecharModalContestacao()">Cancelar</button>
+          <button type="submit" class="btn btn-warning" [disabled]="contestacaoForm.invalid || loading">
+            <i class="material-icons">send</i>
+            Enviar Contestação
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Auto Inventário -->
+<div class="modal" *ngIf="showAutoInventarioModal">
+  <div class="modern-dialog">
+    <div class="dialog-header">
+      <div class="dialog-icon">
+        <i class="material-icons">inventory</i>
+      </div>
+      <div class="dialog-title">
+        <h2>Solicitar Auto Inventário</h2>
+        <p>Registre um recurso que você possui mas não está listado</p>
+      </div>
+      <button class="dialog-close" (click)="fecharModalAutoInventario()">
+        <i class="material-icons">close</i>
+      </button>
+    </div>
+    <div class="dialog-content">
+      <form [formGroup]="autoInventarioForm" (ngSubmit)="criarAutoInventario()">
+        <div class="form-group">
+          <label>Número de Série</label>
+          <input class="form-control" type="text" placeholder="Informe o número de série" formControlName="numeroSerie">
+        </div>
+        <div class="form-group">
+          <label>Observações</label>
+          <textarea class="form-control" rows="3" placeholder="Detalhe o recurso (opcional)" formControlName="observacoes"></textarea>
+        </div>
+        <div class="dialog-actions">
+          <button type="button" class="btn modern-btn neutral" (click)="fecharModalAutoInventario()">Cancelar</button>
+          <button type="submit" class="btn modern-btn warning" [disabled]="autoInventarioForm.invalid || loading">
+            <i class="material-icons">send</i>
+            Enviar Solicitação
+          </button>
+        </div>
+        <div class="form-info">
+          <div class="info-box">
+            <i class="material-icons">info</i>
+            <div class="info-content">
+              <h4>Quando usar o Auto Inventário?</h4>
+              <p>Use quando possuir um recurso corporativo que não aparece listado no seu patrimônio.</p>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

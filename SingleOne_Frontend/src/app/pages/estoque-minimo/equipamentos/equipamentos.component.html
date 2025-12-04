@@ -1,0 +1,367 @@
+<!-- 📊 CONTEÚDO PRINCIPAL -->
+<div class="equipamentos-content">
+  
+  <!-- 📊 RESUMO ESTATÍSTICO COM FILTROS -->
+  <div class="summary-section">
+    <div class="summary-cards">
+      <div class="summary-card" 
+           [class.active]="isCardAtivo('TODOS')"
+           (click)="filtrarPorCard('TODOS')">
+        <div class="card-icon">
+          <i class="cil-laptop"></i>
+        </div>
+        <div class="card-content">
+          <h3>{{ totalEquipamentos }}</h3>
+          <p>Total de Recursos</p>
+        </div>
+        <div class="card-filter-indicator" *ngIf="isCardAtivo('TODOS')">
+          <i class="cil-check"></i>
+        </div>
+      </div>
+      
+      <div class="summary-card" 
+           [class.active]="isCardAtivo('ALERTA')"
+           (click)="filtrarPorCard('ALERTA')">
+        <div class="card-icon alerta">
+          <i class="cil-warning"></i>
+        </div>
+        <div class="card-content">
+          <h3>{{ equipamentosEmAlerta }}</h3>
+          <p>Em Alerta</p>
+        </div>
+        <div class="card-filter-indicator" *ngIf="isCardAtivo('ALERTA')">
+          <i class="cil-check"></i>
+        </div>
+      </div>
+      
+      <div class="summary-card" 
+           [class.active]="isCardAtivo('EXCESSO')"
+           (click)="filtrarPorCard('EXCESSO')">
+        <div class="card-icon excesso">
+          <i class="cil-x-circle"></i>
+        </div>
+        <div class="card-content">
+          <h3>{{ equipamentosEmExcesso }}</h3>
+          <p>Em Excesso</p>
+        </div>
+        <div class="card-filter-indicator" *ngIf="isCardAtivo('EXCESSO')">
+          <i class="cil-check"></i>
+        </div>
+      </div>
+      
+      <div class="summary-card" 
+           [class.active]="isCardAtivo('OK')"
+           (click)="filtrarPorCard('OK')">
+        <div class="card-icon ok">
+          <i class="cil-check-circle"></i>
+        </div>
+        <div class="card-content">
+          <h3>{{ equipamentosOk }}</h3>
+          <p>OK</p>
+        </div>
+        <div class="card-filter-indicator" *ngIf="isCardAtivo('OK')">
+          <i class="cil-check"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 🔍 FILTRO ATIVO -->
+  <div class="active-filter-section" *ngIf="filtroAtivo !== 'TODOS'">
+    <div class="active-filter-info">
+      <i class="cil-filter"></i>
+      <span>Filtro ativo: <strong>{{ filtroAtivo }}</strong></span>
+      <span class="filter-count">({{ equipamentosFiltrados.length }} de {{ totalEquipamentos }} recursos)</span>
+      <button class="btn-clear-filter" (click)="limparFiltros()">
+        <i class="cil-x"></i>
+        <span>Limpar filtro</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- 📋 TABELA -->
+  <div class="table-section">
+    <div class="table-container">
+      <table class="modern-table">
+        <thead>
+          <tr>
+            <th>Recurso</th>
+            <th>Localidade</th>
+            <th>Total Lançado</th>
+            <th>Estoque Atual</th>
+            <th>Estoque Mínimo</th>
+            <th>Estoque Máximo</th>
+            <th>% Utilização</th>
+            <th>Status</th>
+            <th class="text-center">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let equipamento of equipamentosParaExibicao">
+            <td class="recurso-info">
+              <div class="recurso-detalhes">
+                <div class="recurso-avatar">
+                  <i class="cil-laptop"></i>
+                </div>
+                <div class="recurso-texto">
+                  <div class="recurso-tipo">{{ getModeloDescricaoGrid(equipamento) }}</div>
+                  <div class="recurso-serial">Modelo: {{ equipamento.modeloDescricao || 'N/A' }}</div>
+                  <div class="recurso-patrimonio">Fabricante: {{ equipamento.fabricanteDescricao || 'N/A' }}</div>
+                </div>
+              </div>
+            </td>
+            <td class="recurso-localizacao">
+              <div class="localidade-info">
+                <i class="cil-location-pin"></i>
+                <span>{{ getLocalidadeDescricaoGrid(equipamento) }}</span>
+              </div>
+            </td>
+            <td class="recurso-total-lancado">
+              <div class="estoque-total-lancado">
+                <span class="quantidade-numero">{{ equipamento.quantidadeTotalLancada || equipamento.quantidadetotallancada || 0 }}</span>
+                <span class="quantidade-label">total</span>
+              </div>
+            </td>
+            <td class="recurso-estoque">
+              <div class="estoque-atual">
+                <span class="quantidade-numero">{{ equipamento.estoqueAtual || equipamento.quantidadetotallancada || 0 }}</span>
+                <span class="quantidade-label">unidades</span>
+              </div>
+            </td>
+            <td class="recurso-minimo">
+              <div class="estoque-minimo">
+                <span class="quantidade-numero">{{ equipamento.quantidadeMinima || equipamento.quantidademinima || 0 }}</span>
+                <span class="quantidade-label">mínimo</span>
+              </div>
+            </td>
+            <td class="recurso-maximo">
+              <div class="estoque-maximo">
+                <span class="quantidade-numero">{{ equipamento.quantidadeMaxima || equipamento.quantidademaxima || 0 }}</span>
+                <span class="quantidade-label">máximo</span>
+              </div>
+            </td>
+            <td class="recurso-utilizacao">
+              <div class="percentual-container">
+                <div class="percentual-bar">
+                  <div class="percentual-fill" 
+                       [style.width.%]="getPercentualUtilizacao(equipamento)"
+                       [class.alta]="getPercentualUtilizacao(equipamento) > 80"
+                       [class.media]="getPercentualUtilizacao(equipamento) > 60 && getPercentualUtilizacao(equipamento) <= 80"
+                       [class.baixa]="getPercentualUtilizacao(equipamento) <= 60">
+                  </div>
+                </div>
+                <span class="percentual-text" 
+                      [class.alta]="getPercentualUtilizacao(equipamento) > 80"
+                      [class.media]="getPercentualUtilizacao(equipamento) > 60 && getPercentualUtilizacao(equipamento) <= 80"
+                      [class.baixa]="getPercentualUtilizacao(equipamento) <= 60">
+                  {{ getPercentualUtilizacao(equipamento) }}%
+                </span>
+              </div>
+            </td>
+            <td class="recurso-status">
+              <div class="status-container" 
+                   [class.has-tooltip]="getStatusEquipamento(equipamento) === 'ALERTA' || getStatusEquipamento(equipamento) === 'EXCESSO'">
+                <div class="status-label" 
+                     [class.status-alerta]="getStatusEquipamento(equipamento) === 'ALERTA'"
+                     [class.status-excesso]="getStatusEquipamento(equipamento) === 'EXCESSO'"
+                     [class.status-ok]="getStatusEquipamento(equipamento) === 'OK'">
+                  <i [class]="getStatusEquipamento(equipamento) === 'ALERTA' ? 'cil-warning' : 
+                             getStatusEquipamento(equipamento) === 'EXCESSO' ? 'cil-x-circle' : 'cil-check-circle'"></i>
+                  {{ getStatusEquipamento(equipamento) }}
+                </div>
+                <div class="status-tooltip" 
+                     *ngIf="getStatusEquipamento(equipamento) === 'ALERTA' || getStatusEquipamento(equipamento) === 'EXCESSO'">
+                  <span *ngIf="getStatusEquipamento(equipamento) === 'ALERTA'" class="tooltip-text alerta-tooltip">
+                    Alerta! Estoque atual menor ou igual que estoque mínimo programado
+                  </span>
+                  <span *ngIf="getStatusEquipamento(equipamento) === 'EXCESSO'" class="tooltip-text excesso-tooltip">
+                    Excesso! Estoque atual igual ou maior que estoque máximo programado
+                  </span>
+                </div>
+              </div>
+            </td>
+            <td class="recurso-actions text-center">
+              <div class="action-buttons">
+                <button class="action-btn edit-btn" 
+                        matTooltip="Editar configuração" 
+                        (click)="editarEquipamento(equipamento)">
+                  <i class="cil-pencil"></i>
+                </button>
+                <button class="action-btn view-btn" 
+                        matTooltip="Ver recursos" 
+                        (click)="navegarParaRecursosFiltrados(equipamento)">
+                  <i class="cil-external-link"></i>
+                </button>
+                <button class="action-btn delete-btn" 
+                        matTooltip="Excluir configuração" 
+                        (click)="excluirEquipamento(equipamento)">
+                  <i class="cil-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 📄 PAGINAÇÃO -->
+  <div class="pagination-container">
+    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [pageSize]="10" showFirstLastButtons></mat-paginator>
+  </div>
+
+</div>
+
+<!-- 🎯 MODAL ESTOQUE MÍNIMO - BASEADO NO MODAL DE FABRICANTE -->
+<div class="formulario-overlay" *ngIf="mostrarModal" (click)="fecharModal()">
+  <div class="formulario-container" (click)="$event.stopPropagation()">
+    <div class="fabricante-form-container">
+      
+      <!-- Header do Formulário -->
+      <div class="form-header">
+        <h2 class="form-title">
+          <i class="cil-laptop"></i>
+          {{ modo === 'criar' ? 'Novo Recurso' : 'Editar Recurso' }}
+        </h2>
+        <p class="form-subtitle">
+          {{ modo === 'criar' ? 'Configure o estoque mínimo e máximo para este recurso' : 'Edite as configurações de estoque do recurso selecionado' }}
+        </p>
+        
+        <!-- Debug Info (apenas em desenvolvimento) -->
+        <div *ngIf="modo === 'editar'" style="background: #f8f9fa; padding: 10px; margin: 10px 0; border-radius: 5px; font-size: 12px;">
+          <strong>Debug:</strong><br>
+          Modelo: {{ form.get('modeloId')?.value }} | Localidade: {{ form.get('localidadeId')?.value }}<br>
+          Mínimo: {{ form.get('estoqueMinimo')?.value }} | Máximo: {{ form.get('estoqueMaximo')?.value }}
+        </div>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="salvarEquipamento()" class="fabricante-form">
+        
+        <!-- Campo Modelo -->
+        <div class="form-group">
+          <label for="modeloId" class="form-label">
+            <i class="cil-laptop"></i>
+            Modelo <span class="required">*</span>
+          </label>
+          <select 
+            id="modeloId"
+            formControlName="modeloId" 
+            class="form-control"
+            [class.is-invalid]="form.get('modeloId')?.invalid && form.get('modeloId')?.touched"
+            [value]="form.get('modeloId')?.value"
+          >
+            <option value="">Selecione o modelo</option>
+            <option *ngFor="let modelo of modelos" [value]="modelo.id">
+              {{ getModeloDisplayText(modelo) }}
+            </option>
+          </select>
+          <div class="invalid-feedback" *ngIf="form.get('modeloId')?.invalid && form.get('modeloId')?.touched">
+            <span *ngIf="form.get('modeloId')?.errors?.required">Modelo é obrigatório</span>
+          </div>
+          <small class="form-text text-muted">
+            Selecione o modelo do equipamento para configurar o estoque
+          </small>
+        </div>
+
+        <!-- Campo Localidade -->
+        <div class="form-group">
+          <label for="localidadeId" class="form-label">
+            <i class="cil-location-pin"></i>
+            Localidade <span class="required">*</span>
+          </label>
+          <select 
+            id="localidadeId"
+            formControlName="localidadeId" 
+            class="form-control"
+            [class.is-invalid]="form.get('localidadeId')?.invalid && form.get('localidadeId')?.touched"
+            [value]="form.get('localidadeId')?.value"
+          >
+            <option value="">Selecione a localidade</option>
+            <option *ngFor="let localidade of localidadesCompletas" [value]="localidade.id">
+              {{ getLocalidadeDisplayText(localidade) }}
+            </option>
+          </select>
+          <div class="invalid-feedback" *ngIf="form.get('localidadeId')?.invalid && form.get('localidadeId')?.touched">
+            <span *ngIf="form.get('localidadeId')?.errors?.required">Localidade é obrigatória</span>
+          </div>
+          <small class="form-text text-muted">
+            Selecione a localidade onde o equipamento está localizado
+          </small>
+        </div>
+
+        <!-- Campo Estoque Mínimo -->
+        <div class="form-group">
+          <label for="estoqueMinimo" class="form-label">
+            <i class="cil-warning"></i>
+            Estoque Mínimo <span class="required">*</span>
+          </label>
+          <input 
+            type="number" 
+            id="estoqueMinimo"
+            formControlName="estoqueMinimo" 
+            class="form-control"
+            [class.is-invalid]="form.get('estoqueMinimo')?.invalid && form.get('estoqueMinimo')?.touched"
+            placeholder="Ex: 5"
+            min="0"
+            maxlength="10"
+          >
+          <div class="invalid-feedback" *ngIf="form.get('estoqueMinimo')?.invalid && form.get('estoqueMinimo')?.touched">
+            <span *ngIf="form.get('estoqueMinimo')?.errors?.required">Estoque mínimo é obrigatório</span>
+            <span *ngIf="form.get('estoqueMinimo')?.errors?.min">Valor deve ser maior ou igual a 0</span>
+          </div>
+          <small class="form-text text-muted">
+            Quantidade mínima que deve ser mantida em estoque
+          </small>
+        </div>
+
+        <!-- Campo Estoque Máximo -->
+        <div class="form-group">
+          <label for="estoqueMaximo" class="form-label">
+            <i class="cil-check-circle"></i>
+            Estoque Máximo <span class="required">*</span>
+          </label>
+          <input 
+            type="number" 
+            id="estoqueMaximo"
+            formControlName="estoqueMaximo" 
+            class="form-control"
+            [class.is-invalid]="form.get('estoqueMaximo')?.invalid && form.get('estoqueMaximo')?.touched"
+            placeholder="Ex: 50"
+            min="0"
+            maxlength="10"
+          >
+          <div class="invalid-feedback" *ngIf="form.get('estoqueMaximo')?.invalid && form.get('estoqueMaximo')?.touched">
+            <span *ngIf="form.get('estoqueMaximo')?.errors?.required">Estoque máximo é obrigatório</span>
+            <span *ngIf="form.get('estoqueMaximo')?.errors?.min">Valor deve ser maior ou igual a 0</span>
+          </div>
+          <small class="form-text text-muted">
+            Quantidade máxima recomendada para o estoque
+          </small>
+        </div>
+
+        <!-- Botões de Ação -->
+        <div class="form-actions">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="fecharModal()"
+            [disabled]="salvando"
+          >
+            <i class="fas fa-times"></i>
+            Cancelar
+          </button>
+        
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="form.invalid || salvando"
+          >
+            <i class="fas fa-save" *ngIf="!salvando"></i>
+            <i class="fas fa-spinner fa-spin" *ngIf="salvando"></i>
+            {{ modo === 'criar' ? 'Cadastrar' : 'Salvar' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

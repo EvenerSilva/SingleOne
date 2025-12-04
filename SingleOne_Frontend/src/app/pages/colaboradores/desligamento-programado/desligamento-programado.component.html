@@ -1,0 +1,15 @@
+<div class="text-right">
+    <button mat-icon-button color="primary" (click)="dialogRef.close()"><mat-icon>clear</mat-icon></button><b>Desligamento Programado</b>
+</div>
+<!-- <h3 mat-dialog-title>Observação da requisição</h3> -->
+<h5><b>Colaborador: </b>{{colaborador.nome}}</h5>
+<div mat-dialog-content>
+    <mat-form-field class="col-md-12" appearance="fill">
+        <mat-label>Nova data</mat-label>
+        <input matInput [matDatepicker]="dpnovadata" [(ngModel)]="colaborador.dtdemissao" >
+        <mat-datepicker-toggle matSuffix [for]="dpnovadata"></mat-datepicker-toggle>
+        <mat-datepicker #dpnovadata disabled="false"></mat-datepicker>
+    </mat-form-field>
+    <br><br>
+    <button mat-button color="primary" (click)="salvar()">Salvar</button>
+</div>

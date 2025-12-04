@@ -1,0 +1,113 @@
+<!-- 🎯 FORMULÁRIO MODAL DE TIPO DE RECURSO -->
+<div class="formulario-overlay">
+  <div class="formulario-container">
+    <div class="tipo-recurso-form-container">
+      <div class="form-header">
+        <h2 class="form-title">{{ getTitulo() }}</h2>
+        <p class="form-subtitle">
+          {{ modo === 'criar' ? 'Crie um novo tipo de recurso para categorizar seus equipamentos' : 'Edite as informações do tipo de recurso selecionado' }}
+        </p>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="salvar()" class="tipo-recurso-form">
+        
+        <!-- Campo Categoria -->
+        <div class="form-group">
+          <label for="categoria" class="form-label">
+            Categoria <span class="required">*</span>
+          </label>
+          <select 
+            id="categoria"
+            formControlName="categoriaId" 
+            class="form-control"
+            [class.is-invalid]="form.get('categoriaId')?.invalid && form.get('categoriaId')?.touched"
+          >
+            <option value="">Selecione a categoria</option>
+            <option *ngFor="let categoria of categorias" [value]="categoria.id">{{categoria.nome}}</option>
+          </select>
+          <div class="invalid-feedback" *ngIf="form.get('categoriaId')?.invalid && form.get('categoriaId')?.touched">
+            <span *ngIf="form.get('categoriaId')?.errors?.required">Categoria é obrigatória</span>
+            <span *ngIf="form.get('categoriaId')?.errors?.min">Por favor, selecione uma categoria válida</span>
+          </div>
+          <small class="form-text text-muted">
+            Selecione a categoria para este tipo de recurso
+          </small>
+        </div>
+
+        <!-- Campo Descrição -->
+        <div class="form-group">
+          <label for="descricao" class="form-label">
+            Tipo de Recurso <span class="required">*</span>
+          </label>
+          <input
+            type="text"
+            id="descricao"
+            formControlName="descricao"
+            class="form-control"
+            [class.is-invalid]="form.get('descricao')?.invalid && form.get('descricao')?.touched"
+            placeholder="Ex: Computador, Impressora, Roteador..."
+            maxlength="200"
+          >
+          <div class="invalid-feedback" *ngIf="form.get('descricao')?.invalid && form.get('descricao')?.touched">
+            <span *ngIf="form.get('descricao')?.errors?.required">Tipo de recurso é obrigatório</span>
+            <span *ngIf="form.get('descricao')?.errors?.minlength">Tipo de recurso deve ter pelo menos 2 caracteres</span>
+            <span *ngIf="form.get('descricao')?.errors?.maxlength">Tipo de recurso deve ter no máximo 200 caracteres</span>
+          </div>
+          <small class="form-text text-muted">
+            Nome único para identificar o tipo de recurso
+          </small>
+        </div>
+
+        <!-- Campo Trânsito Livre -->
+        <div class="form-group">
+          <label class="form-label">
+            <i class="cil-check-circle"></i>
+            Trânsito Livre
+          </label>
+          <div class="transito-livre-form-group">
+            <div class="toggle-container">
+              <label class="toggle-switch-form">
+                <input 
+                  type="checkbox" 
+                  formControlName="transitolivre"
+                >
+                <span class="toggle-slider-form"></span>
+              </label>
+              <span class="toggle-description">
+                <strong>Habilitar trânsito livre</strong><br>
+                <small>Quando habilitado, este tipo de recurso pode sair livremente sem autorização no Passcheck</small>
+              </span>
+            </div>
+          </div>
+          <small class="form-text text-muted">
+            <i class="cil-info"></i>
+            Desabilitado por padrão para maior segurança. Habilite apenas para recursos que não necessitam de controle de saída.
+          </small>
+        </div>
+
+        <!-- Botões de Ação -->
+        <div class="form-actions">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="cancelar()"
+            [disabled]="carregando"
+          >
+            <i class="fas fa-times"></i>
+            Cancelar
+          </button>
+          
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="form.invalid || !form.get('categoriaId')?.value || carregando"
+          >
+            <i class="fas fa-save" *ngIf="!carregando"></i>
+            <i class="fas fa-spinner fa-spin" *ngIf="carregando"></i>
+            {{ getBotaoTexto() }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

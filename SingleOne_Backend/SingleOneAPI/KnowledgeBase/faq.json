@@ -1,0 +1,651 @@
+[
+    {
+        "Pergunta":  "Saudações e cumprimentos",
+        "Resposta":  "👋 Olá! Sou o Oni o Sábio, seu assistente virtual do SingleOne! Como posso ajudá-lo hoje?",
+        "Palavras-chave":  [
+                               "ola",
+                               "oi",
+                               "bom dia",
+                               "boa tarde",
+                               "boa noite",
+                               "e ai",
+                               "opa",
+                               "oi oni",
+                               "oni"
+                           ]
+    },
+    {
+        "Pergunta":  "Obrigado / Agradecimentos",
+        "Resposta":  "🦉 Por nada! Fico feliz em ajudar! Se precisar de algo mais, é só me chamar! 😊",
+        "Palavras-chave":  [
+                               "obrigado",
+                               "obrigada",
+                               "valeu",
+                               "vlw",
+                               "brigadao",
+                               "brigada",
+                               "gracas",
+                               "muito obrigado"
+                           ]
+    },
+    {
+        "Pergunta":  "Elogios e Feedback Positivo",
+        "Resposta":  "🦉✨ Que alegria receber seu elogio! Fico muito feliz em poder ajudar!\n\nComo um sábio coruja que sou, estou sempre aprendendo e evoluindo para servir melhor. Seu feedback positivo me motiva a continuar crescendo! 🌟\n\n💡 Lembre-se: estou sempre aqui quando precisar de ajuda com o SingleOne!\n\n**🦉 SABEDORIA DO ONI:**\n\u003e \"Um elogio sincero é como o sol nascente:\n\u003e aquece o coração e ilumina o caminho.\n\u003e Gratidão por sua gentileza!\"",
+        "Palavras-chave":  [
+                               "gostei",
+                               "legal",
+                               "top",
+                               "bacana",
+                               "otimo",
+                               "excelente",
+                               "muito bom",
+                               "parabens",
+                               "show",
+                               "massa",
+                               "demais",
+                               "incrivel",
+                               "maravilhoso",
+                               "perfeito",
+                               "sensacional",
+                               "fantastico",
+                               "adorei",
+                               "amei",
+                               "curti",
+                               "maneiro",
+                               "muito legal",
+                               "muito top",
+                               "muito bom",
+                               "gostei muito",
+                               "ficou bom",
+                               "ficou otimo",
+                               "ficou legal",
+                               "ta bom",
+                               "ta otimo",
+                               "muito obrigado mesmo",
+                               "ajudou muito",
+                               "ajudou demais",
+                               "salvou",
+                               "boa",
+                               "maravilha",
+                               "showzao",
+                               "showzinho",
+                               "demaisss",
+                               "topzera",
+                               "topzao",
+                               "issae",
+                               "partiu",
+                               "bora",
+                               "foda",
+                               "foda demais",
+                               "mt bom",
+                               "d+",
+                               "dmais",
+                               "dms",
+                               "slc",
+                               "nossa",
+                               "uau",
+                               "wow",
+                               "caraca",
+                               "brabo",
+                               "braba"
+                           ]
+    },
+    {
+        "Pergunta":  "O que é o SingleOne e o que ele faz?",
+        "Resposta":  "O SingleOne é uma PLATAFORMA DE GOVERNANÇA DE RECURSOS CORPORATIVOS (não apenas inventário), focada no controle completo do ciclo de vida de ativos de TI e recursos empresariais.\n\n🔑 MUDANÇA DE FOCO:\n• Antes: Gestão de Inventário (só controle de estoque)\n• Agora: Plataforma de Governança (controle + compliance + políticas + rastreabilidade + auditoria)\n\n📊 6 MÓDULOS PRINCIPAIS:\n\n1. DASHBOARD - Centro de controle com 12 KPIs, métricas em tempo real, alertas, notificações\n\n2. SOLICITAÇÕES - Requisições, Entregas/Devoluções, Contestações, Termos Digitais, Nada Consta, Descarte com MTR\n\n3. COLABORADORES - Cadastro, importação em lote, Campanhas de Assinatura (Hangfire), timeline individual\n\n4. RELATÓRIOS E TIMELINE - 11 relatórios especializados (Movimentações, Custos, Garantias, Auditoria, Sinalizações, Não Conformidade, etc.)\n\n5. CADASTROS - Organizacional (Empresas, Filiais, Localidades, CCs), Recursos (Tipos, Categorias, Fabricantes, Modelos), Telefonia (Operadoras, Planos, Linhas, Contratos), Fornecedores\n\n6. CONFIGURAÇÕES - Usuários, Parâmetros, Cargos de Confiança, Políticas de Elegibilidade, Estoque Mínimo, TinOne, 2FA\n\n🎯 DIFERENCIAIS DE GOVERNANÇA:\n• Ciclo de vida completo: Aquisição → Estoque → Entrega → Uso → Manutenção → Devolução → Descarte\n• Compliance: Termos digitais, auditoria total, timeline imutável, geolocalização de assinaturas\n• Políticas e Elegibilidade: Regras automáticas, alertas de não conformidade\n• Automação: Hangfire para campanhas, emails automáticos, conclusão automática\n• Multi-empresa e Multi-localidade: Gestão centralizada com segmentação\n• Telefonia Integrada: Gestão de linhas telefônicas corporativas\n\n🔐 PERFIS DE ACESSO:\n• SU (Super User): Acesso total + gestão de clientes\n• Administrador: Acesso total ao cliente\n• Operador: Operações diárias (sem alterar parâmetros)\n• Consulta: Apenas visualização (read-only)\n\n💡 O foco é GOVERNANÇA, não apenas inventário!",
+        "Palavras-chave":  [
+                               "singleone",
+                               "o que e",
+                               "o que faz",
+                               "funcionalidades",
+                               "sistema",
+                               "sobre o sistema",
+                               "sobre",
+                               "conhecer",
+                               "apresentacao",
+                               "governanca",
+                               "plataforma",
+                               "modulos",
+                               "estrutura"
+                           ]
+    },
+    {
+        "Pergunta":  "O que são as configurações do Oni o Sábio?",
+        "Resposta":  "As **Configurações do Oni** permitem personalizar o assistente virtual. Acesse em **Configurações → Oni o Sábio**.\n\n⚙️ **Configurações Disponíveis:**\n\n**🦉 Habilitar Oni o Sábio**\n• Controle mestre - liga/desliga o Oni completamente\n• Desabilitado = widget some para todos os usuários\n\n**💬 Habilitar Chat**\n• Ativa/desativa a funcionalidade de conversação\n• Desabilitado = widget aparece mas não abre o chat\n\n**ℹ️ Habilitar Tooltips** (em desenvolvimento)\n• Dicas contextuais nos campos do sistema\n• Mostra explicações ao passar o mouse\n\n**📖 Habilitar Guias Interativos** ✅ BETA\n• Tutoriais passo-a-passo interativos\n• Oni guia o usuário em processos complexos\n• Exemplo: mostrar como criar requisição, entregar equipamento\n\n**💡 Habilitar Sugestões Proativas** (em desenvolvimento)\n• Oni oferece sugestões sem ser perguntado\n• Baseado no contexto da tela atual\n\n**🤖 Habilitar IA/NLP** ✅ BETA\n• Inteligência Artificial para respostas mais naturais\n• Requer Ollama instalado no servidor\n• Gera respostas quando não encontra na FAQ\n• Desabilitado = apenas respostas programadas\n\n**📊 Habilitar Analytics**\n• Coleta dados de uso (perguntas, respostas, tempo)\n• Ajuda a melhorar o Oni continuamente\n• Armazenado na tabela tinone_analytics\n\n**🐛 Modo Debug**\n• Mostra logs detalhados no console\n• Apenas para desenvolvimento/diagnóstico\n\n**📍 Posição do Widget**\n• Define onde o Oni aparece na tela\n• Opções: Inferior Direito ou Inferior Esquerdo\n• Chat abre automaticamente para o lado oposto\n\n**🎨 Cor Primária**\n• Personaliza a cor do widget e chat\n• Formato hexadecimal (ex: #4a90e2)\n\n💡 Todas as configurações são globais e afetam todos os usuários!",
+        "Palavras-chave":  [
+                               "configuracoes",
+                               "configuracao",
+                               "oni",
+                               "sabio",
+                               "settings",
+                               "opcoes",
+                               "personalizar",
+                               "habilitar",
+                               "desabilitar",
+                               "ia",
+                               "chat",
+                               "tooltips",
+                               "guias",
+                               "analytics",
+                               "debug",
+                               "posicao",
+                               "cor"
+                           ]
+    },
+    {
+        "Pergunta":  "O que é uma contestação de patrimônio?",
+        "Resposta":  "**Contestação de Patrimônio** é quando um colaborador discorda do registro de equipamentos associados a ele no sistema.\n\n📋 **Tipos de Contestação:**\n\n**1. Equipamento NÃO Pertence ao Colaborador**\n• Colaborador afirma que nunca recebeu o equipamento\n• Sistema mostra equipamento sob sua responsabilidade\n• Precisa investigação e correção\n\n**2. Equipamento JÁ Foi Devolvido**\n• Colaborador já devolveu mas ainda consta em seu nome\n• Precisa localizar termo de devolução\n• Atualizar status no sistema\n\n**3. Dados Incorretos**\n• Informações do equipamento estão erradas (número de série, modelo, etc.)\n• Requer verificação física e correção cadastral\n\n⚠️ **Importante:** Contestações precisam ser investigadas e resolvidas rapidamente para manter a integridade do inventário!",
+        "Palavras-chave":  [
+                               "contestacao",
+                               "contestacoes",
+                               "contestar",
+                               "patrimonio",
+                               "discordar",
+                               "divergencia",
+                               "equipamento errado"
+                           ]
+    },
+    {
+        "Pergunta":  "Como atender uma contestação de patrimônio?",
+        "Resposta":  "Para **atender uma contestação de patrimônio**, siga este processo:\n\n**📋 PASSO 1: Analisar a Contestação**\n• Acesse **Movimentações → Contestações**\n• Localize a contestação pendente\n• Leia a justificativa do colaborador\n• Verifique o histórico do equipamento\n\n**🔍 PASSO 2: Investigar**\n• Consulte o **histórico de movimentações** do equipamento\n• Verifique se há **termos de responsabilidade** assinados\n• Entre em contato com o **colaborador** para entender melhor\n• Verifique com o **gestor** ou **vigilante** se necessário\n\n**✅ PASSO 3: Aprovar (se procedente)**\n• Clique no botão **\"Aprovar Contestação\"** (ícone verde)\n• Adicione **observações** sobre a investigação\n• Confirme a ação\n• Sistema remove/corrige o vínculo do equipamento\n\n**❌ PASSO 4: Recusar (se improcedente)**\n• Clique no botão **\"Recusar Contestação\"** (ícone vermelho)\n• **Obrigatório:** Adicione **justificativa detalhada**\n• Anexe **evidências** (fotos do termo, e-mail, etc.) se disponível\n• Confirme a ação\n• Colaborador será notificado\n\n**📝 PASSO 5: Documentar**\n• Todas as ações ficam registradas no **histórico**\n• Mantém **rastreabilidade** e **auditoria**\n\n💡 **Dica:** Resolva contestações rapidamente para evitar problemas em auditorias!",
+        "Palavras-chave":  [
+                               "atender contestacao",
+                               "resolver contestacao",
+                               "aprovar contestacao",
+                               "recusar contestacao",
+                               "como atender",
+                               "processo contestacao"
+                           ]
+    },
+    {
+        "Pergunta":  "Como aprovar uma contestação?",
+        "Resposta":  "Para **aprovar uma contestação de patrimônio**:\n\n**1.** Acesse **Movimentações → Contestações**\n**2.** Localize a contestação pendente\n**3.** Clique no botão **verde** (✓) ou **\"Aprovar\"**\n**4.** Adicione **observações** sobre a aprovação (opcional mas recomendado)\n**5.** Confirme a ação\n\n**✅ O que acontece ao aprovar:**\n• O equipamento é **removido** da responsabilidade do colaborador\n• O status da contestação muda para **\"Aprovada\"**\n• Colaborador é **notificado**\n• Equipamento fica **disponível** ou **sem vínculo**\n• Ação fica **registrada** no histórico para auditoria\n\n⚠️ **Atenção:** Só aprove após investigar e confirmar que a contestação é procedente!",
+        "Palavras-chave":  [
+                               "aprovar",
+                               "aprovacao",
+                               "aceitar contestacao",
+                               "deferir",
+                               "confirmar contestacao"
+                           ]
+    },
+    {
+        "Pergunta":  "Como recusar uma contestação?",
+        "Resposta":  "Para **recusar uma contestação de patrimônio**:\n\n**1.** Acesse **Movimentações → Contestações**\n**2.** Localize a contestação pendente\n**3.** Clique no botão **vermelho** (✗) ou **\"Recusar\"**\n**4.** **OBRIGATÓRIO:** Adicione **justificativa detalhada**\n   • Explique por que a contestação está sendo negada\n   • Cite evidências (ex: \"Termo de entrega assinado em DD/MM/AAAA\")\n   • Seja claro e profissional\n**5.** Anexe **documentos comprobatórios** se disponível (termo, foto, e-mail)\n**6.** Confirme a ação\n\n**❌ O que acontece ao recusar:**\n• O equipamento **permanece** sob responsabilidade do colaborador\n• O status da contestação muda para **\"Recusada\"**\n• Colaborador é **notificado** com a justificativa\n• Ação fica **registrada** no histórico para auditoria\n\n⚠️ **Importante:** Sempre forneça uma justificativa clara e baseada em evidências ao recusar!",
+        "Palavras-chave":  [
+                               "recusar",
+                               "negar",
+                               "rejeitar contestacao",
+                               "indeferir",
+                               "nao aprovar"
+                           ]
+    },
+    {
+        "Pergunta":  "Como exportar dados?",
+        "Resposta":  "Para exportar dados no SingleOne:\n\n1. Acesse o relatório desejado (Garantias, Equipamentos, Requisições, etc.)\n2. Aplique os filtros necessários para obter os dados que deseja\n3. Aguarde o carregamento dos resultados\n4. Clique no botão \u0027Exportar Dados\u0027 (ícone de download)\n5. O arquivo será baixado automaticamente em formato Excel\n\n💡 Dica: O botão de exportar só fica ativo após o carregamento dos dados!",
+        "Palavras-chave":  [
+                               "exportar",
+                               "exportacao",
+                               "excel",
+                               "baixar",
+                               "download",
+                               "dados",
+                               "relatorio",
+                               "planilha"
+                           ]
+    },
+    {
+        "Pergunta":  "Como exportar o relatório de garantias?",
+        "Resposta":  "Para **exportar o relatório de garantias**:\n\n**📋 PASSO 1: Acessar o Relatório**\n• No menu lateral, vá em **Relatórios**\n• Clique em **Gestão de Garantias**\n\n**🔍 PASSO 2: Aplicar Filtros (Opcional)**\n• **Período:** Selecione o intervalo de datas de vencimento\n• **Status:** Escolha entre \u0027Vencidas\u0027, \u0027A Vencer\u0027, \u0027Dentro da Garantia\u0027, etc.\n• **Tipo de Recurso:** Filtre por notebooks, monitores, etc.\n• **Fabricante:** Filtre por marca específica\n• **Localidade:** Filtre por localização dos equipamentos\n• Clique em **\"Filtrar\"** para aplicar\n\n**⏳ PASSO 3: Aguardar Carregamento**\n• O sistema irá buscar os dados\n• A tabela será populada com os resultados\n• **Importante:** O botão de exportar só fica disponível após o carregamento!\n\n**💾 PASSO 4: Exportar**\n• Clique no botão **\"Exportar Dados\"** (ícone de nuvem/download)\n• O arquivo Excel será baixado automaticamente\n• O arquivo conterá todas as colunas visíveis na tela\n\n**📊 DADOS INCLUÍDOS NA EXPORTAÇÃO:**\n• Patrimônio do equipamento\n• Tipo de Recurso\n• Fabricante e modelo\n• Número de série\n• Data de aquisição\n• Data de início da garantia\n• Data de vencimento da garantia\n• Dias restantes ou vencidos\n• Status da garantia\n• Colaborador responsável (se aplicável)\n• Localidade\n\n**💡 DICAS:**\n• Use filtros para exportar apenas o que precisa (planilha menor e mais rápida)\n• Para exportar TUDO, não aplique filtros\n• O arquivo Excel pode ser aberto no Microsoft Excel, LibreOffice, Google Sheets, etc.\n• Útil para auditorias, prestação de contas, planejamento de compras\n\n⚠️ **Atenção:** Se o botão \"Exportar\" estiver desabilitado (cinza), aguarde o carregamento dos dados terminar!",
+        "Palavras-chave":  [
+                               "exportar garantias",
+                               "relatorio garantias",
+                               "exportacao garantias",
+                               "garantia excel",
+                               "baixar garantias",
+                               "download garantias",
+                               "gestao garantias",
+                               "exportar gestao"
+                           ]
+    },
+    {
+        "Pergunta":  "O que são relatórios?",
+        "Resposta":  "Os relatórios do SingleOne permitem visualizar e analisar informações do sistema:\n\n📊 **Tipos de Relatórios:**\n• Gestão de Garantias - equipamentos próximos do vencimento\n• Equipamentos por Status - distribuição por situação\n• Requisições - movimentações de recursos\n• Auditoria de Acessos - logs de consultas ao sistema\n• Patrimônio - inventário completo\n\n✨ Todos os relatórios podem ser filtrados e exportados para Excel!",
+        "Palavras-chave":  [
+                               "relatorios",
+                               "relatorio",
+                               "dashboard",
+                               "analise",
+                               "gestao",
+                               "visualizar"
+                           ]
+    },
+    {
+        "Pergunta":  "Como criar uma requisição?",
+        "Resposta":  "Para criar uma nova requisição de equipamento:\n\n1. Acesse o menu **Requisições → Nova Requisição**\n2. Preencha os dados do colaborador\n3. Selecione o Tipo de Recurso desejado\n4. Adicione justificativa (se necessário)\n5. Revise as informações\n6. Clique em \u0027Salvar Requisição\u0027\n\n⚠️ A requisição será enviada para aprovação conforme as políticas de elegibilidade configuradas.",
+        "Palavras-chave":  [
+                               "requisicao",
+                               "requisicoes",
+                               "criar",
+                               "nova",
+                               "solicitar",
+                               "pedir",
+                               "equipamento",
+                               "solicitar equipamento"
+                           ]
+    },
+    {
+        "Pergunta":  "O que é BYOD?",
+        "Resposta":  "**BYOD** significa **Bring Your Own Device** (Traga Seu Próprio Dispositivo).\n\nNo SingleOne, BYOD é usado para:\n• Registrar equipamentos pessoais dos colaboradores\n• Controlar acesso à rede corporativa\n• Gerenciar termos de uso e responsabilidade\n• Monitorar dispositivos não corporativos\n\n📱 Exemplos: celular pessoal, notebook próprio, tablet.",
+        "Palavras-chave":  [
+                               "byod",
+                               "bring your own device",
+                               "dispositivo pessoal",
+                               "equipamento pessoal",
+                               "celular proprio"
+                           ]
+    },
+    {
+        "Pergunta":  "Como consultar garantias?",
+        "Resposta":  "Para consultar garantias de equipamentos:\n\n1. Acesse **Relatórios → Gestão de Garantias**\n2. Use os filtros disponíveis:\n   • Dias para vencimento (30, 60, 90 dias)\n   • Tipo de Recurso\n   • Fabricante\n   • Status\n3. Visualize os equipamentos que estão próximos do vencimento\n4. Exporte os dados se necessário\n\n⚠️ O sistema alerta automaticamente sobre garantias próximas do vencimento!",
+        "Palavras-chave":  [
+                               "garantia",
+                               "garantias",
+                               "vencimento",
+                               "prazo",
+                               "validade",
+                               "warranty"
+                           ]
+    },
+    {
+        "Pergunta":  "Como movimentar equipamentos?",
+        "Resposta":  "Para movimentar equipamentos entre colaboradores:\n\n1. Acesse **Equipamentos → Movimentações**\n2. Selecione o tipo de movimentação:\n   • **Entrega** - atribuir equipamento a um colaborador\n   • **Devolução** - receber equipamento de volta\n   • **Transferência** - mover entre colaboradores\n3. Preencha os dados necessários\n4. Gere o termo de responsabilidade\n5. Colete a assinatura do colaborador\n6. Finalize a movimentação\n\n📝 Todas as movimentações geram histórico e são auditadas!",
+        "Palavras-chave":  [
+                               "movimentacao",
+                               "movimentacoes",
+                               "entrega",
+                               "devolucao",
+                               "transferencia",
+                               "mover",
+                               "atribuir"
+                           ]
+    },
+    {
+        "Pergunta":  "Como cadastrar colaboradores?",
+        "Resposta":  "Para cadastrar um novo colaborador:\n\n1. Acesse **Cadastros → Colaboradores**\n2. Clique em Novo Colaborador\n3. Preencha os CAMPOS OBRIGATÓRIOS:\n\n📋 DADOS PESSOAIS (obrigatórios):\n• Nome completo\n• CPF (único no sistema)\n• Matrícula\n• Email corporativo\n• Data de Admissão\n\n🏢 DADOS ORGANIZACIONAIS (obrigatórios):\n• Empresa\n• Centro de Custo\n• Localidade\n• Cargo\n\n👤 CLASSIFICAÇÃO (obrigatório):\n• Tipo de Colaborador (CLT, PJ, Estagiário, Terceiro, etc.)\n\n📝 CAMPOS OPCIONAIS:\n• Setor\n• Filial\n• Matrícula do Superior\n• Data de Demissão\n• Situação (Ativo/Desligado/Férias)\n\n4. Salve o cadastro\n\n✅ O colaborador estará apto a receber equipamentos!\n\n⚠️ IMPORTANTE: Ao importar colaboradores em lote (CSV/Excel), TODOS os campos obrigatórios devem estar preenchidos para evitar erros!",
+        "Palavras-chave":  [
+                               "colaborador",
+                               "colaboradores",
+                               "cadastrar",
+                               "novo",
+                               "funcionario",
+                               "usuario",
+                               "pessoa",
+                               "campos obrigatorios",
+                               "obrigatorios",
+                               "required"
+                           ]
+    },
+    {
+        "Pergunta":  "O que é política de elegibilidade?",
+        "Resposta":  "**Política de Elegibilidade** define quais equipamentos um colaborador pode solicitar com base em:\n\n• **Cargo** - nível hierárquico\n• **Departamento** - área de atuação\n• **Centro de custo** - orçamento disponível\n• **Tipo de contrato** - CLT, terceiro, etc.\n\nExemplo:\n• Gerentes → Notebook + Celular\n• Analistas → Notebook\n• Operacionais → Desktop\n\n⚙️ Configure em: **Configurações → Políticas de Elegibilidade**",
+        "Palavras-chave":  [
+                               "politica",
+                               "elegibilidade",
+                               "permissao",
+                               "regra",
+                               "cargo",
+                               "pode solicitar",
+                               "tem direito"
+                           ]
+    },
+    {
+        "Pergunta":  "Como gerar termos de responsabilidade?",
+        "Resposta":  "Os termos de responsabilidade são gerados automaticamente:\n\n1. Durante a **entrega** de equipamentos\n2. No momento da **movimentação**\n3. Ao criar uma **requisição aprovada**\n\nO sistema gera:\n• Documento PDF com dados do colaborador\n• Lista de equipamentos entregues\n• Cláusulas de responsabilidade\n• Campo para assinatura digital ou física\n\n📧 O termo pode ser enviado por e-mail ou impresso!",
+        "Palavras-chave":  [
+                               "termo",
+                               "termos",
+                               "responsabilidade",
+                               "assinatura",
+                               "documento",
+                               "contrato"
+                           ]
+    },
+    {
+        "Pergunta":  "Como funciona o estoque mínimo?",
+        "Resposta":  "O **Estoque Mínimo** alerta quando a quantidade de equipamentos disponíveis está baixa:\n\n⚙️ **Configuração:**\n1. Acesse **Configurações → Estoque Mínimo**\n2. Defina quantidade mínima por Tipo de Recurso\n3. Configure alertas automáticos\n\n📊 **Alertas:**\n• Dashboard mostra equipamentos abaixo do mínimo\n• Notificações por e-mail (opcional)\n• Relatórios de estoque crítico\n\n💡 Ajuda no planejamento de compras!",
+        "Palavras-chave":  [
+                               "estoque",
+                               "minimo",
+                               "quantidade",
+                               "disponivel",
+                               "alerta",
+                               "compra",
+                               "reposicao"
+                           ]
+    },
+    {
+        "Pergunta":  "O que é auditoria de acessos?",
+        "Resposta":  "A **Auditoria de Acessos** registra todas as consultas a dados sensíveis:\n\n🔍 **O que é auditado:**\n• Consultas a CPF de colaboradores\n• Visualização de dados pessoais\n• Acesso a tela \u0027Meu Patrimônio\u0027\n• Downloads de relatórios\n\n📋 **Informações registradas:**\n• Quem acessou (usuário)\n• Quando (data/hora)\n• O que consultou (dados acessados)\n• IP e navegador\n\n🔒 Garante conformidade com LGPD!",
+        "Palavras-chave":  [
+                               "auditoria",
+                               "acesso",
+                               "log",
+                               "lgpd",
+                               "consulta",
+                               "historico",
+                               "rastreamento"
+                           ]
+    },
+    {
+        "Pergunta":  "Como fazer descarte de equipamentos?",
+        "Resposta":  "Para descartar equipamentos com segurança:\n\n1. Acesse **Descarte → Novo Protocolo**\n2. Selecione os equipamentos para descarte\n3. Defina o tipo de descarte:\n   • **Sanitização** - limpeza de dados\n   • **Descaracterização** - destruição física\n   • **Reciclagem** - destinação sustentável\n4. Anexe evidências (fotos, certificados)\n5. Gere MTR se necessário (resíduos perigosos)\n6. Finalize o protocolo\n\n♻️ Cumpre normas ambientais e de segurança!",
+        "Palavras-chave":  [
+                               "descarte",
+                               "descartar",
+                               "destruir",
+                               "reciclar",
+                               "sanitizacao",
+                               "mtr",
+                               "certificado"
+                           ]
+    },
+    {
+        "Pergunta":  "Como funciona a sinalização de suspeitas?",
+        "Resposta":  "A **Sinalização de Suspeitas** ajuda a identificar irregularidades:\n\n🚨 **Tipos de suspeitas:**\n• Recurso não localizado\n• Colaborador desligado com recurso\n• Patrimônio duplicado\n• Movimentações suspeitas\n• Ausência de devolução\n\n📝 **Processo:**\n1. Sistema sinaliza automaticamente\n2. Gestor investiga\n3. Registra ações tomadas\n4. Resolve ou escala\n\n✅ Mantém controle e reduz perdas!",
+        "Palavras-chave":  [
+                               "suspeita",
+                               "suspeitas",
+                               "sinalizacao",
+                               "irregularidade",
+                               "alerta",
+                               "investigacao",
+                               "perda"
+                           ]
+    },
+    {
+        "Pergunta":  "Como cadastrar um novo recurso?",
+        "Resposta":  "Para **cadastrar um novo recurso** (equipamento):\n\n**📋 PASSO 1: Acessar Cadastro**\n• Menu lateral → **Equipamentos** → **Novo Equipamento**\n\n**📝 PASSO 2: Informações Básicas (Obrigatórias)**\n• **Número de Patrimônio** - 6 dígitos únicos\n• **Tipo de Recurso** - Notebook, Desktop, Monitor, etc.\n• **Fabricante** - Dell, HP, Lenovo, Apple, etc.\n• **Modelo** - Modelo específico do recurso\n• **Número de Série** - S/N do fabricante\n\n**💰 PASSO 3: Informações Financeiras**\n• **Data de Aquisição** - Quando foi comprado\n• **Valor de Aquisição** - Preço pago\n• **Nota Fiscal** - Número da NF\n• **Fornecedor** - De quem comprou\n\n**💾 PASSO 4: Salvar**\n• Clique em **\"Salvar\"**\n• Recurso cadastrado com status \"Disponível\"\n\n**💡 DICAS:**\n• Tire fotos do recurso\n• Use etiqueta física de patrimônio\n• Confira número de série 2x\n• Preencha o máximo de informações\n\n**🦉 ONI ENSINA:**\n\u003e \"No SingleOne, chamamos de RECURSOS, não equipamentos.\n\u003e Um recurso é qualquer bem de TI sob controle da empresa:\n\u003e notebooks, monitores, periféricos, acessórios.\n\u003e Recurso é o termo que unifica tudo.\"\n\n⚠️ **Obrigatórios:** Patrimônio, Tipo, Fabricante, Modelo, Série",
+        "Palavras-chave":  [
+                               "cadastrar recurso",
+                               "cadastrar equipamento",
+                               "novo recurso",
+                               "novo equipamento",
+                               "adicionar recurso",
+                               "criar recurso",
+                               "registrar recurso"
+                           ]
+    },
+    {
+        "Pergunta":  "O que são os status dos recursos?",
+        "Resposta":  "Os **status dos recursos** (equipamentos) são **FIXOS** e **não podem ser alterados manualmente**. Eles seguem **boas práticas de gestão de ativos de TI** validadas por **grandes corporações**.\r\n\r\n**POR QUE STATUS FIXOS?**\r\n• Garante **lisura** do processo de ponta a ponta\r\n• **Padronização** entre todas as organizações\r\n• **Integridade** e rastreabilidade completa\r\n• **Auditoria facilitada** (todos seguem o mesmo padrão)\r\n• **Conformidade** com normas internacionais (ITIL, ISO 55000)\r\n• **Evita gambiarras** e processos mal estruturados\r\n\r\n**TRANSIÇÃO AUTOMÁTICA:**\r\nÀ medida que o recurso se **movimenta**, o sistema **automaticamente** o coloca no status mais adequado. Você não escolhe o status manualmente - ele é definido pela **ação** que você executa!\r\n\r\n---\r\n\r\n## **TODOS OS STATUS DO SINGLEONE**\r\n\r\n### **1. NOVO**\r\n**O que é:**\r\n• Recurso lançado a partir de **nota fiscal**\r\n• Primeiro status ao entrar no sistema\r\n• **NÃO permite requisição** por padrão\r\n• Precisa ir para \"Em estoque\" antes de ser usado\r\n\r\n**Fluxo:**\r\nCadastro via NF → NOVO → [Conferência] → Em Estoque\r\n\r\n**Importante:**\r\n• Necessário colocar em estoque primeiro\r\n• Somente depois pode ser requisitado e entregue\r\n• Garante que recurso foi conferido antes do uso\r\n\r\n---\r\n\r\n### **2. EM ESTOQUE**\r\n**O que é:**\r\n• Recurso **disponível para ser requisitado**\r\n• Pronto para uso operacional\r\n• **Ideal: armazenado em sala trancada** (segurança física)\r\n• Estado: conferido, funcional e disponível\r\n\r\n**Como chega aqui:**\r\n• Recurso NOVO após conferência\r\n• Devolução processada e verificada\r\n• Volta da manutenção (consertado)\r\n\r\n**O que pode fazer:**\r\n• Criar requisição\r\n• Fazer entrega direta (casos urgentes)\r\n• Enviar para manutenção preventiva\r\n\r\n**Boas práticas:**\r\n• Mantenha em local seguro e trancado\r\n• Faça inventários periódicos\r\n• Etiquete com patrimônio visível\r\n\r\n---\r\n\r\n### **3. REQUISITADO [CRÍTICO - TRANSITÓRIO]**\r\n**O que é:**\r\n• Recurso foi **solicitado** e aguarda preparação\r\n• **Está na bancada do técnico** sendo preparado\r\n• Status **TRANSITÓRIO** - atenção especial necessária!\r\n• Não deve ficar parado por muito tempo\r\n\r\n**Fluxo:**\r\nEm Estoque → [Requisição] → REQUISITADO → [Prepara] → Entregue\r\n\r\n**Tempo de permanência:**\r\n• **0-2 dias:** Normal (preparando)\r\n• **3-5 dias:** Atenção (priorizar)\r\n• **5+ dias:** **CRÍTICO!** Recurso ESQUECIDO na bancada!\r\n\r\n**O que fazer:**\r\n• Separar do estoque\r\n• Preparar (instalar software, limpar, testar)\r\n• **Entregar rapidamente** para colaborador\r\n• Status muda para \"Entregue\" após termo assinado\r\n\r\n**ATENÇÃO:**\r\n• Como DEVOLVIDO, é status crítico transitório\r\n• Processar diariamente para não acumular\r\n• Monitorar tempo de permanência, não quantidade\r\n\r\n---\r\n\r\n### **4. ENTREGUE**\r\n**O que é:**\r\n• Recurso está **com colaborador**\r\n• Termo **provavelmente** foi assinado\r\n• Colaborador responsável pelo bem\r\n• **BOM SEMPRE VALIDAR** se está devidamente legalizado!\r\n\r\n**Como chega aqui:**\r\n• Entrega com termo assinado\r\n• Transferência entre colaboradores\r\n\r\n**O que pode fazer:**\r\n• Solicitar devolução\r\n• Fazer transferência\r\n• Registrar dano/problema\r\n• Contestar (pelo colaborador)\r\n\r\n**IMPORTANTE - VALIDAÇÃO:**\r\n• Sempre verificar se termo foi assinado\r\n• Confirmar data de entrega\r\n• Validar dados do colaborador\r\n• Garantir legalização do vínculo\r\n\r\n**Auditoria:**\r\n• Verifique periodicamente se recursos entregues têm termos\r\n• Recursos sem termo = risco jurídico alto!\r\n\r\n---\r\n\r\n### **5. DANIFICADO**\r\n**O que é:**\r\n• Recurso **temporariamente fora de operação**\r\n• Apresentou algum **erro ou problema**\r\n• **Aguardando avaliação** técnica\r\n• Não pode ser usado até avaliação\r\n\r\n**Como chega aqui:**\r\n• Devolução com defeito relatado\r\n• Detecção de problema durante uso\r\n• Falha identificada em teste\r\n\r\n**O que fazer:**\r\n• **Avaliar tecnicamente** o problema\r\n• Verificar se tem conserto\r\n• Orçar reparo\r\n• Decidir próximo status:\r\n  - Tem conserto? → Enviar para manutenção externa\r\n  - Sem conserto? → Descartar ou Sinistrar\r\n\r\n**Tempo de permanência:**\r\n• Avaliar o mais rápido possível\r\n• Não deixar acumular recursos danificados sem decisão\r\n\r\n---\r\n\r\n### **6. DEVOLVIDO [CRÍTICO - TRANSITÓRIO]**\r\n**O que é:**\r\n• Recurso em **estado CRÍTICO transitório**\r\n• Alguém realizou **devolução** de colaborador\r\n• **Pendente** ser entregue para estoque\r\n• Aguardando verificação e nova entrega\r\n\r\n**Fluxo:**\r\nEntregue → [Devolução] → DEVOLVIDO → [Verifica] → Em Estoque\r\n\r\n**Tempo de permanência:**\r\n• **0-2 dias:** Normal (aguardando verificação)\r\n• **3-5 dias:** Atenção (priorizar processamento)\r\n• **5+ dias:** **CRÍTICO!** Recurso ESQUECIDO!\r\n\r\n**O que fazer:**\r\n1. **Verificar recurso devolvido:**\r\n   • Conferir patrimônio e número de série\r\n   • Testar funcionamento completo\r\n   • Verificar estado físico (arranhões, quebras)\r\n   • Conferir acessórios (carregador, mouse, cabo)\r\n   • Documentar problemas com fotos\r\n\r\n2. **Decidir próximo status:**\r\n   • OK → **Em Estoque** (libera para novo uso)\r\n   • Com defeito → **Danificado** (avaliar)\r\n   • Inutilizável → Iniciar **Descarte**\r\n\r\n**ATENÇÃO:**\r\n• É um dos status **MAIS CRÍTICOS**\r\n• Processar devoluções **DIARIAMENTE**\r\n• Não deixar acumular\r\n• Monitorar **tempo de permanência**, não quantidade\r\n\r\n---\r\n\r\n### **7. EXTRAVIADO**\r\n**O que é:**\r\n• Recurso **lançado no sistema** (existe logicamente)\r\n• **NÃO identificado/NÃO encontrado** fisicamente\r\n• Inventário lógico existe, mas físico não\r\n• Situação problemática que precisa investigação\r\n\r\n**Como chega aqui:**\r\n• Inventário físico não localiza o item\r\n• Colaborador afirma não ter/não receber\r\n• Recurso \"desapareceu\" sem explicação\r\n\r\n**O que fazer:**\r\n• **Investigar urgentemente:**\r\n  - Verificar último responsável\r\n  - Consultar termos de responsabilidade\r\n  - Verificar histórico de movimentações\r\n  - Entrar em contato com último colaborador\r\n  - Verificar locais comuns (TI, almoxarifado)\r\n  \r\n• **Possíveis resoluções:**\r\n  - Encontrou? → Atualizar para status correto\r\n  - Confirmou perda? → Roubado ou Descartado\r\n  - Colaborador responsável? → Cobrar/Sinistrar\r\n\r\n**Risco:**\r\n• Alto risco patrimonial e jurídico\r\n• Pode indicar falha nos processos\r\n• Auditorias questionam recursos extraviados\r\n\r\n---\r\n\r\n### **8. ROUBADO [STATUS FINAL]**\r\n**O que é:**\r\n• Recurso em **estado FINAL**\r\n• Com registro de **Boletim de Ocorrência (BO)**\r\n• Confirmação oficial de roubo/furto\r\n• Não há mais possibilidade de recuperação física\r\n\r\n**Como chega aqui:**\r\n• BO registrado na polícia\r\n• Confirmação de roubo/furto\r\n• Investigação concluída sem recuperação\r\n\r\n**O que fazer:**\r\n1. **Levar para Patrimônio:**\r\n   • Solicitar **baixa patrimonial** oficial\r\n   • Anexar cópia do BO\r\n   • Documentar toda ocorrência\r\n\r\n2. **Se for equipamento ALUGADO:**\r\n   • **Sinistro será gerado** automaticamente\r\n   • Seguradora será acionada\r\n   • **Valor será cobrado** conforme contrato\r\n   • Processo de indenização iniciado\r\n\r\n3. **Responsabilização:**\r\n   • Identificar responsável na data do roubo\r\n   • Verificar termo de responsabilidade\r\n   • Avaliar responsabilidade do colaborador\r\n   • Decidir se haverá cobrança\r\n\r\n**IMPORTANTE:**\r\n• Status **IRREVERSÍVEL** (final)\r\n• Exige documentação legal (BO)\r\n• Pode gerar cobrança ao colaborador ou empresa\r\n\r\n---\r\n\r\n### **9. SINISTRADO [STATUS FINAL]**\r\n**O que é:**\r\n• Recurso em **estado FINAL**\r\n• Sinistro **pago** ou com **pagamento programado**\r\n• Processo de indenização concluído ou em andamento\r\n• Recurso já foi ressarcido financeiramente\r\n\r\n**Como chega aqui:**\r\n• Sinistro gerado (roubo, dano total, perda)\r\n• Seguradora acionada\r\n• Processo de pagamento iniciado\r\n\r\n**Situações:**\r\n• **Sinistro pago:** Indenização já recebida\r\n• **Pagamento programado:** Aguardando recebimento\r\n\r\n**O que pode fazer:**\r\n• **NADA** - status final irreversível\r\n• Consultar documentação do sinistro\r\n• Verificar valores pagos/programados\r\n• Histórico para auditoria\r\n\r\n**Informações importantes:**\r\n• Sempre documente: data, valor, seguradora\r\n• Guarde comprovantes de pagamento\r\n• Vincule ao BO (se houver)\r\n• Atualize contabilidade\r\n\r\n---\r\n\r\n### **10. DESCARTADO [STATUS FINAL]**\r\n**O que é:**\r\n• Recurso em **estado FINAL**\r\n• **Baixa patrimonial realizada**\r\n• Equipamento saiu definitivamente do patrimônio\r\n• **Histórico PRESERVADO** (nunca deletado!)\r\n\r\n**Como chega aqui:**\r\n• Processo formal de descarte\r\n• Equipamento obsoleto, inutilizável ou ultrapassado\r\n• Decisão oficial de dar baixa\r\n\r\n**Formas de descarte:**\r\n• **Logística reversa:** Devolução ao fabricante\r\n• **Doação:** Para instituições, ONGs, escolas\r\n• **Descarte direto:** Reciclagem, lixo eletrônico especializado\r\n\r\n**O que pode fazer:**\r\n• **NADA** - status final irreversível\r\n• Consultar histórico completo\r\n• Ver documentação de descarte\r\n• Auditar decisão de baixa\r\n\r\n**Documentação obrigatória:**\r\n• **Motivo** do descarte (obsoleto, quebrado, etc.)\r\n• **Data** da baixa\r\n• **Responsável** pela decisão\r\n• **Certificado de Sanitização** (limpeza de dados - obrigatório!)\r\n• **MTR** (Manifesto de Transporte de Resíduos) para e-lixo\r\n• **Nota de doação** (se aplicável)\r\n• **Fotos** do equipamento descartado\r\n\r\n**NUNCA delete recursos do sistema!**\r\n• Descarte preserva TODO o histórico\r\n• Auditoria precisa saber o que foi descartado\r\n• Compliance exige rastreabilidade completa\r\n• Valor patrimonial precisa estar documentado\r\n\r\n---\r\n\r\n## **RESUMO DOS 10 STATUS**\r\n\r\n**STATUS OPERACIONAIS:**\r\n1. NOVO - Lançado via NF\r\n2. EM ESTOQUE - Disponível para uso\r\n3. ENTREGUE - Com colaborador\r\n4. DANIFICADO - Aguardando avaliação\r\n5. EXTRAVIADO - Não encontrado físicamente\r\n\r\n**STATUS TRANSITÓRIOS CRÍTICOS:**\r\n6. REQUISITADO - Na bancada do técnico (processar em 0-2 dias)\r\n7. DEVOLVIDO - Aguardando ir para estoque (processar em 0-2 dias)\r\n\r\n**STATUS FINAIS (IRREVERSÍVEIS):**\r\n8. ROUBADO - Com BO\r\n9. SINISTRADO - Sinistro pago\r\n10. DESCARTADO - Baixa realizada\r\n\r\n---\r\n\r\n## **ONI ENSINA - A SABEDORIA DOS STATUS FIXOS**\r\n\r\n**\"Os 10 status do SingleOne são como as estações do ano: inevitáveis, ordenadas e cada uma com seu propósito.**\r\n\r\n**Novo** é a primavera - o começo de tudo.\r\n**Em Estoque** é o verão - pronto e vibrante.\r\n**Requisitado** e **Devolvido** são o outono - transitórios e críticos.\r\n**Entregue** é o inverno ativo - trabalhando firme.\r\n**Danificado** e **Extraviado** são tempestades - problemas a resolver.\r\n**Roubado**, **Sinistrado** e **Descartado** são o fim do ciclo.\r\n\r\nNão force as estações. Deixe o recurso fluir naturalmente pelas ações corretas.\r\n\r\nStatus transitórios (Requisitado, Devolvido) são passageiros: como nuvens que passam, não devem permanecer.\r\n\r\nStatus finais (Roubado, Sinistrado, Descartado) são irreversíveis: como o pôr do sol, marcam o fim da jornada.\r\n\r\nEsta é a lisura corporativa: cada status reflete a verdade do momento. Cada transição, uma ação documentada.\r\n\r\nConfie no sistema. Ele guarda a memória de tudo.\"**\r\n\r\n---\r\n\r\n**CERTIFICAÇÃO:**\r\nEste modelo de 10 status fixos foi **validado** e está em uso por:\r\n• Empresas de tecnologia multinacionais\r\n• Instituições financeiras\r\n• Órgãos públicos\r\n• Corporações com certificação ISO 55000\r\n• Empresas auditadas por Big Four\r\n\r\n**100% compliance** com normas internacionais de gestão de ativos (ITIL, ISO 55000, ITAM)!",
+        "Palavras-chave":  [
+                               "status recurso",
+                               "status equipamento",
+                               "situacao recurso",
+                               "novo",
+                               "em estoque",
+                               "requisitado",
+                               "entregue",
+                               "danificado",
+                               "devolvido",
+                               "extraviado",
+                               "roubado",
+                               "sinistrado",
+                               "descartado",
+                               "todos os status",
+                               "quais status",
+                               "lista status",
+                               "status fixos",
+                               "boas praticas",
+                               "ciclo de vida",
+                               "fluxo status",
+                               "transicao status",
+                               "mudanca status",
+                               "status criticos",
+                               "status finais",
+                               "status transitorios"
+                           ]
+    },
+    {
+        "Pergunta":  "Como editar um recurso?",
+        "Resposta":  "Para **editar um recurso** (equipamento):\n\n**🔍 LOCALIZAR:** Menu → Equipamentos → Listar\n**✏️ EDITAR:** Clique no ícone de lápis\n\n**📝 Você pode alterar:**\n• ✅ Modelo, Fabricante, Especificações\n• ✅ Localidade, Centro de Custo\n• ✅ Datas de garantia, Valor, NF\n\n**❌ NÃO pode alterar:**\n• Número de Patrimônio (ID único)\n• Status (muda via movimentações)\n• Histórico (imutável)\n\n**💾 SALVAR:** Alterações são auditadas\n\n**💡 DICAS:**\n• Sistema registra quem editou e quando\n• Mudança de responsável = fazer movimentação\n• Se errou patrimônio, crie novo e descarte errado\n\n🦉 **ONI ENSINA:**\n\u003e \"Editar não é apagar o passado,\n\u003e é atualizar o presente.\n\u003e O histórico preserva a verdade.\"",
+        "Palavras-chave":  [
+                               "editar recurso",
+                               "editar equipamento",
+                               "alterar recurso",
+                               "modificar recurso",
+                               "atualizar recurso",
+                               "corrigir recurso"
+                           ]
+    },
+    {
+        "Pergunta":  "Posso excluir um recurso?",
+        "Resposta":  "**❌ NÃO EXCLUA RECURSOS!**\n\nO SingleOne **NÃO permite exclusão** de recursos (equipamentos) que já foram utilizados.\n\n**Por quê?**\n• 📊 Perde TODO o histórico\n• 📋 Quebra auditoria e compliance\n• 💼 Afeta controle patrimonial\n• 🗂️ Termos ficam órfãos\n\n**✅ FAÇA ISSO: DESCARTE**\n```\nMenu → Equipamentos → Descartar\n```\n• Status vira \"Descartado\"\n• Histórico é PRESERVADO\n• Não aparece em relatórios ativos\n• Rastreável para sempre\n\n**📝 Informe ao descartar:**\n• Motivo (obsoleto, danificado, vendido)\n• Data, Responsável, Documentos\n\n**💡 BENEFÍCIOS:**\n• ✅ Histórico completo preservado\n• ✅ Auditorias facilitadas\n• ✅ Rastreabilidade total\n• ✅ Compliance garantido\n\n🦉 **ONI ENSINA:**\n\u003e \"Um recurso descartado é como um monge que partiu:\n\u003e não está mais ativo no monastério,\n\u003e mas sua história permanece nos registros.\n\u003e Escondê-lo do relatório é negar sua existência,\n\u003e é perder o controle do que foi descartado.\n\u003e Mostre TODOS - ativos e inativos - e terás a verdade completa.\"",
+        "Palavras-chave":  [
+                               "excluir recurso",
+                               "excluir equipamento",
+                               "deletar recurso",
+                               "apagar recurso",
+                               "remover recurso",
+                               "descartar recurso",
+                               "dar baixa"
+                           ]
+    },
+    {
+        "Pergunta":  "O que fazer quando esqueço minha senha?",
+        "Resposta":  "Se você esqueceu sua senha:\n\n1. Na tela de login, clique em **\u0027Esqueci minha senha\u0027**\n2. Digite seu e-mail cadastrado\n3. Verifique sua caixa de entrada\n4. Clique no link recebido\n5. Defina uma nova senha\n6. Faça login com a senha nova\n\n⚠️ O link expira em 24 horas!\n\n❌ Não recebeu o e-mail? Verifique a pasta de spam ou contate o administrador do sistema.",
+        "Palavras-chave":  [
+                               "senha",
+                               "esqueci",
+                               "recuperar",
+                               "redefinir",
+                               "login",
+                               "acesso",
+                               "entrar"
+                           ]
+    },
+    {
+        "Pergunta":  "Como alterar meus dados cadastrais?",
+        "Resposta":  "Para alterar seus dados cadastrais:\n\n1. Faça login no sistema\n2. Clique no seu nome (canto superior direito)\n3. Selecione **\u0027Meu Perfil\u0027**\n4. Atualize as informações:\n   • E-mail\n   • Telefone\n   • Foto de perfil\n5. Clique em \u0027Salvar\u0027\n\n⚠️ Alguns dados (CPF, cargo) só podem ser alterados pelo administrador do sistema.\n\n📧 Mudanças críticas geram notificação de segurança!",
+        "Palavras-chave":  [
+                               "perfil",
+                               "dados",
+                               "alterar",
+                               "editar",
+                               "meu perfil",
+                               "cadastro",
+                               "informacoes"
+                           ]
+    },
+    {
+        "Pergunta":  "Como fazer uma entrega de recurso?",
+        "Resposta":  "Para **entregar um recurso** (equipamento) a um colaborador:\n\n**📋 RÁPIDO:**\nMenu → Movimentações → Nova Entrega → Recurso + Colaborador → Gerar Termo → Assinar → Finalizar\n\n**📝 DETALHADO:**\n1. **Acessar:** Menu → Equipamentos → Movimentações → Nova Entrega\n2. **Selecionar Recurso:** Digite patrimônio ou escaneie código de barras\n3. **Selecionar Colaborador:** Digite CPF ou nome\n4. **Gerar Termo:** Sistema cria termo de responsabilidade automático\n5. **Coletar Assinatura:** Digital ou imprimir para assinar físico\n6. **Finalizar:** Recurso muda para status \"Em Uso\"\n\n**✅ O QUE ACONTECE:**\n• Recurso vinculado ao colaborador\n• Status muda para \"Em Uso\"\n• Termo de responsabilidade criado\n• E-mail de confirmação enviado\n• Histórico registrado\n\n**💡 DICAS:**\n• Confira dados antes de finalizar\n• Termo é documento legal - guarde bem!\n• Colaborador passa a ser responsável\n• Use assinatura digital sempre que possível\n\n🦉 **ONI ENSINA:**\n\u003e \"Um termo assinado é como um pacto sagrado:\n\u003e define responsabilidades e protege ambos os lados.\n\u003e Sem ele, há apenas promessas ao vento.\"",
+        "Palavras-chave":  [
+                               "entregar recurso",
+                               "entregar equipamento",
+                               "entrega recurso",
+                               "nova entrega",
+                               "movimentacao",
+                               "termo",
+                               "atribuir recurso",
+                               "vincular recurso"
+                           ]
+    },
+    {
+        "Pergunta":  "Como fazer uma devolução de recurso?",
+        "Resposta":  "Para **receber devolução** de equipamento:\n\n**📋 RÁPIDO:**\nMenu → Movimentações → Nova Devolução → Equipamento → Conferir Estado → Finalizar\n\n**📝 DETALHADO:**\n1. **Acessar:** Menu → Movimentações → Nova Devolução\n2. **Informar Equipamento:** Digite patrimônio ou escaneie\n3. **Sistema mostra:** Colaborador atual, data de entrega, tempo de uso\n4. **Conferir Estado:** Perfeito, Bom, Arranhado, Danificado\n5. **Observações:** Descreva danos se houver\n6. **Finalizar:** Equipamento volta para \"Disponível\"\n\n**✅ O QUE ACONTECE:**\n• Vínculo com colaborador é encerrado\n• Status volta para \"Disponível\"\n• Termo de responsabilidade é finalizado\n• Histórico atualizado\n• Equipamento pode ser requisitado novamente\n\n**⚠️ SE HOUVER DANOS:**\n• Documente com fotos\n• Descreva detalhadamente\n• Pode gerar cobrança ao colaborador\n• Equipamento pode ir para \"Manutenção\"\n\n**💡 DICAS:**\n• Confira número de série na devolução\n• Verifique acessórios (carregador, mouse, etc.)\n• Registre qualquer anormalidade\n• Se danificado, tire fotos antes de aceitar\n\n🦉 **ONI ENSINA:**\n\u003e \"Cada entrega e cada devolução é um elo na corrente.\n\u003e Quebre um elo, e toda a corrente se perde.\n\u003e Registre cada movimento com cuidado.\"",
+        "Palavras-chave":  [
+                               "devolver recurso",
+                               "devolucao",
+                               "receber devolucao",
+                               "retorno",
+                               "retornar equipamento"
+                           ]
+    },
+    {
+        "Pergunta":  "O que é BYOD?",
+        "Resposta":  "**BYOD** significa **\"Bring Your Own Device\"** (Traga Seu Próprio Dispositivo).\n\n**📱 O QUE É:**\n• Colaborador usa dispositivo **pessoal** para trabalho\n• Ex: Celular próprio, notebook pessoal, tablet\n• Empresa **NÃO** é proprietária\n• **Controle diferenciado** no sistema\n\n**✅ QUANDO USAR:**\n• Empresa permite uso de dispositivos pessoais\n• Colaborador prefere usar seu equipamento\n• Economia para empresa (não precisa comprar)\n• Colaborador tem equipamento melhor que padrão da empresa\n\n**📋 COMO CADASTRAR BYOD:**\n1. Menu → Equipamentos → BYOD → Novo\n2. Preencher dados do dispositivo\n3. Vincular ao colaborador **dono**\n4. Definir políticas de uso\n5. Coletar termo de BYOD (diferente do termo normal)\n\n**📝 INFORMAÇÕES NECESSÁRIAS:**\n• Tipo de dispositivo\n• Marca e modelo\n• Número de série (IME para celulares)\n• Sistema operacional\n• Colaborador proprietário\n\n**⚠️ DIFERENÇAS DO EQUIPAMENTO NORMAL:**\n• ❌ Empresa NÃO é dona\n• ❌ NÃO tem patrimônio da empresa\n• ❌ NÃO tem nota fiscal da empresa\n• ✅ Colaborador é dono e responsável\n• ✅ Controle apenas para segurança e acesso\n• ✅ Pode ser removido a qualquer momento\n\n**🔒 POLÍTICAS COMUNS:**\n• Acesso ao e-mail corporativo\n• Aplicativos de trabalho permitidos\n• VPN para acesso remoto\n• Antivírus obrigatório\n• Criptografia ativada\n• Senha de desbloqueio forte\n\n**📊 RELATÓRIOS:**\n• BYODs são contabilizados separadamente\n• Não entram no patrimônio da empresa\n• Relatórios específicos para controle\n\n**💡 BENEFÍCIOS:**\n• **Empresa:** Economia, sem manutenção\n• **Colaborador:** Usa equipamento que já conhece\n\n**⚠️ RISCOS:**\n• Segurança de dados corporativos\n• Perda ou roubo (empresa não repõe)\n• Desligamento (precisa remover acessos)\n\n🦉 **ONI ENSINA:**\n\u003e \"Dispositivos BYOD são como hóspedes no monastério:\n\u003e são bem-vindos, mas seguem regras diferentes dos residentes.\n\u003e Registre-os, mas respeite sua natureza híbrida.\"",
+        "Palavras-chave":  [
+                               "byod",
+                               "bring your own device",
+                               "dispositivo pessoal",
+                               "celular proprio",
+                               "notebook proprio",
+                               "equipamento pessoal"
+                           ]
+    },
+    {
+        "Pergunta":  "Como configurar alertas de estoque mínimo?",
+        "Resposta":  "**Estoque Mínimo** alerta quando equipamentos disponíveis ficam abaixo do limite configurado.\n\n**🎯 COMO CONFIGURAR:**\n\n**1. Acessar Configuração**\n```\nMenu → Configurações → Estoque Mínimo\n```\n\n**2. Definir por Tipo de Recurso**\n• **Notebooks:** Ex: mínimo 5 unidades\n• **Desktops:** Ex: mínimo 3 unidades\n• **Monitores:** Ex: mínimo 10 unidades\n• Cada tipo tem seu próprio limite\n\n**3. Configurar Alertas**\n• **E-mail:** Quem deve receber alertas\n• **Frequência:** Diário, semanal\n• **Crítico:** Quando está ZERO (urgente!)\n\n**📊 EXEMPLO DE CONFIGURAÇÃO:**\n```\nNotebooks:\n  Estoque Mínimo: 5\n  Estoque Atual: 3\n  Status: ⚠️ ALERTA - Comprar mais!\n\nMonitores:\n  Estoque Mínimo: 10\n  Estoque Atual: 15\n  Status: ✅ OK\n```\n\n**🚨 QUANDO ALERTA:**\n• Sistema conta equipamentos com status **\"Disponível\"**\n• Se quantidade \u003c mínimo configurado → **ALERTA**\n• Dashboard mostra em destaque\n• E-mail automático para responsáveis\n\n**📈 NO DASHBOARD:**\n```\n🟢 Dentro do estoque (acima do mínimo)\n🟡 Próximo do limite (atenção)\n🔴 Abaixo do mínimo (CRÍTICO!)\n⚫ Estoque zerado (URGENTE!!)\n```\n\n**💡 DICAS:**\n• Configure baseado na demanda real\n• Leve em conta tempo de reposição (compra leva 30 dias?)\n• Revise trimestralmente\n• Tipos mais usados = estoque maior\n• Considere sazonalidade (contratações em janeiro?)\n\n**✅ BENEFÍCIOS:**\n• Nunca fica sem equipamentos\n• Planejamento de compras antecipado\n• Evita espera de colaboradores\n• Controle proativo\n\n🦉 **ONI ENSINA:**\n\u003e \"Estoque baixo é como celeiro vazio antes do inverno:\n\u003e um aviso de que a escassez se aproxima.\n\u003e Configure alertas, e nunca serás pego desprevenido.\"",
+        "Palavras-chave":  [
+                               "estoque minimo",
+                               "alerta estoque",
+                               "configurar estoque de recursos",
+                               "falta recurso",
+                               "comprar recurso",
+                               "reposicao"
+                           ]
+    },
+    {
+        "Pergunta":  "Qual a diferença entre Enviar Termos em Massa e Campanha de Assinatura?",
+        "Resposta":  "**Enviar Termos em Massa** e **Campanhas de Assinatura** são funcionalidades DIFERENTES com objetivos distintos!\n\n**📧 ENVIAR TERMOS EM MASSA:**\n\n**O que é:**\n• Envio **PONTUAL** e **IMEDIATO** de termos eletrônicos\n• Ação **UMA VEZ** - você seleciona, envia e pronto\n• **SEM acompanhamento estruturado** de quem assinou\n• **SEM métricas** consolidadas de adesão\n\n**Quando usar:**\n• Necessidade **urgente** de termo assinado\n• **Poucos colaboradores** específicos\n• Situação **pontual** (ex: 3 novos contratados chegaram hoje)\n• **Não precisa** de controle rigoroso de adesão\n\n**Como funciona:**\n1. Acesse **Termo Eletrônico**\n2. Selecione colaboradores (checkbox)\n3. Clique em **\"Enviar Termos em Massa\"**\n4. Sistema envia e-mails IMEDIATAMENTE\n5. Fim - não há controle estruturado depois\n\n**Limitações:**\n• ❌ SEM dashboard de acompanhamento\n• ❌ SEM métricas de adesão\n• ❌ SEM lembretes automáticos\n• ❌ SEM visão consolidada de quem assinou\n• ❌ SEM relatórios específicos\n• ❌ Difícil saber quem NÃO assinou depois\n\n---\n\n**🎯 CAMPANHAS DE ASSINATURA:**\n\n**O que é:**\n• Processo **ESTRUTURADO** e **GERENCIADO** de coleta de assinaturas\n• **Acompanhamento contínuo** da adesão\n• **Métricas e relatórios** detalhados\n• **Lembretes automáticos** para quem não assinou\n• **Dashboard visual** de progresso\n\n**Quando usar:**\n• **Grande volume** de colaboradores (10+, 50+, 100+)\n• **Necessidade de controle rigoroso** de adesão\n• **Prazo definido** para todos assinarem\n• **Auditoria/compliance** exige comprovação formal\n• **Renovação anual** de termos\n• **Novos termos** (LGPD, código de conduta, etc.)\n\n**Como funciona:**\n1. Acesse **Termo Eletrônico → Campanhas**\n2. Clique em **\"Nova Campanha\"**\n3. Preencha:\n   • **Nome da campanha** (ex: \"Termo de Responsabilidade 2024\")\n   • **Descrição** (objetivo, contexto)\n   • **Data de início** e **fim**\n   • **Selecione colaboradores** (individual ou em massa)\n4. **Acompanhe em tempo real:**\n   • Quantos receberam\n   • Quantos assinaram\n   • Quantos pendentes\n   • Taxa de adesão (%)\n5. **Reenvie lembretes** automáticos para quem não assinou\n6. **Encerre campanha** quando todos assinarem ou prazo expirar\n\n**Recursos:**\n• ✅ **Dashboard visual** com progresso\n• ✅ **Métricas detalhadas** (assinados, pendentes, taxa de adesão)\n• ✅ **Lista de quem assinou** e quem não assinou\n• ✅ **Lembretes automáticos** configuráveis\n• ✅ **Histórico de campanhas** anteriores\n• ✅ **Relatórios exportáveis** para auditoria\n• ✅ **Status da campanha** (Aberta, Agendada, Encerrada)\n• ✅ **Linha do tempo** de assinaturas\n\n---\n\n**📊 COMPARAÇÃO RÁPIDA:**\n\n| Característica | Enviar em Massa | Campanha |\n|----------------|-----------------|----------|\n| **Objetivo** | Envio pontual | Gestão estruturada |\n| **Volume** | Poucos | Muitos |\n| **Acompanhamento** | ❌ NÃO | ✅ SIM |\n| **Métricas** | ❌ NÃO | ✅ SIM (taxa, progresso) |\n| **Lembretes** | ❌ NÃO | ✅ SIM (automáticos) |\n| **Dashboard** | ❌ NÃO | ✅ SIM (visual) |\n| **Relatórios** | ❌ NÃO | ✅ SIM (completos) |\n| **Prazo** | Imediato | Definido (início/fim) |\n| **Auditoria** | Difícil | Fácil (tudo registrado) |\n| **Uso** | Urgências | Processos formais |\n\n---\n\n**💡 EXEMPLOS DE USO:**\n\n**Enviar em Massa:**\n• 3 colaboradores novos chegaram hoje → enviar termo urgente\n• Esqueceu de enviar para 2 pessoas → corrigir rapidamente\n• Teste com 1-2 colaboradores antes de campanha grande\n\n**Campanha:**\n• Renovação anual de termos para 200 colaboradores\n• Novo termo LGPD - todos devem assinar até 31/12\n• Auditoria ISO exige comprovação formal de adesão\n• Campanha de início de ano com novos contratos\n• RH precisa relatório de quem assinou e quem não\n\n---\n\n**🦉 ONI ENSINA:**\n\u003e \"Enviar em massa é como gritar em praça pública:\n\u003e rápido, imediato, mas sem garantia de quem ouviu.\n\u003e Campanha é como enviar carta registrada com AR:\n\u003e lento, estruturado, mas com controle de quem recebeu e respondeu.\n\u003e Use o primeiro para urgências,\n\u003e o segundo para gestão séria e auditável.\"",
+        "Palavras-chave":  [
+                               "diferenca",
+                               "enviar massa",
+                               "campanha",
+                               "termo massa",
+                               "campanha assinatura",
+                               "termo eletronico",
+                               "massa vs campanha",
+                               "qual usar",
+                               "quando usar campanha"
+                           ]
+    },
+    {
+        "Pergunta":  "O que é o status DEVOLVIDO?",
+        "Resposta":  "**DEVOLVIDO** é um status **CRÍTICO TRANSITÓRIO** no fluxo de movimentação de recursos.\n\n**O QUE SIGNIFICA:**\n Alguém realizou **devolução** de algum colaborador\n Recurso está **pendente** ser entregue para estoque\n Status **CRÍTICO TEMPORÁRIO** - processar urgentemente!\n Aguardando verificação e nova entrega ao estoque\n\n**FLUXO NORMAL:**\nEntregue (com colaborador)  [Colaborador devolve]  DEVOLVIDO (status crítico transitório)  [Equipe TI/Patrimônio verifica]  Em Estoque OU Danificado OU Descartado\n\n**TEMPO DE PERMANÊNCIA:**\n **0-2 dias:** Normal (aguardando verificação)\n **3-5 dias:** Atenção (priorizar processamento)\n **5+ dias:** **CRÍTICO!** Equipamento ESQUECIDO!\n\n**O QUE FAZER:**\n1. **Verificar o equipamento devolvido:** Conferir número de patrimônio e série, testar funcionamento completo, verificar estado físico (arranhões, quebras, danos), conferir acessórios (carregador, mouse, cabos), documentar problemas com fotos.\n\n2. **Decidir próximo status:** Se está OK  Mude para **EM ESTOQUE** (libera para novo uso). Se com defeito  Mude para **DANIFICADO** (avaliar reparo). Se inutilizável  Inicie processo de **DESCARTE**.\n\n**ATENÇÃO - É UM DOS STATUS MAIS CRÍTICOS:**\nTer recursos no status DEVOLVIDO é **NORMAL** no dia a dia operacional. O **PROBLEMA** não é a quantidade, mas sim o **TEMPO DE PERMANÊNCIA**!\n\n**RISCOS:** Equipamentos esquecidos sem processamento, perda de controle do patrimônio, estoque irreal (não sabe se está disponível ou não), atraso no atendimento (recurso devolvido mas não liberado para novo uso).\n\n**BOAS PRÁTICAS:** Processar devoluções DIARIAMENTE (não deixar acumular), verificar tempo de permanência (não apenas quantidade), priorizar itens parados há 5+ dias, estabelecer SLA (ex: Toda devolução processada em até 2 dias úteis).\n\n**ONI ENSINA:** DEVOLVIDO é como uma carta recebida mas não aberta - ela chegou (foi devolvida), mas ainda não foi processada. O perigo não é receber muitas cartas, mas deixá-las empilhadas sem abrir por semanas. Processe suas devoluções diariamente!",
+        "Palavras-chave":  [
+                               "devolvido",
+                               "status devolvido",
+                               "o que e devolvido",
+                               "equipamento devolvido",
+                               "recurso devolvido",
+                               "devolucao",
+                               "status transitorios",
+                               "recursos esquecidos",
+                               "processamento devolucao"
+                           ]
+    },
+    {
+        "Pergunta":  "O que é o status REQUISITADO?",
+        "Resposta":  "**REQUISITADO** é um status **CRÍTICO TRANSITÓRIO** no fluxo de movimentação de recursos.\n\n**O QUE SIGNIFICA:**\n Recurso foi **solicitado/requisitado** para um colaborador\n Está **na bancada do técnico** sendo preparado para entrega\n Status **CRÍTICO TEMPORÁRIO** - atenção especial necessária!\n Aguardando separação, preparação e entrega\n\n**FLUXO NORMAL:**\nEm Estoque (disponível)  [Cria requisição/solicitação]  REQUISITADO (status crítico transitório)  [Técnico prepara na bancada]  Entregue (com colaborador)\n\n**TEMPO DE PERMANÊNCIA:**\n **0-2 dias:** Normal (preparando, instalando software)\n **3-5 dias:** Atenção (colaborador pode estar cobrando)\n **5+ dias:** **CRÍTICO!** Requisição ESQUECIDA na bancada!\n\n**O QUE FAZER:**\n1. **Revisar a requisição:** Verificar qual equipamento foi solicitado, conferir colaborador solicitante, validar aprovações necessárias.\n\n2. **Preparar o equipamento (NA BANCADA):** Localizar fisicamente o recurso, verificar estado e funcionamento, instalar software necessário (SO, aplicativos), preparar acessórios (carregador, mouse, cabo), limpar e higienizar, etiquetar patrimônio, testar completamente.\n\n3. **Fazer a entrega:** Ir em Movimentações  Nova Entrega, vincular recurso ao colaborador, gerar **termo de responsabilidade**, coletar **assinatura**, finalizar (status muda **automaticamente** para ENTREGUE).\n\n**ATENÇÃO - É UM DOS STATUS MAIS CRÍTICOS:**\nTer recursos no status REQUISITADO é **NORMAL** no dia a dia operacional. O **PROBLEMA** não é a quantidade, mas sim o **TEMPO DE PERMANÊNCIA**!\n\n**RISCOS:** Requisições esquecidas na bancada do técnico, colaborador aguardando indefinidamente, perda de controle do fluxo de atendimento, satisfação do usuário comprometida, SLA não cumprido.\n\n**BOAS PRÁTICAS:** Atender requisições DIARIAMENTE (não deixar acumular na bancada), estabelecer SLA (ex: Toda requisição atendida em até 3 dias úteis), priorizar requisições antigas (há 5+ dias), organizar bancada para requisições em andamento.\n\n**ONI ENSINA:** REQUISITADO é como um pedido no restaurante - você fez o pedido (requisição criada), o cozinheiro está preparando (na bancada), mas ainda está aguardando ser servido (entrega). O problema não é ter pedidos na cozinha, mas deixar pedidos prontos esfriando na bancada. Atenda seus pedidos rapidamente!",
+        "Palavras-chave":  [
+                               "requisitado",
+                               "status requisitado",
+                               "o que e requisitado",
+                               "equipamento requisitado",
+                               "recurso requisitado",
+                               "requisicao pendente",
+                               "solicitacao",
+                               "aguardando entrega"
+                           ]
+    },
+    {
+        "Pergunta": "O que tem no módulo Dashboard?",
+        "Resposta": "O Dashboard é o centro de controle com 7 SEÇÕES EXPANSÍVEIS:\n\n1. KPIs PRINCIPAIS: 12 indicadores com sparklines - Total Recursos, Colaboradores, Sinalizações Pendentes, Devoluções Pendentes, Taxa Adesão Termo, Contestações, Não Conformidade, Garantias Críticas, Descartados, Perdidos, Admins Ativos, Recursos Associados. Cada KPI mostra: valor, variação (seta pra cima/baixo), tendência, sparkline 7 dias, cor indicativa.\n\n2. AÇÕES RÁPIDAS: 8 cards clicáveis (Nova Requisição, Entregas/Devoluções, Novo Colaborador, Novo Recurso, Gerar Termo, Descarte, Relatórios, Configurações)\n\n3. AÇÕES PENDENTES: Requisições em Aberto, Devoluções Atrasadas (vencidos pulsam vermelho), Contestações Pendentes\n\n4. COLABORADORES DESLIGADOS: Tabela com desligados que têm recursos, ações (ver recursos, forçar devolução), modal de detalhes\n\n5. DEVOLUÇÕES PROGRAMADAS: Recursos com data de devolução agendada, cores por urgência, modal de detalhes\n\n6. RECURSOS POR STATUS: Tabela com 11 status. Box de alerta: REQUISITADO e DEVOLVIDO são transitórios normais, ATENÇÃO ao TEMPO DE PERMANÊNCIA (maior que 3-5 dias). NÃO exibe Linhas Telefônicas (gestão exclusiva no Telecom).\n\n7. OUTRAS INFORMAÇÕES: Estatísticas Gerais, Métricas Auditoria (acessos/tentativas falhas/top 5 usuários), Sinalizações (por status/prioridade), Hangfire (jobs e link para dashboard), Últimos Usuários que Movimentaram\n\n🎨 RECURSOS: Notificações (painel lateral), refresh automático, controles de visibilidade salvos em localStorage, tema moderno com gradientes, animações hover e pulsante, cores semânticas (verde/amarelo/vermelho), totalmente responsivo",
+        "Palavras-chave": [
+            "dashboard",
+            "painel controle",
+            "kpis",
+            "metricas dashboard",
+            "indicadores",
+            "centro controle",
+            "modulo dashboard",
+            "secoes dashboard"
+        ]
+    },
+    {
+        "Pergunta": "O que tem no módulo Solicitações?",
+        "Resposta": "O módulo **SOLICITAÇÕES** (`/movimentacoes`) tem **6 operações**:\n\n**OPERAÇÕES BÁSICAS:**\n**1. Requisições:** Solicitações de recursos. 3 abas (Requisições, Devoluções, BYOD). Filtros por status. Estatísticas em tempo real. Busca. Cache. Paginação local.\n\n**2. Entregas e Devoluções:** Controle do ciclo entrega/devolução. Sistema de expansão por colaborador. Cache de requisições. Compartilhamento de itens. BYOD. Agendamento. Geração de termos.\n\n**3. Contestações:** Gestão de disputas. Tipos: contestação manual e auto-inventário. Status tracking. Timeline de ações.\n\n**OPERAÇÕES TÉCNICAS:**\n**4. Perícia Técnica (Laudos):** Avaliação especializada. Abertura/encerramento. Anexos. Valores de manutenção.\n\n**5. Processo de Descartes:** Protocolo com MTR. Rastreamento ambiental. Compliance legislação. Sanitização obrigatória.\n\n**6. Gerar Nada Consta:** Certificado de situação patrimonial. Valida ausência de recursos pendentes. Termo oficial. Assinatura digital.\n\n✅ Todas têm: timeline, termos, auditoria, anexos/evidências, notificações",
+        "Palavras-chave": [
+            "solicitacoes",
+            "modulo solicitacoes",
+            "movimentacoes",
+            "requisicoes",
+            "entregas devolucoes",
+            "o que tem solicitacoes"
+        ]
+    },
+    {
+        "Pergunta": "O que tem no módulo Relatórios?",
+        "Resposta": "O módulo RELATÓRIOS E TIMELINE tem 11 relatórios em 3 categorias:\n\n📊 TIMELINE (2 relatórios):\n• Timeline por Recursos: Histórico completo por equipamento. Busca por número de série, patrimônio ou ID. Linha do tempo visual com todos os eventos. Exportação.\n• Timeline por Colaboradores: Histórico de recursos por pessoa. Busca por nome, matrícula ou CPF. Controle de devoluções.\n\n📈 OPERACIONAIS (2 relatórios):\n• Movimentações de Colaboradores: 4 abas (Status, Empresa, Centro de Custo, Localidade). Paginação server-side (10 registros por página). Exportação completa (Excel com 4 abas + CSV com 4 seções). Totalizadores em tempo real nos badges.\n• Custos de Manutenção: 2 abas (Dashboard com gráfico + Listagem Detalhada). Filtros por empresa e centro de custo. Paginação local (10 registros). Métricas: total manutenções, custo total, custo médio, grupos de análise. Gráfico comparativo quantidade vs valor. Exportação Excel e CSV.\n\n🔍 ESPECIALIZADOS (7 relatórios):\n• Status Detalhado de Equipamentos: 15 filtros avançados (empresa, localidade, CC, tipo, fabricante, modelo, categoria, status, filial, tipo aquisição, técnico, fornecedor, NF, períodos). Exportação.\n• Auditoria de Acessos: Logs de acessos às páginas Meu Patrimônio e Portaria. IPs, datas, usuários, tentativas falhas.\n• Sinalizações de Suspeitas: Suspeitas da portaria. Status (Pendente, Em Investigação, Resolvida, Arquivada). Prioridade (Crítica, Alta, Média, Baixa). Anexos de evidências.\n• Gestão de Garantias: Controle de vencimentos. Alertas de garantias próximas do fim. Filtros por período e status. Dashboard visual.\n• Não Conformidade de Elegibilidade: Identifica colaboradores com recursos fora da política. Baseado em regras configuradas. Ações corretivas sugeridas.\n• Colaboradores sem Recursos: Lista colaboradores elegíveis sem recursos. Filtros por empresa, CC, tipo. Link direto para criar requisição. Exportação.\n• Campanhas de Assinaturas: Gerenciamento de termos em massa (ver termo-eletronico)\n• Mapa de Recursos: Visualização hierárquica da distribuição empresa→CC→colaborador. Drill-down interativo.\n\n✅ RECURSOS COMUNS: Exportação Excel/CSV, filtros avançados, paginação (10 registros padrão), busca com debounce, cache de performance, design moderno e responsivo",
+        "Palavras-chave": [
+            "relatorios",
+            "modulo relatorios",
+            "timeline",
+            "quais relatorios",
+            "lista relatorios",
+            "o que tem relatorios"
+        ]
+    },
+    {
+        "Pergunta": "O que tem no módulo Colaboradores?",
+        "Resposta": "O módulo COLABORADORES gerencia o cadastro e controle de pessoas com foco em governança:\n\n📋 TELA PRINCIPAL (/colaboradores):\n• Listagem: Tabela com matrícula, nome, empresa, centro de custo, tipo de colaborador\n• Busca: Com debounce (aguarda você parar de digitar)\n• Paginação: Local, 10 registros por página\n• Cards de Estatísticas: Total, Ativos, Desligados, Com Recursos, Sem Recursos (clicáveis para filtrar)\n• Cache: 5 segundos para performance\n• Ações: Novo colaborador, editar, desativar, ver recursos, ver timeline individual\n• Filtros automáticos: Suporta vir de outras telas com filtro pré-aplicado\n• Modal inline: Criar/editar sem sair da tela\n\n📤 IMPORTAÇÃO EM LOTE (/colaboradores/importacoes):\n• Upload: CSV ou Excel com validação prévia\n• Wizard 3 passos: 1) Upload e validação, 2) Revisão de erros/avisos, 3) Confirmação e importação\n• Validações: CPF duplicado, campos obrigatórios, formato de dados, empresas/CCs inexistentes\n• Feedback: Lista de sucessos, erros e avisos com cores\n• Download de planilha com erros para correção\n• Lote rastreável com ID único\n• Rollback: Opção de desfazer se detectar problemas\n\n📥 EXPORTAÇÃO:\n• Excel: Exporta TODOS os colaboradores (não apenas os 10 da tela) com formatação\n• CSV: Formato compatível com reimportação\n• Filtros: Se tiver busca ativa, exporta apenas os filtrados\n\n📧 CAMPANHAS DE ASSINATURA (/termo-eletronico):\nEnvio massivo de termos com Hangfire (imediato ou agendado). Prazo de conclusão com job automático de fechamento às 23:59:59. Rastreamento de adesão (assinados/pendentes) com métricas visuais. Dashboard de campanhas. Cards com status, progresso, prazos com cores por urgência.\n\n👤 CADASTRO INDIVIDUAL (/colaborador ou /colaborador/:id):\n• Dados Pessoais: Nome, CPF (criptografado), Email (criptografado), Matrícula\n• Dados Empresariais: Empresa, Filial, Localidade, Centro de Custo, Cargo, Setor\n• Tipo de Colaborador: CLT, Terceiro, Estagiário, etc.\n• Situação: Ativo, Desligado, Férias, Afastado\n• Recursos Associados: Lista de equipamentos que o colaborador possui\n• Timeline: Histórico de todas as movimentações\n• Termos: Lista de termos assinados com datas\n• Campanhas: Histórico de participação em campanhas\n\n✅ CARACTERÍSTICAS: Validação de CPF, dados sensíveis criptografados, timeline imutável, rastreamento completo, integração com requisições/entregas/termos, soft delete (marca inativo, não deleta)",
+        "Palavras-chave": [
+            "colaboradores",
+            "modulo colaboradores",
+            "funcionarios",
+            "pessoas",
+            "cadastro colaboradores",
+            "importacao colaboradores",
+            "o que tem colaboradores"
+        ]
+    },
+    {
+        "Pergunta": "O que tem no módulo Cadastros?",
+        "Resposta": "O módulo CADASTROS é um hub visual com 3 seções:\n\n💻 SEÇÃO RECURSOS (8 cards):\n• Visão Geral dos Recursos (/recursos): Dashboard com resumo estatístico. Listagem completa. Filtros múltiplos. Ações: Novo, Exportar. Busca avançada.\n• Gestão de Telefonia (/telecom): Hub com resumo (Operadoras, Contas, Planos, Linhas). Acesso rápido aos 4 submódulos. Importação em lote de linhas. Dashboard de consumo.\n• Cadastro Rápido (/equipamentos-wizard): Wizard para cadastro ágil usando modelos existentes. Pré-preenche dados. Múltiplos equipamentos. Geração de etiquetas.\n• Categorias (/categorias, apenas SU/ADM): Base da hierarquia de classificação. Criar, desativar, reativar. SQL direto para persistência. Exibe ativos e inativos. Modal de confirmação customizado.\n• Tipos de Recursos: Define características (Notebook, Desktop, Monitor, etc.). Vinculado a categoria. Especifica campos obrigatórios.\n• Fabricantes: Marcas (Dell, HP, Lenovo, etc.). Usado em modelos e equipamentos.\n• Modelos: Modelos específicos por fabricante e tipo. Criar, editar, desativar, reativar. Deduplicação por ID e nome. Exibe ativos e inativos.\n• Estoque Mínimo (/estoque-minimo): 2 abas (Equipamentos e Linhas). Configuração de limites mínimo/máximo por localidade. Alertas quando abaixo do mínimo. Paginação 10 registros. Deduplicação de modelos e planos.\n\n🏢 SEÇÃO ORGANIZACIONAL (6 cards):\n• Cadastro Rápido de Empresa (/empresa-wizard): Wizard empresa + filiais + localidades em sequência. Validações. Deduplicação de localidades.\n• Empresas: CNPJ, razão social, contatos. Hierarquia empresa → filiais → localidades. Soft delete. Cache de localidades.\n• Filiais: Unidades vinculadas a empresas. Endereço completo.\n• Localidades: Locais físicos/geográficos. Usado em todo o sistema. Deduplicação backend (por ID e nome normalizado).\n• Centros de Custo: Código e nome. Vinculado a empresas. Segregação financeira.\n• Clientes (apenas SU): Clientes do sistema (multi-tenant). Configurações globais por cliente (2FA, políticas).\n\n🚚 SEÇÃO FORNECEDORES (3 cards):\n• Fornecedores: CNPJ, razão social, contatos. Vinculado a NFs e contratos.\n• Contratos: Contratos gerais (não telefonia). Vigência, valores, anexos.\n• Notas Fiscais: Upload de NFs. OCR para extração de dados. Vinculação com equipamentos. Controle de garantias baseado em NF. Visualização de PDF.\n\n➕ ESPECIAIS:\n• Laudos: Perícia técnica. Abertura/encerramento. Valores de manutenção.\n• Templates: Documentos HTML editáveis (Termo Entrega, Nada Consta, Descarte). Editor CKEditor. Variáveis dinâmicas (@colaborador, @recurso, @empresa, @usuarioLogado, @dataAtual). Versionamento. Preview.\n\n✅ CARACTERÍSTICAS: Deduplicação automática (IDs e nomes), validações robustas, modais customizados, soft delete (marca inativo), hierarquia organizacional, cache de performance",
+        "Palavras-chave": [
+            "cadastros",
+            "modulo cadastros",
+            "empresas",
+            "localidades",
+            "tipos recursos",
+            "fabricantes",
+            "modelos",
+            "categorias",
+            "o que tem cadastros"
+        ]
+    },
+    {
+        "Pergunta": "O que tem no módulo Configurações?",
+        "Resposta": "O módulo CONFIGURAÇÕES organiza parâmetros e políticas em 4 seções:\n\n⚙️ SEÇÃO SISTEMA (2 cards):\n• Parâmetros (/parametros): Configurações gerais do sistema. Comportamentos globais. Limites e restrições. Habilitações de funcionalidades. Acesso: todos os perfis.\n• Templates (/templates): Modelos de documentos HTML editáveis (Termo de Entrega, Nada Consta, Descarte, Laudo). Editor HTML customizado (CKEditor). Variáveis dinâmicas (@colaborador, @recurso, @empresa, @usuarioLogado, @dataAtual, @numeroSerie, @patrimonio, @cargo, etc.). Versionamento de templates. Preview antes de salvar.\n\n🛡️ SEÇÃO POLÍTICAS (2 cards):\n• Políticas de Elegibilidade (/configuracoes/politicas-elegibilidade): Regras de quem pode receber quais recursos. Baseado em: cargo, setor, tipo de colaborador, empresa, localidade. Exemplo: Gerentes têm direito a notebook + celular. Validação automática em requisições. Relatório de não conformidade vinculado.\n• Cargos de Confiança (/configuracoes/cargosconfianca): Cargos que podem autorizar descarte de recursos (compliance e segurança). Lista de cargos privilegiados. Validação em processos de descarte. Auditoria de ações. Modal de confirmação. Tabela com busca e paginação.\n\n👥 SEÇÃO USUÁRIOS E PERMISSÕES (1 card):\n• Usuários (/usuarios): Gestão completa. Dados: nome, email, login, senha. Perfis: SU, Administrador, Operador, Consulta (apenas um ativo por vez). 2FA: toggle individual por usuário com modal de confirmação customizado. Ações: criar, editar, desativar, habilitar/desabilitar 2FA. Validações: email único, login único. Tabela com coluna 2FA mostrando mat-slide-toggle. Modal padronizado usando util.exibirMensagemPopUp() com informações detalhadas antes de habilitar/desabilitar 2FA.\n\n🦉 SEÇÃO ASSISTENTE INTELIGENTE (1 card):\n• Oni o Sábio (/configuracoes/tinone): Configurações do assistente virtual. Widget flutuante. Sugestões contextuais. Base de conhecimento (faq.json, fields.json, processes.json). Integração com todo o sistema. Configurações de comportamento e personalidade. Habilitar/desabilitar funcionalidades (Chat, Tooltips, Guias, IA, Analytics).\n\n✅ CARACTERÍSTICAS: Acesso restrito (maioria apenas Adm/Operador), validações robustas, auditoria de alterações, soft delete, modais de confirmação para ações críticas",
+        "Palavras-chave": [
+            "configuracoes",
+            "modulo configuracoes",
+            "parametros",
+            "templates",
+            "politicas",
+            "elegibilidade",
+            "cargos confianca",
+            "usuarios",
+            "2fa",
+            "tinone config",
+            "o que tem configuracoes"
+        ]
+    },
+    {
+        "Pergunta": "O que é o módulo de Telefonia?",
+        "Resposta": "O módulo TELEFONIA (/telecom) gerencia linhas telefônicas corporativas de forma SEPARADA dos equipamentos físicos:\n\n📞 4 SUB-MÓDULOS:\n\n1. OPERADORAS (/operadoras):\n• Cadastro de operadoras telefônicas (Claro, Vivo, TIM, Oi, etc.)\n• Nome, CNPJ, contatos, ativo/inativo\n\n2. CONTAS/CONTRATOS (/contratos-telefonia):\n• Contratos de telefonia com operadoras\n• Dados: número da conta, operadora, vigência, valores\n• Controle de vencimento de contratos\n• Anexos de documentos\n\n3. PLANOS (/planos):\n• Planos de voz e dados oferecidos pelas operadoras\n• Exemplos: Controle 10GB, Pós 20GB, Corporativo Ilimitado\n• Valores mensais, franquias, características\n• Vinculado a operadora\n\n4. LINHAS TELEFÔNICAS (/linhas):\n• Linhas ativas com número completo (11987654321)\n• Dados: número, operadora, plano, colaborador associado\n• Status: Ativa, Cancelada, Suspensa\n• Controle de quem está usando cada linha\n• Histórico de associações\n\n📤 IMPORTAÇÃO EM LOTE:\n• Upload de CSV/Excel com múltiplas linhas\n• Validação automática (números duplicados, formato inválido)\n• Wizard de importação similar ao de colaboradores\n• Associação em massa a planos e colaboradores\n\n📊 DASHBOARD DE CONSUMO:\n• Resumo: Total de operadoras, contas ativas, planos disponíveis, linhas ativas\n• Métricas por operadora\n• Custos mensais estimados\n• Linhas por status\n\n🔑 DIFERENÇA IMPORTANTE:\n• Linhas Telefônicas = RECURSOS LÓGICOS (não físicos)\n• NÃO aparecem na tabela Recursos por Status do Dashboard\n• Gestão EXCLUSIVA no módulo Telecom\n• Separação clara de domínios: Dashboard para equipamentos FÍSICOS, Telecom para recursos LÓGICOS\n\n✅ Melhor UX e métricas corretas para cada área",
+        "Palavras-chave": [
+            "telefonia",
+            "telecom",
+            "linhas telefonicas",
+            "operadoras",
+            "planos telefonia",
+            "contratos telefonia",
+            "contas telefonia",
+            "modulo telefonia",
+            "o que tem telefonia"
+        ]
+    }
+]

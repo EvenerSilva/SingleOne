@@ -1,0 +1,327 @@
+<!-- 🎯 MODAL DE PROTOCOLO DE DESCARTE -->
+<div class="formulario-overlay">
+  <div class="formulario-container">
+    <div class="protocolo-container">
+      <div class="form-header">
+        <h2 class="form-title">
+          <i class="cil-assignment"></i>
+          {{ isEditMode ? 'Editar Protocolo de Descarte' : 'Novo Protocolo de Descarte' }}
+        </h2>
+        <p class="form-subtitle">
+          {{ isEditMode ? 'Atualize as informações do protocolo' : 'Configure um novo protocolo de descarte para equipamentos' }}
+        </p>
+      </div>
+
+      <!-- Conteúdo do Modal -->
+      <div class="protocolo-content" *ngIf="!loading">
+        <form [formGroup]="protocoloForm" class="protocolo-form">
+          
+          <!-- Número do Protocolo -->
+          <div class="form-group">
+            <label class="form-label">Número do Protocolo:</label>
+            <div class="form-value protocolo-number">
+              <i class="cil-assignment"></i>
+              {{ protocoloForm.get('protocolo')?.value || 'Gerando...' }}
+            </div>
+          </div>
+
+          <!-- Tipo de Descarte -->
+          <div class="form-group">
+            <label class="form-label">Tipo de Descarte *</label>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-select formControlName="tipoDescarte">
+                <mat-option *ngFor="let tipo of tiposDescarte" [value]="tipo.value">
+                  <i class="cil-tag"></i>
+                  {{ tipo.label }}
+                </mat-option>
+              </mat-select>
+              <mat-icon matSuffix>category</mat-icon>
+              <mat-error *ngIf="getFieldError('tipoDescarte')">
+                {{ getFieldError('tipoDescarte') }}
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <!-- Motivo do Descarte -->
+          <div class="form-group">
+            <label class="form-label">Motivo do Descarte</label>
+            <mat-form-field appearance="outline" class="full-width">
+              <textarea matInput formControlName="motivoDescarte" rows="3" 
+                        placeholder="Descreva o motivo do descarte..."></textarea>
+              <mat-icon matSuffix>description</mat-icon>
+            </mat-form-field>
+          </div>
+
+          <!-- Destino Final -->
+          <div class="form-group">
+            <label class="form-label">Destino Final</label>
+            <mat-form-field appearance="outline" class="full-width">
+              <input matInput formControlName="destinoFinal" 
+                     placeholder="Para onde vão os equipamentos?">
+              <mat-icon matSuffix>place</mat-icon>
+            </mat-form-field>
+          </div>
+
+          <!-- Valor Total Estimado -->
+          <div class="form-group">
+            <label class="form-label">Valor Total Estimado</label>
+            <mat-form-field appearance="outline" class="full-width">
+              <input matInput type="number" formControlName="valorTotalEstimado" 
+                     placeholder="0,00" min="0" step="0.01">
+              <span matPrefix>R$&nbsp;</span>
+              <mat-icon matSuffix>attach_money</mat-icon>
+            </mat-form-field>
+          </div>
+
+          <!-- INFORMAÇÕES DE LOGÍSTICA REVERSA (Lei 12.305/2010) -->
+          <div class="section-divider">
+            <i class="material-icons">local_shipping</i>
+            <span>Destino Final e Logística Reversa</span>
+          </div>
+
+          <!-- Seleção de Fornecedor Destinador -->
+          <div class="form-group">
+            <label class="form-label">Empresa Destinadora de Resíduos</label>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-select formControlName="fornecedorDestinador" 
+                          (selectionChange)="onFornecedorSelecionado($event.value)"
+                          placeholder="Selecione uma empresa destinadora">
+                <mat-option *ngFor="let fornecedor of fornecedoresDestinadores" [value]="fornecedor.id">
+                  {{ fornecedor.nome }} - {{ fornecedor.cnpj }}
+                </mat-option>
+              </mat-select>
+              <mat-icon matSuffix>business</mat-icon>
+            </mat-form-field>
+            <small class="form-hint">Selecione a empresa responsável pelo descarte/logística reversa</small>
+          </div>
+
+          <!-- Empresa Destino Final (preenchido automaticamente) -->
+          <div class="form-group">
+            <label class="form-label">Empresa de Destino Final</label>
+            <mat-form-field appearance="outline" class="full-width">
+              <input matInput formControlName="empresaDestinoFinal" 
+                     placeholder="Preenchido automaticamente ao selecionar fornecedor"
+                     readonly>
+              <mat-icon matSuffix>business</mat-icon>
+            </mat-form-field>
+            <small class="form-hint">Preenchido automaticamente</small>
+          </div>
+
+          <!-- CNPJ Destino Final (preenchido automaticamente) -->
+          <div class="form-group">
+            <label class="form-label">CNPJ da Empresa</label>
+            <mat-form-field appearance="outline" class="full-width">
+              <input matInput formControlName="cnpjDestinoFinal" 
+                     placeholder="00.000.000/0000-00"
+                     mask="00.000.000/0000-00"
+                     readonly>
+              <mat-icon matSuffix>badge</mat-icon>
+            </mat-form-field>
+            <small class="form-hint">Preenchido automaticamente</small>
+          </div>
+
+          <!-- Certificado de Descarte -->
+          <div class="form-group">
+            <label class="form-label">Certificado de Descarte Ambiental</label>
+            <mat-form-field appearance="outline" class="full-width">
+              <input matInput formControlName="certificadoDescarte" 
+                     placeholder="Ex: CERT-2025-001234">
+              <mat-icon matSuffix>verified</mat-icon>
+            </mat-form-field>
+            <small class="form-hint">Número do certificado ambiental de descarte</small>
+          </div>
+
+          <!-- MANIFESTO DE TRANSPORTE DE RESÍDUOS (MTR) -->
+          <div class="section-divider">
+            <i class="material-icons">local_shipping</i>
+            <span>Manifesto de Transporte de Resíduos (MTR)</span>
+          </div>
+
+          <!-- MTR Obrigatório -->
+          <div class="form-group">
+            <mat-checkbox formControlName="mtrObrigatorio" class="mtr-checkbox">
+              <div class="checkbox-label">
+                <i class="material-icons">assignment</i>
+                <span>MTR é obrigatório para este protocolo</span>
+              </div>
+            </mat-checkbox>
+            <small class="form-hint">Marque se o Manifesto de Transporte de Resíduos é necessário</small>
+          </div>
+
+          <!-- Seção MTR (aparece apenas se obrigatório) -->
+          <div class="mtr-section" *ngIf="protocoloForm.get('mtrObrigatorio')?.value">
+            
+            <!-- Número do MTR -->
+            <div class="form-group">
+              <label class="form-label">Número do MTR</label>
+              <mat-form-field appearance="outline" class="full-width">
+                <input matInput formControlName="mtrNumero" 
+                       placeholder="Ex: MTR-2025-001234">
+                <mat-icon matSuffix>assignment</mat-icon>
+              </mat-form-field>
+            </div>
+
+            <!-- Quem emitiu o MTR -->
+            <div class="form-group">
+              <label class="form-label">MTR emitido por</label>
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-select formControlName="mtrEmitidoPor">
+                  <mat-option *ngFor="let opcao of mtrEmitidoPor" [value]="opcao.value">
+                    {{ opcao.label }}
+                  </mat-option>
+                </mat-select>
+                <mat-icon matSuffix>person</mat-icon>
+              </mat-form-field>
+            </div>
+
+            <!-- Data de Emissão e Validade -->
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Data de Emissão</label>
+                <mat-form-field appearance="outline" class="full-width">
+                  <input matInput [matDatepicker]="emissaoPicker" formControlName="mtrDataEmissao">
+                  <mat-datepicker-toggle matSuffix [for]="emissaoPicker"></mat-datepicker-toggle>
+                  <mat-datepicker #emissaoPicker></mat-datepicker>
+                </mat-form-field>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Data de Validade</label>
+                <mat-form-field appearance="outline" class="full-width">
+                  <input matInput [matDatepicker]="validadePicker" formControlName="mtrValidade">
+                  <mat-datepicker-toggle matSuffix [for]="validadePicker"></mat-datepicker-toggle>
+                  <mat-datepicker #validadePicker></mat-datepicker>
+                </mat-form-field>
+              </div>
+            </div>
+
+            <!-- Informações da Transportadora (quando MTR emitido por transportador) -->
+            <div class="transportadora-section" *ngIf="protocoloForm.get('mtrEmitidoPor')?.value === 'TRANSPORTADOR'">
+              <h4 class="subsection-title">
+                <i class="material-icons">local_shipping</i>
+                Dados da Transportadora
+              </h4>
+
+              <!-- Empresa Transportadora -->
+              <div class="form-group">
+                <label class="form-label">Empresa Transportadora</label>
+                <mat-form-field appearance="outline" class="full-width">
+                  <input matInput formControlName="mtrEmpresaTransportadora" 
+                         placeholder="Ex: Transportes ABC Ltda">
+                  <mat-icon matSuffix>business</mat-icon>
+                </mat-form-field>
+              </div>
+
+              <!-- CNPJ da Transportadora -->
+              <div class="form-group">
+                <label class="form-label">CNPJ da Transportadora</label>
+                <mat-form-field appearance="outline" class="full-width">
+                  <input matInput formControlName="mtrCnpjTransportadora" 
+                         placeholder="00.000.000/0000-00"
+                         mask="00.000.000/0000-00">
+                  <mat-icon matSuffix>badge</mat-icon>
+                </mat-form-field>
+              </div>
+
+              <!-- Placa do Veículo -->
+              <div class="form-group">
+                <label class="form-label">Placa do Veículo</label>
+                <mat-form-field appearance="outline" class="full-width">
+                  <input matInput formControlName="mtrPlacaVeiculo" 
+                         placeholder="Ex: ABC-1234"
+                         mask="AAA-0000">
+                  <mat-icon matSuffix>directions_car</mat-icon>
+                </mat-form-field>
+              </div>
+
+              <!-- Dados do Motorista -->
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Nome do Motorista</label>
+                  <mat-form-field appearance="outline" class="full-width">
+                    <input matInput formControlName="mtrMotorista" 
+                           placeholder="Nome completo do motorista">
+                    <mat-icon matSuffix>person</mat-icon>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">CPF do Motorista</label>
+                  <mat-form-field appearance="outline" class="full-width">
+                    <input matInput formControlName="mtrCpfMotorista" 
+                           placeholder="000.000.000-00"
+                           mask="000.000.000-00">
+                    <mat-icon matSuffix>badge</mat-icon>
+                  </mat-form-field>
+                </div>
+              </div>
+            </div>
+
+            <!-- Upload do Arquivo MTR -->
+            <div class="form-group">
+              <label class="form-label">Arquivo MTR (PDF)</label>
+              <div class="file-upload-area">
+                <input type="file" 
+                       accept=".pdf" 
+                       (change)="onFileSelected($event, 'mtrArquivo')"
+                       #fileInput
+                       style="display: none;">
+                <button type="button" 
+                        class="btn btn-outline-primary"
+                        (click)="fileInput.click()">
+                  <i class="material-icons">attach_file</i>
+                  Anexar MTR
+                </button>
+                <span class="file-name" *ngIf="protocoloForm.get('mtrArquivo')?.value">
+                  {{ protocoloForm.get('mtrArquivo')?.value }}
+                </span>
+              </div>
+              <small class="form-hint">Anexe o arquivo PDF do MTR</small>
+            </div>
+          </div>
+
+          <!-- Observações -->
+          <div class="form-group">
+            <label class="form-label">Observações</label>
+            <mat-form-field appearance="outline" class="full-width">
+              <textarea matInput formControlName="observacoes" rows="4" 
+                        placeholder="Informações adicionais sobre o protocolo..."></textarea>
+              <mat-icon matSuffix>note</mat-icon>
+            </mat-form-field>
+          </div>
+
+        </form>
+      </div>
+
+      <!-- Loading State -->
+      <div class="loading-state" *ngIf="loading">
+        <div class="loading-content">
+          <i class="cil-reload c-spin"></i>
+          <p>{{ loading ? 'Salvando...' : (isEditMode ? 'Salvando alterações...' : 'Criando protocolo...') }}</p>
+        </div>
+      </div>
+
+      <!-- Botões de Ação -->
+      <div class="form-actions">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="cancelar()"
+          [disabled]="loading"
+        >
+          <i class="cil-x"></i>
+          Cancelar
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="salvar()"
+          [disabled]="!protocoloForm.valid || loading"
+        >
+          <i class="cil-{{ isEditMode ? 'save' : 'plus' }}"></i>
+          {{ loading ? 'Salvando...' : (isEditMode ? 'Salvar Alterações' : 'Criar Protocolo') }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

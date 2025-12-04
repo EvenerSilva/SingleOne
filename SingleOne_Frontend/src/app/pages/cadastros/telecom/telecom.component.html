@@ -1,0 +1,437 @@
+<!-- 🎯 HEADER MODERNO DA TELECOM -->
+<div class="telecom-header">
+  <div class="header-content">
+    <div class="header-left">
+      <button class="back-button" [routerLink]="['/cadastros']" matTooltip="Voltar para Cadastros">
+        <i class="cil-arrow-left"></i>
+      </button>
+      <div class="header-title">
+        <div class="title-icon">
+          <i class="cil-phone"></i>
+        </div>
+        <div class="title-text">
+          <h1>Gestão de Telefonia</h1>
+          <p>Gerenciar serviços, operadoras e linhas telefônicas</p>
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="btn-importar" (click)="abrirModalImportacao()" matTooltip="Importar Linhas em Massa">
+        <i class="cil-cloud-upload"></i>
+        <span>Importar Linhas</span>
+      </button>
+      <button class="btn-exportar" (click)="exportarExcelTelecom()" matTooltip="Exportar Dados">
+        <i class="cil-cloud-download"></i>
+        <span>Exportar Dados</span>
+      </button>
+    </div>  </div>
+</div>
+
+<!-- 🍞 BREADCRUMB MODERNO -->
+<nav class="modern-breadcrumb">
+  <div class="breadcrumb-container">
+    <a [routerLink]="['/dashboard']" class="breadcrumb-item">
+      <i class="cil-home"></i>
+      <span>Dashboard</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a [routerLink]="['/cadastros']" class="breadcrumb-item">
+      <i class="cil-building"></i>
+      <span>Cadastros</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <span class="breadcrumb-item active">Telecom</span>
+  </div>
+</nav>
+
+<!-- 📋 CONTEÚDO PRINCIPAL -->
+<div class="telecom-content">
+  <div class="row">
+    <div class="col-12">
+      <!-- 🔧 CARDS DE AÇÃO COM TOTALIZADORES INTEGRADOS -->
+      <div class="cards-container">
+        <!-- 1️⃣ OPERADORAS - Primeiro cadastrar a operadora -->
+        <div class="action-card" (click)="navegarParaOperadoras()">
+          <div class="card-icon">
+            <i class="cil-building"></i>
+          </div>
+          <div class="card-content">
+            <h3>Operadoras</h3>
+            <p>Gerenciar operadoras de telefonia</p>
+            <!-- 🆕 TOTALIZADOR INTEGRADO -->
+            <div class="card-totalizador" *ngIf="telefoniaResumo">
+              <div class="totalizador-item">
+                <span class="totalizador-valor">{{ telefoniaResumo.operadoras }}</span>
+                <span class="totalizador-label">Operadoras</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2️⃣ CONTAS - Depois cadastrar a conta (contrato) -->
+        <div class="action-card" (click)="navegarParaContratosTelefonia()">
+          <div class="card-icon">
+            <i class="cil-user"></i>
+          </div>
+          <div class="card-content">
+            <h3>Contas</h3>
+            <p>Gerenciar contas de telefonia</p>
+            <!-- 🆕 TOTALIZADOR INTEGRADO -->
+            <div class="card-totalizador" *ngIf="telefoniaResumo">
+              <div class="totalizador-item">
+                <span class="totalizador-valor">{{ telefoniaResumo.contratos || 0 }}</span>
+                <span class="totalizador-label">Contas</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3️⃣ PLANOS - Em seguida cadastrar os planos -->
+        <div class="action-card" (click)="navegarParaPlanos()">
+          <div class="card-icon">
+            <i class="cil-list"></i>
+          </div>
+          <div class="card-content">
+            <h3>Planos</h3>
+            <p>Gerenciar planos de telefonia</p>
+            <!-- 🆕 TOTALIZADOR INTEGRADO -->
+            <div class="card-totalizador" *ngIf="telefoniaResumo">
+              <div class="totalizador-item">
+                <span class="totalizador-valor">{{ telefoniaResumo.planos }}</span>
+                <span class="totalizador-label">Planos</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4️⃣ LINHAS - Por último cadastrar as linhas -->
+        <div class="action-card" (click)="navegarParaLinhas()">
+          <div class="card-icon">
+            <i class="cil-phone"></i>
+          </div>
+          <div class="card-content">
+            <h3>Linhas</h3>
+            <p>Gerenciar linhas telefônicas</p>
+            <!-- 🆕 TOTALIZADOR INTEGRADO -->
+            <div class="card-totalizador" *ngIf="telefoniaResumo">
+              <div class="totalizador-item">
+                <span class="totalizador-valor">{{ telefoniaResumo.linhas }}</span>
+                <span class="totalizador-label">Linhas</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+  </div>
+</div>
+
+            <!-- 🚀 MODAL DE EXPORTAÇÃO -->
+            <div class="export-modal" *ngIf="mostrarModalExportacao" (click)="fecharModalExportacao()">
+              <div class="export-modal-content" (click)="$event.stopPropagation()">
+                <div class="export-modal-header">
+                  <h3><i class="cil-download"></i> Exportar Dados</h3>
+                  <button class="close-btn" (click)="fecharModalExportacao()">
+                    <i class="cil-x"></i>
+                  </button>
+                </div>
+                
+                <div class="export-modal-body">
+                  <p>Escolha o formato de exportação para os dados de telecom:</p>
+                  
+                  <div class="export-options">
+                    <div class="export-option" (click)="exportarExcel()">
+                      <div class="export-icon excel">
+                        <i class="cil-file"></i>
+                      </div>
+                      <div class="export-info">
+                        <h4>Excel (.xlsx)</h4>
+                        <p>Formato ideal para análise e manipulação de dados</p>
+                      </div>
+                      <i class="cil-chevron-right"></i>
+                    </div>
+                    
+                    <div class="export-option" (click)="exportarCSV()">
+                      <div class="export-icon csv">
+                        <i class="cil-file"></i>
+                      </div>
+                      <div class="export-info">
+                        <h4>CSV (.csv)</h4>
+                        <p>Formato universal compatível com qualquer planilha</p>
+                      </div>
+                      <i class="cil-chevron-right"></i>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="export-modal-footer">
+                  <button class="btn-secondary" (click)="fecharModalExportacao()">
+                    Cancelar
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- 📤 MODAL DE IMPORTAÇÃO -->
+            <div class="import-modal" *ngIf="mostrarModalImportacao" (click)="fecharModalImportacao()">
+              <div class="import-modal-content" (click)="$event.stopPropagation()">
+                <div class="import-modal-header">
+                  <h3><i class="cil-cloud-upload"></i> Importar Linhas Telefônicas</h3>
+                  <button class="close-btn" (click)="fecharModalImportacao()">
+                    <i class="cil-x"></i>
+                  </button>
+                </div>
+                
+                <div class="import-modal-body">
+                  
+                  <!-- PASSO 1: SELEÇÃO DE ARQUIVO -->
+                  <div *ngIf="passoImportacao === 1" class="import-step">
+                    <div class="step-header">
+                      <div class="step-number">1</div>
+                      <div class="step-title">
+                        <h4>Selecione o arquivo</h4>
+                        <p>Faça o download do template, preencha e faça upload</p>
+                      </div>
+                    </div>
+
+                    <div class="template-download">
+                      <button class="btn-download-template" (click)="baixarTemplate()">
+                        <i class="cil-data-transfer-down"></i>
+                        <span>Baixar Template Excel</span>
+                      </button>
+                      <p class="template-info">O template contém instruções e exemplos</p>
+                    </div>
+
+                    <div class="upload-area" (click)="fileInputImport.click()">
+                      <i class="cil-cloud-upload upload-icon"></i>
+                      <h5>Clique para selecionar o arquivo</h5>
+                      <p>Arquivos aceitos: .xlsx, .xls (Máximo: 10MB)</p>
+                      <input 
+                        #fileInputImport 
+                        type="file" 
+                        class="d-none" 
+                        accept=".xlsx,.xls" 
+                        (change)="onArquivoSelecionadoImportacao($event)">
+                    </div>
+
+                    <div class="info-box">
+                      <i class="cil-info"></i>
+                      <div>
+                        <strong>O arquivo deve conter as colunas:</strong>
+                        <ul>
+                          <li>Operadora, Contrato, Plano, Valor, Número, ICCID (opcional)</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- PASSO 2: VALIDAÇÃO -->
+                  <div *ngIf="passoImportacao === 2" class="import-step">
+                    <!-- Loading -->
+                    <div *ngIf="uploadandoImportacao" class="loading-state">
+                      <div class="spinner-border text-primary mb-3"></div>
+                      <h5>Processando arquivo...</h5>
+                      <p>Aguarde enquanto validamos os dados</p>
+                    </div>
+
+                    <!-- Resultado Validação -->
+                    <div *ngIf="!uploadandoImportacao && resultadoValidacaoImport" class="validation-result">
+                      <div class="step-header">
+                        <div class="step-number">2</div>
+                        <div class="step-title">
+                          <h4>Validação Concluída</h4>
+                          <p>{{ resultadoValidacaoImport.mensagem }}</p>
+                        </div>
+                      </div>
+
+                      <!-- Métricas -->
+                      <div class="metrics-grid">
+                        <div class="metric-card total">
+                          <i class="cil-list"></i>
+                          <div>
+                            <span class="metric-value">{{ resultadoValidacaoImport.totalRegistros }}</span>
+                            <span class="metric-label">Total de Registros</span>
+                          </div>
+                        </div>
+                        <div class="metric-card success">
+                          <i class="cil-check-circle"></i>
+                          <div>
+                            <span class="metric-value">{{ resultadoValidacaoImport.totalValidos }}</span>
+                            <span class="metric-label">Válidos</span>
+                          </div>
+                        </div>
+                        <div class="metric-card warning">
+                          <i class="cil-warning"></i>
+                          <div>
+                            <span class="metric-value">{{ resultadoValidacaoImport.totalAvisos }}</span>
+                            <span class="metric-label">Avisos</span>
+                          </div>
+                        </div>
+                        <div class="metric-card error">
+                          <i class="cil-x-circle"></i>
+                          <div>
+                            <span class="metric-value">{{ resultadoValidacaoImport.totalErros }}</span>
+                            <span class="metric-label">Erros</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Novos Cadastros -->
+                      <div class="new-records" *ngIf="resultadoValidacaoImport.novasOperadoras > 0 || resultadoValidacaoImport.novosContratos > 0 || resultadoValidacaoImport.novosPlanos > 0">
+                        <h5><i class="cil-plus-circle"></i> Serão criados automaticamente:</h5>
+                        <div class="new-items">
+                          <span class="badge badge-info" *ngIf="resultadoValidacaoImport.novasOperadoras > 0">
+                            {{ resultadoValidacaoImport.novasOperadoras }} Operadora(s)
+                          </span>
+                          <span class="badge badge-info" *ngIf="resultadoValidacaoImport.novosContratos > 0">
+                            {{ resultadoValidacaoImport.novosContratos }} Contrato(s)
+                          </span>
+                          <span class="badge badge-info" *ngIf="resultadoValidacaoImport.novosPlanos > 0">
+                            {{ resultadoValidacaoImport.novosPlanos }} Plano(s)
+                          </span>
+                        </div>
+                      </div>
+
+                      <!-- Ações -->
+                      <div class="action-buttons">
+                        <button class="btn-secondary" (click)="cancelarImportacao()">
+                          <i class="cil-x"></i>
+                          Cancelar
+                        </button>
+                        <button 
+                          class="btn-primary" 
+                          [disabled]="!resultadoValidacaoImport.podeImportar"
+                          (click)="confirmarImportacao()">
+                          <i class="cil-check"></i>
+                          Confirmar Importação
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- PASSO 3: IMPORTANDO -->
+                  <div *ngIf="passoImportacao === 3" class="import-step">
+                    <div class="loading-state">
+                      <div class="spinner-border text-success mb-3"></div>
+                      <h5>Importando dados...</h5>
+                      <p>Aguarde enquanto criamos os registros</p>
+                    </div>
+                  </div>
+
+                  <!-- PASSO 4: CONCLUÍDO -->
+                  <div *ngIf="passoImportacao === 4" class="import-step">
+                    <div class="success-state">
+                      <i class="cil-check-circle success-icon"></i>
+                      <h4>Importação Concluída!</h4>
+                      <p>{{ resultadoImportacaoFinal?.mensagem }}</p>
+
+                      <div class="metrics-grid" *ngIf="resultadoImportacaoFinal">
+                        <div class="metric-card">
+                          <i class="cil-building"></i>
+                          <div>
+                            <span class="metric-value">{{ resultadoImportacaoFinal.operadorasCriadas }}</span>
+                            <span class="metric-label">Operadoras Criadas</span>
+                          </div>
+                        </div>
+                        <div class="metric-card">
+                          <i class="cil-user"></i>
+                          <div>
+                            <span class="metric-value">{{ resultadoImportacaoFinal.contratosCriados }}</span>
+                            <span class="metric-label">Contratos Criados</span>
+                          </div>
+                        </div>
+                        <div class="metric-card">
+                          <i class="cil-list"></i>
+                          <div>
+                            <span class="metric-value">{{ resultadoImportacaoFinal.planosCriados }}</span>
+                            <span class="metric-label">Planos Criados</span>
+                          </div>
+                        </div>
+                        <div class="metric-card success">
+                          <i class="cil-phone"></i>
+                          <div>
+                            <span class="metric-value">{{ resultadoImportacaoFinal.linhasCriadas }}</span>
+                            <span class="metric-label">Linhas Criadas</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <button class="btn-primary mt-3" (click)="resetarImportacao()">
+                        <i class="cil-reload"></i>
+                        Nova Importação
+                      </button>
+                    </div>
+                  </div>
+
+                </div>
+                
+                <div class="import-modal-footer" *ngIf="passoImportacao === 1">
+                  <button class="btn-secondary" (click)="fecharModalImportacao()">
+                    Cancelar
+                  </button>
+                </div>
+              </div>
+            </div>
+
+<!-- 📊 MODAL DE PROGRESSO DA IMPORTAÇÃO -->
+<div class="modal-progresso-overlay" *ngIf="mostrarModalProgresso">
+  <div class="modal-progresso-container">
+    <div class="modal-progresso-header">
+      <div class="header-content">
+        <i class="cil-cloud-upload"></i>
+        <h3>Importando Linhas Telefônicas</h3>
+        <p>Lote: {{ progresso.lote }}</p>
+      </div>
+    </div>
+
+    <div class="modal-progresso-content">
+      <!-- Barra de progresso -->
+      <div class="progresso-bar-container">
+        <div class="progresso-bar">
+          <div class="progresso-fill" [style.width.%]="progresso.percentual"></div>
+        </div>
+        <div class="progresso-percentual">{{ progresso.percentual | number:'1.0-0' }}%</div>
+      </div>
+
+      <!-- Estatísticas -->
+      <div class="progresso-stats">
+        <div class="stat-item">
+          <i class="cil-check-circle"></i>
+          <span class="stat-label">Processadas:</span>
+          <span class="stat-value">{{ progresso.linhasProcessadas | number }}</span>
+        </div>
+        <div class="stat-item">
+          <i class="cil-list"></i>
+          <span class="stat-label">Total:</span>
+          <span class="stat-value">{{ progresso.totalLinhas | number }}</span>
+        </div>
+        <div class="stat-item">
+          <i class="cil-clock"></i>
+          <span class="stat-label">Tempo:</span>
+          <span class="stat-value">{{ progresso.tempoDecorrido }}s / {{ progresso.tempoEstimado }}s</span>
+        </div>
+      </div>
+
+      <!-- Status -->
+      <div class="progresso-status">
+        <i class="cil-info"></i>
+        <span>{{ progresso.status }}</span>
+      </div>
+
+      <!-- Estimativa de tempo restante -->
+      <div *ngIf="progresso.percentual < 100" class="progresso-tempo-restante">
+        <i class="cil-timer"></i>
+        <span>Tempo estimado restante: {{ calcularTempoRestante() }} segundos</span>
+      </div>
+    </div>
+
+    <div class="modal-progresso-footer">
+      <div class="progresso-warning">
+        <i class="cil-warning"></i>
+        <span>Não feche esta janela durante o processamento</span>
+      </div>
+    </div>
+  </div>
+</div>

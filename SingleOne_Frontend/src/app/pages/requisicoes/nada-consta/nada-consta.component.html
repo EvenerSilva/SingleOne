@@ -1,0 +1,150 @@
+<!-- 🎯 HEADER MODERNO DO NADA CONSTA -->
+<div class="nada-consta-header">
+  <div class="header-content">
+    <div class="header-left">
+      <button class="back-button" [routerLink]="['/movimentacoes']" matTooltip="Voltar para Solicitações">
+        <i class="cil-arrow-left"></i>
+      </button>
+      <div class="header-title">
+        <div class="title-icon">
+          <i class="cil-check-circle"></i>
+        </div>
+        <div class="title-text">
+          <h1>Nada Consta</h1>
+          <p>Comprovante de situação patrimonial</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- 🍞 BREADCRUMB MODERNO -->
+<nav class="modern-breadcrumb">
+  <div class="breadcrumb-container">
+    <a [routerLink]="['/dashboard']" class="breadcrumb-item">
+      <i class="cil-home"></i>
+      <span>Dashboard</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a [routerLink]="['/movimentacoes']" class="breadcrumb-item">
+      <i class="cil-transfer"></i>
+      <span>Solicitações</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <span class="breadcrumb-item active">Nada Consta</span>
+  </div>
+</nav>
+
+<!-- 📋 CONTEÚDO PRINCIPAL -->
+<div class="nada-consta-content">
+  <!-- 🔍 SEÇÃO DE BUSCA -->
+  <div class="search-section">
+    <div class="search-card">
+      <div class="search-header">
+        <div class="search-icon">
+          <i class="cil-user"></i>
+        </div>
+        <div class="search-info">
+          <h3>Selecionar Colaborador</h3>
+          <p>Escolha o colaborador para consultar sua situação patrimonial</p>
+        </div>
+      </div>
+      <div class="search-form">
+        <mat-form-field class="collaborator-select" appearance="outline">
+          <mat-label>Colaborador</mat-label>
+          <mat-select #singleSelect [(ngModel)]="colaborador.id" placeholder="Selecione um colaborador">
+            <mat-option>
+              <ngx-mat-select-search
+                [formControl]="recursos"
+                placeholderLabel="Buscar pelo nome do colaborador"
+                noEntriesFoundLabel="Nenhum colaborador encontrado"
+              ></ngx-mat-select-search>
+            </mat-option>
+            <mat-option *ngFor="let row of colaboradores" [value]="row.id">
+              {{ row.nome }} - {{ row.matricula }}
+            </mat-option>
+          </mat-select>
+          <mat-hint>Digite para buscar colaboradores</mat-hint>
+        </mat-form-field>
+        
+        <div class="search-actions">
+          <button 
+            class="consultar-btn" 
+            (click)="consultarHistorico()" 
+            [disabled]="!colaborador.id" 
+            matTooltip="Consultar situação patrimonial">
+            <i class="cil-magnifying-glass"></i>
+            <span>Consultar</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- 📊 SEÇÃO DE RESULTADOS -->
+  <div class="results-section" *ngIf="nadaConsta.length > 0">
+    <div class="result-card">
+      <div class="result-header">
+        <div class="result-icon" [ngClass]="{'success': nadaConsta[0].maquinascomcolaborador == 0, 'warning': nadaConsta[0].maquinascomcolaborador > 0}">
+          <i [class]="nadaConsta[0].maquinascomcolaborador == 0 ? 'cil-check-circle' : 'cil-warning'"></i>
+        </div>
+        <div class="result-info">
+          <h3 *ngIf="nadaConsta[0].maquinascomcolaborador == 0">Situação Regular</h3>
+          <h3 *ngIf="nadaConsta[0].maquinascomcolaborador > 0">Devoluções Pendentes</h3>
+          <p>Consulta realizada com sucesso</p>
+        </div>
+      </div>
+      
+      <div class="collaborator-info">
+        <div class="info-grid" *ngFor="let row of nadaConsta">
+          <div class="info-item">
+            <label>Colaborador:</label>
+            <span class="value">{{ row.nome }}</span>
+          </div>
+          <div class="info-item">
+            <label>Matrícula:</label>
+            <span class="value">{{ row.matricula }}</span>
+          </div>
+          <div class="info-item">
+            <label>Empresa:</label>
+            <span class="value">{{ row.empresa }}</span>
+          </div>
+          <div class="info-item">
+            <label>Centro de Custo:</label>
+            <span class="value">{{ row.centrocusto }}</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="result-actions">
+        <div class="warning-chip" *ngIf="nadaConsta[0].maquinascomcolaborador > 0">
+          <i class="cil-warning"></i>
+          <span>Existem {{ nadaConsta[0].maquinascomcolaborador }} equipamento(s) pendente(s) de devolução</span>
+          <a [routerLink]="['/movimentacoes/entregas-devolucoes']" [queryParams]="{ search: nadaConsta[0].nome, source: 'nada-consta' }" class="view-details-btn">
+            Ver Detalhes
+          </a>
+        </div>
+        
+        <div class="success-actions" *ngIf="nadaConsta[0].maquinascomcolaborador == 0">
+          <div class="success-message">
+            <i class="cil-check-circle"></i>
+            <span>Colaborador não possui recursos pendentes de devolução</span>
+          </div>
+          <button class="print-btn" (click)="imprimir()" matTooltip="Imprimir comprovante">
+            <i class="cil-print"></i>
+            <span>Imprimir Comprovante</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 🚫 ESTADO VAZIO -->
+  <div class="empty-state" *ngIf="nadaConsta.length == 0 && colaborador.id != undefined">
+    <div class="empty-icon">
+      <i class="cil-info"></i>
+    </div>
+    <h3>Nenhum registro encontrado</h3>
+    <p>Não foram encontrados dados para o colaborador selecionado</p>
+  </div>
+</div>

@@ -1,0 +1,105 @@
+<!-- 🎯 FORMULÁRIO MODAL DE CENTRO DE CUSTO -->
+<div class="centro-custo-form-container">
+  <div class="form-header">
+    <h2 class="form-title">{{ modo === 'criar' ? 'Novo Centro de Custo' : 'Editar Centro de Custo' }}</h2>
+    <p class="form-subtitle">
+      {{ modo === 'criar' ? 'Crie um novo centro de custo no sistema' : 'Edite as informações do centro de custo selecionado' }}
+    </p>
+  </div>
+
+    <form [formGroup]="form" (ngSubmit)="salvar()" class="centro-custo-form">
+      
+      <!-- 🏢 SEÇÃO: INFORMAÇÕES BÁSICAS -->
+      <div class="form-section">
+        <div class="section-header">
+          <div class="section-icon">
+            <i class="cil-building"></i>
+          </div>
+          <div class="section-title">
+            <h3>Informações Básicas</h3>
+            <p>Dados principais do centro de custo</p>
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-field full-width">
+            <label for="empresaId">Empresa *</label>
+            <div class="select-container">
+              <i class="cil-building select-icon"></i>
+              <select id="empresaId" formControlName="empresaId" [class.error]="form.get('empresaId')?.invalid && form.get('empresaId')?.touched">
+                <option value="">Selecione uma empresa</option>
+                <option *ngFor="let empresa of empresas" [value]="empresa.id">
+                  {{ empresa.nome }}
+                </option>
+              </select>
+            </div>
+            <div class="field-error" *ngIf="form.get('empresaId')?.invalid && form.get('empresaId')?.touched">
+              <i class="cil-warning"></i>
+              <span>Empresa é obrigatória</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-field">
+            <label for="codigo">Código *</label>
+            <div class="input-container">
+              <i class="cil-tag input-icon"></i>
+              <input 
+                id="codigo" 
+                type="text" 
+                formControlName="codigo" 
+                placeholder="Ex: CC001"
+                [class.error]="form.get('codigo')?.invalid && form.get('codigo')?.touched">
+            </div>
+            <div class="field-error" *ngIf="form.get('codigo')?.invalid && form.get('codigo')?.touched">
+              <i class="cil-warning"></i>
+              <span>Código é obrigatório</span>
+            </div>
+          </div>
+          
+          <div class="form-field">
+            <label for="nome">Nome *</label>
+            <div class="input-container">
+              <i class="cil-dollar input-icon"></i>
+              <input 
+                id="nome" 
+                type="text" 
+                formControlName="nome" 
+                placeholder="Ex: Centro de Custo Principal"
+                [class.error]="form.get('nome')?.invalid && form.get('nome')?.touched">
+            </div>
+            <div class="field-error" *ngIf="form.get('nome')?.invalid && form.get('nome')?.touched">
+              <i class="cil-warning"></i>
+              <span>Nome é obrigatório</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+
+      <!-- 🎯 SEÇÃO: AÇÕES -->
+      <div class="form-actions">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="cancelar()"
+          [disabled]="salvando"
+        >
+          <i class="fas fa-times"></i>
+          Cancelar
+        </button>
+      
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="form.invalid || salvando"
+        >
+          <i class="fas fa-save" *ngIf="!salvando"></i>
+          <i class="fas fa-spinner fa-spin" *ngIf="salvando"></i>
+          {{ salvando ? 'Salvando...' : 'Salvar Centro de Custo' }}
+        </button>
+      </div>
+    </form>
+  </div>

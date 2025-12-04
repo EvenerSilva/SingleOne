@@ -1,0 +1,494 @@
+<!-- 🎯 HEADER MODERNO DO MAPA DE RECURSOS -->
+<div class="mapa-recursos-header">
+  <div class="header-content">
+    <div class="header-left">
+      <button class="back-button" [routerLink]="['/relatorios']" title="Voltar para Relatórios">
+        <i class="cil-arrow-left"></i>
+      </button>
+      <div class="header-title">
+        <div class="title-icon">
+          <i class="cil-map"></i>
+        </div>
+        <div class="title-text">
+          <h1>Mapa de Recursos</h1>
+          <p>Visualização hierárquica de colaboradores e recursos alocados</p>
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button 
+        class="btn-action" 
+        (click)="toggleVisualizacao()"
+        [disabled]="!hierarquia"
+        title="Alternar modo de visualização">
+        <i [class]="modoVisualizacao === 'arvore' ? 'cil-list' : 'cil-sitemap'"></i>
+        <span>{{ modoVisualizacao === 'arvore' ? 'Modo Lista' : 'Modo Árvore' }}</span>
+      </button>
+      <button 
+        class="btn-action" 
+        (click)="exportarPDF()"
+        [disabled]="!hierarquia"
+        title="Imprimir ou Salvar como PDF">
+        <i class="cil-print"></i>
+        <span>PDF</span>
+      </button>
+      <button 
+        class="btn-action btn-success" 
+        (click)="exportarExcel()"
+        [disabled]="!hierarquia || exportando"
+        title="Exportar como Excel">
+        <i class="cil-spreadsheet"></i>
+        <span>{{ exportando ? 'Exportando...' : 'Excel' }}</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 🍞 BREADCRUMB MODERNO -->
+<nav class="modern-breadcrumb">
+  <div class="breadcrumb-container">
+    <a [routerLink]="['/dashboard']" class="breadcrumb-item">
+      <i class="cil-home"></i>
+      <span>Dashboard</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a [routerLink]="['/relatorios']" class="breadcrumb-item">
+      <i class="cil-timeline"></i>
+      <span>Relatórios e Timeline</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <span class="breadcrumb-item active">Mapa de Recursos</span>
+  </div>
+</nav>
+
+<!-- 📋 CONTEÚDO PRINCIPAL -->
+<div class="animated fadeIn">
+  <div class="row">
+    <div class="col-12">
+      <!-- CARD DE FILTROS -->
+      <div class="card">
+        <div class="card-header">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <i class="cil-filter mr-2"></i>
+              <strong>Filtros de Pesquisa</strong>
+            </div>
+            <button 
+              class="btn btn-sm btn-outline-secondary" 
+              (click)="limparFiltros()"
+              [disabled]="!empresaSelecionada && !localidadeSelecionada && !centroCustoSelecionado">
+              <i class="cil-reload"></i>
+              Limpar
+            </button>
+          </div>
+        </div>
+
+        <!-- FILTROS -->
+        <div class="card-body">
+          <div class="row">
+            <!-- Empresa -->
+            <div class="col-md-4">
+              <div class="form-group">
+                <label>Empresa</label>
+                <select 
+                  class="form-control" 
+                  [(ngModel)]="empresaSelecionada" 
+                  (change)="onEmpresaChange()">
+                  <option [ngValue]="null">Selecione...</option>
+                  <option *ngFor="let emp of empresas" [ngValue]="emp.id">
+                    {{ emp.nome }}
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Localidade -->
+            <div class="col-md-4">
+              <div class="form-group">
+                <label>Localidade</label>
+                <select 
+                  class="form-control" 
+                  [(ngModel)]="localidadeSelecionada" 
+                  (change)="onLocalidadeChange()"
+                  [disabled]="localidades.length === 0">
+                  <option [ngValue]="null">Selecione...</option>
+                  <option *ngFor="let loc of localidades" [ngValue]="loc.id">
+                    {{ loc.descricao }}
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Centro de Custo -->
+            <div class="col-md-4">
+              <div class="form-group">
+                <label>Centro de Custo</label>
+                <select 
+                  class="form-control" 
+                  [(ngModel)]="centroCustoSelecionado" 
+                  (change)="onCentroCustoChange()"
+                  [disabled]="centrosCusto.length === 0">
+                  <option [ngValue]="null">Selecione...</option>
+                  <option *ngFor="let cc of centrosCusto" [ngValue]="cc.id">
+                    {{ cc.nome }}
+                  </option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- TOGGLES E BOTÃO BUSCAR -->
+          <div class="row mt-3">
+            <div class="col-md-8">
+              <div class="d-flex gap-3 align-items-center">
+                <div class="custom-control custom-switch">
+                  <input 
+                    type="checkbox" 
+                    class="custom-control-input" 
+                    id="toggleSemRecursos"
+                    [(ngModel)]="mostrarSemRecursos"
+                    (change)="toggleMostrarSemRecursos()">
+                  <label class="custom-control-label" for="toggleSemRecursos">
+                    <i class="cil-user-unfollow mr-1"></i>
+                    Mostrar colaboradores sem recursos
+                  </label>
+                </div>
+
+                <div class="custom-control custom-switch">
+                  <input 
+                    type="checkbox" 
+                    class="custom-control-input" 
+                    id="toggleHistorico"
+                    [(ngModel)]="mostrarHistorico"
+                    (change)="toggleMostrarHistorico()">
+                  <label class="custom-control-label" for="toggleHistorico">
+                    <i class="cil-history mr-1"></i>
+                    Mostrar histórico de recursos
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- BOTÃO BUSCAR -->
+            <div class="col-md-4 text-right">
+              <button 
+                class="btn btn-primary btn-lg"
+                (click)="buscarMapaRecursos()"
+                [disabled]="carregando">
+                <i class="cil-search mr-2"></i>
+                {{ carregando ? 'Buscando...' : 'Buscar Mapa' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LOADING -->
+      <div *ngIf="carregando" class="text-center my-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="sr-only">Carregando...</span>
+        </div>
+        <p class="mt-2">Carregando mapa de recursos...</p>
+      </div>
+
+      <!-- MÉTRICAS -->
+      <div *ngIf="!carregando && metricas && metricas.totalColaboradores > 0" class="row mb-3">
+        <div class="col-md-3">
+          <div class="card text-white bg-primary">
+            <div class="card-body">
+              <div class="text-value-lg">{{ metricas.totalColaboradores }}</div>
+              <div>Total de Colaboradores</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card text-white bg-success">
+            <div class="card-body">
+              <div class="text-value-lg">{{ metricas.totalColaboradoresComRecursos }}</div>
+              <div>Com Recursos</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card text-white bg-warning">
+            <div class="card-body">
+              <div class="text-value-lg">{{ metricas.totalColaboradoresSemRecursos }}</div>
+              <div>Sem Recursos</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card text-white bg-info">
+            <div class="card-body">
+              <div class="text-value-lg">{{ metricas.mediaRecursosPorColaborador | number:'1.1-1' }}</div>
+              <div>Média Recursos/Pessoa</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 🆕 MODO ÁRVORE - CARDS VERTICAIS (OPÇÃO 3) -->
+      <div *ngIf="!carregando && modoVisualizacao === 'arvore' && hierarquia" class="card">
+        <div class="card-header">
+          <i class="cil-sitemap mr-2"></i>
+          Mapa Mental - Conexões Hierárquicas
+        </div>
+        <div class="card-body">
+          <div class="mind-map-container" #mapaContainer>
+            <div *ngIf="hierarquia.filhos && hierarquia.filhos.length > 0" class="hierarchy-vertical">
+              <!-- Nó Raiz (Organização) -->
+              <div class="level-container">
+                <div class="hierarchy-card" style="border-top-color: #9C27B0; cursor: default;">
+                  <div class="card-icon" style="background: linear-gradient(135deg, #9C27B0, #7B1FA2);">
+                    <i class="cil-building"></i>
+                  </div>
+                  <div class="card-title">Organização</div>
+                  <div class="card-subtitle">{{ session?.usuario?.clienteNome || 'Sistema' }}</div>
+                </div>
+              </div>
+
+              <!-- Renderizar níveis recursivamente -->
+              <ng-container *ngTemplateOutlet="cardTemplate; context: {nodes: hierarquia.filhos}"></ng-container>
+            </div>
+            <div *ngIf="!hierarquia.filhos || hierarquia.filhos.length === 0" class="text-center text-muted py-5">
+              <i class="cil-info-circle" style="font-size: 3rem; opacity: 0.3;"></i>
+              <p class="mt-3">Clique em "Buscar Mapa" para visualizar a hierarquia</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Template Recursivo para Cards -->
+      <ng-template #cardTemplate let-nodes="nodes">
+        <div class="level-container">
+          <div class="nodes-row">
+            <div *ngFor="let no of nodes" 
+                 class="hierarchy-card"
+                 [class.empresa-card]="no.tipo === 'empresa'"
+                 [class.localidade-card]="no.tipo === 'localidade'"
+                 [class.cc-card]="no.tipo === 'centroCusto'"
+                 [class.colaborador-card]="no.tipo === 'colaborador'"
+                 [class.recurso-card]="no.tipo === 'recurso'"
+                 [class.sem-recursos]="no.tipo === 'colaborador' && (!no.filhos || no.filhos.length === 0)"
+                 [class.devolvido]="no.tipo === 'recurso' && no.cor === '#9E9E9E'"
+                 [class.expanded]="no.isExpandido"
+                 (click)="toggleNo(no)">
+              
+              <div class="card-icon">
+                <i [class]="no.icone"></i>
+              </div>
+              
+              <div class="card-title">{{ no.nome }}</div>
+              
+              <div class="card-subtitle" *ngIf="no.descricao">{{ no.descricao }}</div>
+              
+              <div class="card-badges" *ngIf="no.totalColaboradores > 0 || no.totalRecursos > 0">
+                <span class="badge badge-primary" *ngIf="no.totalColaboradores > 0">
+                  <i class="cil-user"></i> {{ no.totalColaboradores }}
+                </span>
+                <span class="badge badge-success" *ngIf="no.totalRecursos > 0">
+                  <i class="cil-laptop"></i> {{ no.totalRecursos }}
+                </span>
+              </div>
+              
+              <div class="expand-indicator" *ngIf="no.temFilhos">
+                <i [class]="no.isExpandido ? 'cil-chevron-bottom' : 'cil-chevron-right'"></i>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Filhos (Recursivo) - Renderizar abaixo quando expandido -->
+          <div *ngIf="temNosExpandidos(nodes)">
+            <ng-container *ngFor="let no of nodes">
+              <ng-container *ngIf="no.isExpandido && no.filhos && no.filhos.length > 0">
+                <ng-container *ngTemplateOutlet="cardTemplate; context: {nodes: no.filhos}"></ng-container>
+              </ng-container>
+            </ng-container>
+          </div>
+        </div>
+      </ng-template>
+
+      <!-- 🆕 MODO LISTA - FLUXO HORIZONTAL (OPÇÃO 2) -->
+      <div *ngIf="!carregando && modoVisualizacao === 'lista' && colaboradoresLista.length > 0" class="card">
+        <div class="card-header">
+          <i class="cil-list mr-2"></i>
+          Visualização em Fluxo - Conexões Diretas
+        </div>
+        <div class="card-body">
+          <div class="hierarchy-horizontal" #mapaContainer>
+            <div *ngFor="let colab of colaboradoresLista" class="flow-item">
+              <!-- Breadcrumb com Caminho Completo -->
+              <div class="breadcrumb-flow">
+                <div class="flow-node empresa">
+                  <i class="cil-factory"></i>
+                  <span>{{ colab.empresa }}</span>
+                </div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-node localidade">
+                  <i class="cil-location-pin"></i>
+                  <span>{{ colab.localidade }}</span>
+                </div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-node cc">
+                  <i class="cil-folder"></i>
+                  <span>{{ colab.centroCusto }}</span>
+                </div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-node" [class.sem-recursos]="!colab.temFilhos">
+                  <i [class]="colab.icone"></i>
+                  <span><strong>{{ colab.nome }}</strong></span>
+                </div>
+              </div>
+              
+              <!-- Card do Colaborador com Recursos -->
+              <div class="colaborador-flow-card" [class.sem-recursos]="!colab.temFilhos">
+                <div class="colaborador-header">
+                  <div class="colaborador-info">
+                    <h5>
+                      <i [class]="colab.icone" [style.color]="colab.cor"></i>
+                      {{ colab.nome }}
+                    </h5>
+                    <small class="text-muted">{{ colab.descricao }}</small>
+                  </div>
+                  <span class="badge" [class.badge-success]="colab.temFilhos" [class.badge-secondary]="!colab.temFilhos">
+                    {{ colab.totalRecursos || 0 }} recurso(s)
+                  </span>
+                </div>
+                
+                <!-- Recursos em Chips Horizontais -->
+                <div *ngIf="colab.filhos && colab.filhos.length > 0" class="recursos-flow">
+                  <div *ngFor="let recurso of colab.filhos" 
+                       class="recurso-chip"
+                       [class.ativo]="recurso.cor === '#4CAF50'"
+                       [class.devolvido]="recurso.cor === '#9E9E9E'">
+                    <i [class]="recurso.icone" [style.color]="recurso.cor"></i>
+                    <div class="recurso-info">
+                      <span class="recurso-nome">{{ recurso.nome }}</span>
+                      <span class="recurso-detalhe">{{ recurso.descricao }}</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div *ngIf="!colab.filhos || colab.filhos.length === 0" class="text-center text-muted py-2">
+                  <small><i class="cil-ban"></i> Sem recursos alocados</small>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Mensagem vazia -->
+            <div *ngIf="colaboradoresLista.length === 0" class="text-center text-muted py-5">
+              <i class="cil-info-circle" style="font-size: 3rem; opacity: 0.3;"></i>
+              <p class="mt-3">Nenhum colaborador encontrado com os filtros selecionados</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 🗑️ MODO LISTA ANTIGO (MANTER PARA COMPATIBILIDADE) -->
+      <div *ngIf="!carregando && modoVisualizacao === 'lista' && colaboradoresLista.length === 0 && (colaboradores.length > 0 || colaboradoresSemRecursos.length > 0)" class="card">
+        <div class="card-header">
+          <i class="cil-people mr-2"></i>
+          Colaboradores e Recursos
+        </div>
+        <div class="card-body">
+          <!-- Colaboradores COM recursos -->
+          <div *ngIf="colaboradores.length > 0">
+            <h5 class="mb-3">
+              <i class="cil-user-follow text-success mr-2"></i>
+              Colaboradores com Recursos ({{ colaboradores.length }})
+            </h5>
+            <div class="row">
+              <div *ngFor="let colab of colaboradores" class="col-md-6 mb-3">
+                <div class="card border-left-success">
+                  <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                      <div>
+                        <h6 class="mb-1">{{ colab.nome }}</h6>
+                        <small class="text-muted d-block">{{ colab.cargo }}</small>
+                        <small class="text-muted d-block">{{ colab.email }}</small>
+                      </div>
+                      <span class="badge badge-success badge-lg">
+                        {{ colab.totalRecursosAtivos }} recursos
+                      </span>
+                    </div>
+                    
+                    <!-- Recursos Ativos -->
+                    <div class="recursos-list mt-3">
+                      <small class="text-muted font-weight-bold">Recursos Ativos:</small>
+                      <div *ngFor="let recurso of colab.recursos" class="recurso-item mt-1">
+                        <i [class]="recurso.icone + ' mr-2'" [style.color]="recurso.cor"></i>
+                        <span>{{ recurso.tipo }} - {{ recurso.modelo }}</span>
+                        <small class="text-muted ml-2">({{ recurso.patrimonio || recurso.numeroSerie }})</small>
+                      </div>
+                      <div *ngIf="colab.recursos.length === 0" class="text-muted">
+                        <small>Nenhum recurso ativo</small>
+                      </div>
+                    </div>
+
+                    <!-- Histórico (se habilitado) -->
+                    <div *ngIf="mostrarHistorico && colab.historicoRecursos.length > 0" class="historico-list mt-3 pt-3 border-top">
+                      <small class="text-muted font-weight-bold">Histórico:</small>
+                      <div *ngFor="let recurso of colab.historicoRecursos" class="recurso-item mt-1 opacity-60">
+                        <i [class]="recurso.icone + ' mr-2'" style="color: #9E9E9E"></i>
+                        <span>{{ recurso.tipo }} - {{ recurso.modelo }}</span>
+                        <small class="text-muted ml-2">
+                          (Devolvido em {{ formatarData(recurso.dataDevolucao) }})
+                        </small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Colaboradores SEM recursos -->
+          <div *ngIf="mostrarSemRecursos && colaboradoresSemRecursos.length > 0" class="mt-4">
+            <h5 class="mb-3">
+              <i class="cil-user-unfollow text-warning mr-2"></i>
+              Colaboradores sem Recursos ({{ colaboradoresSemRecursos.length }})
+            </h5>
+            <div class="alert alert-warning" role="alert">
+              <i class="cil-warning mr-2"></i>
+              <strong>Atenção!</strong> Os colaboradores abaixo não possuem recursos atribuídos.
+            </div>
+            <div class="row">
+              <div *ngFor="let colab of colaboradoresSemRecursos" class="col-md-4 mb-2">
+                <div class="card border-left-warning">
+                  <div class="card-body py-2">
+                    <div class="d-flex align-items-center">
+                      <i class="cil-user text-warning mr-2"></i>
+                      <div>
+                        <small class="font-weight-bold d-block">{{ colab.nome }}</small>
+                        <small class="text-muted">{{ colab.cargo }}</small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Nenhum colaborador -->
+          <div *ngIf="colaboradores.length === 0 && colaboradoresSemRecursos.length === 0" class="text-center text-muted py-5">
+            <i class="cil-info-circle icon-2xl mb-3"></i>
+            <p>Selecione um Centro de Custo para visualizar os colaboradores e seus recursos</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- EMPTY STATE -->
+      <div *ngIf="!carregando && !empresaSelecionada" class="card">
+        <div class="card-body text-center py-5">
+          <i class="cil-map icon-2xl text-muted mb-3"></i>
+          <h5 class="text-muted">Selecione uma empresa para começar</h5>
+          <p class="text-muted">
+            Navegue pela hierarquia da sua organização para visualizar<br>
+            a distribuição de recursos por colaborador
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

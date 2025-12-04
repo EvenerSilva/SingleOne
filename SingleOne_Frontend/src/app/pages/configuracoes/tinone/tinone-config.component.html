@@ -1,0 +1,176 @@
+<!-- HEADER -->
+<div class="configuracoes-header">
+  <div class="header-content">
+    <div class="header-left">
+      <button class="btn-voltar" (click)="voltar()">
+        <i class="cil-arrow-left"></i>
+      </button>
+      <div class="header-title">
+        <div class="title-icon">
+          <span style="font-size: 36px;">🦉</span>
+        </div>
+        <div class="title-text">
+          <h1>Oni o Sábio - Configurações</h1>
+          <p>Gerenciar funcionalidades do assistente inteligente</p>
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button 
+        class="btn-salvar" 
+        (click)="salvarConfiguracoes()"
+        [disabled]="salvando">
+        <i class="cil-save"></i>
+        <span>{{ salvando ? 'Salvando...' : 'Salvar Configurações' }}</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- BREADCRUMB -->
+<nav class="modern-breadcrumb">
+  <div class="breadcrumb-container">
+    <a [routerLink]="['/dashboard']" class="breadcrumb-item">
+      <i class="cil-home"></i>
+      <span>Dashboard</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a [routerLink]="['/configuracoes']" class="breadcrumb-item">
+      <span>Configurações</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <span class="breadcrumb-item active">Oni o Sábio</span>
+  </div>
+</nav>
+
+<!-- MENSAGENS -->
+<div class="alerts-container" *ngIf="mensagemSucesso || mensagemErro">
+  <div class="alert alert-success" *ngIf="mensagemSucesso">
+    <i class="cil-check-circle"></i>
+    {{ mensagemSucesso }}
+  </div>
+  <div class="alert alert-danger" *ngIf="mensagemErro">
+    <i class="cil-x-circle"></i>
+    {{ mensagemErro }}
+  </div>
+</div>
+
+<!-- LOADING -->
+<div class="loading-container" *ngIf="loading">
+  <div class="spinner"></div>
+  <p>Carregando configurações...</p>
+</div>
+
+<!-- CONTEÚDO -->
+<div class="tinone-config-content" *ngIf="!loading">
+  
+  <!-- AVISO IMPORTANTE -->
+  <div class="info-box">
+    <i class="cil-info"></i>
+    <div>
+      <strong>Importante:</strong> As alterações nas configurações do Oni serão aplicadas após salvar. 
+      O botão do assistente 🦉 aparecerá no canto inferior direito da tela quando habilitado.
+    </div>
+  </div>
+
+  <!-- CONFIGURAÇÕES PRINCIPAIS -->
+  <div class="config-section">
+    <div class="section-header">
+      <h2>⚙️ Configurações Principais</h2>
+      <p>Ativar/desativar funcionalidades do assistente</p>
+    </div>
+
+    <div class="config-grid">
+      <div 
+        *ngFor="let config of configuracoes" 
+        class="config-card"
+        [class.disabled]="!config.ativo || isConfigDesabilitada(config.chave)"
+        [class.master-disabled]="isConfigDesabilitada(config.chave)">
+        
+        <div class="config-card-header">
+          <div class="config-icon">
+            <i class="cil" [ngClass]="getIcon(config.chave)"></i>
+          </div>
+          <div class="config-info">
+            <h3>
+              {{ getConfigLabel(config.chave) }}
+              <span class="badge-beta" *ngIf="isBeta(config.chave)">BETA</span>
+              <span class="badge-locked" *ngIf="isConfigDesabilitada(config.chave)" title="Habilite o Oni primeiro">🔒</span>
+            </h3>
+            <p>{{ config.descricao }}</p>
+          </div>
+        </div>
+
+        <div class="config-card-body">
+          <!-- Toggle para booleanos -->
+          <div *ngIf="isBoolean(config.chave)" class="toggle-container">
+            <label class="toggle-switch">
+              <input 
+                type="checkbox" 
+                [checked]="config.valor === 'true'"
+                (change)="toggleConfig(config)"
+                [disabled]="!config.ativo || isConfigDesabilitada(config.chave)">
+              <span class="toggle-slider"></span>
+            </label>
+            <span class="toggle-label">
+              {{ config.valor === 'true' ? 'Habilitado' : 'Desabilitado' }}
+            </span>
+          </div>
+
+          <!-- Input para posição -->
+          <div *ngIf="config.chave === 'TINONE_POSICAO'" class="input-container">
+            <select 
+              [(ngModel)]="config.valor" 
+              class="form-select"
+              [disabled]="!config.ativo || isConfigDesabilitada(config.chave)">
+              <option value="bottom-right">Inferior Direito</option>
+              <option value="bottom-left">Inferior Esquerdo</option>
+            </select>
+          </div>
+
+          <!-- Input para cor -->
+          <div *ngIf="config.chave === 'TINONE_COR_PRIMARIA'" class="input-container color-input">
+            <input 
+              type="color" 
+              [(ngModel)]="config.valor"
+              [disabled]="!config.ativo || isConfigDesabilitada(config.chave)">
+            <input 
+              type="text" 
+              [(ngModel)]="config.valor"
+              class="form-control"
+              placeholder="#4a90e2"
+              [disabled]="!config.ativo || isConfigDesabilitada(config.chave)">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INFORMAÇÕES ADICIONAIS -->
+  <div class="info-section">
+    <div class="info-card">
+      <i class="cil-info"></i>
+      <div>
+        <h4>Sobre as Funcionalidades do Oni 🦉</h4>
+        <ul>
+          <li><strong>Chat:</strong> Converse com o Oni para tirar dúvidas</li>
+          <li><strong>Tooltips:</strong> Ajuda contextual inteligente nos campos dos formulários</li>
+          <li><strong>Guias:</strong> Oni te guia passo-a-passo pelos processos (em desenvolvimento)</li>
+          <li><strong>Sugestões Proativas:</strong> Oni sugere ações baseadas no contexto (beta)</li>
+          <li><strong>IA/NLP:</strong> Respostas inteligentes com Inteligência Artificial (requer Ollama local)</li>
+          <li><strong>Analytics:</strong> Ajuda o Oni a aprender e melhorar continuamente</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="warning-card" *ngIf="isOniDesabilitado()">
+      <i class="cil-warning"></i>
+      <div>
+        <h4>🦉 Oni Desabilitado - Interruptor Mestre</h4>
+        <p>O assistente Oni o Sábio está desabilitado. Este é o <strong>interruptor mestre</strong> que controla todas as funcionalidades do Oni. Quando desabilitado, nenhuma funcionalidade (chat, tooltips, guias, etc.) estará disponível. Habilite-o primeiro para poder ativar as funcionalidades específicas!</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+

@@ -1,0 +1,70 @@
+# Configuração do SingleOne Agent
+
+# Configurações do servidor
+server:
+  # URL base do servidor SingleOne
+  url: "http://localhost:5000/api"
+  
+  # API Key para autenticação (obrigatório)
+  api_key: "your-api-key-here"
+  
+  # Timeout para requisições (segundos)
+  timeout: 30
+  
+  # Tentar novamente em caso de falha
+  retry_attempts: 3
+  
+  # Intervalo entre tentativas (segundos)
+  retry_delay: 60
+
+# Configurações do agente
+agent:
+  # ID do cliente no sistema SingleOne
+  client_id: 1
+  
+  # Nome/identificador do agente (deixe vazio para usar hostname)
+  name: ""
+  
+  # Intervalo de coleta em segundos (padrão: 3600 = 1 hora)
+  interval: 3600
+  
+  # Executar coleta na inicialização
+  run_on_startup: true
+  
+  # Modo debug (mais logs)
+  debug: false
+
+# O que coletar
+collection:
+  # Informações de hardware
+  hardware: true
+  
+  # Software instalado
+  software: true
+  
+  # Informações de rede
+  network: true
+  
+  # Processos em execução
+  processes: false
+  
+  # Usuários logados
+  users: false
+
+# Configurações de log
+logging:
+  # Nível de log: DEBUG, INFO, WARNING, ERROR, CRITICAL
+  level: "INFO"
+  
+  # Arquivo de log
+  file: "logs/agent.log"
+  
+  # Tamanho máximo do arquivo (MB)
+  max_size: 10
+  
+  # Número de arquivos de backup
+  backup_count: 5
+  
+  # Formato JSON
+  json_format: true
+

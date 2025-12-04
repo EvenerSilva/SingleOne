@@ -1,0 +1,266 @@
+<!-- 🎯 HEADER MODERNO DO TIMELINE DE RECURSOS -->
+<div class="timeline-recursos-header">
+  <div class="header-content">
+    <div class="header-left">
+      <button class="back-button" [routerLink]="['/relatorios']" matTooltip="Voltar para Relatórios">
+        <i class="material-icons">arrow_back</i>
+      </button>
+      <div class="header-title">
+        <div class="title-icon">
+          <i class="material-icons">timeline</i>
+        </div>
+        <div class="title-text">
+                <h1>Timeline de Recursos</h1>
+      <p>Histórico completo de movimentações por recurso</p>
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="action-btn clear-filters-btn" (click)="limparFiltros()" matTooltip="Limpar todos os filtros e parâmetros de busca">
+        <i class="cil-filter-x"></i>
+        <span>Limpar Filtros</span>
+      </button>
+      <div class="header-stats">
+        <div class="stat-item">
+          <div class="stat-number">{{historicos.length}}</div>
+          <div class="stat-label">Registros</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">{{recursos.length}}</div>
+          <div class="stat-label">Recursos</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 🍞 BREADCRUMB MODERNO -->
+<nav class="modern-breadcrumb">
+  <div class="breadcrumb-container">
+    <a [routerLink]="['/dashboard']" class="breadcrumb-item">
+      <i class="cil-home"></i>
+      <span>Dashboard</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a [routerLink]="['/relatorios']" class="breadcrumb-item">
+      <span>Relatórios e Timeline</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <span class="breadcrumb-item active">Recursos</span>
+  </div>
+</nav>
+
+<!-- 📋 CONTEÚDO PRINCIPAL -->
+<div class="timeline-recursos-content">
+
+  <!-- 🔍 SEÇÃO DE PESQUISA -->
+  <div class="search-section">
+    <div class="search-card">
+      <div class="search-header">
+        <div class="search-icon">
+          <i class="material-icons">search</i>
+        </div>
+        <div class="search-title">
+          <h3>Selecionar Recurso</h3>
+          <p>Escolha um recurso para visualizar seu histórico completo</p>
+        </div>
+      </div>
+      
+      <div class="search-form">
+        <div class="form-group">
+          <mat-form-field appearance="outline" class="search-select">
+            <mat-label>Selecione o recurso</mat-label>
+            <mat-select [formControl]="recursoSelecionado" #singleSelect (selectionChange)="onRecursoSelecionado($event)">
+              <mat-option>
+                <ngx-mat-select-search 
+                  [formControl]="buscarRecursos" 
+                  placeholderLabel="Buscar pelo fabricante, modelo, S/N ou patrimônio" 
+                  noEntriesFoundLabel="Nenhum recurso encontrado">
+                </ngx-mat-select-search>
+              </mat-option>
+              <mat-option *ngFor="let row of recursos" [value]="row.id" [ngClass]="{'linha-telefonica-option': row.isLinhaTelefonica}">
+                <div class="option-content">
+                  <div class="option-main">
+                    <span class="option-type" *ngIf="row.isLinhaTelefonica">📱</span>
+                    <span class="option-type" *ngIf="!row.isLinhaTelefonica">💻</span>
+                    <span *ngIf="row.isLinhaTelefonica">{{row.tipoequipamento}} {{row.fabricante}} - {{row.modelo}}</span>
+                    <span *ngIf="!row.isLinhaTelefonica">{{row.tipoequipamento}} {{row.fabricante}}</span>
+                  </div>
+                  <div class="option-details" *ngIf="row.isLinhaTelefonica">
+                    Operadora: {{row.patrimonio}}
+                  </div>
+                  <div class="option-details" *ngIf="!row.isLinhaTelefonica">
+                    {{row.modelo}} - S/N: {{row.numeroserie}} - Patrimônio: {{(row.patrimonio == "") ? "-" : row.patrimonio}}
+                  </div>
+                </div>
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        
+        <div class="search-actions">
+          <button class="btn-search" (click)="consultarHistorico()">
+            <i class="material-icons">search</i>
+            Pesquisar Histórico
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 📊 SEÇÃO DO TIMELINE COMPACTA -->
+  <div class="timeline-section" *ngIf="historicos.length > 0">
+    <div class="timeline-header">
+      <div class="timeline-info">
+        <div class="timeline-icon">
+          <i class="material-icons">devices</i>
+        </div>
+        <div class="timeline-details">
+          <h3>{{recurso.descricao}}</h3>
+          <p>{{historicos.length}} movimentações registradas</p>
+        </div>
+      </div>
+      <div class="timeline-actions">
+        <button class="btn-print" (click)="imprimirTimeline()" matTooltip="Imprimir Timeline">
+          <i class="material-icons">print</i>
+          Imprimir
+        </button>
+      </div>
+    </div>
+    
+    <!-- Timeline compacto -->
+    <div class="timeline-container">
+      <div class="compact-timeline">
+        <div class="timeline-item-compact" *ngFor="let item of historicos; let i = index">
+          
+          <!-- Linha única com status e informações -->
+          <div class="timeline-line" [ngClass]="getStatusClass(item.status)">
+            
+            <!-- Status e ícone -->
+            <div class="status-section">
+              <i class="material-icons status-icon">
+                {{item.status?.toLowerCase().includes('entregue') ? 'check_circle' : 
+                  item.status?.toLowerCase().includes('devolvido') ? 'check_circle' : 
+                  item.status?.toLowerCase().includes('pendente') ? 'schedule' : 
+                  item.status?.toLowerCase().includes('estoque') ? 'inventory' : 'info'}}
+              </i>
+              <span class="status-text">{{item.status}}</span>
+            </div>
+            
+            <!-- Título da movimentação -->
+            <div class="title-section">
+              <span class="movement-title">{{item.title}}</span>
+            </div>
+            
+            <!-- Informações do recurso -->
+            <div class="resource-section" *ngIf="item.numeroserie || item.patrimonio">
+              <span class="resource-item" *ngIf="item.numeroserie">
+                <i class="material-icons">memory</i>
+                <!-- Link para linhas telefônicas -->
+                <span *ngIf="item.isLinhaTelefonica">
+                  Número: <a 
+                    [routerLink]="['/linhas']"
+                    [queryParams]="{search: item.numeroserie}"
+                    [matTooltip]="'Clique para ver detalhes da linha (Número: ' + item.numeroserie + ')'"
+                    [matTooltipClass]="'resource-tooltip'"
+                    [matTooltipPosition]="'above'"
+                    [matTooltipShowDelay]="500"
+                    class="serial-link">{{item.numeroserie}}</a>
+                </span>
+                <!-- Link para equipamentos físicos -->
+                <span *ngIf="!item.isLinhaTelefonica">
+                  S/N: <a 
+                    [routerLink]="['/recursos']"
+                    [queryParams]="{search: item.numeroserie}"
+                    [matTooltip]="'Clique para ver detalhes do recurso (S/N: ' + item.numeroserie + ')'"
+                    [matTooltipClass]="'resource-tooltip'"
+                    [matTooltipPosition]="'above'"
+                    [matTooltipShowDelay]="500"
+                    class="serial-link">{{item.numeroserie}}</a>
+                </span>
+              </span>
+              <span class="resource-item" *ngIf="item.patrimonio">
+                <i class="material-icons">inventory</i>
+                Patrimônio: {{item.patrimonio}}
+              </span>
+            </div>
+            
+            <!-- Usuário/Colaborador -->
+            <div class="user-section" *ngIf="item.usuario || item.colaborador">
+              <span class="user-item" *ngIf="item.usuario">
+                <i class="material-icons">person</i>
+                {{item.usuario}}
+              </span>
+              <span class="user-item" *ngIf="item.colaborador">
+                <i class="material-icons">badge</i>
+                {{item.colaborador}}
+              </span>
+            </div>
+            
+            <!-- Data e hora -->
+            <div class="date-section">
+              <span class="date">{{item.dataFormatada}}</span>
+              <span class="time">{{item.horaFormatada}}</span>
+            </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🚫 ESTADO VAZIO -->
+  <div class="empty-state" *ngIf="historicos.length === 0 && recurso.id">
+    <div class="empty-content">
+      <div class="empty-icon">
+        <i class="material-icons">timeline</i>
+      </div>
+      <h3>Nenhum histórico encontrado</h3>
+      <p>O recurso selecionado ainda não possui registros de movimentação.</p>
+      <div class="empty-tips">
+        <div class="tip-item">
+          <i class="material-icons">info</i>
+          <span>Este recurso pode ser novo no sistema</span>
+        </div>
+        <div class="tip-item">
+          <i class="material-icons">schedule</i>
+          <span>Histórico será criado após primeira movimentação</span>
+        </div>
+        <div class="tip-item">
+          <i class="material-icons">refresh</i>
+          <span>Tente selecionar outro recurso ou verificar mais tarde</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 💡 ESTADO INICIAL -->
+  <div class="initial-state" *ngIf="!recurso.id">
+    <div class="initial-content">
+      <div class="initial-icon">
+        <i class="material-icons">search</i>
+      </div>
+      <h3>Selecione um recurso</h3>
+      <p>Use o campo de pesquisa acima para encontrar e selecionar um recurso e visualizar seu timeline completo.</p>
+      <div class="initial-tips">
+        <div class="tip-item">
+          <i class="material-icons">info</i>
+          <span>Você pode buscar por fabricante, modelo, número de série ou patrimônio</span>
+        </div>
+        <div class="tip-item">
+          <i class="material-icons">timeline</i>
+          <span>O histórico mostra todas as movimentações e alterações de status</span>
+        </div>
+        <div class="tip-item">
+          <i class="material-icons">date_range</i>
+          <span>Entregas e devoluções são exibidas com data e hora</span>
+        </div>
+        <div class="tip-item">
+          <i class="material-icons">person</i>
+          <span>Veja quem realizou cada operação no sistema</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

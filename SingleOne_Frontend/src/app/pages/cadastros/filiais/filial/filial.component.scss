@@ -1,0 +1,332 @@
+// 🎯 ESTILOS DO FORMULÁRIO DE FILIAL
+.filial-form-container {
+  max-width: 900px;
+  width: 90%;
+  margin: 0 auto;
+  padding: 2rem;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  min-height: 300px; /* Reduzir altura mínima */
+  max-height: 80vh; /* Limitar altura máxima */
+  overflow-y: auto;
+}
+
+// Header do Formulário
+.form-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid #f0f0f0;
+
+  .form-title {
+    color: #2c3e50;
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  .form-subtitle {
+    color: #7f8c8d;
+    font-size: 1rem;
+    margin: 0;
+    line-height: 1.5;
+  }
+}
+
+// Formulário
+.filial-form {
+  .form-row {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+
+    .form-group {
+      flex: 1;
+      min-width: 0; // Evita overflow
+    }
+
+    .form-group.full-width {
+      flex: 1 1 100%;
+    }
+  }
+
+  .form-group {
+    margin-bottom: 1.5rem;
+
+    .form-label {
+      display: block;
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 0.5rem;
+      font-size: 0.95rem;
+
+      .required {
+        color: #e74c3c;
+        font-weight: 700;
+      }
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 2px solid #e1e8ed;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      background: #fafbfc;
+
+      &:focus {
+        outline: none;
+        border-color: #3498db;
+        background: #ffffff;
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+      }
+
+      &.is-invalid {
+        border-color: #e74c3c;
+        background: #fdf2f2;
+
+        &:focus {
+          box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+        }
+      }
+
+      &::placeholder {
+        color: #bdc3c7;
+      }
+    }
+
+    select.form-control {
+      cursor: pointer;
+      height: auto;
+      min-height: 48px; /* Garantir altura mínima para o texto */
+      line-height: 1.5;
+      padding: 0.75rem 1rem;
+      
+      /* Garantir que o texto seja exibido completamente */
+      white-space: nowrap;
+      overflow: visible;
+      text-overflow: clip;
+      
+      /* Estilizar as opções */
+      option {
+        padding: 0.5rem;
+        font-size: 0.95rem;
+      }
+    }
+
+    .input-group {
+      .form-control {
+        border-right: none;
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+      }
+
+      .btn-outline-secondary {
+        border-left: none;
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+        background: #f8f9fa;
+        border-color: #e1e8ed;
+        color: #6c757d;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+
+        &:hover {
+          background: #e9ecef;
+          border-color: #ced4da;
+          color: #495057;
+        }
+
+        i {
+          font-size: 0.9rem;
+        }
+      }
+    }
+
+    .invalid-feedback {
+      display: block;
+      color: #e74c3c;
+      font-size: 0.85rem;
+      margin-top: 0.25rem;
+      font-weight: 500;
+    }
+
+    .form-text {
+      color: #6c757d;
+      font-size: 0.85rem;
+      margin-top: 0.25rem;
+      font-style: italic;
+    }
+  }
+}
+
+// Botões de Ação
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 2px solid #f0f0f0;
+
+  .btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 120px;
+    justify-content: center;
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    i {
+      font-size: 0.9rem;
+    }
+  }
+
+  .btn-secondary {
+    background: #6c757d;
+    color: white;
+
+    &:hover:not(:disabled) {
+      background: #5a6268;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+    }
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    color: white;
+
+    &:hover:not(:disabled) {
+      background: linear-gradient(135deg, #2980b9 0%, #1f5f8b 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+    }
+  }
+}
+
+// Responsividade
+@media (max-width: 768px) {
+  .filial-form-container {
+    padding: 1.5rem;
+    margin: 1rem;
+    border-radius: 8px;
+    max-width: 95%;
+  }
+
+  .form-header {
+    .form-title {
+      font-size: 1.5rem;
+    }
+
+    .form-subtitle {
+      font-size: 0.9rem;
+    }
+  }
+
+  .filial-form {
+    .form-row {
+      flex-direction: column;
+      gap: 1rem;
+      margin-bottom: 1rem;
+
+      .form-group {
+        margin-bottom: 1rem;
+      }
+    }
+  }
+
+  .form-actions {
+    flex-direction: column;
+    gap: 1rem;
+
+    .btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .filial-form-container {
+    padding: 1rem;
+    margin: 0.5rem;
+  }
+
+  .form-header {
+    .form-title {
+      font-size: 1.3rem;
+    }
+  }
+
+  .filial-form {
+    .form-group {
+      margin-bottom: 1rem;
+
+      .form-control {
+        padding: 0.625rem 0.875rem;
+        font-size: 0.9rem;
+      }
+    }
+  }
+}
+
+// Animações
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.filial-form-container {
+  animation: fadeIn 0.3s ease-out;
+}
+
+// Estados de loading
+.form-control:disabled {
+  background: #f8f9fa;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+// Melhorias de acessibilidade
+.form-control:focus {
+  outline: 2px solid #3498db;
+  outline-offset: 2px;
+}
+
+// Estilos para campos obrigatórios
+.form-label .required {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 1;
+  }
+}

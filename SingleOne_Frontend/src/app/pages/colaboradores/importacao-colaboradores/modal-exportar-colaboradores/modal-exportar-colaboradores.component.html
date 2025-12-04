@@ -1,0 +1,55 @@
+<div class="export-modal-content">
+  <div class="export-modal-header">
+    <h3><i class="cil-download"></i> Exportar Colaboradores</h3>
+    <button class="close-btn" (click)="fechar()">
+      <i class="cil-x"></i>
+    </button>
+  </div>
+
+  <div class="export-modal-body">
+    <p>Escolha o formato de exportação para os dados de colaboradores:</p>
+
+    <div class="export-info-box">
+      <i class="cil-info"></i>
+      <div>
+        <strong>O que será exportado:</strong>
+        <ul>
+          <li>Todos os colaboradores visíveis para o cliente atual</li>
+          <li>Campos principais: Matrícula, Nome, CPF, Email, Cargo, Setor, Empresa, Centro de Custo, etc.</li>
+          <li>A exportação considera os filtros da listagem atual</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="export-options">
+      <div class="export-option" (click)="exportarExcel()">
+        <div class="export-icon excel">
+          <i class="cil-file"></i>
+        </div>
+        <div class="export-info">
+          <h4>Excel (.xlsx)</h4>
+          <p>Formato ideal para análise e manipulação de dados</p>
+        </div>
+        <i class="cil-chevron-right"></i>
+      </div>
+
+      <div class="export-option" (click)="exportarCSV()">
+        <div class="export-icon csv">
+          <i class="cil-file"></i>
+        </div>
+        <div class="export-info">
+          <h4>CSV (.csv)</h4>
+          <p>Formato universal compatível com qualquer planilha</p>
+        </div>
+        <i class="cil-chevron-right"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="export-modal-footer">
+    <button class="btn-secondary" (click)="fechar()">
+      Cancelar
+    </button>
+  </div>
+</div>
+

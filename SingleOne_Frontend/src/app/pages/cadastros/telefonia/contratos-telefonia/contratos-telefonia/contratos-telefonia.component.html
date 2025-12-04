@@ -1,0 +1,190 @@
+<!-- 🎯 HEADER MODERNO DAS CONTAS -->
+<div class="contas-header">
+  <div class="header-content">
+    <div class="header-left">
+      <div class="back-button" (click)="voltarParaTelecom()">
+        <i class="cil-arrow-left"></i>
+      </div>
+      
+      <div class="header-title">
+        <div class="title-icon">
+          <i class="cil-credit-card"></i>
+        </div>
+        
+        <div class="title-text">
+          <h1>Contas</h1>
+          <p>Gestão de contas de telefonia</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="header-right">
+      <button class="action-btn" (click)="novo()">
+        <i class="cil-plus"></i>
+        <span>Nova Conta</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 🍞 BREADCRUMB MODERNO -->
+<div class="modern-breadcrumb">
+  <div class="breadcrumb-container">
+    <a class="breadcrumb-item" (click)="voltarParaTelecom()">
+      <i class="cil-home"></i>
+      <span>Telecom</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a class="breadcrumb-item" (click)="navegarParaOperadoras()">
+      <i class="cil-building"></i>
+      <span>Operadoras</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <span class="breadcrumb-item active">Contas</span>
+    <i class="cil-chevron-right"></i>
+    <a class="breadcrumb-item" (click)="navegarParaPlanosGeral()">
+      <i class="cil-list"></i>
+      <span>Planos</span>
+    </a>
+    <i class="chevron-right"></i>
+    <a class="breadcrumb-item" (click)="navegarParaLinhasGeral()">
+      <i class="cil-phone"></i>
+      <span>Linhas</span>
+    </a>
+  </div>
+</div>
+
+<!-- 📋 CONTEÚDO PRINCIPAL -->
+<div class="contas-content">
+  <!-- 🔍 SEÇÃO DE BUSCA -->
+  <div class="search-section">
+    <div class="search-box">
+      <i class="cil-magnifying-glass search-icon"></i>
+      <input 
+        type="text" 
+        placeholder="Buscar pelo nome da conta ou pela operadora..." 
+        [formControl]="consulta"
+        class="form-control">
+      <button 
+        *ngIf="consulta.value" 
+        class="clear-btn" 
+        (click)="limparBusca()"
+        type="button">
+        <i class="cil-x"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- 📊 TABELA MODERNA -->
+  <div class="table-section">
+    <table mat-table [dataSource]="dataSource" class="modern-table">
+      <!-- Coluna Operadora -->
+      <ng-container matColumnDef="operadora">
+        <th mat-header-cell *matHeaderCellDef>Operadora</th>
+        <td mat-cell *matCellDef="let row">
+          {{ row.operadoraNavigation.nome }}
+        </td>
+      </ng-container>
+
+      <!-- Coluna Nome -->
+      <ng-container matColumnDef="nome">
+        <th mat-header-cell *matHeaderCellDef>Nome</th>
+        <td mat-cell *matCellDef="let row">{{ row.nome }}</td>
+      </ng-container>
+
+      <!-- Coluna Descrição -->
+      <ng-container matColumnDef="descricao">
+        <th mat-header-cell *matHeaderCellDef>Descrição</th>
+        <td mat-cell *matCellDef="let row">{{ row.descricao }}</td>
+      </ng-container>
+
+      <!-- Coluna Totalizadores -->
+      <ng-container matColumnDef="totalizadores">
+        <th mat-header-cell *matHeaderCellDef>Totalizadores</th>
+        <td mat-cell *matCellDef="let row">
+          <div class="totalizadores-chips">
+            <a class="chip planos" 
+               (click)="navegarParaPlanos(row.operadoraNavigation.nome, row.nome)"
+               matTooltip="Ver planos desta conta">
+              {{ row.totalPlanos }} PLANOS
+            </a>
+            <a class="chip linhas" 
+               (click)="navegarParaLinhas(row.operadoraNavigation.nome, row.nome, 'todas')"
+               matTooltip="Ver todas as linhas desta conta">
+              {{ row.totalLinhas }} LINHAS
+            </a>
+            <a class="chip em-uso" 
+               (click)="navegarParaLinhas(row.operadoraNavigation.nome, row.nome, 'em-uso')"
+               matTooltip="Ver linhas em uso desta conta">
+              {{ row.totalEmUso }} EM USO
+            </a>
+            <a class="chip livres" 
+               (click)="navegarParaLinhas(row.operadoraNavigation.nome, row.nome, 'livres')"
+               matTooltip="Ver linhas livres desta conta">
+              {{ row.totalLivre }} LIVRES
+            </a>
+          </div>
+        </td>
+      </ng-container>
+
+      <!-- Coluna Ativo -->
+      <ng-container matColumnDef="ativo">
+        <th mat-header-cell *matHeaderCellDef>Status</th>
+        <td mat-cell *matCellDef="let row">
+          <div class="status-indicator" [class.ativo]="row.ativo" [class.inativo]="!row.ativo">
+            <i [class]="row.ativo ? 'cil-check' : 'cil-ban'"></i>
+            <span>{{ row.ativo ? 'Ativo' : 'Inativo' }}</span>
+          </div>
+        </td>
+      </ng-container>
+
+      <!-- Coluna Ações -->
+      <ng-container matColumnDef="acao">
+        <th mat-header-cell *matHeaderCellDef class="text-center">Ações</th>
+        <td mat-cell *matCellDef="let row" class="text-center">
+          <div class="action-buttons">
+            <button 
+              class="action-btn edit-btn" 
+              matTooltip="Editar"
+              (click)="editar(row)">
+              <i class="cil-pencil"></i>
+            </button>
+            
+            <button 
+              class="action-btn delete-btn" 
+              matTooltip="Excluir"
+              (click)="excluir(row)"
+              *ngIf="row.totalPlanos == 0">
+              <i class="cil-trash"></i>
+            </button>
+          </div>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="colunas"></tr>
+      <tr mat-row *matRowDef="let row; columns: colunas"></tr>
+    </table>
+  </div>
+
+  <!-- 📄 PAGINAÇÃO -->
+  <div class="pagination-container">
+    <mat-paginator
+      [pageSizeOptions]="[5, 10, 25, 100]"
+      [pageSize]="10"
+      showFirstLastButtons>
+    </mat-paginator>
+  </div>
+</div>
+
+<!-- 🎯 FORMULÁRIO DE CONTRATO (MODAL) -->
+<div class="formulario-overlay" *ngIf="mostrarFormulario">
+  <div class="formulario-container">
+    <app-contrato-telefonia
+      [contrato]="contratoEditando"
+      [modo]="modoFormulario"
+      (contratoSalvo)="onContratoSalvo($event)"
+      (cancelado)="onCancelado()"
+    ></app-contrato-telefonia>
+  </div>
+</div>
+  

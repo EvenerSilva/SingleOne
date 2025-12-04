@@ -1,0 +1,675 @@
+/* 🎯 HEADER DO FORMULÁRIO (MESMO PADRÃO) */
+.form-header {
+  text-align: center;
+  margin-bottom: 1.25rem; /* ✅ REDUZIDO: de 1.5rem para 1.25rem para economizar espaço */
+  padding-bottom: 0.75rem; /* ✅ REDUZIDO: de 1rem para 0.75rem para economizar espaço */
+  border-bottom: 2px solid #f0f0f0;
+  padding-top: 1rem; /* ✅ AUMENTADO: de 0.25rem para 1rem para dar mais espaço ao título */
+  margin-top: 0.5rem; /* ✅ AUMENTADO: de 0.25rem para 0.5rem para dar mais espaço */
+
+  .form-title {
+    color: #2c3e50;
+    font-size: 1.5rem; /* ✅ REDUZIDO: de 1.6rem para 1.5rem para garantir que caiba */
+    font-weight: 600;
+    margin-bottom: 0.4rem; /* ✅ REDUZIDO: de 0.5rem para 0.4rem para economizar espaço */
+    line-height: 1.1; /* ✅ REDUZIDO: de 1.2 para 1.1 para economizar espaço */
+  }
+
+  .form-subtitle {
+    color: #7f8c8d;
+    font-size: 0.9rem; /* ✅ REDUZIDO: de 0.95rem para 0.9rem para economizar espaço */
+    margin: 0;
+    line-height: 1.2; /* ✅ REDUZIDO: de 1.3 para 1.2 para economizar espaço */
+  }
+}
+
+/* 🎭 ANIMAÇÕES */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}
+
+/* 📋 CONTEÚDO PRINCIPAL (MESMO PADRÃO) */
+.laudo-form-container {
+  width: 100%;
+  padding: 1.5rem; /* ✅ REDUZIDO: de 2rem para 1.5rem */
+  background: transparent;
+  min-height: 300px; /* ✅ REDUZIDO: de 400px para 300px */
+  padding-top: 1rem; /* ✅ AUMENTADO: de 0.5rem para 1rem para dar mais espaço ao título */
+  
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* ✅ REDUZIDO: de 350px para 300px */
+    gap: 1rem; /* ✅ REDUZIDO: de 1.5rem para 1rem */
+    
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+      gap: 0.75rem; /* ✅ REDUZIDO: de 1rem para 0.75rem */
+    }
+  }
+  
+  .info-section {
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 1.25rem; /* ✅ REDUZIDO: de 1.5rem para 1.25rem */
+    
+    h3 {
+      margin: 0 0 0.75rem 0; /* ✅ REDUZIDO: de 1rem para 0.75rem */
+      font-size: 1rem; /* ✅ REDUZIDO: de 1.1rem para 1rem */
+      font-weight: 600;
+      color: #333;
+      border-bottom: 2px solid #007bff;
+      padding-bottom: 0.4rem; /* ✅ REDUZIDO: de 0.5rem para 0.4rem */
+    }
+    
+    .info-value {
+      font-size: 0.95rem; /* ✅ REDUZIDO: de 1rem para 0.95rem */
+      color: #555;
+      line-height: 1.4; /* ✅ REDUZIDO: de 1.5 para 1.4 */
+      padding: 0.6rem; /* ✅ REDUZIDO: de 0.75rem para 0.6rem */
+      background: #f8f9fa;
+      border-radius: 4px;
+      border-left: 3px solid #007bff;
+    }
+    
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.4rem 0; /* ✅ REDUZIDO: de 0.5rem para 0.4rem */
+      border-bottom: 1px solid #f0f0f0;
+      
+      &:last-child {
+        border-bottom: none;
+      }
+      
+      .info-label {
+        font-weight: 600;
+        color: #666;
+        font-size: 0.85rem; /* ✅ REDUZIDO: de 0.9rem para 0.85rem */
+      }
+      
+      .info-value {
+        font-weight: 500;
+        color: #333;
+        font-size: 0.9rem; /* ✅ REDUZIDO: de 0.95rem para 0.9rem */
+        background: none;
+        border: none;
+        padding: 0;
+      }
+    }
+    
+    .avaliacoes-list {
+      .avaliacao-item {
+        padding: 0.4rem 0; /* ✅ REDUZIDO: de 0.5rem para 0.4rem */
+        
+        mat-checkbox {
+          font-size: 0.9rem; /* ✅ REDUZIDO: de 0.95rem para 0.9rem */
+          color: #555;
+        }
+      }
+    }
+    
+    .datas-list {
+      .data-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.4rem 0; /* ✅ REDUZIDO: de 0.5rem para 0.4rem */
+        border-bottom: 1px solid #f0f0f0;
+        
+        &:last-child {
+          border-bottom: none;
+        }
+        
+        .data-label {
+          font-weight: 600;
+          color: #666;
+          font-size: 0.85rem; /* ✅ REDUZIDO: de 0.9rem para 0.85rem */
+        }
+        
+        .data-value {
+          font-weight: 500;
+          color: #333;
+          font-size: 0.9rem; /* ✅ REDUZIDO: de 0.95rem para 0.9rem */
+          background: #f8f9fa;
+          padding: 0.4rem 0.6rem; /* ✅ REDUZIDO: de 0.5rem 0.75rem para 0.4rem 0.6rem */
+          border-radius: 4px;
+          border: 1px solid #dee2e6;
+        }
+      }
+    }
+  }
+
+     /* 📸 SEÇÃO DE EVIDÊNCIAS */
+   &.evidencias-section {
+     
+           // CSS GLOBAL PARA FORÇAR LAYOUT
+      ::ng-deep {
+        .evidencias-list {
+          display: grid !important;
+          grid-template-columns: repeat(3, 1fr) !important;
+          grid-template-rows: repeat(2, auto) !important;
+          gap: 0.75rem !important; /* ✅ REDUZIDO: de 1rem para 0.75rem */
+          margin-bottom: 0.75rem !important; /* ✅ REDUZIDO: de 1rem para 0.75rem */
+          width: 100% !important;
+          max-width: 100% !important;
+          
+          .evidencia-item {
+            display: block !important;
+            float: none !important;
+            clear: none !important;
+            width: auto !important;
+            max-width: 180px !important; /* ✅ REDUZIDO: de 200px para 180px */
+            margin: 0 !important;
+          }
+        }
+      }
+      
+           // CSS LOCAL DIRETO
+     .evidencias-list {
+       display: grid !important;
+       grid-template-columns: repeat(3, 1fr) !important;
+       grid-template-rows: repeat(2, auto) !important;
+       gap: 0.75rem !important; /* ✅ REDUZIDO: de 1rem para 0.75rem */
+       margin-bottom: 0.75rem !important; /* ✅ REDUZIDO: de 1rem para 0.75rem */
+       width: 100% !important;
+       max-width: 100% !important;
+       
+       .evidencia-item {
+         display: block !important;
+         float: none !important;
+         clear: none !important;
+         width: auto !important;
+         max-width: 180px !important; /* ✅ REDUZIDO: de 200px para 180px */
+         margin: 0 !important;
+       }
+     }
+     
+     // CSS ADICIONAL PARA FORÇAR LAYOUT
+     .evidencias-list {
+       display: grid !important;
+       grid-template-columns: repeat(3, 1fr) !important;
+       grid-template-rows: repeat(2, auto) !important;
+       gap: 0.75rem !important; /* ✅ REDUZIDO: de 1rem para 0.75rem */
+       margin-bottom: 0.75rem !important; /* ✅ REDUZIDO: de 1rem para 0.75rem */
+       width: 100% !important;
+       max-width: 100% !important;
+       
+       .evidencia-item {
+         display: block !important;
+         float: none !important;
+         clear: none !important;
+         width: auto !important;
+         max-width: 200px !important;
+         margin: 0 !important;
+       }
+     }
+    
+         // 🎨 LAYOUT DE GRID PARA EVIDÊNCIAS
+     
+     // FORÇAR LAYOUT HORIZONTAL
+     .evidencias-list {
+       display: grid !important;
+       grid-template-columns: repeat(3, 1fr) !important;
+       grid-template-rows: repeat(2, auto) !important;
+       gap: 0.75rem !important; /* ✅ REDUZIDO: de 1rem para 0.75rem */
+       margin-bottom: 0.75rem !important; /* ✅ REDUZIDO: de 1rem para 0.75rem */
+       width: 100% !important;
+       max-width: 100% !important;
+       
+       // FORÇAR ITENS EM LINHA
+       .evidencia-item {
+         display: block !important;
+         float: none !important;
+         clear: none !important;
+         width: auto !important;
+         max-width: 200px !important;
+         margin: 0 !important;
+       }
+     }
+    
+    .evidencias-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem; /* ✅ REDUZIDO: de 1rem para 0.75rem */
+
+      h3 {
+        margin: 0;
+        font-size: 1rem; /* ✅ REDUZIDO: de 1.1rem para 1rem */
+        font-weight: 600;
+        color: #333;
+      }
+
+      // 🎨 CUSTOMIZAÇÃO SUTIL PARA BOTÕES COREUI
+      .btn {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem; /* ✅ REDUZIDO: de 0.5rem para 0.4rem */
+        
+        i {
+          font-size: 14px; /* ✅ REDUZIDO: de 16px para 14px */
+        }
+      }
+    }
+
+    .loading-evidencias {
+      text-align: center;
+      padding: 0.75rem; /* ✅ REDUZIDO: de 1rem para 0.75rem */
+      color: #666;
+    }
+
+                   .evidencias-list {
+            display: grid !important;
+            grid-template-columns: repeat(3, 1fr) !important;
+            grid-template-rows: repeat(2, auto) !important;
+            gap: 0.75rem !important; /* ✅ REDUZIDO: de 1rem para 0.75rem */
+            margin-bottom: 0.75rem !important; /* ✅ REDUZIDO: de 1rem para 0.75rem */
+            
+            .evidencia-item {
+              border: 1px solid #dee2e6;
+              border-radius: 8px;
+              background: white;
+              transition: all 0.2s ease;
+              padding: 0.75rem; /* ✅ REDUZIDO: de 1rem para 0.75rem */
+              max-width: 200px !important;
+              width: 100% !important;
+              
+              &:hover {
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                transform: translateY(-2px);
+              }
+
+              .evidencia-view {
+                .evidencia-info {
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center;
+                  gap: 0.75rem;
+                  text-align: center;
+                  position: relative;
+                  width: 100% !important;
+
+                  .evidencia-ordem {
+                    background: #007bff;
+                    color: white;
+                    width: 24px;
+                    height: 24px;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 0.8rem;
+                    font-weight: 600;
+                    position: absolute;
+                    top: 0;
+                    right: 0;
+                    z-index: 2;
+                  }
+                  
+                  /* 🖼️ MINIATURA DA EVIDÊNCIA */
+                  .evidencia-preview {
+                    width: 80px !important;
+                    height: 80px !important;
+                    max-width: 80px !important;
+                    max-height: 80px !important;
+                    min-width: 80px !important;
+                    min-height: 80px !important;
+                    border-radius: 8px;
+                    overflow: hidden !important;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    background: #f8f9fa;
+                    border: 2px solid #e9ecef;
+                    position: relative;
+                    flex-shrink: 0 !important;
+                    
+                    .image-thumbnail {
+                      width: 100% !important;
+                      height: 100% !important;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      overflow: hidden !important;
+                      
+                      img {
+                        width: 100% !important;
+                        height: 100% !important;
+                        max-width: 100% !important;
+                        max-height: 100% !important;
+                        object-fit: cover !important;
+                        border-radius: 6px;
+                        flex-shrink: 0 !important;
+                      }
+                    }
+                    
+                    .file-icon {
+                      width: 100% !important;
+                      height: 100% !important;
+                      border-radius: 6px;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      background: linear-gradient(135deg, #007bff, #0056b3);
+                      color: white;
+                      
+                      i {
+                        font-size: 24px;
+                      }
+                    }
+                  }
+                  
+                  /* 📋 DETALHES DA EVIDÊNCIA */
+                  .evidencia-details {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 0.25rem;
+                    width: 100% !important;
+                    max-width: 100% !important;
+                    
+                    .evidencia-nome {
+                      font-size: 0.9rem;
+                      color: #333;
+                      font-weight: 500;
+                      word-break: break-word;
+                      max-width: 100% !important;
+                      overflow-wrap: break-word !important;
+                    }
+                    
+                    .evidencia-size {
+                      font-size: 0.75rem;
+                      color: #6c757d;
+                    }
+                  }
+
+                  .evidencia-actions {
+                    display: flex;
+                    gap: 0.5rem;
+                    align-items: center;
+                    justify-content: center;
+                    margin-top: 0.5rem;
+                    width: 100% !important;
+
+                    .btn {
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      font-weight: 500;
+                      border-radius: 8px;
+                      transition: all 0.2s ease;
+                      width: 36px !important;
+                      height: 36px !important;
+                      padding: 0;
+                      flex-shrink: 0 !important;
+                      
+                      i {
+                        font-size: 16px;
+                      }
+                      
+                      &:hover {
+                        transform: translateY(-1px);
+                        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+                      }
+                    }
+                  }
+                }
+              }
+
+        .evidencia-edit {
+          background: #fff3cd;
+          border-top: 1px solid #ffeaa7;
+          padding: 0.75rem;
+
+          .edit-form {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+
+            label {
+              font-size: 0.9rem;
+              font-weight: 600;
+              color: #856404;
+            }
+
+            input {
+              width: 60px;
+              padding: 0.25rem 0.5rem;
+              border: 1px solid #ffeaa7;
+              border-radius: 3px;
+              font-size: 0.9rem;
+              text-align: center;
+            }
+
+                         .edit-buttons {
+               display: flex;
+               gap: 0.75rem;
+
+               button {
+                 border: none;
+                 border-radius: 6px;
+                 padding: 0.4rem 0.75rem; /* ✅ REDUZIDO: de 0.5rem 1rem para 0.4rem 0.75rem */
+                 cursor: pointer;
+                 font-size: 0.9rem;
+                 font-weight: 600;
+                 transition: all 0.2s ease;
+                 box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+                 &:hover {
+                   transform: translateY(-1px);
+                   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+                 }
+
+                 &.btn-save {
+                   background: #28a745;
+                   color: white;
+
+                   &:hover {
+                     background: #218838;
+                   }
+                 }
+
+                 &.btn-cancel {
+                   background: #6c757d;
+                   color: white;
+
+                   &:hover {
+                     background: #5a6268;
+                   }
+                 }
+               }
+             }
+          }
+        }
+      }
+    }
+
+    .sem-evidencias {
+      text-align: center;
+      padding: 0.75rem; /* ✅ REDUZIDO: de 1rem para 0.75rem */
+      color: #6c757d;
+      font-style: italic;
+    }
+  }
+}
+
+/* 🎯 FOOTER DO FORMULÁRIO (MESMO PADRÃO DO NOVO SINISTRO) */
+.form-footer {
+  display: flex;
+  gap: 0.75rem; /* ✅ REDUZIDO: de 1rem para 0.75rem */
+  justify-content: flex-end;
+  margin-top: 1.5rem; /* ✅ REDUZIDO: de 2rem para 1.5rem */
+  padding-top: 1rem; /* ✅ REDUZIDO: de 1.5rem para 1rem */
+  border-top: 1px solid #f0f0f0;
+  
+  .btn-cancel {
+    padding: 0.6rem 1.25rem; /* ✅ REDUZIDO: de 0.75rem 1.5rem para 0.6rem 1.25rem */
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem; /* ✅ REDUZIDO: de 0.95rem para 0.9rem */
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem; /* ✅ REDUZIDO: de 0.5rem para 0.4rem */
+    min-width: 110px; /* ✅ REDUZIDO: de 120px para 110px */
+    justify-content: center;
+    background: #95a5a6;
+    color: white;
+
+    &:hover {
+      background: #7f8c8d;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(149, 165, 166, 0.3);
+    }
+    
+    &:active {
+      transform: translateY(0);
+    }
+    
+    i {
+      font-size: 14px; /* ✅ REDUZIDO: de 16px para 14px */
+    }
+  }
+}
+
+/* 📱 RESPONSIVIDADE (MESMO PADRÃO) */
+@media (max-width: 768px) {
+  .form-header {
+    padding: 0.75rem; /* ✅ REDUZIDO: de 1rem para 0.75rem */
+    
+    .form-title {
+      font-size: 1.4rem; /* ✅ REDUZIDO: de 1.5rem para 1.4rem */
+    }
+  }
+  
+  .laudo-form-container {
+    padding: 0.75rem; /* ✅ REDUZIDO: de 1rem para 0.75rem */
+    
+    .form-footer {
+      flex-direction: column;
+      
+      .btn-cancel {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+    
+    .info-grid {
+      gap: 0.75rem; /* ✅ REDUZIDO: de 1rem para 0.75rem */
+    }
+    
+    .info-section {
+      padding: 0.75rem; /* ✅ REDUZIDO: de 1rem para 0.75rem */
+      
+      h3 {
+        font-size: 0.95rem; /* ✅ REDUZIDO: de 1rem para 0.95rem */
+      }
+      
+      .info-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.4rem; /* ✅ REDUZIDO: de 0.5rem para 0.4rem */
+      }
+      
+      .datas-list {
+        .data-item {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 0.4rem; /* ✅ REDUZIDO: de 0.5rem para 0.4rem */
+        }
+      }
+
+      /* 📸 EVIDÊNCIAS RESPONSIVAS */
+      &.evidencias-section {
+        .evidencias-header {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 0.75rem; /* ✅ REDUZIDO: de 1rem para 0.75rem */
+
+          .evidencias-actions {
+            width: 100%;
+            justify-content: space-between;
+          }
+        }
+
+                                 .evidencias-list {
+           grid-template-columns: repeat(2, 1fr);
+           gap: 0.6rem; /* ✅ REDUZIDO: de 0.75rem para 0.6rem */
+           
+           .evidencia-item {
+             padding: 0.6rem; /* ✅ REDUZIDO: de 0.75rem para 0.6rem */
+             
+             .evidencia-view {
+               .evidencia-info {
+                 gap: 0.4rem; /* ✅ REDUZIDO: de 0.5rem para 0.4rem */
+               }
+
+               .evidencia-preview {
+                 width: 55px; /* ✅ REDUZIDO: de 60px para 55px */
+                 height: 55px; /* ✅ REDUZIDO: de 60px para 55px */
+                 
+                 .file-icon i {
+                   font-size: 16px; /* ✅ REDUZIDO: de 18px para 16px */
+                 }
+               }
+               
+               .evidencia-actions {
+                 .btn {
+                   width: 30px; /* ✅ REDUZIDO: de 32px para 30px */
+                   height: 30px; /* ✅ REDUZIDO: de 32px para 30px */
+                   
+                   i {
+                     font-size: 13px; /* ✅ REDUZIDO: de 14px para 13px */
+                   }
+                 }
+               }
+               
+               .evidencia-details {
+                 .evidencia-nome {
+                   font-size: 0.8rem; /* ✅ REDUZIDO: de 0.85rem para 0.8rem */
+                 }
+                 
+                 .evidencia-size {
+                   font-size: 0.65rem; /* ✅ REDUZIDO: de 0.7rem para 0.65rem */
+                 }
+               }
+             }
+
+            .evidencia-edit {
+              .edit-form {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.75rem; /* ✅ REDUZIDO: de 1rem para 0.75rem */
+
+                .edit-actions {
+                  justify-content: flex-start;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

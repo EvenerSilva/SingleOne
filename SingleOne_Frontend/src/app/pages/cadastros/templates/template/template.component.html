@@ -1,0 +1,457 @@
+<!-- 🎯 HEADER MODERNO DO TEMPLATE -->
+<div class="template-header">
+  <div class="header-content">
+    <div class="header-left">
+      <button class="back-button" [routerLink]="['/templates']" matTooltip="Voltar para Templates">
+        <i class="cil-arrow-left"></i>
+      </button>
+      <div class="header-title">
+        <div class="title-icon">
+          <i class="cil-file"></i>
+        </div>
+        <div class="title-text">
+          <h1>{{ template.id ? 'Editar Template' : 'Novo Template' }}</h1>
+          <p>{{ template.id ? 'Modificar template existente' : 'Criar novo template de documento' }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="action-btn secondary-btn" type="button" (click)="preview()" matTooltip="Visualizar preview">
+        <i class="cil-eye"></i>
+        <span>Visualizar</span>
+      </button>
+      <button class="action-btn primary-btn" type="submit" form="templateForm" matTooltip="Salvar template">
+        <i class="cil-check"></i>
+        <span>Salvar</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 🍞 BREADCRUMB MODERNO -->
+<nav class="modern-breadcrumb">
+  <div class="breadcrumb-container">
+    <a [routerLink]="['/dashboard']" class="breadcrumb-item">
+      <i class="cil-home"></i>
+      <span>Dashboard</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a [routerLink]="['/configuracoes']" class="breadcrumb-item">
+      <i class="cil-cog"></i>
+      <span>Configurações</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a [routerLink]="['/templates']" class="breadcrumb-item">
+      <i class="cil-description"></i>
+      <span>Templates</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <span class="breadcrumb-item active">{{ template.id ? 'Editar' : 'Novo' }}</span>
+  </div>
+</nav>
+
+<!-- 📋 CONTEÚDO PRINCIPAL -->
+<div class="template-content">
+  <div class="content-grid">
+    <!-- 📝 FORMULÁRIO -->
+    <div class="form-section">
+      <form [formGroup]="form" (ngSubmit)="salvar()" id="templateForm">
+        <div class="form-card">
+          <div class="card-header">
+            <i class="cil-pencil"></i>
+            <h2>Informações do Template</h2>
+          </div>
+          <div class="card-body">
+            <div class="form-group">
+              <label class="form-label">
+                <i class="cil-tag"></i>
+                Tipo de Template
+                <span class="required">*</span>
+              </label>
+              <mat-form-field class="modern-field" appearance="outline">
+                <mat-select formControlName="tipo" placeholder="Selecione o tipo" required>
+                  <mat-option *ngFor="let row of tiposTemplate" [value]="row.id">
+                    {{row.descricao}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">
+                <i class="cil-text"></i>
+                Título
+                <span class="required">*</span>
+              </label>
+              <mat-form-field class="modern-field" appearance="outline">
+                <input matInput formControlName="titulo" placeholder="Digite o título do template" required>
+              </mat-form-field>
+            </div>
+
+            <div class="form-group editor-group">
+              <label class="form-label">
+                <i class="cil-align-left"></i>
+                Conteúdo
+              </label>
+              <div class="editor-container">
+                <ckeditor 
+                  [editor]="Editor" 
+                  [data]="template.conteudo" 
+                  formControlName="conteudo" 
+                  [config]="configEditor" 
+                  (ready)="onReady($event)">
+                </ckeditor>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- 📚 INSTRUÇÕES -->
+    <div class="instructions-section">
+      <div class="instructions-card">
+        <div class="card-header">
+          <i class="cil-info"></i>
+          <h2>Instruções</h2>
+        </div>
+        <div class="card-body">
+          <div class="info-message">
+            <i class="cil-lightbulb"></i>
+            <p>Bem-vindo! Nesta área você irá configurar os templates utilizados pelo SingleOne que serão utilizados na assinatura digital posteriormente.</p>
+          </div>
+          
+          <div class="markers-section">
+            <h3>
+              <i class="cil-code"></i>
+              Marcadores Disponíveis
+            </h3>
+            <p class="markers-description">Utilize os marcadores abaixo na confecção dos templates:</p>
+            
+            <!-- Marcadores para Termo de Responsabilidade - Colaboradores (tipo 2) -->
+            <div class="markers-grid" *ngIf="form.get('tipo')?.value == 2 || form.get('tipo')?.value == 3">
+              <div class="marker-item">
+                <div class="marker-code">@nomeEmpresa</div>
+                <div class="marker-description">Nome da empresa</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@cnpjEmpresa</div>
+                <div class="marker-description">CNPJ da empresa</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@centroCusto</div>
+                <div class="marker-description">Centro de custo do colaborador</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@nomeColaborador</div>
+                <div class="marker-description">Nome do colaborador</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@cargo</div>
+                <div class="marker-description">Cargo do colaborador</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@matricula</div>
+                <div class="marker-description">Matrícula do colaborador</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@equipamentos</div>
+                <div class="marker-description">Lista de equipamentos</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@usuarioLogado</div>
+                <div class="marker-description">Usuário que gerou o termo</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@dataAtual</div>
+                <div class="marker-description">Data/Hora de geração</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@dataUltimaAtual</div>
+                <div class="marker-description">Data/Hora última atualização</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@versao</div>
+                <div class="marker-description">Versão atual do termo</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@tipoColaborador</div>
+                <div class="marker-description">Tipo de Colaborador</div>
+              </div>
+            </div>
+
+            <!-- Marcadores para Protocolo de Descarte (tipo 5) -->
+            <div class="markers-grid" *ngIf="form.get('tipo')?.value == 5">
+              <div class="section-title">Informações do Protocolo</div>
+              <div class="marker-item">
+                <div class="marker-code">@numeroProtocolo</div>
+                <div class="marker-description">Número do protocolo</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@cliente</div>
+                <div class="marker-description">Nome do cliente</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@tipoDescarte</div>
+                <div class="marker-description">Tipo de descarte</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@responsavel</div>
+                <div class="marker-description">Responsável pelo protocolo</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@dataCriacao</div>
+                <div class="marker-description">Data de criação</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@dataConclusao</div>
+                <div class="marker-description">Data de conclusão</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@quantidadeEquipamentos</div>
+                <div class="marker-description">Total de equipamentos</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@motivoDescarte</div>
+                <div class="marker-description">Motivo do descarte</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@destinoFinal</div>
+                <div class="marker-description">Destino final</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@observacoes</div>
+                <div class="marker-description">Observações gerais</div>
+              </div>
+
+              <div class="section-title">Logística Reversa</div>
+              <div class="marker-item">
+                <div class="marker-code">@empresaDestino</div>
+                <div class="marker-description">Empresa destino final</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@cnpjDestino</div>
+                <div class="marker-description">CNPJ destino</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@certificado</div>
+                <div class="marker-description">Certificado de descarte</div>
+              </div>
+
+              <div class="section-title">MTR - Manifesto de Transporte</div>
+              <div class="marker-item">
+                <div class="marker-code">@mtrObrigatorio</div>
+                <div class="marker-description">MTR obrigatório (Sim/Não)</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@mtrNumero</div>
+                <div class="marker-description">Número do MTR</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@mtrEmitidoPor</div>
+                <div class="marker-description">Quem emitiu o MTR</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@mtrDataEmissao</div>
+                <div class="marker-description">Data de emissão</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@mtrValidade</div>
+                <div class="marker-description">Validade do MTR</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@mtrDadosTransportadora</div>
+                <div class="marker-description">Dados completos da transportadora</div>
+              </div>
+
+              <div class="section-title">Equipamentos</div>
+              <div class="marker-item">
+                <div class="marker-code">@listaEquipamentos</div>
+                <div class="marker-description">Lista detalhada de equipamentos</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@tabelaEquipamentos</div>
+                <div class="marker-description">Alias para @listaEquipamentos</div>
+              </div>
+            </div>
+
+            <!-- Marcadores para Nada Consta (tipo 1) -->
+            <div class="markers-grid" *ngIf="form.get('tipo')?.value == 1">
+              <div class="marker-item">
+                <div class="marker-code">@nomeEmpresa</div>
+                <div class="marker-description">Nome da empresa</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@cnpjEmpresa</div>
+                <div class="marker-description">CNPJ da empresa</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@centroCusto</div>
+                <div class="marker-description">Centro de custo do colaborador</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@nomeColaborador</div>
+                <div class="marker-description">Nome do colaborador</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@cargo</div>
+                <div class="marker-description">Cargo do colaborador</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@matricula</div>
+                <div class="marker-description">Matrícula do colaborador</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@usuarioLogado</div>
+                <div class="marker-description">Usuário que gerou o documento</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@dataAtual</div>
+                <div class="marker-description">Data/Hora de geração</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@dataUltimaAtual</div>
+                <div class="marker-description">Data/Hora última atualização</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@versao</div>
+                <div class="marker-description">Versão atual do documento</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@tipoColaborador</div>
+                <div class="marker-description">Tipo de Colaborador</div>
+              </div>
+            </div>
+
+            <!-- Marcadores para Sinistro (tipo 4) -->
+            <div class="markers-grid" *ngIf="form.get('tipo')?.value == 4">
+              <div class="marker-item">
+                <div class="marker-code">@nomeEmpresa</div>
+                <div class="marker-description">Nome da empresa</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@cnpjEmpresa</div>
+                <div class="marker-description">CNPJ da empresa</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@centroCusto</div>
+                <div class="marker-description">Centro de custo do colaborador</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@nomeColaborador</div>
+                <div class="marker-description">Nome do colaborador</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@cargo</div>
+                <div class="marker-description">Cargo do colaborador</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@matricula</div>
+                <div class="marker-description">Matrícula do colaborador</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@usuarioLogado</div>
+                <div class="marker-description">Usuário que gerou o documento</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@dataAtual</div>
+                <div class="marker-description">Data/Hora de geração</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@dataUltimaAtual</div>
+                <div class="marker-description">Data/Hora última atualização</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@versao</div>
+                <div class="marker-description">Versão atual do documento</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@tipoColaborador</div>
+                <div class="marker-description">Tipo de Colaborador</div>
+              </div>
+            </div>
+
+            <!-- Marcadores para Notificação de Inventário Forçado (tipo 6) -->
+            <div class="markers-grid" *ngIf="form.get('tipo')?.value == 6">
+              <div class="section-title">Informações do Colaborador</div>
+              <div class="marker-item">
+                <div class="marker-code">@nomeColaborador</div>
+                <div class="marker-description">Nome completo do colaborador</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@cpf</div>
+                <div class="marker-description">CPF do colaborador</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@matricula</div>
+                <div class="marker-description">Matrícula do colaborador</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@cargo</div>
+                <div class="marker-description">Cargo do colaborador</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@empresa</div>
+                <div class="marker-description">Nome da empresa do colaborador</div>
+              </div>
+
+              <div class="section-title">Prazo e Agendamento</div>
+              <div class="marker-item">
+                <div class="marker-code">@dataLimite</div>
+                <div class="marker-description">Data limite para resposta (ex: 05/11/2025)</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@prazoCalculado</div>
+                <div class="marker-description">Descrição do prazo (ex: "5 dias úteis")</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@dataForcado</div>
+                <div class="marker-description">Data em que o inventário foi forçado</div>
+              </div>
+
+              <div class="section-title">Contato da Equipe</div>
+              <div class="marker-item">
+                <div class="marker-code">@nomeEquipe</div>
+                <div class="marker-description">Nome da equipe responsável (ex: "TI/Patrimônio")</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@emailEquipe</div>
+                <div class="marker-description">E-mail de contato da equipe</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@telefoneEquipe</div>
+                <div class="marker-description">Telefone/Ramal da equipe</div>
+              </div>
+
+              <div class="section-title">Auditoria e Contexto</div>
+              <div class="marker-item">
+                <div class="marker-code">@usuarioQueForcou</div>
+                <div class="marker-description">Nome do administrador que forçou o inventário</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@mensagemAdicional</div>
+                <div class="marker-description">Mensagem extra opcional do administrador</div>
+              </div>
+              <div class="marker-item">
+                <div class="marker-code">@nomeEmpresa</div>
+                <div class="marker-description">Nome da empresa principal (cliente logado)</div>
+              </div>
+            </div>
+
+            <!-- Mensagem quando nenhum tipo está selecionado -->
+            <div class="info-message" *ngIf="!form.get('tipo')?.value">
+              <i class="cil-info"></i>
+              <p>Selecione um tipo de template para ver os marcadores disponíveis.</p>
+            </div>
+
+            <!-- Mensagem para tipos sem marcadores específicos -->
+            <div class="info-message" *ngIf="form.get('tipo')?.value && form.get('tipo')?.value != 1 && form.get('tipo')?.value != 2 && form.get('tipo')?.value != 3 && form.get('tipo')?.value != 4 && form.get('tipo')?.value != 5 && form.get('tipo')?.value != 6">
+              <i class="cil-info"></i>
+              <p>Não há marcadores específicos definidos para este tipo de template.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

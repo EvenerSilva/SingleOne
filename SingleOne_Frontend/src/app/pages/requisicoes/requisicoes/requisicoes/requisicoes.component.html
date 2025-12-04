@@ -1,0 +1,309 @@
+<!-- 🎯 HEADER MODERNO DAS REQUISIÇÕES -->
+<div class="requisicoes-header">
+  <div class="header-content">
+    <div class="header-left">
+      <button class="back-button" [routerLink]="['/movimentacoes']">
+        <i class="cil-arrow-left"></i>
+      </button>
+      <div class="header-title">
+        <div class="title-icon">
+          <i class="cil-list"></i>
+        </div>
+        <div class="title-text">
+          <h1>Gestão de Requisições</h1>
+          <p>Controle e acompanhamento de todas as requisições de recursos</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="header-actions">
+      <button class="action-btn primary-btn" [routerLink]="['/movimentacoes/requisicoes/requisicao']">
+        <i class="cil-plus"></i>
+        Nova Requisição
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 🍞 BREADCRUMB MODERNO -->
+<nav class="modern-breadcrumb">
+  <div class="breadcrumb-container">
+    <a [routerLink]="['/dashboard']" class="breadcrumb-item">
+      <i class="cil-home"></i>
+      <span>Dashboard</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a [routerLink]="['/movimentacoes']" class="breadcrumb-item">
+      <i class="cil-transfer"></i>
+      <span>Solicitações</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <span class="breadcrumb-item active">Requisições</span>
+  </div>
+</nav>
+
+<!-- 📊 CARDS DE ESTATÍSTICAS EM TEMPO REAL -->
+<div class="stats-section">
+  <div class="stats-grid">
+    <div class="stat-card total" (click)="filtrarPorStatusCard('Total')" title="Clique para ver todas as requisições">
+      <div class="stat-content">
+        <div class="stat-number">{{getTotalRequisicoes()}}</div>
+        <div class="stat-label">Total de Requisições</div>
+      </div>
+    </div>
+    
+    <div class="stat-card active" (click)="filtrarPorStatusCard('Ativa')" title="Clique para ver requisições ativas">
+      <div class="stat-content">
+        <div class="stat-number">{{getRequisicoesAtivas()}}</div>
+        <div class="stat-label">Ativas</div>
+      </div>
+    </div>
+    
+    <div class="stat-card processed" (click)="filtrarPorStatusCard('Processada')" title="Clique para ver requisições processadas">
+      <div class="stat-content">
+        <div class="stat-number">{{getRequisicoesProcessadas()}}</div>
+        <div class="stat-label">Processadas</div>
+      </div>
+    </div>
+    
+    <div class="stat-card cancelled" (click)="filtrarPorStatusCard('Cancelada')" title="Clique para ver requisições canceladas">
+      <div class="stat-content">
+        <div class="stat-number">{{getRequisicoesCanceladas()}}</div>
+        <div class="stat-label">Canceladas</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 🔍 SEÇÃO DE BUSCA E FILTROS -->
+<div class="search-filters-section">
+  <div class="search-filters-content">
+    <!-- 🔍 Campo de Busca -->
+    <div class="search-box">
+      <i class="cil-magnifying-glass search-icon"></i>
+      <input 
+        type="text" 
+        placeholder="Buscar por número da requisição, técnico responsável ou status..." 
+        [formControl]="consulta">
+      <button 
+        *ngIf="consulta.value" 
+        class="clear-btn" 
+        (click)="limparBusca()"
+        type="button">
+        <i class="cil-x"></i>
+      </button>
+    </div>
+    
+    <!-- 🎛️ Filtros e Indicadores -->
+    <div class="filters-content">
+      <!-- ✅ Indicador de filtro ativo -->
+      <div class="filtro-ativo" *ngIf="temFiltroAtivo()">
+        <i class="cil-filter"></i>
+        <span>Filtro: {{ getFiltroAtivo() }}</span>
+      </div>
+      
+      <!-- ✅ Indicador de filtro padrão -->
+      <div class="filtro-padrao" *ngIf="!temFiltroAtivo()">
+        <i class="cil-check-circle"></i>
+        <span>Filtro padrão aplicado</span>
+      </div>
+      
+      <!-- ✅ Filtros de histórico -->
+      <div class="filtros-historico">
+        <button 
+          class="filter-btn secondary-btn" 
+          (click)="filtrarPorPeriodo(7)" 
+          title="Mostrar requisições dos últimos 7 dias">
+          <i class="cil-calendar"></i>
+          <span>7 dias</span>
+        </button>
+        
+        <button 
+          class="filter-btn secondary-btn" 
+          (click)="filtrarPorPeriodo(30)" 
+          title="Mostrar requisições dos últimos 30 dias">
+          <i class="cil-calendar"></i>
+          <span>30 dias</span>
+        </button>
+        
+        <button 
+          class="filter-btn secondary-btn" 
+          (click)="filtrarPorPeriodo(90)" 
+          title="Mostrar requisições dos últimos 90 dias">
+          <i class="cil-calendar"></i>
+          <span>90 dias</span>
+        </button>
+      </div>
+      
+      <button class="filter-btn secondary-btn" (click)="limparFiltroCard()" title="Voltar ao filtro padrão (Ativas)">
+        <i class="cil-reload"></i>
+        Padrão (Ativas)
+      </button>
+      
+      <button class="filter-btn secondary-btn" (click)="mostrarTodasRequisicoes()" title="Mostrar todas as requisições (histórico completo)">
+        <i class="cil-list"></i>
+        Histórico Completo
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 📋 TABELA MODERNA DE REQUISIÇÕES -->
+<div class="table-section">
+  <div class="table-container">
+    <table class="modern-table">
+      <thead>
+        <tr>
+          <th>Requisição</th>
+          <th>Status</th>
+          <th>Aberta por</th>
+          <th>Responsável</th>
+          <th>Criada em</th>
+          <th>Recursos</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of dadosPaginados" 
+            class="table-row" 
+            [class.requisicao-atrasada]="isRequisicaoAtrasada(row)"
+            [matTooltip]="getAlertaRequisicao(row)"
+            [matTooltipDisabled]="!isRequisicaoAtrasada(row)"
+            matTooltipClass="alerta-tooltip"
+            [matTooltipPosition]="'above'"
+            [matTooltipShowDelay]="500">
+          <td class="id-cell">
+            <span class="requisicao-id">{{ getRequisicaoNome(row) }}</span>
+          </td>
+          
+          <td class="status-cell">
+            <span class="status-badge" [class]="getStatusClass(getRequisicaoStatus(row))">
+              {{ getRequisicaoStatus(row) }}
+            </span>
+          </td>
+          
+          <td class="user-cell">
+            <div class="user-info">
+              <i class="cil-user"></i>
+              <span>{{ getRequisicaoUsuario(row) }}</span>
+            </div>
+          </td>
+          
+          <td class="responsible-cell">
+            <div class="user-info">
+              <i class="cil-user-follow"></i>
+              <span>{{ getRequisicaoTecnico(row) }}</span>
+            </div>
+          </td>
+          
+          <td class="date-cell">
+            <div class="date-info">
+              <i class="cil-calendar"></i>
+              <span>{{ getRequisicaoDataCriacao(row) }}</span>
+            </div>
+          </td>
+          
+          <td class="resources-cell">
+            <div class="resources-chips">
+              <!-- ✅ RECURSOS (EQUIPAMENTOS) -->
+              <span class="resource-chip" *ngFor="let eqp of getEquipamentosRequisicao(row)">
+                <i class="cil-devices"></i>
+                {{ eqp.equipamento }}
+                <small 
+                  class="serial-number-link"
+                  [routerLink]="['/recursos']"
+                  [queryParams]="{search: eqp.numeroserie}"
+                  [matTooltip]="'Clique para ver detalhes do recurso: ' + eqp.equipamento + ' (S/N: ' + eqp.numeroserie + ')'"
+                  [matTooltipClass]="'resource-tooltip'"
+                  [matTooltipPosition]="'above'"
+                  [matTooltipShowDelay]="500">
+                  <i class="cil-external-link"></i>
+                  S/N: {{ eqp.numeroserie }}
+                </small>
+              </span>
+              
+                                <!-- ✅ LINHAS TELEFÔNICAS -->
+                  <span class="resource-chip telefonia" *ngFor="let linha of getLinhasTelefonicas(row)">
+                    <i class="cil-phone"></i>
+                    {{ linha.operadora || 'N/A' }} - {{ linha.plano || 'N/A' }}
+                    <small
+                      class="linha-link"
+                      [routerLink]="['/linhas']"
+                      [queryParams]="{search: linha.numero}"
+                      [matTooltip]="'Clique para ver detalhes da linha: ' + linha.numero + ' - ' + (linha.operadora || 'N/A') + ' - ' + (linha.plano || 'N/A')"
+                      [matTooltipClass]="'resource-tooltip'"
+                      [matTooltipPosition]="'above'"
+                      [matTooltipShowDelay]="500">
+                      <i class="cil-external-link"></i>
+                      {{ linha.numero }}
+                    </small>
+                  </span>
+            </div>
+          </td>
+          
+          <td class="actions-cell">
+            <div class="action-buttons">
+              <button 
+                class="action-btn danger-btn" 
+                matTooltip="Cancelar Requisição"
+                (click)="excluir(row)"
+                *ngIf="getRequisicaoStatusId(row) == 1"
+              >
+                <i class="cil-ban"></i>
+              </button>
+              
+              <button 
+                class="action-btn success-btn" 
+                matTooltip="Entregar Recursos"
+                [routerLink]="['/movimentacoes/entregas-devolucoes/entrega', getRequisicaoId(row)]"
+                *ngIf="getRequisicaoStatusId(row) == 1 && row.podeEntregar"
+              >
+                <i class="cil-arrow-right"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <!-- 📊 INFORMAÇÕES DA TABELA -->
+    <div class="table-info" *ngIf="dataSource?.data">
+      <div class="info-text">
+        <div class="info-left">
+          <span>Mostrando {{dadosPaginados.length}} de {{dataSource.data.length}} registros</span>
+          <span class="info-total" *ngIf="dadosCompletos.length > 0">
+            | Total no sistema: {{dadosCompletos.length}} requisições
+          </span>
+        </div>
+        <div class="info-right">
+          <span class="info-historico" *ngIf="temFiltroAtivo()">
+            <i class="cil-info"></i>
+            Filtro ativo: {{ getFiltroAtivo() }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <!-- 📄 PAGINAÇÃO -->
+  <div class="pagination-container" *ngIf="dataSource?.data?.length > 0">
+    <mat-paginator 
+      [pageSizeOptions]="[5, 10, 25, 50, 100]" 
+      [pageSize]="10" 
+      showFirstLastButtons>
+    </mat-paginator>
+  </div>
+
+<!-- Estado vazio -->
+<div class="empty-state" *ngIf="!dataSource?.data || dataSource.data.length === 0">
+  <div class="empty-icon">
+    <i class="cil-inbox"></i>
+  </div>
+  <h3>Nenhuma requisição encontrada</h3>
+  <p>Comece criando uma nova requisição ou ajuste os filtros de busca</p>
+  <button class="action-btn primary-btn" [routerLink]="['/movimentacoes/requisicoes/requisicao']">
+    <i class="cil-plus"></i>
+    Criar Primeira Requisição
+  </button>
+</div>

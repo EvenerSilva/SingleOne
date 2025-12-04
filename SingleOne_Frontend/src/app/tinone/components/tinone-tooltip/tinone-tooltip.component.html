@@ -1,0 +1,25 @@
+<div class="tinone-tooltip" *ngIf="campoInfo" [style.top.px]="posicao.top" [style.left.px]="posicao.left">
+  <div class="tinone-tooltip-header">
+    <span class="tinone-tooltip-icon">💡</span>
+    <strong>{{ campoInfo.nome }}</strong>
+  </div>
+  <div class="tinone-tooltip-body">
+    <p>{{ campoInfo.descricao }}</p>
+    
+    <div *ngIf="campoInfo.exemplo" class="tinone-tooltip-example">
+      <small><strong>Exemplo:</strong> {{ campoInfo.exemplo }}</small>
+    </div>
+
+    <div *ngIf="campoInfo.obrigatorio" class="tinone-tooltip-required">
+      <small>📌 Campo obrigatório</small>
+    </div>
+
+    <div *ngIf="campoInfo.dicas && campoInfo.dicas.length > 0" class="tinone-tooltip-tips">
+      <small><strong>Dicas:</strong></small>
+      <ul>
+        <li *ngFor="let dica of campoInfo.dicas"><small>{{ dica }}</small></li>
+      </ul>
+    </div>
+  </div>
+</div>
+

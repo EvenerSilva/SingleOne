@@ -1,0 +1,560 @@
+<div class="portaria-container">
+  <!-- Header da Página -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-icon">
+        <i class="material-icons">security</i>
+      </div>
+      <div class="header-text">
+        <h1>Controle de Portaria</h1>
+        <p>Verificação de recursos e liberação de colaboradores</p>
+      </div>
+      <div class="header-logos light-bg">
+        <app-logo-display class="light-bg"></app-logo-display>
+      </div>
+    </div>
+  </div>
+
+  <!-- Formulário de Consulta -->
+  <div class="form-section">
+    <div class="form-container">
+      <form [formGroup]="passCheckForm" (ngSubmit)="consultarPassCheck()">
+        <div class="form-group">
+          <label for="cpf">CPF do Colaborador</label>
+          <div class="input-with-clear">
+            <input 
+              type="text" 
+              id="cpf" 
+              formControlName="cpf" 
+              placeholder="Digite o CPF"
+              class="form-control"
+              [class.is-invalid]="passCheckForm.get('cpf')?.invalid && passCheckForm.get('cpf')?.touched"
+            >
+            <button 
+              type="button" 
+              class="btn-clear" 
+              (click)="limparCpf()"
+              [disabled]="!passCheckForm.get('cpf')?.value"
+              title="Limpar CPF"
+            >
+              <i class="material-icons">clear</i>
+            </button>
+          </div>
+          <div class="invalid-feedback" *ngIf="passCheckForm.get('cpf')?.invalid && passCheckForm.get('cpf')?.touched">
+            CPF é obrigatório
+          </div>
+        </div>
+        <div class="form-actions">
+          <button 
+            type="submit" 
+            class="btn btn-consultar"
+            [disabled]="passCheckForm.invalid || loading"
+          >
+            <i class="material-icons">{{ loading ? 'hourglass_empty' : 'search' }}</i>
+            {{ loading ? 'Consultando...' : 'Consultar' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Informações do Colaborador - Colapsável (movido para o topo) -->
+  <div *ngIf="passCheckResult" class="colaborador-section">
+    <div class="colaborador-header-collapsed" (click)="toggleColaboradorDetails()">
+      <div class="colaborador-info-compact">
+        <div class="colaborador-avatar" [ngClass]="[getStatusClass(passCheckResult), getColaboradorStatus() === 'Desligado' ? 'desligado' : '']">
+          {{ passCheckResult.colaborador.nome.charAt(0).toUpperCase() }}
+          <div class="status-indicator" [ngClass]="[getStatusClass(passCheckResult), getColaboradorStatus() === 'Desligado' ? 'desligado' : '']"></div>
+        </div>
+        <div class="colaborador-details-compact">
+          <h3 class="colaborador-nome">{{ passCheckResult.colaborador.nome }}</h3>
+          <div class="colaborador-info-basic">
+            <span class="info-item">{{ passCheckResult.colaborador.cargo }}</span>
+            <span class="info-separator">•</span>
+            <span class="info-item">{{ passCheckResult.colaborador.setor }}</span>
+            <span class="info-separator">•</span>
+            <span class="info-item">{{ passCheckResult.colaborador.empresaNome }}</span>
+            <span class="info-separator" *ngIf="passCheckResult.colaborador.superiorImediatoNome">•</span>
+            <span class="info-item" *ngIf="passCheckResult.colaborador.superiorImediatoNome">Superior: {{ passCheckResult.colaborador.superiorImediatoNome }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="colaborador-actions-compact">
+        <div class="recursos-info-card">
+          <div class="recursos-icon">
+            <i class="material-icons">inventory_2</i>
+          </div>
+          <div class="recursos-content">
+            <div class="recursos-count">{{ getRecursosEmPosse().length }}</div>
+            <div class="recursos-label">Em Posse</div>
+          </div>
+        </div>
+
+        <div class="recursos-info-card">
+          <div class="recursos-icon">
+            <i class="material-icons">archive</i>
+          </div>
+          <div class="recursos-content">
+            <div class="recursos-count">{{ getRecursosHistoricos().length }}</div>
+            <div class="recursos-label">Histórico</div>
+          </div>
+        </div>
+
+        <div class="recursos-info-card">
+          <div class="recursos-icon">
+            <i class="material-icons">smartphone</i>
+          </div>
+          <div class="recursos-content">
+            <div class="recursos-count">{{ getRecursosParticulares().length }}</div>
+            <div class="recursos-label">BYOD</div>
+          </div>
+        </div>
+
+        <button class="btn btn-secondary" (click)="limparResultado()" title="Limpar consulta">
+          <i class="fas fa-sign-out-alt"></i> Sair
+        </button>
+        <div class="expand-toggle">
+          <i class="material-icons" [class.rotated]="colaboradorDetailsExpanded">expand_more</i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Detalhes Expandidos do Colaborador -->
+    <div class="colaborador-details-expanded" *ngIf="colaboradorDetailsExpanded">
+      <div class="details-grid">
+        <div class="detail-item">
+          <span class="detail-label">Nome:</span>
+          <span class="detail-value">{{ passCheckResult.colaborador.nome }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">CPF:</span>
+          <span class="detail-value">{{ passCheckResult.colaborador.cpf }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Cargo:</span>
+          <span class="detail-value">{{ passCheckResult.colaborador.cargo }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Setor:</span>
+          <span class="detail-value">{{ passCheckResult.colaborador.setor }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Empresa:</span>
+          <span class="detail-value">{{ passCheckResult.colaborador.empresaNome }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Superior Imediato:</span>
+          <span class="detail-value">{{ passCheckResult.colaborador.superiorImediatoNome || 'Não informado' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Data de Admissão:</span>
+          <span class="detail-value">{{ formatarData(passCheckResult.colaborador.dtAdmissao) }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Status:</span>
+          <span class="detail-value">
+            {{ getColaboradorStatus() }}
+            <span *ngIf="getColaboradorStatus() === 'Desligado'" class="status-alert">
+              ⚠️ Colaborador com data de demissão - Recolher recursos
+            </span>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Orientações para o Vigilante -->
+  <div class="orientacoes-vigilante" [ngClass]="getColaboradorStatus() === 'Desligado' ? 'desligado' : ''" *ngIf="passCheckResult?.recursos && passCheckResult.recursos.length > 0">
+    <div class="orientacoes-header" [ngClass]="getColaboradorStatus() === 'Desligado' ? 'desligado' : ''">
+      <i class="material-icons">security</i>
+      <span>Orientações para Vigilante</span>
+    </div>
+    <div class="orientacoes-content">
+      <div class="orientacao-texto" [innerHTML]="getOrientacaoVigilante()"></div>
+    </div>
+  </div>
+
+  <!-- Aviso de Pendências de Assinatura (igual Patrimônio) -->
+  <div *ngIf="passCheckResult && temPendenciasAssinatura()" class="aviso-pendencias-assinatura">
+    <div class="aviso-content">
+      <div class="aviso-icon">
+        <i class="material-icons">warning</i>
+      </div>
+      <div class="aviso-text">
+        <div class="aviso-title">⚠️ ATENÇÃO: Recursos com pendência de assinatura</div>
+        <div class="aviso-description">
+          Colaborador possui <strong>{{ getTotalPendenciasAssinatura() }}</strong> recurso(s) sem termo assinado:
+          <br>• <strong>Corporativos:</strong> {{ getRecursosComPendenciaAssinatura().length }} pendente(s)
+          <br>• <strong>BYOD:</strong> {{ getRecursosByodComPendenciaAssinatura().length }} pendente(s)
+          <br><br>
+          <strong>Orientação:</strong>
+          <br>• Direcionar o colaborador para assinar os termos antes de liberar saída
+          <br>• Verificar botões "Assinar Termo" na tela Meu Patrimônio
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recursos em Posse -->
+  <div class="recursos-container">
+    <!-- ✅ NOVA SEÇÃO: Recursos Particulares (BYOD) -->
+    <div class="secao-recursos byod-section" *ngIf="getRecursosParticulares().length > 0">
+      <div class="secao-header byod-header" (click)="toggleSection('byod')">
+        <div class="secao-info">
+          <div class="secao-icon">
+            <i class="material-icons">smartphone</i>
+          </div>
+          <div class="secao-details">
+            <div class="secao-title">BYOD - Recursos Particulares</div>
+            <div class="secao-subtitle">Ativos em Posse - Podem Sair Livremente ({{ getRecursosParticulares().length }})</div>
+          </div>
+        </div>
+        <div class="secao-actions">
+          <div class="secao-badge byod-badge">
+            <i class="material-icons">check_circle</i>
+            <span>Liberado</span>
+          </div>
+          <div class="secao-toggle">
+            <i class="material-icons" [class.rotated]="isSectionExpanded('byod')">expand_more</i>
+          </div>
+        </div>
+      </div>
+      
+      <div class="recursos-content" *ngIf="isSectionExpanded('byod')">
+        <div class="recursos-grid">
+          <div class="recurso-card byod-card" *ngFor="let recurso of getRecursosParticulares()">
+            <div class="recurso-info">
+              <div class="recurso-nome">{{ recurso.tipoEquipamento }}</div>
+              <div class="recurso-detalhes">
+                <span class="patrimonio" *ngIf="recurso.tipoEquipamento !== 'Linha Telefônica'">Patrimônio: {{ recurso.patrimonio }}</span>
+                <span class="patrimonio" *ngIf="recurso.tipoEquipamento === 'Linha Telefônica'">Número: {{ recurso.patrimonio }}</span>
+                <span class="serial" *ngIf="recurso.tipoEquipamento !== 'Linha Telefônica'">S/N: {{ recurso.numeroSerie }}</span>
+                <span class="serial" *ngIf="recurso.tipoEquipamento === 'Linha Telefônica'">ICCID: {{ recurso.numeroSerie }}</span>
+                <span class="fabricante-modelo" *ngIf="!recurso.tipoEquipamento.toLowerCase().includes('linha telefônica')">Fabricante: {{ recurso.fabricante || 'Não informado' }} | Modelo: {{ recurso.modelo || 'Não informado' }}</span>
+                <span class="fabricante-modelo" *ngIf="recurso.tipoEquipamento.toLowerCase().includes('linha telefônica')">Tipo: {{ recurso.fabricante || 'Linha Telefônica' }} | Categoria: {{ recurso.modelo || 'Telefone' }}</span>
+                <span class="tipo-aquisicao">Tipo: {{ recurso.tipoAquisicao || 'Particular' }}</span>
+              </div>
+              
+              <!-- Status de Trânsito Livre -->
+              <div class="transito-status">
+                <span class="transito-livre-badge byod-ativo">
+                  <i class="material-icons">person</i>
+                  BYOD - Trânsito Livre
+                </span>
+                <span class="termo-status" *ngIf="recurso.assinado" title="Termo já assinado">
+                  <i class="material-icons">check_circle</i>
+                  Termo Assinado
+                </span>
+                <span class="termo-status pendente" *ngIf="!recurso.assinado" title="Termo não assinado">
+                  <i class="material-icons">error_outline</i>
+                  Termo Não Assinado
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Seção: Recursos com Trânsito Livre - APENAS ATIVOS -->
+    <div class="secao-recursos transito-livre-section" *ngIf="getRecursosTransitoLivre().length > 0">
+      <div class="secao-header transito-livre-header" (click)="toggleSection('transitoLivre')">
+        <div class="secao-info">
+          <div class="secao-icon">
+            <i class="material-icons">exit_to_app</i>
+          </div>
+          <div class="secao-details">
+            <div class="secao-title">Podem Sair Livremente</div>
+            <div class="secao-subtitle">Recursos ativos com trânsito livre ({{ getRecursosTransitoLivre().length }})</div>
+          </div>
+        </div>
+        <div class="secao-actions">
+          <div class="secao-badge transito-livre-badge">
+            <i class="material-icons">check_circle</i>
+            <span>Liberado</span>
+          </div>
+          <div class="secao-toggle">
+            <i class="material-icons" [class.rotated]="isSectionExpanded('transitoLivre')">expand_more</i>
+          </div>
+        </div>
+      </div>
+      
+      <div class="recursos-content" *ngIf="isSectionExpanded('transitoLivre')">
+        <div class="recursos-grid">
+          <div class="recurso-card transito-livre-card" *ngFor="let recurso of getRecursosTransitoLivre()">
+            <div class="recurso-info">
+              <div class="recurso-nome">{{ recurso.tipoEquipamento }}</div>
+              <div class="recurso-detalhes">
+                <span class="patrimonio" *ngIf="recurso.tipoEquipamento !== 'Linha Telefônica'">Patrimônio: {{ recurso.patrimonio }}</span>
+                <span class="patrimonio" *ngIf="recurso.tipoEquipamento === 'Linha Telefônica'">Número: {{ recurso.patrimonio }}</span>
+                <span class="serial" *ngIf="recurso.tipoEquipamento !== 'Linha Telefônica'">S/N: {{ recurso.numeroSerie }}</span>
+                <span class="serial" *ngIf="recurso.tipoEquipamento === 'Linha Telefônica'">ICCID: {{ recurso.numeroSerie }}</span>
+                <span class="fabricante-modelo" *ngIf="!recurso.tipoEquipamento.toLowerCase().includes('linha telefônica')">Fabricante: {{ recurso.fabricante || 'Não informado' }} | Modelo: {{ recurso.modelo || 'Não informado' }}</span>
+                <span class="fabricante-modelo" *ngIf="recurso.tipoEquipamento.toLowerCase().includes('linha telefônica')">Tipo: {{ recurso.fabricante || 'Linha Telefônica' }} | Categoria: {{ recurso.modelo || 'Telefone' }}</span>
+                <span class="tipo-aquisicao">Tipo: {{ recurso.tipoAquisicao || 'Não informado' }}</span>
+              </div>
+              
+              <!-- Status de Trânsito Livre -->
+              <div class="transito-status">
+                <span class="transito-livre-badge transito-ativo">
+                  <i class="material-icons">check_circle</i>
+                  Trânsito Livre
+                </span>
+                <span class="termo-status" *ngIf="recurso.assinado" title="Termo já assinado">
+                  <i class="material-icons">check_circle</i>
+                  Termo Assinado
+                </span>
+                <span class="termo-status pendente" *ngIf="!recurso.assinado" title="Termo não assinado">
+                  <i class="material-icons">error_outline</i>
+                  Termo Não Assinado
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Seção: Recursos que Requerem Autorização - APENAS ATIVOS -->
+    <div class="secao-recursos requer-autorizacao-section" *ngIf="getRecursosRequerAutorizacao().length > 0">
+      <div class="secao-header requer-autorizacao-header" (click)="toggleSection('requerAutorizacao')">
+        <div class="secao-info">
+          <div class="secao-icon">
+            <i class="material-icons">security</i>
+          </div>
+          <div class="secao-details">
+            <div class="secao-title">Requer Autorização</div>
+            <div class="secao-subtitle">Recursos ativos que precisam de autorização ({{ getRecursosRequerAutorizacao().length }})</div>
+          </div>
+        </div>
+        <div class="secao-actions">
+          <div class="secao-badge requer-autorizacao-badge">
+            <i class="material-icons">block</i>
+            <span>Bloqueado</span>
+          </div>
+          <div class="secao-toggle">
+            <i class="material-icons" [class.rotated]="isSectionExpanded('requerAutorizacao')">expand_more</i>
+          </div>
+        </div>
+      </div>
+      
+      <div class="recursos-content" *ngIf="isSectionExpanded('requerAutorizacao')">
+        <div class="recursos-grid">
+          <div class="recurso-card requer-autorizacao-card" *ngFor="let recurso of getRecursosRequerAutorizacao()">
+            <div class="recurso-info">
+              <div class="recurso-nome">{{ recurso.tipoEquipamento }}</div>
+              <div class="recurso-detalhes">
+                <span class="patrimonio" *ngIf="recurso.tipoEquipamento !== 'Linha Telefônica'">Patrimônio: {{ recurso.patrimonio }}</span>
+                <span class="patrimonio" *ngIf="recurso.tipoEquipamento === 'Linha Telefônica'">Número: {{ recurso.patrimonio }}</span>
+                <span class="serial" *ngIf="recurso.tipoEquipamento !== 'Linha Telefônica'">S/N: {{ recurso.numeroSerie }}</span>
+                <span class="serial" *ngIf="recurso.tipoEquipamento === 'Linha Telefônica'">ICCID: {{ recurso.numeroSerie }}</span>
+                <span class="fabricante-modelo" *ngIf="!recurso.tipoEquipamento.toLowerCase().includes('linha telefônica')">Fabricante: {{ recurso.fabricante || 'Não informado' }} | Modelo: {{ recurso.modelo || 'Não informado' }}</span>
+                <span class="fabricante-modelo" *ngIf="recurso.tipoEquipamento.toLowerCase().includes('linha telefônica')">Tipo: {{ recurso.fabricante || 'Linha Telefônica' }} | Categoria: {{ recurso.modelo || 'Telefone' }}</span>
+                <span class="tipo-aquisicao">Tipo: {{ recurso.tipoAquisicao || 'Não informado' }}</span>
+              </div>
+              
+              <!-- Status de Requer Autorização -->
+              <div class="transito-status">
+                <span class="transito-livre-badge requer-ativo">
+                  <i class="material-icons">block</i>
+                  Requer Autorização
+                </span>
+                <span class="termo-status" *ngIf="recurso.assinado" title="Termo já assinado">
+                  <i class="material-icons">check_circle</i>
+                  Termo Assinado
+                </span>
+                <span class="termo-status pendente" *ngIf="!recurso.assinado" title="Termo não assinado">
+                  <i class="material-icons">error_outline</i>
+                  Termo Não Assinado
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ NOVA SEÇÃO: Recursos Históricos -->
+  <div class="secao-recursos historico-section" *ngIf="getRecursosHistoricos().length > 0">
+    <div class="secao-header historico-header" (click)="toggleSection('historico')">
+      <div class="secao-info">
+        <div class="secao-icon">
+          <i class="material-icons">archive</i>
+        </div>
+        <div class="secao-details">
+          <div class="secao-title">Histórico de Recursos</div>
+          <div class="secao-subtitle">Recursos não ativos ou devolvidos ({{ getRecursosHistoricos().length }})</div>
+        </div>
+      </div>
+      <div class="secao-actions">
+        <div class="secao-badge historico-badge">
+          <i class="material-icons">info</i>
+          <span>Histórico</span>
+        </div>
+        <div class="secao-toggle">
+          <i class="material-icons" [class.rotated]="isSectionExpanded('historico')">expand_more</i>
+        </div>
+      </div>
+    </div>
+    
+    <div class="recursos-content" *ngIf="isSectionExpanded('historico')">
+      <div class="recursos-grid">
+        <div class="recurso-card historico-card" *ngFor="let recurso of getRecursosHistoricos()">
+          <div class="recurso-info">
+            <div class="recurso-nome">{{ recurso.tipoEquipamento }}</div>
+            <div class="recurso-detalhes">
+              <span class="patrimonio" *ngIf="recurso.tipoEquipamento !== 'Linha Telefônica'">Patrimônio: {{ recurso.patrimonio }}</span>
+              <span class="patrimonio" *ngIf="recurso.tipoEquipamento === 'Linha Telefônica'">Número: {{ recurso.patrimonio }}</span>
+              <span class="serial" *ngIf="recurso.tipoEquipamento !== 'Linha Telefônica'">S/N: {{ recurso.numeroSerie }}</span>
+              <span class="serial" *ngIf="recurso.tipoEquipamento === 'Linha Telefônica'">ICCID: {{ recurso.numeroSerie }}</span>
+              <span class="fabricante-modelo" *ngIf="!recurso.tipoEquipamento.toLowerCase().includes('linha telefônica')">Fabricante: {{ recurso.fabricante || 'Não informado' }} | Modelo: {{ recurso.modelo || 'Não informado' }}</span>
+              <span class="fabricante-modelo" *ngIf="recurso.tipoEquipamento.toLowerCase().includes('linha telefônica')">Tipo: {{ recurso.fabricante || 'Linha Telefônica' }} | Categoria: {{ recurso.modelo || 'Telefone' }}</span>
+              <span class="tipo-aquisicao">Tipo: {{ recurso.tipoAquisicao || 'Não informado' }}</span>
+            </div>
+            
+            <!-- Status Histórico -->
+            <div class="transito-status">
+              <span class="transito-livre-badge historico-ativo">
+                <i class="material-icons">history</i>
+                Histórico - {{ recurso.status }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card de Sinalizar Suspeita - Final da Página -->
+  <div class="sinalizacao-suspeita-card" *ngIf="passCheckResult?.recursos && passCheckResult.recursos.length > 0">
+    <div class="sinalizacao-header">
+      <i class="material-icons">warning</i>
+      <span>Sinalizar Suspeita</span>
+    </div>
+    <div class="sinalizacao-content">
+      <p>Se houver algum comportamento suspeito ou irregularidade, registre uma sinalização:</p>
+      <button class="btn btn-warning" (click)="abrirModalSinalizacao()">
+        <i class="material-icons">flag</i>
+        Sinalizar Suspeita
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Sinalização de Suspeita -->
+<div class="modal" *ngIf="showSinalizacaoModal">
+  <div class="modern-dialog">
+    <!-- Header com ícone e título -->
+    <div class="dialog-header">
+      <div class="dialog-icon">
+        <i class="material-icons">warning</i>
+      </div>
+      <div class="dialog-title">
+        <h2>Sinalizar Suspeita</h2>
+        <p>Registre uma suspeita sobre este colaborador</p>
+      </div>
+      <button class="dialog-close" (click)="fecharModalSinalizacao()">
+        <i class="material-icons">close</i>
+      </button>
+    </div>
+
+    <!-- Conteúdo do modal -->
+    <div class="dialog-content">
+      <form [formGroup]="sinalizacaoForm" (ngSubmit)="criarSinalizacao()">
+        <div class="form-group">
+          <label for="motivoSuspeita">Motivo da Suspeita *</label>
+          <select 
+            id="motivoSuspeita" 
+            formControlName="motivoSuspeita" 
+            class="form-control"
+            [class.is-invalid]="sinalizacaoForm.get('motivoSuspeita')?.invalid && sinalizacaoForm.get('motivoSuspeita')?.touched"
+          >
+            <option value="">Selecione um motivo</option>
+            <option *ngFor="let motivo of motivosSuspeita" [value]="motivo.codigo">
+              {{ motivo.descricao }}
+            </option>
+          </select>
+          <div class="invalid-feedback" *ngIf="sinalizacaoForm.get('motivoSuspeita')?.invalid && sinalizacaoForm.get('motivoSuspeita')?.touched">
+            Motivo da suspeita é obrigatório
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="prioridade">Prioridade *</label>
+          <select 
+            id="prioridade" 
+            formControlName="prioridade" 
+            class="form-control"
+            [class.is-invalid]="sinalizacaoForm.get('prioridade')?.invalid && sinalizacaoForm.get('prioridade')?.touched"
+          >
+            <option value="baixa">Baixa</option>
+            <option value="media">Média</option>
+            <option value="alta">Alta</option>
+            <option value="critica">Crítica</option>
+          </select>
+          <div class="invalid-feedback" *ngIf="sinalizacaoForm.get('prioridade')?.invalid && sinalizacaoForm.get('prioridade')?.touched">
+            Prioridade é obrigatória
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="descricaoDetalhada">Descrição Detalhada *</label>
+          <textarea 
+            id="descricaoDetalhada" 
+            formControlName="descricaoDetalhada" 
+            class="form-control"
+            rows="3"
+            placeholder="Descreva detalhadamente o motivo da suspeita..."
+            [class.is-invalid]="sinalizacaoForm.get('descricaoDetalhada')?.invalid && sinalizacaoForm.get('descricaoDetalhada')?.touched"
+          ></textarea>
+          <div class="invalid-feedback" *ngIf="sinalizacaoForm.get('descricaoDetalhada')?.invalid && sinalizacaoForm.get('descricaoDetalhada')?.touched">
+            Descrição detalhada é obrigatória
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="nomeVigilante">Nome do Vigilante *</label>
+          <input 
+            type="text" 
+            id="nomeVigilante" 
+            formControlName="nomeVigilante" 
+            class="form-control"
+            placeholder="Digite o nome do vigilante"
+            [class.is-invalid]="sinalizacaoForm.get('nomeVigilante')?.invalid && sinalizacaoForm.get('nomeVigilante')?.touched"
+          >
+          <div class="invalid-feedback" *ngIf="sinalizacaoForm.get('nomeVigilante')?.invalid && sinalizacaoForm.get('nomeVigilante')?.touched">
+            Nome do vigilante é obrigatório
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="observacoesVigilante">Observações do Vigilante</label>
+          <textarea 
+            id="observacoesVigilante" 
+            formControlName="observacoesVigilante" 
+            class="form-control"
+            rows="3"
+            placeholder="Observações adicionais do vigilante..."
+          ></textarea>
+        </div>
+
+        <!-- Botões de ação -->
+        <div class="dialog-actions">
+          <button type="button" class="btn btn-secondary" (click)="fecharModalSinalizacao()">
+            <i class="fas fa-times"></i>
+            Cancelar
+          </button>
+          <button 
+            type="submit" 
+            class="btn btn-danger"
+            [disabled]="sinalizacaoForm.invalid || loading"
+          >
+            <i class="fas fa-flag"></i>
+            {{ loading ? 'Salvando...' : 'Sinalizar Suspeita' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

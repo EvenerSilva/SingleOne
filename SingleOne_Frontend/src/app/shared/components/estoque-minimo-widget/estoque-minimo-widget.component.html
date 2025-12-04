@@ -1,0 +1,86 @@
+<!-- 🎯 WIDGET DE ESTOQUE MÍNIMO -->
+<div class="estoque-minimo-widget">
+  
+  <!-- Header do Widget -->
+  <div class="widget-header">
+    <div class="widget-title">
+      <i class="fas fa-warehouse"></i>
+      <h3>Estoque Mínimo</h3>
+    </div>
+    <div class="widget-actions">
+      <button class="btn btn-sm btn-outline-primary" (click)="navegarParaEstoqueMinimo()">
+        <i class="fas fa-external-link-alt"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="carregando" class="widget-loading">
+    <div class="spinner-border spinner-border-sm text-primary" role="status">
+      <span class="sr-only">Carregando...</span>
+    </div>
+  </div>
+
+  <!-- Conteúdo do Widget -->
+  <div *ngIf="!carregando" class="widget-content">
+    
+    <!-- Estatísticas Resumidas -->
+    <div class="widget-stats">
+      <div class="stat-item total">
+        <div class="stat-value">{{ totalAlertas }}</div>
+        <div class="stat-label">Total de Alertas</div>
+      </div>
+      
+      <div class="stat-item criticos">
+        <div class="stat-value">{{ estatisticas.alertasCriticos }}</div>
+        <div class="stat-label">Críticos</div>
+      </div>
+      
+      <div class="stat-item moderados">
+        <div class="stat-value">{{ estatisticas.alertasModerados }}</div>
+        <div class="stat-label">Moderados</div>
+      </div>
+    </div>
+
+    <!-- Lista de Alertas Críticos -->
+    <div *ngIf="getAlertasCriticos().length > 0" class="alertas-criticos">
+      <div class="alertas-header">
+        <h4><i class="fas fa-fire"></i> Alertas Críticos</h4>
+      </div>
+      
+      <div class="alertas-list">
+        <div *ngFor="let alerta of getAlertasCriticos()" class="alerta-item" [ngClass]="getSeveridadeClass(alerta.quantidadeFaltante)">
+          <div class="alerta-icon">
+            <i [ngClass]="getTipoIcon(alerta.tipo)"></i>
+          </div>
+          
+          <div class="alerta-content">
+            <div class="alerta-descricao">{{ alerta.descricao }}</div>
+            <div class="alerta-details">
+              <span class="localidade">{{ alerta.localidade }}</span>
+              <span class="faltante">{{ alerta.quantidadeFaltante }} faltantes</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mensagem quando não há alertas críticos -->
+    <div *ngIf="getAlertasCriticos().length === 0 && totalAlertas === 0" class="no-alerts">
+      <div class="no-alerts-icon">
+        <i class="fas fa-check-circle"></i>
+      </div>
+      <p>Nenhum alerta de estoque</p>
+    </div>
+
+    <!-- Mensagem quando há alertas mas não críticos -->
+    <div *ngIf="getAlertasCriticos().length === 0 && totalAlertas > 0" class="no-critical-alerts">
+      <div class="no-critical-icon">
+        <i class="fas fa-info-circle"></i>
+      </div>
+      <p>{{ totalAlertas }} alerta(s) não crítico(s)</p>
+    </div>
+
+  </div>
+
+</div>

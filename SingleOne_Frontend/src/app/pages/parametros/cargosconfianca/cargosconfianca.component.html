@@ -1,0 +1,250 @@
+<!-- 🎯 HEADER MODERNO DOS CARGOS DE CONFIANÇA -->
+<div class="cargosconfianca-header">
+  <div class="header-content">
+    <div class="header-left">
+      <button class="back-button" [routerLink]="['/configuracoes']" matTooltip="Voltar para Configurações">
+        <i class="cil-arrow-left"></i>
+      </button>
+      <div class="header-title">
+        <div class="title-icon">
+          <i class="cil-lock-locked"></i>
+        </div>
+        <div class="title-text">
+          <h1>Cargos de Confiança</h1>
+          <p>Gerenciar cargos que requerem processos especiais de segurança no descarte</p>
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="action-btn primary-btn" (click)="abrirFormulario()" matTooltip="Adicionar novo cargo de confiança">
+        <i class="cil-plus"></i>
+        <span>Novo Cargo</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 🍞 BREADCRUMB MODERNO -->
+<nav class="modern-breadcrumb">
+  <div class="breadcrumb-container">
+    <a [routerLink]="['/dashboard']" class="breadcrumb-item">
+      <i class="cil-home"></i>
+      <span>Dashboard</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a [routerLink]="['/configuracoes']" class="breadcrumb-item">
+      <i class="cil-cog"></i>
+      <span>Configurações</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <span class="breadcrumb-item active">Cargos de Confiança</span>
+  </div>
+</nav>
+
+<!-- 📋 CONTEÚDO PRINCIPAL -->
+<div class="cargosconfianca-content">
+  
+  <!-- 🔒 CONFIGURAÇÃO DE NOVO CARGO (COLAPSÁVEL) -->
+  <div class="config-section" [class.expanded]="mostrarFormulario">
+    <div class="section-header" (click)="toggleFormulario()">
+      <div class="header-content">
+        <div class="header-icon">
+          <i class="cil-shield-alt"></i>
+        </div>
+        <div class="header-text">
+          <h2>{{editandoCargo ? 'Editar' : 'Adicionar'}} Cargo de Confiança</h2>
+          <p>Configure cargos que requerem processos especiais de segurança no descarte</p>
+        </div>
+        <div class="header-toggle">
+          <i class="cil-chevron-bottom" [class.rotated]="mostrarFormulario"></i>
+        </div>
+      </div>
+    </div>
+    
+    <div class="config-content" *ngIf="mostrarFormulario">
+      <form [formGroup]="form" (ngSubmit)="editandoCargo ? salvarEdicao() : adicionarCargo()">
+        <div class="form-layout">
+          <!-- LADO ESQUERDO: Cargo e Criticidade -->
+          <div class="form-left">
+            <div class="form-section">
+              <h4>Informações do Cargo</h4>
+              
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Cargo ou Padrão de Cargo</mat-label>
+                <input matInput formControlName="cargo" required 
+                       placeholder="Ex: Gerente, Diretor, Presidente, etc.">
+                <mat-hint>Digite o nome do cargo ou um padrão para agrupar cargos similares</mat-hint>
+                <mat-error *ngIf="form.get('cargo')?.invalid && form.get('cargo')?.touched">
+                  Cargo é obrigatório
+                </mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Nível de Criticidade</mat-label>
+                <mat-select formControlName="nivelcriticidade" required>
+                  <mat-option value="ALTO">ALTO</mat-option>
+                  <mat-option value="MEDIO">MÉDIO</mat-option>
+                  <mat-option value="BAIXO">BAIXO</mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <div class="padrao-section">
+                <mat-checkbox formControlName="matchexato" class="padrao-checkbox" color="warn">
+                  <div class="padrao-info">
+                    <div class="padrao-title">
+                      <i class="material-icons">warning</i>
+                      <strong>Cargo Exato (Exceção)</strong>
+                    </div>
+                    <span class="padrao-hint">
+                      <strong>Padrão (desmarcado):</strong> Usa match parcial. Ex: "Gerente" incluirá "Gerente I", "Gerente II", "Gerente Regional", etc.<br>
+                      <strong>Exceção (marcado):</strong> Apenas o cargo exato. Ex: "Presidente" incluirá SOMENTE quem tem cargo exatamente "Presidente".
+                    </span>
+                  </div>
+                </mat-checkbox>
+              </div>
+            </div>
+          </div>
+
+          <!-- LADO DIREITO: Processos Obrigatórios -->
+          <div class="form-right">
+            <div class="form-section">
+              <h4>Processos Obrigatórios</h4>
+              
+              <div class="processos-grid">
+                <mat-checkbox formControlName="obrigarsanitizacao" class="processo-checkbox" color="primary">
+                  <div class="processo-content">
+                    <i class="material-icons">cleaning_services</i>
+                    <span>Sanitização</span>
+                  </div>
+                </mat-checkbox>
+
+                <mat-checkbox formControlName="obrigardescaracterizacao" class="processo-checkbox" color="primary">
+                  <div class="processo-content">
+                    <i class="material-icons">remove_circle</i>
+                    <span>Descaracterização</span>
+                  </div>
+                </mat-checkbox>
+
+                <mat-checkbox formControlName="obrigarperfuracaodisco" class="processo-checkbox" color="primary">
+                  <div class="processo-content">
+                    <i class="material-icons">storage</i>
+                    <span>Perfuração de Disco</span>
+                  </div>
+                </mat-checkbox>
+
+                <mat-checkbox formControlName="obrigarevidencias" class="processo-checkbox evidencias-especial" color="warn"
+                              matTooltip="Se marcado, exige evidências FOTOGRÁFICAS de TODOS os processos selecionados acima">
+                  <div class="processo-content">
+                    <i class="material-icons">photo_library</i>
+                    <div class="processo-text">
+                      <span class="processo-nome">Exigir Evidências Fotográficas</span>
+                      <small class="processo-hint">Anexar fotos de CADA processo marcado</small>
+                    </div>
+                  </div>
+                </mat-checkbox>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn-cancel" (click)="cancelarEdicao()" *ngIf="editandoCargo || mostrarFormulario">
+            <i class="material-icons">close</i>
+            Cancelar
+          </button>
+          <button type="submit" class="btn-primary" [disabled]="form.invalid || carregando">
+            <i class="material-icons">{{editandoCargo ? 'save' : 'add'}}</i>
+            {{editandoCargo ? 'Salvar Alterações' : 'Adicionar Cargo'}}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 🔍 SEÇÃO DE BUSCA -->
+  <div class="search-section">
+    <div class="search-box">
+      <i class="cil-magnifying-glass search-icon"></i>
+      <input type="text" placeholder="Buscar por cargo, criticidade, tipo de match ou processos..." [formControl]="consulta">
+      <button 
+        *ngIf="consulta.value" 
+        class="clear-btn" 
+        (click)="limparBusca()"
+        type="button">
+        <i class="cil-x"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- 📊 TABELA MODERNA -->
+  <div class="table-section">
+    <div class="table-container">
+      <table class="modern-table">
+        <thead>
+          <tr>
+            <th>Cargo</th>
+            <th class="text-center">Criticidade</th>
+            <th>Tipo de Match</th>
+            <th>Processos Obrigatórios</th>
+            <th class="text-center">Status</th>
+            <th class="text-center">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let cargo of dadosPaginados" [class.inativo]="!cargo.ativo">
+            <td class="cargo-info">
+              <div class="cargo-details">
+                <div class="cargo-text">
+                  <span class="cargo-nome">{{cargo.cargo}}</span>
+                  <small class="cargo-meta">Criado em: {{cargo.datacriacao | date:'dd/MM/yyyy'}}</small>
+                </div>
+              </div>
+            </td>
+            <td class="text-center">
+              <span class="criticidade-badge" [class]="getNivelCriticidadeClass(cargo.nivelcriticidade)">
+                {{cargo.nivelcriticidade}}
+              </span>
+            </td>
+            <td>
+              <span class="match-badge" [ngClass]="cargo.usarpadrao ? 'padrao' : 'exato'">
+                <i [class]="cargo.usarpadrao ? 'cil-search' : 'cil-check-circle'"></i>
+                {{cargo.usarpadrao ? 'Padrão' : 'Exato'}}
+              </span>
+            </td>
+            <td>
+              <div class="processos-list">
+                <span class="processo-tag" *ngFor="let processo of getProcessosObrigatorios(cargo)">
+                  {{processo}}
+                </span>
+              </div>
+            </td>
+            <td class="text-center">
+              <span class="status-badge" [ngClass]="cargo.ativo ? 'ativo' : 'inativo'">
+                <i [class]="cargo.ativo ? 'cil-check-circle' : 'cil-x-circle'"></i>
+                {{cargo.ativo ? 'ATIVO' : 'INATIVO'}}
+              </span>
+            </td>
+            <td class="cargo-actions">
+              <div class="action-buttons">
+                <button class="action-btn toggle-btn" matTooltip="Ativar/Desativar" (click)="toggleAtivo(cargo)">
+                  <i [class]="cargo.ativo ? 'cil-check-circle' : 'cil-ban'"></i>
+                </button>
+                <button class="action-btn edit-btn" matTooltip="Editar cargo" (click)="editarCargo(cargo)">
+                  <i class="cil-pencil"></i>
+                </button>
+                <button class="action-btn delete-btn" matTooltip="Excluir cargo" (click)="excluirCargo(cargo.id)">
+                  <i class="cil-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 📄 PAGINAÇÃO -->
+  <div class="pagination-container">
+    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [pageSize]="10" showFirstLastButtons></mat-paginator>
+  </div>
+</div>

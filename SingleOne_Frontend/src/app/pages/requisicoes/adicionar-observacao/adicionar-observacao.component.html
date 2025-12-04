@@ -1,0 +1,45 @@
+<div class="modern-dialog">
+  <!-- Header com ícone e título -->
+  <div class="dialog-header">
+    <div class="header-icon">
+      <i class="cil-comment-bubble"></i>
+    </div>
+    <h2 class="dialog-title">Adicionar Observação</h2>
+  </div>
+
+  <!-- Informações do recurso -->
+  <div class="dialog-content">
+    <div class="resource-info">
+      <p><strong>Recurso:</strong> {{ equipamento.equipamento }}</p>
+      <p><strong>S/N:</strong> {{ equipamento.numeroSerie }}</p>
+      <p><strong>Patrimônio:</strong> {{ equipamento.patrimonio }}</p>
+    </div>
+    
+    <div class="form-group">
+      <label>Observação:</label>
+      <textarea 
+        class="form-control" 
+        placeholder="Digite sua observação sobre o recurso..."
+        rows="4"
+        [(ngModel)]="equipamento.observacaoEntrega">
+      </textarea>
+    </div>
+  </div>
+
+  <!-- Botões de ação -->
+  <div class="dialog-actions">
+    <button 
+      class="btn btn-secondary" 
+      (click)="dialogRef.close()">
+      <i class="cil-x"></i>
+      Cancelar
+    </button>
+    <button 
+      class="btn btn-primary" 
+      (click)="salvar()">
+      <i class="cil-check"></i>
+      Salvar
+    </button>
+  </div>
+</div>
+  

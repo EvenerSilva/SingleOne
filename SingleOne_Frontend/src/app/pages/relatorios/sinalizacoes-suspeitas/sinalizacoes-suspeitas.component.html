@@ -1,0 +1,789 @@
+<!-- 🎯 HEADER MODERNO DAS SINALIZAÇÕES DE SUSPEITAS -->
+<div class="sinalizacoes-suspeitas-header">
+  <div class="header-content">
+    <div class="header-left">
+      <button class="back-button" [routerLink]="['/relatorios']" matTooltip="Voltar para Relatórios">
+        <i class="cil-arrow-left"></i>
+      </button>
+      <div class="header-title">
+        <div class="title-icon">
+          <i class="cil-warning"></i>
+        </div>
+        <div class="title-text">
+          <h1>Sinalizações de Suspeitas</h1>
+          <p>Relatório de suspeitas sinalizadas pelos vigilantes da portaria</p>
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="btn-exportar" (click)="exportarDados()" matTooltip="Exportar Dados" [disabled]="!dataSource || dataSource.data.length === 0">
+        <i class="cil-cloud-download"></i>
+        <span>Exportar Dados</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 🍞 BREADCRUMB MODERNO -->
+<nav class="modern-breadcrumb">
+  <div class="breadcrumb-container">
+    <a [routerLink]="['/dashboard']" class="breadcrumb-item">
+      <i class="cil-home"></i>
+      <span>Dashboard</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a [routerLink]="['/relatorios']" class="breadcrumb-item">
+      <i class="cil-timeline"></i>
+      <span>Relatórios e Timeline</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <span class="breadcrumb-item active">Sinalizações de Suspeitas</span>
+  </div>
+</nav>
+
+<!-- 📋 CONTEÚDO PRINCIPAL -->
+<div class="sinalizacoes-suspeitas-content">
+  <!-- 🔍 SEÇÃO DE FILTROS -->
+  <div class="filters-section">
+    <div class="filters-container">
+      <div class="filters-header">
+        <button class="toggle-filters-btn">
+          <i class="cil-filter"></i>
+          <span>Filtros de Pesquisa</span>
+        </button>
+      </div>
+      <div class="filters-content">
+        <div class="filters-grid">
+          <!-- Data Início -->
+          <div class="filter-field">
+            <label>Data Início</label>
+            <input type="date" class="modern-input" [(ngModel)]="filtros.dataInicio" />
+          </div>
+
+          <!-- Data Fim -->
+          <div class="filter-field">
+            <label>Data Fim</label>
+            <input type="date" class="modern-input" [(ngModel)]="filtros.dataFim" />
+          </div>
+
+          <!-- Status -->
+          <div class="filter-field">
+            <label>Status</label>
+            <select class="modern-select" [(ngModel)]="filtros.status">
+              <option [ngValue]="null">Todos os status</option>
+              <option *ngFor="let status of statusOptions" [ngValue]="status.valor">
+                {{ status.descricao }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Prioridade -->
+          <div class="filter-field">
+            <label>Prioridade</label>
+            <select class="modern-select" [(ngModel)]="filtros.prioridade">
+              <option [ngValue]="null">Todas as prioridades</option>
+              <option *ngFor="let prioridade of prioridadeOptions" [ngValue]="prioridade.valor">
+                {{ prioridade.descricao }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Motivo de Suspeita -->
+          <div class="filter-field">
+            <label>Motivo de Suspeita</label>
+            <select class="modern-select" [(ngModel)]="filtros.motivoSuspeita">
+              <option [ngValue]="null">Todos os motivos</option>
+              <option *ngFor="let motivo of motivosSuspeita" [ngValue]="motivo.codigo">
+                {{ motivo.descricao }}
+              </option>
+            </select>
+          </div>
+
+          <!-- CPF Consultado -->
+          <div class="filter-field">
+            <label>CPF Consultado</label>
+            <input type="text" class="modern-input" [(ngModel)]="filtros.cpfConsultado" 
+                   placeholder="Digite o CPF" maxlength="11" />
+          </div>
+
+          <!-- Nome do Colaborador -->
+          <div class="filter-field">
+            <label>Nome do Colaborador</label>
+            <input type="text" class="modern-input" [(ngModel)]="filtros.colaboradorNome" 
+                   placeholder="Digite o nome do colaborador" />
+          </div>
+
+          <!-- Nome do Vigilante -->
+          <div class="filter-field">
+            <label>Nome do Vigilante</label>
+            <input type="text" class="modern-input" [(ngModel)]="filtros.vigilanteNome" 
+                   placeholder="Digite o nome do vigilante" />
+          </div>
+
+          <div class="filter-actions">
+            <button class="action-btn primary-btn" (click)="consultar()" [disabled]="loading">
+              <i class="cil-search"></i>
+              <span>Pesquisar</span>
+            </button>
+            <button class="action-btn secondary-btn" (click)="limparBusca()">
+              <i class="cil-x-circle"></i>
+              <span>Limpar</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 📊 SEÇÃO DE MÉTRICAS -->
+  <div class="metrics-section" *ngIf="dataSource?.data && dataSource.data.length > 0">
+    <div class="metrics-grid">
+      <div class="metric-card primary">
+        <div class="metric-icon">
+          <i class="cil-list"></i>
+        </div>
+        <div class="metric-info">
+          <div class="metric-value">{{ getTotalSinalizacoes() }}</div>
+          <div class="metric-label">Total de Sinalizações</div>
+        </div>
+      </div>
+      
+      <div class="metric-card warning">
+        <div class="metric-icon">
+          <i class="cil-clock"></i>
+        </div>
+        <div class="metric-info">
+          <div class="metric-value">{{ getTotalPendentes() }}</div>
+          <div class="metric-label">Pendentes</div>
+        </div>
+      </div>
+      
+      <div class="metric-card info">
+        <div class="metric-icon">
+          <i class="cil-magnifying-glass"></i>
+        </div>
+        <div class="metric-info">
+          <div class="metric-value">{{ getTotalEmInvestigacao() }}</div>
+          <div class="metric-label">Em Investigação</div>
+        </div>
+      </div>
+
+      <div class="metric-card success">
+        <div class="metric-icon">
+          <i class="cil-check-circle"></i>
+        </div>
+        <div class="metric-info">
+          <div class="metric-value">{{ getTotalResolvidas() }}</div>
+          <div class="metric-label">Resolvidas</div>
+        </div>
+      </div>
+
+      <div class="metric-card danger">
+        <div class="metric-icon">
+          <i class="cil-warning"></i>
+        </div>
+        <div class="metric-info">
+          <div class="metric-value">{{ getTotalCriticas() }}</div>
+          <div class="metric-label">Críticas</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🔄 CONTAINER DE LOADING -->
+  <div class="loading-container" *ngIf="loading">
+    <div class="loading-spinner"></div>
+    <p>Carregando dados...</p>
+  </div>
+
+  <!-- 📋 SEÇÃO DA TABELA -->
+  <div class="table-section" *ngIf="!loading && dataSource?.data">
+    <div class="table-container">
+      <div class="scroll-indicator" *ngIf="dataSource.data.length > 0">
+        <i class="cil-arrow-left"></i>
+        <span>Deslize horizontalmente para ver mais colunas</span>
+        <i class="cil-arrow-right"></i>
+      </div>
+      
+      <table class="modern-table detailed-table">
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Protocolo</th>
+            <th>Colaborador</th>
+            <th>Motivo</th>
+            <th>Prioridade</th>
+            <th>Status</th>
+            <th>Vigilante</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let sinalizacao of dadosPagina">
+            <td class="text-center">
+              <span class="data-badge">{{ formatarData(sinalizacao.dataSinalizacao) }}</span>
+              <br>
+              <small class="hora-badge">{{ formatarHora(sinalizacao.dataSinalizacao) }}</small>
+            </td>
+            <td class="text-center">
+              <span class="protocolo-badge">{{ sinalizacao.numeroProtocolo }}</span>
+            </td>
+            <td class="text-center">
+              <span class="colaborador-info">
+                {{ sinalizacao.colaboradorNome }}
+                <br>
+                <small class="cpf-badge">{{ sinalizacao.cpfConsultado }}</small>
+              </span>
+            </td>
+            <td class="text-center">
+              <span class="motivo-badge">
+                {{ getMotivoSuspeitaDescricao(sinalizacao.motivoSuspeita) }}
+              </span>
+            </td>
+            <td class="text-center">
+              <span class="prioridade-badge" [ngClass]="getPrioridadeClass(sinalizacao.prioridade)">
+                <i class="cil-flag" *ngIf="sinalizacao.prioridade === 'critica'"></i>
+                <i class="cil-exclamation-triangle" *ngIf="sinalizacao.prioridade === 'alta'"></i>
+                <i class="cil-info" *ngIf="sinalizacao.prioridade === 'media'"></i>
+                <i class="cil-minus" *ngIf="sinalizacao.prioridade === 'baixa'"></i>
+                {{ getPrioridadeDescricao(sinalizacao.prioridade) }}
+              </span>
+            </td>
+            <td class="text-center">
+              <span class="status-badge" [ngClass]="getStatusClass(sinalizacao.status)">
+                <i class="cil-clock" *ngIf="sinalizacao.status === 'pendente'"></i>
+                <i class="cil-magnifying-glass" *ngIf="sinalizacao.status === 'em_investigacao'"></i>
+                <i class="cil-check-circle" *ngIf="sinalizacao.status === 'resolvida'"></i>
+                <i class="cil-archive" *ngIf="sinalizacao.status === 'arquivada'"></i>
+                {{ getStatusDescricao(sinalizacao.status) }}
+              </span>
+            </td>
+            <td class="text-center">
+              <span class="vigilante-info">{{ sinalizacao.vigilanteNome }}</span>
+            </td>
+            <td class="text-center">
+              <div class="action-buttons">
+                <!-- Ver Detalhes - sempre visível -->
+                <button class="btn-detalhes" (click)="verDetalhes(sinalizacao)" matTooltip="Ver Detalhes">
+                  <i class="cil-magnifying-glass"></i>
+                </button>
+                
+                <!-- Ações para status PENDENTE -->
+                <button class="btn-alterar-status" (click)="iniciarInvestigacao(sinalizacao)" 
+                        *ngIf="sinalizacao.status === 'pendente'" matTooltip="Iniciar Investigação">
+                  <i class="cil-media-play"></i>
+                </button>
+                
+                <!-- Ações para status EM_INVESTIGACAO -->
+                <button class="btn-atribuir" (click)="atribuirInvestigador(sinalizacao)" 
+                        *ngIf="sinalizacao.status === 'em_investigacao'" matTooltip="Reatribuir Investigador">
+                  <i class="cil-user-plus"></i>
+                </button>
+                <button class="btn-resolver" (click)="resolverInvestigacao(sinalizacao)" 
+                        *ngIf="sinalizacao.status === 'em_investigacao'" matTooltip="Marcar como Resolvida">
+                  <i class="cil-check-circle"></i>
+                </button>
+                <button class="btn-arquivar" (click)="arquivarInvestigacao(sinalizacao)" 
+                        *ngIf="sinalizacao.status === 'em_investigacao'" matTooltip="Arquivar">
+                  <i class="cil-folder"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          
+          <!-- Mensagem quando não há dados -->
+          <tr *ngIf="!loading && (!dadosPagina || dadosPagina.length === 0) && totalLength === 0">
+            <td colspan="8" class="no-data-row">
+              <div class="no-data-message">
+                <i class="cil-inbox"></i>
+                <p>Nenhuma sinalização encontrada</p>
+                <small>Selecione um período e clique em "Pesquisar" para carregar dados</small>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <div class="pagination-container">
+      <mat-paginator 
+        [length]="totalLength" 
+        [pageSize]="pageSize" 
+        [pageSizeOptions]="[10, 25, 50, 100]" 
+        (page)="onPageChange($event)"
+        showFirstLastButtons>
+      </mat-paginator>
+    </div>
+  </div>
+</div>
+
+<!-- 🔍 MODAL DE DETALHES -->
+<div class="formulario-overlay" *ngIf="showDetalhesModal && sinalizacaoSelecionada" (click)="fecharDetalhesModal()">
+  <div class="formulario-container" (click)="$event.stopPropagation()">
+    <div class="fabricante-form-container">
+      
+      <!-- Header do Formulário -->
+      <div class="form-header">
+        <h2 class="form-title">
+          <i class="cil-eye"></i>
+          Detalhes da Sinalização
+        </h2>
+        <p class="form-subtitle">
+          Visualize todas as informações detalhadas desta sinalização de suspeita
+        </p>
+      </div>
+
+      <div class="fabricante-form" *ngIf="sinalizacaoSelecionada">
+        <!-- Informações Básicas -->
+        <div class="info-section">
+          <h4><i class="cil-info"></i> Informações Básicas</h4>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>Protocolo:</label>
+              <span class="protocolo-badge">{{ sinalizacaoSelecionada.numeroProtocolo }}</span>
+            </div>
+            <div class="info-item">
+              <label>Data/Hora:</label>
+              <span>{{ formatarData(sinalizacaoSelecionada.dataSinalizacao) }} às {{ formatarHora(sinalizacaoSelecionada.dataSinalizacao) }}</span>
+            </div>
+            <div class="info-item">
+              <label>Status:</label>
+              <span class="status-badge" [ngClass]="getStatusClass(sinalizacaoSelecionada.status)">
+                {{ getStatusDescricao(sinalizacaoSelecionada.status) }}
+              </span>
+            </div>
+            <div class="info-item">
+              <label>Prioridade:</label>
+              <span class="prioridade-badge" [ngClass]="getPrioridadeClass(sinalizacaoSelecionada.prioridade)">
+                {{ getPrioridadeDescricao(sinalizacaoSelecionada.prioridade) }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dados do Colaborador -->
+        <div class="info-section">
+          <h4><i class="cil-user"></i> Dados do Colaborador</h4>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>Nome:</label>
+              <span>{{ sinalizacaoSelecionada.colaboradorNome }}</span>
+            </div>
+            <div class="info-item">
+              <label>CPF:</label>
+              <span>{{ sinalizacaoSelecionada.cpfConsultado }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dados da Sinalização -->
+        <div class="info-section">
+          <h4><i class="cil-shield-alt"></i> Dados da Sinalização</h4>
+          <div class="info-grid">
+            <div class="info-item full-width">
+              <label>Motivo:</label>
+              <span>{{ getMotivoSuspeitaDescricao(sinalizacaoSelecionada.motivoSuspeita) }}</span>
+            </div>
+            <div class="info-item full-width">
+              <label>Descrição Detalhada:</label>
+              <span>{{ sinalizacaoSelecionada.descricaoDetalhada }}</span>
+            </div>
+            <div class="info-item full-width" *ngIf="sinalizacaoSelecionada.observacoesVigilante">
+              <label>Observações do Vigilante:</label>
+              <span>{{ sinalizacaoSelecionada.observacoesVigilante }}</span>
+            </div>
+            <div class="info-item">
+              <label>Vigilante:</label>
+              <span>{{ sinalizacaoSelecionada.vigilanteNome }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Investigação -->
+        <div class="info-section" *ngIf="sinalizacaoSelecionada.investigadorNome">
+          <h4><i class="cil-magnifying-glass"></i> Investigação</h4>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>Investigador:</label>
+              <span>{{ sinalizacaoSelecionada.investigadorNome }}</span>
+            </div>
+            <div class="info-item" *ngIf="sinalizacaoSelecionada.dataInvestigacao">
+              <label>Data Investigação:</label>
+              <span>{{ formatarData(sinalizacaoSelecionada.dataInvestigacao) }}</span>
+            </div>
+            <div class="info-item full-width" *ngIf="sinalizacaoSelecionada.resultadoInvestigacao">
+              <label>Resultado:</label>
+              <span>{{ sinalizacaoSelecionada.resultadoInvestigacao }}</span>
+            </div>
+            <div class="info-item full-width" *ngIf="sinalizacaoSelecionada.acoesTomadas">
+              <label>Ações Tomadas:</label>
+              <span>{{ sinalizacaoSelecionada.acoesTomadas }}</span>
+            </div>
+            <div class="info-item full-width" *ngIf="sinalizacaoSelecionada.observacoesFinais">
+              <label>Observações Finais:</label>
+              <span>{{ sinalizacaoSelecionada.observacoesFinais }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Botões de Ação -->
+        <div class="form-actions">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="fecharDetalhesModal()">
+            <i class="fas fa-times"></i>
+            Fechar
+          </button>
+        
+          <button
+            type="button"
+            class="btn btn-primary"
+            (click)="iniciarInvestigacaoDoModal(sinalizacaoSelecionada)"
+            *ngIf="sinalizacaoSelecionada.status === 'pendente'">
+            <i class="fas fa-play"></i>
+            Iniciar Investigação
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 🚀 MODAL DE SELEÇÃO DE INVESTIGADOR -->
+<div class="formulario-overlay" *ngIf="showInvestigatorModal" (click)="fecharModalInvestigador()">
+  <div class="formulario-container" (click)="$event.stopPropagation()">
+    <div class="fabricante-form-container">
+      
+      <!-- Header do Formulário -->
+      <div class="form-header">
+        <h2 class="form-title">
+          <i class="cil-user-plus"></i>
+          Atribuir Investigador
+        </h2>
+        <p class="form-subtitle">
+          Selecione um usuário ativo do sistema para atribuir como investigador
+        </p>
+      </div>
+
+      <form class="fabricante-form">
+        <!-- Informação da Sinalização -->
+        <div class="info-box" *ngIf="sinalizacaoSelecionada">
+          <div class="info-box-header">
+            <i class="cil-info"></i>
+            <strong>Sinalização #{{ sinalizacaoSelecionada.numeroProtocolo }}</strong>
+          </div>
+          <div class="info-box-content">
+            <p><strong>Colaborador:</strong> {{ sinalizacaoSelecionada.colaboradorNome }}</p>
+            <p><strong>Motivo:</strong> {{ getMotivoSuspeitaDescricao(sinalizacaoSelecionada.motivoSuspeita) }}</p>
+          </div>
+        </div>
+
+        <!-- Lista de Investigadores -->
+        <div class="form-group">
+          <label class="form-label">
+            <i class="cil-people"></i>
+            Selecione o Investigador <span class="required">*</span>
+          </label>
+          <small class="form-text text-muted mb-2">
+            <i class="cil-info"></i>
+            Apenas usuários ativos do sistema (exceto o administrador do sistema) podem ser investigadores
+          </small>
+          
+          <div class="investigadores-list" *ngIf="usuariosInvestigadores.length > 0">
+            <div class="investigador-item" 
+                 *ngFor="let investigador of usuariosInvestigadores"
+                 [class.selected]="investigadorSelecionado?.id === investigador.id"
+                 (click)="selecionarInvestigador(investigador)">
+              <div class="investigador-avatar">
+                <i class="cil-user"></i>
+              </div>
+              <div class="investigador-info">
+                <h4>{{ investigador.nome }}</h4>
+                <p>{{ investigador.email }}</p>
+                <div class="investigador-badges">
+                  <span class="badge badge-admin" *ngIf="investigador.adm">Admin</span>
+                  <span class="badge badge-operator" *ngIf="investigador.operador">Operador</span>
+                </div>
+              </div>
+              <div class="investigador-check">
+                <i class="cil-check" *ngIf="investigadorSelecionado?.id === investigador.id"></i>
+              </div>
+            </div>
+          </div>
+          
+          <div class="no-investigators" *ngIf="usuariosInvestigadores.length === 0">
+            <i class="cil-user-x"></i>
+            <p>Nenhum usuário ativo encontrado</p>
+            <small>Verifique se existem usuários ativos no sistema</small>
+            <button type="button" 
+                    (click)="carregarUsuariosInvestigadores()" 
+                    class="btn btn-primary"
+                    style="margin-top: 1rem;">
+              <i class="cil-reload"></i>
+              Recarregar Lista
+            </button>
+          </div>
+        </div>
+
+        <!-- Botões de Ação -->
+        <div class="form-actions">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="fecharModalInvestigador()">
+            <i class="fas fa-times"></i>
+            Cancelar
+          </button>
+        
+          <button
+            type="button"
+            class="btn btn-primary"
+            (click)="confirmarAtribuicaoInvestigador()"
+            [disabled]="!investigadorSelecionado">
+            <i class="fas fa-check"></i>
+            Atribuir Investigador
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- 🚀 MODAL DE EXPORTAÇÃO -->
+<div class="export-modal" *ngIf="showExportModal" (click)="closeExportModal($event)">
+  <div class="export-modal-content" (click)="$event.stopPropagation()">
+    <div class="export-modal-header">
+      <h3><i class="cil-download"></i> Exportar Dados</h3>
+      <button class="close-btn" (click)="closeExportModal($event)">
+        <i class="cil-x"></i>
+      </button>
+    </div>
+    
+    <div class="export-modal-body">
+      <p>Escolha o formato de exportação para as sinalizações de suspeitas:</p>
+      
+      <div class="export-options">
+        <div class="export-option" (click)="exportar('excel')">
+          <div class="export-icon excel">
+            <i class="cil-file"></i>
+          </div>
+          <div class="export-info">
+            <h4>Excel (.xlsx)</h4>
+            <p>Formato ideal para análise e manipulação de dados</p>
+          </div>
+          <i class="cil-chevron-right"></i>
+        </div>
+        
+        <div class="export-option" (click)="exportar('csv')">
+          <div class="export-icon csv">
+            <i class="cil-file"></i>
+          </div>
+          <div class="export-info">
+            <h4>CSV (.csv)</h4>
+            <p>Formato universal compatível com qualquer planilha</p>
+          </div>
+          <i class="cil-chevron-right"></i>
+        </div>
+      </div>
+    </div>
+    
+    <div class="export-modal-footer">
+      <button class="btn-secondary" (click)="closeExportModal($event)">
+        Cancelar
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 🎯 MODAL DE RESOLVER INVESTIGAÇÃO -->
+<div class="formulario-overlay" *ngIf="showResolverModal" (click)="fecharModalResolver()">
+  <div class="formulario-container" (click)="$event.stopPropagation()">
+    <div class="fabricante-form-container">
+      <form class="fabricante-form">
+        <!-- Header -->
+        <div class="form-header">
+          <h2 class="form-title">
+            <i class="cil-check-circle"></i>
+            Resolver Investigação
+          </h2>
+          <p class="form-subtitle">Preencha os detalhes da resolução da investigação</p>
+        </div>
+
+        <!-- Informações da Sinalização -->
+        <div class="info-box" *ngIf="sinalizacaoSelecionada">
+          <div class="info-box-header">
+            <i class="cil-info"></i>
+            <strong>Sinalização #{{ sinalizacaoSelecionada.numeroProtocolo }}</strong>
+          </div>
+          <div class="info-box-content">
+            <p><strong>Colaborador:</strong> {{ sinalizacaoSelecionada.colaboradorNome }}</p>
+            <p><strong>Investigador:</strong> {{ sinalizacaoSelecionada.investigadorNome }}</p>
+            <p><strong>Motivo:</strong> {{ getMotivoSuspeitaDescricao(sinalizacaoSelecionada.motivoSuspeita) }}</p>
+          </div>
+        </div>
+
+        <!-- Resultado da Investigação -->
+        <div class="form-group">
+          <label class="form-label">
+            <i class="cil-clipboard"></i>
+            Resultado da Investigação <span class="required">*</span>
+          </label>
+          <textarea 
+            class="form-control"
+            [(ngModel)]="formularioResolucao.resultadoInvestigacao"
+            name="resultadoInvestigacao"
+            rows="4"
+            placeholder="Descreva o resultado da investigação..."
+            required></textarea>
+          <small>Informe o que foi apurado durante a investigação</small>
+        </div>
+
+        <!-- Ações Tomadas -->
+        <div class="form-group">
+          <label class="form-label">
+            <i class="cil-task"></i>
+            Ações Tomadas <span class="required">*</span>
+          </label>
+          <textarea 
+            class="form-control"
+            [(ngModel)]="formularioResolucao.acoesTomadas"
+            name="acoesTomadas"
+            rows="4"
+            placeholder="Descreva as ações que foram tomadas..."
+            required></textarea>
+          <small>Informe as medidas que foram aplicadas</small>
+        </div>
+
+        <!-- Observações Finais (Opcional) -->
+        <div class="form-group">
+          <label class="form-label">
+            <i class="cil-notes"></i>
+            Observações Finais
+          </label>
+          <textarea 
+            class="form-control"
+            [(ngModel)]="formularioResolucao.observacoesFinais"
+            name="observacoesFinais"
+            rows="3"
+            placeholder="Observações adicionais (opcional)..."></textarea>
+          <small>Informações complementares sobre a resolução</small>
+        </div>
+
+        <!-- Botões de Ação -->
+        <div class="form-actions">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="fecharModalResolver()">
+            <i class="fas fa-times"></i>
+            Cancelar
+          </button>
+        
+          <button
+            type="button"
+            class="btn btn-primary"
+            (click)="confirmarResolucao()"
+            [disabled]="!formularioResolucao.resultadoInvestigacao || !formularioResolucao.acoesTomadas">
+            <i class="fas fa-check"></i>
+            Confirmar Resolução
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- 📦 MODAL DE ARQUIVAR INVESTIGAÇÃO -->
+<div class="formulario-overlay" *ngIf="showArquivarModal" (click)="fecharModalArquivar()">
+  <div class="formulario-container" (click)="$event.stopPropagation()">
+    <div class="fabricante-form-container">
+      <form class="fabricante-form">
+        <!-- Header -->
+        <div class="form-header">
+          <h2 class="form-title">
+            <i class="cil-folder"></i>
+            Arquivar Investigação
+          </h2>
+          <p class="form-subtitle">Informe o motivo do arquivamento</p>
+        </div>
+
+        <!-- Informações da Sinalização -->
+        <div class="info-box" *ngIf="sinalizacaoSelecionada">
+          <div class="info-box-header">
+            <i class="cil-info"></i>
+            <strong>Sinalização #{{ sinalizacaoSelecionada.numeroProtocolo }}</strong>
+          </div>
+          <div class="info-box-content">
+            <p><strong>Colaborador:</strong> {{ sinalizacaoSelecionada.colaboradorNome }}</p>
+            <p><strong>Investigador:</strong> {{ sinalizacaoSelecionada.investigadorNome }}</p>
+            <p><strong>Motivo:</strong> {{ getMotivoSuspeitaDescricao(sinalizacaoSelecionada.motivoSuspeita) }}</p>
+          </div>
+        </div>
+
+        <!-- Motivo do Arquivamento -->
+        <div class="form-group">
+          <label class="form-label">
+            <i class="cil-warning"></i>
+            Motivo do Arquivamento <span class="required">*</span>
+          </label>
+          <textarea 
+            class="form-control"
+            [(ngModel)]="formularioArquivamento.motivo"
+            name="motivo"
+            rows="4"
+            placeholder="Descreva o motivo do arquivamento..."
+            required></textarea>
+          <small>Informe por que esta investigação está sendo arquivada</small>
+        </div>
+
+        <!-- Observações (Opcional) -->
+        <div class="form-group">
+          <label class="form-label">
+            <i class="cil-notes"></i>
+            Observações Adicionais
+          </label>
+          <textarea 
+            class="form-control"
+            [(ngModel)]="formularioArquivamento.observacoes"
+            name="observacoes"
+            rows="3"
+            placeholder="Observações adicionais (opcional)..."></textarea>
+          <small>Informações complementares sobre o arquivamento</small>
+        </div>
+
+        <!-- Alerta -->
+        <div class="info-box" style="background: #fff3cd; border-left-color: #ffc107;">
+          <div class="info-box-content">
+            <p style="margin: 0; color: #856404;">
+              <i class="cil-warning" style="margin-right: 0.5rem;"></i>
+              <strong>Atenção:</strong> O arquivamento indica que a investigação não será concluída. 
+              Use este status apenas para casos que não requerem resolução.
+            </p>
+          </div>
+        </div>
+
+        <!-- Botões de Ação -->
+        <div class="form-actions">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="fecharModalArquivar()">
+            <i class="fas fa-times"></i>
+            Cancelar
+          </button>
+        
+          <button
+            type="button"
+            class="btn btn-primary"
+            (click)="confirmarArquivamento()"
+            [disabled]="!formularioArquivamento.motivo"
+            style="background: linear-gradient(135deg, #607D8B 0%, #455A64 100%);">
+            <i class="fas fa-archive"></i>
+            Confirmar Arquivamento
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

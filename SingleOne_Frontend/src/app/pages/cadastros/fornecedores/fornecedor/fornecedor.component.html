@@ -1,0 +1,105 @@
+<!-- 🎯 FORMULÁRIO MODAL DE FORNECEDOR -->
+<div class="formulario-overlay">
+  <div class="formulario-container">
+    <div class="fornecedor-form-container">
+      <div class="form-header">
+        <h2 class="form-title">{{ getTitulo() }}</h2>
+        <p class="form-subtitle">
+          {{ modo === 'criar' ? 'Crie um novo fornecedor para seus equipamentos' : 'Edite as informações do fornecedor selecionado' }}
+        </p>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="salvar()" class="fornecedor-form">
+        
+        <!-- Campo Razão Social -->
+        <div class="form-group">
+          <label for="razaosocial" class="form-label">
+            Razão Social <span class="required">*</span>
+          </label>
+          <input 
+            type="text" 
+            id="razaosocial"
+            formControlName="razaosocial" 
+            class="form-control"
+            [class.is-invalid]="form.get('razaosocial')?.invalid && form.get('razaosocial')?.touched"
+            placeholder="Ex: Empresa LTDA..."
+            maxlength="200"
+          >
+          <div class="invalid-feedback" *ngIf="form.get('razaosocial')?.invalid && form.get('razaosocial')?.touched">
+            <span *ngIf="form.get('razaosocial')?.errors?.required">Razão social é obrigatória</span>
+            <span *ngIf="form.get('razaosocial')?.errors?.maxlength">Razão social deve ter no máximo 200 caracteres</span>
+          </div>
+          <small class="form-text text-muted">
+            Nome completo da empresa fornecedora
+          </small>
+        </div>
+
+        <!-- Campo CNPJ -->
+        <div class="form-group">
+          <label for="cnpj" class="form-label">
+            CNPJ <span class="required">*</span>
+          </label>
+          <input 
+            type="text" 
+            id="cnpj"
+            formControlName="cnpj" 
+            class="form-control"
+            [class.is-invalid]="form.get('cnpj')?.invalid && form.get('cnpj')?.touched"
+            placeholder="00.000.000/0000-00"
+            maxlength="18"
+            (input)="formatarCNPJ($event)"
+          >
+          <div class="invalid-feedback" *ngIf="form.get('cnpj')?.invalid && form.get('cnpj')?.touched">
+            <span *ngIf="form.get('cnpj')?.errors?.required">CNPJ é obrigatório</span>
+            <span *ngIf="form.get('cnpj')?.errors?.maxlength">CNPJ deve ter no máximo 18 caracteres</span>
+          </div>
+          <small class="form-text text-muted">
+            CNPJ válido da empresa fornecedora
+          </small>
+        </div>
+
+        <!-- Destinador de Resíduos -->
+        <div class="form-group destinador-group">
+          <div class="custom-checkbox">
+            <input 
+              type="checkbox" 
+              id="destinadorResiduos"
+              formControlName="destinadorResiduos"
+              class="custom-control-input"
+            >
+            <label for="destinadorResiduos" class="custom-control-label">
+              <i class="fas fa-recycle icon-destinador"></i>
+              <span class="label-text">
+                <strong>Destinador de Resíduos</strong>
+                <small class="label-hint">Marque se este fornecedor é responsável por destinar resíduos/descarte de equipamentos</small>
+              </span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Botões de Ação -->
+        <div class="form-actions">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="cancelar()"
+            [disabled]="carregando"
+          >
+            <i class="fas fa-times"></i>
+            Cancelar
+          </button>
+        
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="form.invalid || carregando"
+          >
+            <i class="fas fa-save" *ngIf="!carregando"></i>
+            <i class="fas fa-spinner fa-spin" *ngIf="carregando"></i>
+            {{ getBotaoTexto() }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

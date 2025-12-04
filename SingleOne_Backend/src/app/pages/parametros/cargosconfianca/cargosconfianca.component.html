@@ -1,0 +1,228 @@
+<!-- 🎯 HEADER MODERNO DOS CARGOS DE CONFIANÇA -->
+<div class="cargosconfianca-header">
+  <div class="header-content">
+    <div class="header-left">
+      <button class="back-button" [routerLink]="['/parametros']" matTooltip="Voltar para Parâmetros">
+        <i class="material-icons">arrow_back</i>
+      </button>
+      <div class="header-title">
+        <div class="title-icon">
+          <i class="material-icons">security</i>
+        </div>
+        <div class="title-text">
+          <h1>Cargos de Confiança</h1>
+          <p>Configuração de segurança para descarte de recursos</p>
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="header-stats">
+        <div class="stat-item">
+          <div class="stat-number">{{cargosConfianca.length}}</div>
+          <div class="stat-label">Cargos Configurados</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">{{cargosExistentes.length}}</div>
+          <div class="stat-label">Cargos no Sistema</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 🍞 BREADCRUMB MODERNO -->
+<nav class="modern-breadcrumb">
+  <div class="breadcrumb-container">
+    <a [routerLink]="['/dashboard']" class="breadcrumb-item">
+      <i class="material-icons">home</i>
+      <span>Dashboard</span>
+    </a>
+    <i class="material-icons">chevron_right</i>
+    <a [routerLink]="['/parametros']" class="breadcrumb-item">
+      <i class="material-icons">settings</i>
+      <span>Parâmetros</span>
+    </a>
+    <i class="material-icons">chevron_right</i>
+    <span class="breadcrumb-item active">Cargos de Confiança</span>
+  </div>
+</nav>
+
+<!-- 📋 CONTEÚDO PRINCIPAL -->
+<div class="cargosconfianca-content" *ngIf="usuarioAutorizado">
+  
+  <!-- 🔒 CONFIGURAÇÃO DE NOVO CARGO -->
+  <div class="config-section">
+    <div class="section-header">
+      <div class="header-content">
+        <div class="header-icon">
+          <i class="material-icons">add_security</i>
+        </div>
+        <div class="header-text">
+          <h2>{{editandoCargo ? 'Editar' : 'Adicionar'}} Cargo de Confiança</h2>
+          <p>Configure cargos que requerem processos especiais de segurança no descarte</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="config-content">
+      <form [formGroup]="form" (ngSubmit)="editandoCargo ? salvarEdicao() : adicionarCargo()">
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="cargo-input">
+            <mat-label>Cargo</mat-label>
+            <mat-select formControlName="cargo" required>
+              <mat-option *ngFor="let cargo of cargosExistentes" [value]="cargo">
+                {{cargo}}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="form.get('cargo')?.invalid && form.get('cargo')?.touched">
+              Cargo é obrigatório
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="nivel-input">
+            <mat-label>Nível de Criticidade</mat-label>
+            <mat-select formControlName="nivelcriticidade" required>
+              <mat-option value="ALTO">ALTO</mat-option>
+              <mat-option value="MEDIO">MÉDIO</mat-option>
+              <mat-option value="BAIXO">BAIXO</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="processos-section">
+          <h3>Processos Obrigatórios</h3>
+          <div class="processos-grid">
+            <mat-checkbox formControlName="obrigarsanitizacao" class="processo-checkbox">
+              <div class="processo-info">
+                <i class="material-icons">cleaning_services</i>
+                <span>Sanitização</span>
+              </div>
+            </mat-checkbox>
+
+            <mat-checkbox formControlName="obrigardescaracterizacao" class="processo-checkbox">
+              <div class="processo-info">
+                <i class="material-icons">remove_circle</i>
+                <span>Descaracterização</span>
+              </div>
+            </mat-checkbox>
+
+            <mat-checkbox formControlName="obrigarperfuracaodisco" class="processo-checkbox">
+              <div class="processo-info">
+                <i class="material-icons">storage</i>
+                <span>Perfuração de Disco</span>
+              </div>
+            </mat-checkbox>
+
+            <mat-checkbox formControlName="obrigarevidencias" class="processo-checkbox">
+              <div class="processo-info">
+                <i class="material-icons">photo_camera</i>
+                <span>Evidências Fotos</span>
+              </div>
+            </mat-checkbox>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn-cancel" (click)="cancelarEdicao()" *ngIf="editandoCargo">
+            <i class="material-icons">close</i>
+            Cancelar
+          </button>
+          <button type="submit" class="btn-primary" [disabled]="form.invalid || carregando">
+            <i class="material-icons">{{editandoCargo ? 'save' : 'add'}}</i>
+            {{editandoCargo ? 'Salvar Alterações' : 'Adicionar Cargo'}}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 📊 LISTA DE CARGOS CONFIGURADOS -->
+  <div class="cargos-section">
+    <div class="section-header">
+      <div class="header-content">
+        <div class="header-icon">
+          <i class="material-icons">list_alt</i>
+        </div>
+        <div class="header-text">
+          <h2>Cargos de Confiança Configurados</h2>
+          <p>Gerencie os cargos que requerem processos especiais de segurança</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="cargos-content">
+      <div class="loading-container" *ngIf="carregando">
+        <div class="loading-spinner">
+          <i class="material-icons rotating">refresh</i>
+          <span>Carregando...</span>
+        </div>
+      </div>
+
+      <div class="cargos-grid" *ngIf="!carregando && cargosConfianca.length > 0">
+        <div class="cargo-card" *ngFor="let cargo of cargosConfianca" [class.inativo]="!cargo.ativo">
+          <div class="cargo-header">
+            <div class="cargo-info">
+              <h3 class="cargo-nome">{{cargo.cargo}}</h3>
+              <span class="nivel-criticidade" [class]="getNivelCriticidadeClass(cargo.nivelcriticidade)">
+                {{cargo.nivelcriticidade}}
+              </span>
+            </div>
+            <div class="cargo-actions">
+              <button mat-icon-button class="toggle-button" (click)="toggleAtivo(cargo)" 
+                      [matTooltip]="cargo.ativo ? 'Desativar' : 'Ativar'">
+                <i class="material-icons">{{cargo.ativo ? 'visibility' : 'visibility_off'}}</i>
+              </button>
+              <button mat-icon-button class="edit-button" (click)="editarCargo(cargo)" matTooltip="Editar">
+                <i class="material-icons">edit</i>
+              </button>
+              <button mat-icon-button class="delete-button" (click)="excluirCargo(cargo.id)" matTooltip="Excluir">
+                <i class="material-icons">delete</i>
+              </button>
+            </div>
+          </div>
+
+          <div class="cargo-details">
+            <div class="processos-obrigatorios">
+              <h4>Processos Obrigatórios:</h4>
+              <div class="processos-list">
+                <span class="processo-tag" *ngFor="let processo of getProcessosObrigatorios(cargo)">
+                  {{processo}}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="cargo-footer">
+            <small class="cargo-meta">
+              Criado em: {{cargo.datacriacao | date:'dd/MM/yyyy'}}
+            </small>
+          </div>
+        </div>
+      </div>
+
+      <div class="empty-state" *ngIf="!carregando && cargosConfianca.length === 0">
+        <div class="empty-icon">
+          <i class="material-icons">security</i>
+        </div>
+        <h3>Nenhum cargo configurado</h3>
+        <p>Adicione cargos de confiança para configurar processos de segurança no descarte</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 🚫 ACESSO NEGADO -->
+<div class="access-denied" *ngIf="!usuarioAutorizado">
+  <div class="denied-content">
+    <div class="denied-icon">
+      <i class="material-icons">block</i>
+    </div>
+    <h2>Acesso Negado</h2>
+    <p>Apenas usuários com perfil SU podem configurar cargos de confiança.</p>
+    <p>Esta é uma configuração de segurança crítica do sistema.</p>
+    <button class="btn-back" [routerLink]="['/dashboard']">
+      <i class="material-icons">home</i>
+      Voltar ao Dashboard
+    </button>
+  </div>
+</div>

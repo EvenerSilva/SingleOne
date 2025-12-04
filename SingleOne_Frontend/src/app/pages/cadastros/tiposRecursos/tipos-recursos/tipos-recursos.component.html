@@ -1,0 +1,146 @@
+<!-- 🎯 HEADER MODERNO DOS TIPOS DE RECURSOS -->
+<div class="tipos-recursos-header">
+  <div class="header-content">
+    <div class="header-left">
+      <button class="back-button" [routerLink]="['/cadastros']" matTooltip="Voltar para Cadastros">
+        <i class="cil-arrow-left"></i>
+      </button>
+      <div class="header-title">
+        <div class="title-icon">
+          <i class="cil-laptop"></i>
+        </div>
+        <div class="title-text">
+          <h1>Tipos de Recursos</h1>
+          <p>Gerenciar tipos de recursos do sistema</p>
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="action-btn primary-btn" (click)="novoTipo()" matTooltip="Adicionar novo tipo de recurso">
+        <i class="cil-plus"></i>
+        <span>Novo Tipo</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 🍞 BREADCRUMB MODERNO -->
+<nav class="modern-breadcrumb">
+  <div class="breadcrumb-container">
+    <a [routerLink]="['/dashboard']" class="breadcrumb-item">
+      <i class="cil-home"></i>
+      <span>Dashboard</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a [routerLink]="['/cadastros']" class="breadcrumb-item">
+      <i class="cil-cog"></i>
+      <span>Cadastros</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <span class="breadcrumb-item active">Tipos de Recursos</span>
+  </div>
+</nav>
+
+<!-- 📋 CONTEÚDO PRINCIPAL -->
+<div class="tipos-recursos-content">
+  <!-- 🔍 SEÇÃO DE BUSCA -->
+  <div class="search-section">
+    <div class="search-box">
+      <i class="cil-magnifying-glass search-icon"></i>
+      <input type="text" placeholder="Buscar pelo nome do tipo de recurso..." [formControl]="consulta">
+      <button 
+        *ngIf="consulta.value" 
+        class="clear-btn" 
+        (click)="limparBusca()"
+        type="button">
+        <i class="cil-x"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- 📊 TABELA MODERNA -->
+  <div class="table-section">
+    <div class="table-container">
+      <table class="modern-table">
+        <thead>
+          <tr>
+            <th>Tipo</th>
+            <th class="text-center">Trânsito Livre</th>
+            <th class="text-center">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of dadosPaginados">
+            <td class="tipo-nome">
+              <div class="tipo-info">
+                <div class="tipo-avatar">
+                  <i [class]="getTipoIcon(row.descricao)"></i>
+                </div>
+                <span>{{row.descricao}}</span>
+              </div>
+            </td>
+            <td class="text-center">
+              <div class="transito-livre-compact">
+                <div 
+                  class="status-icon" 
+                  [class.active]="row.transitolivre"
+                  [matTooltip]="row.transitolivre ? 'Trânsito Livre: Habilitado' : 'Trânsito Livre: Desabilitado'"
+                  matTooltipPosition="above">
+                  <i [class]="row.transitolivre ? 'cil-thumb-up' : 'cil-thumb-down'"></i>
+                </div>
+              </div>
+            </td>
+            <td class="tipo-actions">
+              <div class="action-buttons">
+                <button class="action-btn edit-btn" matTooltip="Editar tipo de recurso" (click)="editar(row)">
+                  <i class="cil-pencil"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <!-- 📊 INFORMAÇÕES DA TABELA -->
+      <div class="table-info" *ngIf="dataSource.data">
+        <div class="info-text">
+          <span>Mostrando {{dadosPaginados.length}} de {{dataSource.data.length}} registros</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 📄 PAGINAÇÃO -->
+  <div class="pagination-container" *ngIf="dataSource.data && dataSource.data.length > 0">
+    <mat-paginator 
+      [pageSizeOptions]="[5, 10, 25, 50, 100]" 
+      [pageSize]="10" 
+      showFirstLastButtons>
+    </mat-paginator>
+  </div>
+  
+  <!-- 📝 MENSAGEM QUANDO NÃO HÁ DADOS -->
+  <div class="no-data-message" *ngIf="!dataSource.data || dataSource.data.length === 0">
+    <div class="message-content">
+      <i class="cil-inbox"></i>
+      <h3>Nenhum tipo de recurso encontrado</h3>
+      <p>Não há tipos de recursos cadastrados no sistema ou a busca não retornou resultados.</p>
+      <button class="action-btn primary-btn" (click)="novoTipo()">
+        <i class="cil-plus"></i>
+        <span>Cadastrar Primeiro Tipo</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 🎯 FORMULÁRIO DE TIPO DE RECURSO (MODAL) -->
+<div class="formulario-overlay" *ngIf="mostrarFormulario">
+  <div class="formulario-container">
+    <app-tipo-recurso
+      [tiporecurso]="tipoEditando"
+      [modo]="modoFormulario"
+      (tipoSalvo)="onTipoSalvo($event)"
+      (cancelado)="onCancelado()"
+    ></app-tipo-recurso>
+  </div>
+</div>

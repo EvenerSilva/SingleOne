@@ -1,0 +1,329 @@
+<!-- 🎯 HEADER MODERNO DO TIMELINE -->
+<div class="relatorios-header">
+  <div class="header-content">
+    <div class="header-left">
+      <button class="back-button" [routerLink]="['/dashboard']" matTooltip="Voltar para Dashboard">
+        <i class="material-icons">arrow_back</i>
+      </button>
+      <div class="header-title">
+        <div class="title-icon">
+          <i class="material-icons">timeline</i>
+        </div>
+        <div class="title-text">
+          <h1>Relatórios e Timeline</h1>
+          <p>Histórico e análises temporais do sistema patrimonial</p>
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="header-stats">
+        <div class="stat-item">
+          <div class="stat-number">11</div>
+          <div class="stat-label">Relatórios</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">24/7</div>
+          <div class="stat-label">Disponível</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 🍞 BREADCRUMB MODERNO -->
+<nav class="modern-breadcrumb">
+  <div class="breadcrumb-container">
+    <a [routerLink]="['/dashboard']" class="breadcrumb-item">
+      <i class="cil-home"></i>
+      <span>Dashboard</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <span class="breadcrumb-item active">Relatórios e Timeline</span>
+  </div>
+</nav>
+
+<!-- 📋 CONTEÚDO PRINCIPAL -->
+<div class="relatorios-content">
+
+  <!-- 🎯 RELATÓRIOS DE TIMELINE -->
+  <div class="operations-section">
+    <div class="section-header">
+      <div class="header-content">
+        <div class="header-icon">
+          <i class="material-icons">timeline</i>
+        </div>
+        <div class="header-text">
+          <h2>Timeline de Recursos</h2>
+          <p>Rastreamento histórico de recursos e colaboradores</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="operations-grid">
+      <div class="operation-card timeline-card" [routerLink]="['/relatorios/timeline-recursos']">
+        <div class="card-icon">
+          <i class="material-icons">devices</i>
+        </div>
+        <div class="card-content">
+          <h3 class="card-title">Timeline por Recursos</h3>
+          <p class="card-description">Histórico completo de movimentações por equipamento</p>
+          <div class="card-meta">
+            <span class="meta-item">
+              <i class="material-icons">track_changes</i>
+              Rastreamento detalhado
+            </span>
+          </div>
+        </div>
+        <div class="card-action">
+          <i class="material-icons">arrow_forward</i>
+        </div>
+      </div>
+
+      <div class="operation-card timeline-card" [routerLink]="['/relatorios/timeline-colaboradores']">
+        <div class="card-icon">
+          <i class="material-icons">people</i>
+        </div>
+        <div class="card-content">
+          <h3 class="card-title">Timeline por Colaboradores</h3>
+          <p class="card-description">Histórico de recursos utilizados por pessoa</p>
+          <div class="card-meta">
+            <span class="meta-item">
+              <i class="material-icons">person_search</i>
+              Controle individual
+            </span>
+          </div>
+        </div>
+        <div class="card-action">
+          <i class="material-icons">arrow_forward</i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 📊 RELATÓRIOS OPERACIONAIS -->
+  <div class="operations-section">
+    <div class="section-header">
+      <div class="header-content">
+        <div class="header-icon">
+          <i class="material-icons">assessment</i>
+        </div>
+        <div class="header-text">
+          <h2>Relatórios Operacionais</h2>
+          <p>Análises de movimentações e custos</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="operations-grid">
+      <div class="operation-card operational-card" [routerLink]="['/relatorios/movimentacoes-colaboradores']">
+        <div class="card-icon">
+          <i class="material-icons">swap_horiz</i>
+        </div>
+        <div class="card-content">
+          <h3 class="card-title">Movimentações por Colaborador</h3>
+          <p class="card-description">Relatório de entradas, saídas e devoluções</p>
+          <div class="card-meta">
+            <span class="meta-item">
+              <i class="material-icons">sync</i>
+              Controle de fluxo
+            </span>
+          </div>
+        </div>
+        <div class="card-action">
+          <i class="material-icons">arrow_forward</i>
+        </div>
+      </div>
+
+      <div class="operation-card operational-card" [routerLink]="['/relatorios/custos-de-manutencao']">
+        <div class="card-icon">
+          <i class="material-icons">account_balance_wallet</i>
+        </div>
+        <div class="card-content">
+          <h3 class="card-title">Custos de Manutenção</h3>
+          <p class="card-description">Análise financeira de manutenções realizadas</p>
+          <div class="card-meta">
+            <span class="meta-item">
+              <i class="material-icons">trending_up</i>
+              Controle financeiro
+            </span>
+          </div>
+        </div>
+        <div class="card-action">
+          <i class="material-icons">arrow_forward</i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🔍 RELATÓRIOS ESPECIALIZADOS -->
+  <div class="operations-section">
+    <div class="section-header">
+      <div class="header-content">
+        <div class="header-icon">
+          <i class="material-icons">psychology</i>
+        </div>
+        <div class="header-text">
+          <h2>Relatórios Especializados</h2>
+          <p>Análises técnicas e detalhadas</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="operations-grid">
+      <div class="operation-card specialized-card" [routerLink]="['/equipamentos-status-detalhe']">
+        <div class="card-icon">
+          <i class="material-icons">build_circle</i>
+        </div>
+        <div class="card-content">
+          <h3 class="card-title">Status Detalhado de Equipamentos</h3>
+          <p class="card-description">Análise técnica do estado dos recursos</p>
+          <div class="card-meta">
+            <span class="meta-item">
+              <i class="material-icons">engineering</i>
+              Análise técnica
+            </span>
+          </div>
+        </div>
+        <div class="card-action">
+          <i class="material-icons">arrow_forward</i>
+        </div>
+      </div>
+
+      <div class="operation-card specialized-card" [routerLink]="['/relatorios/auditoria-acessos']">
+        <div class="card-icon">
+          <i class="material-icons">shield</i>
+        </div>
+        <div class="card-content">
+          <h3 class="card-title">Auditoria de Acessos</h3>
+          <p class="card-description">Logs de acessos às páginas Meu Patrimônio e Portaria</p>
+          <div class="card-meta">
+            <span class="meta-item">
+              <i class="material-icons">security</i>
+              Auditoria e segurança
+            </span>
+          </div>
+        </div>
+        <div class="card-action">
+          <i class="material-icons">arrow_forward</i>
+        </div>
+      </div>
+
+      <div class="operation-card specialized-card" [routerLink]="['/relatorios/sinalizacoes-suspeitas']">
+        <div class="card-icon">
+          <i class="material-icons">report_problem</i>
+        </div>
+        <div class="card-content">
+          <h3 class="card-title">Sinalizações de Suspeitas</h3>
+          <p class="card-description">Relatório de suspeitas sinalizadas pelos vigilantes da portaria</p>
+          <div class="card-meta">
+            <span class="meta-item">
+              <i class="material-icons">warning</i>
+              Controle de segurança
+            </span>
+          </div>
+        </div>
+        <div class="card-action">
+          <i class="material-icons">arrow_forward</i>
+        </div>
+      </div>
+
+      <div class="operation-card specialized-card" [routerLink]="['/relatorios/gestao-garantias']">
+        <div class="card-icon">
+          <i class="material-icons">verified</i>
+        </div>
+        <div class="card-content">
+          <h3 class="card-title">Gestão de Garantias</h3>
+          <p class="card-description">Controle e acompanhamento de garantias de equipamentos</p>
+          <div class="card-meta">
+            <span class="meta-item">
+              <i class="material-icons">event_available</i>
+              Controle de vencimentos
+            </span>
+          </div>
+        </div>
+        <div class="card-action">
+          <i class="material-icons">arrow_forward</i>
+        </div>
+      </div>
+
+      <div class="operation-card specialized-card" [routerLink]="['/relatorios/nao-conformidade-elegibilidade']">
+        <div class="card-icon">
+          <i class="material-icons">policy</i>
+        </div>
+        <div class="card-content">
+          <h3 class="card-title">Não Conformidade de Elegibilidade</h3>
+          <p class="card-description">Identifica colaboradores fora da política de elegibilidade de recursos</p>
+          <div class="card-meta">
+            <span class="meta-item">
+              <i class="material-icons">rule</i>
+              Controle de políticas
+            </span>
+          </div>
+        </div>
+        <div class="card-action">
+          <i class="material-icons">arrow_forward</i>
+        </div>
+      </div>
+
+      <div class="operation-card specialized-card" [routerLink]="['/relatorios/colaboradores-sem-recursos']">
+        <div class="card-icon">
+          <i class="material-icons">person_search</i>
+        </div>
+        <div class="card-content">
+          <h3 class="card-title">Colaboradores sem Recursos</h3>
+          <p class="card-description">Análise de colaboradores elegíveis sem recursos associados</p>
+          <div class="card-meta">
+            <span class="meta-item">
+              <i class="material-icons">inventory_2</i>
+              Controle de inconsistências
+            </span>
+          </div>
+        </div>
+        <div class="card-action">
+          <i class="material-icons">arrow_forward</i>
+        </div>
+      </div>
+
+      <div class="operation-card specialized-card" [routerLink]="['/termo-eletronico']">
+        <div class="card-icon">
+          <i class="material-icons">campaign</i>
+        </div>
+        <div class="card-content">
+          <h3 class="card-title">Campanhas de Assinaturas</h3>
+          <p class="card-description">Gerenciamento de assinaturas de termos de responsabilidade</p>
+          <div class="card-meta">
+            <span class="meta-item">
+              <i class="material-icons">edit_document</i>
+              Controle de termos
+            </span>
+          </div>
+        </div>
+        <div class="card-action">
+          <i class="material-icons">arrow_forward</i>
+        </div>
+      </div>
+
+      <div class="operation-card specialized-card" [routerLink]="['/relatorios/mapa-recursos']">
+        <div class="card-icon">
+          <i class="material-icons">account_tree</i>
+        </div>
+        <div class="card-content">
+          <h3 class="card-title">Mapa de Recursos</h3>
+          <p class="card-description">Visualização hierárquica da distribuição de recursos por colaborador</p>
+          <div class="card-meta">
+            <span class="meta-item">
+              <i class="material-icons">hub</i>
+              Visão organizacional
+            </span>
+          </div>
+        </div>
+        <div class="card-action">
+          <i class="material-icons">arrow_forward</i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+</div>

@@ -1,0 +1,570 @@
+// 🎯 ESTILOS DO MODAL DE PROTOCOLO DE DESCARTE
+
+// Estilos globais para checkboxes Material
+::ng-deep .mat-checkbox {
+  .mat-checkbox-frame {
+    border-color: #e9ecef !important;
+    border-width: 2px !important;
+  }
+
+  &.mat-checkbox-checked {
+    .mat-checkbox-background {
+      background-color: #FF3A0F !important;
+    }
+
+    .mat-checkbox-checkmark {
+      color: white !important;
+      opacity: 1 !important;
+    }
+
+    .mat-checkbox-checkmark-path {
+      stroke: white !important;
+      stroke-width: 2px !important;
+    }
+  }
+
+  &:hover {
+    .mat-checkbox-frame {
+      border-color: #FF3A0F !important;
+    }
+  }
+}
+.protocolo-container {
+  max-width: 800px;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  min-height: 400px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+// Header do Formulário
+.form-header {
+  text-align: center;
+  margin-bottom: 0;
+  padding: 2rem 2rem 1.5rem 2rem;
+  border-bottom: 2px solid #f0f0f0;
+  flex-shrink: 0;
+
+  .form-title {
+    color: #2c3e50;
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+
+    i {
+      color: #FF3A0F;
+      font-size: 1.5rem;
+    }
+  }
+
+  .form-subtitle {
+    color: #7f8c8d;
+    font-size: 1rem;
+    margin: 0;
+    line-height: 1.5;
+  }
+}
+
+// Conteúdo do Modal
+.protocolo-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 2rem;
+  
+  // Personalizar barra de rolagem
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: #FF3A0F;
+    border-radius: 3px;
+  }
+  
+  &::-webkit-scrollbar-thumb:hover {
+    background: #e0330d;
+  }
+  
+  .protocolo-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .section-divider {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 24px 0 16px 0;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #e9ecef;
+    color: #FF3A0F;
+    font-weight: 600;
+    font-size: 15px;
+
+    i {
+      font-size: 20px;
+    }
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    .form-label {
+      display: block;
+      font-weight: 600;
+      color: #2c3e50;
+      font-size: 0.95rem;
+    }
+
+    .form-hint {
+      font-size: 0.8rem;
+      color: #6c757d;
+      font-style: italic;
+      margin-top: -4px;
+    }
+
+    .form-value {
+      font-size: 1rem;
+      color: #2c3e50;
+      font-weight: 500;
+      padding: 0.75rem;
+      border: 1px solid #e9ecef;
+      border-radius: 8px;
+      background: #f8f9fa;
+
+      &.protocolo-number {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 700;
+        color: #FF3A0F;
+        background: rgba(255, 58, 15, 0.1);
+        border-color: rgba(255, 58, 15, 0.2);
+
+        i {
+          font-size: 1.1rem;
+        }
+      }
+    }
+
+    // Estilos para Material Form Fields
+    mat-form-field {
+      width: 100%;
+
+      ::ng-deep .mat-form-field-appearance-outline {
+        .mat-form-field-outline {
+          color: #e9ecef;
+        }
+
+        &.mat-focused .mat-form-field-outline-thick {
+          color: #FF3A0F;
+        }
+      }
+
+      ::ng-deep .mat-form-field-label {
+        color: #6c757d;
+      }
+
+      ::ng-deep .mat-focused .mat-form-field-label {
+        color: #FF3A0F;
+      }
+
+      ::ng-deep .mat-form-field-wrapper {
+        margin-bottom: 0;
+      }
+
+      ::ng-deep .mat-error {
+        color: #dc3545;
+        font-size: 0.75rem;
+        margin-top: 0.25rem;
+      }
+    }
+  }
+
+  // Estilos específicos para MTR
+  .mtr-checkbox {
+    ::ng-deep {
+      .mat-checkbox-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 600;
+        color: #2c3e50;
+
+        .checkbox-label {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+
+          i {
+            color: #FF3A0F;
+            font-size: 18px;
+          }
+        }
+      }
+
+      // Estilos do checkbox em si
+      .mat-checkbox {
+        .mat-checkbox-frame {
+          border-color: #e9ecef !important;
+          border-width: 2px !important;
+          width: 20px !important;
+          height: 20px !important;
+        }
+
+        &.mat-checkbox-checked {
+          .mat-checkbox-background {
+            background-color: #FF3A0F !important;
+          }
+
+          .mat-checkbox-checkmark {
+            color: white !important;
+            stroke: white !important;
+            stroke-width: 2px !important;
+          }
+
+          .mat-checkbox-checkmark-path {
+            stroke: white !important;
+            stroke-width: 2px !important;
+          }
+        }
+
+        &.mat-checkbox-focused {
+          .mat-checkbox-ripple {
+            background-color: rgba(255, 58, 15, 0.1) !important;
+          }
+        }
+
+        &:hover {
+          .mat-checkbox-frame {
+            border-color: #FF3A0F !important;
+          }
+        }
+
+        // Forçar visibilidade do checkmark
+        .mat-checkbox-checkmark {
+          opacity: 1 !important;
+        }
+
+        .mat-checkbox-checkmark-path {
+          stroke-dasharray: 0 !important;
+          stroke-dashoffset: 0 !important;
+        }
+      }
+    }
+  }
+
+  .mtr-section {
+    background: rgba(255, 58, 15, 0.05);
+    border: 2px solid rgba(255, 58, 15, 0.1);
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 16px;
+    transition: all 0.3s ease;
+
+    &:hover {
+      border-color: rgba(255, 58, 15, 0.2);
+      background: rgba(255, 58, 15, 0.08);
+    }
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+  }
+
+  .transportadora-section {
+    background: rgba(33, 150, 243, 0.05);
+    border: 1px solid rgba(33, 150, 243, 0.1);
+    border-radius: 8px;
+    padding: 16px;
+    margin-top: 16px;
+
+    .subsection-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #2196f3;
+      font-size: 16px;
+      font-weight: 600;
+      margin: 0 0 16px 0;
+
+      i {
+        font-size: 20px;
+      }
+    }
+  }
+
+  .file-upload-area {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border: 2px dashed #e9ecef;
+    border-radius: 8px;
+    background: #f8f9fa;
+    transition: all 0.3s ease;
+
+    &:hover {
+      border-color: #FF3A0F;
+      background: rgba(255, 58, 15, 0.05);
+    }
+
+    .btn-outline-primary {
+      background: transparent;
+      border: 2px solid #FF3A0F;
+      color: #FF3A0F;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      &:hover {
+        background: #FF3A0F;
+        color: white;
+        transform: translateY(-1px);
+      }
+
+      i {
+        font-size: 18px;
+      }
+    }
+
+    .file-name {
+      color: #28a745;
+      font-weight: 600;
+      font-size: 14px;
+    }
+  }
+}
+
+// Estado de Loading
+.loading-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  padding: 4rem 2rem;
+  flex: 1;
+
+  .loading-content {
+    text-align: center;
+    color: #6c757d;
+
+    i {
+      font-size: 2rem;
+      color: #FF3A0F;
+      margin-bottom: 1rem;
+    }
+
+    p {
+      margin: 0;
+      font-size: 1rem;
+    }
+  }
+}
+
+// Botões de Ação
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 0;
+  padding: 1.5rem 2rem 2rem 2rem;
+  border-top: 2px solid #f0f0f0;
+  flex-shrink: 0;
+
+  .btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 140px;
+    justify-content: center;
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    i {
+      font-size: 0.9rem;
+    }
+  }
+
+  .btn-secondary {
+    background: #95a5a6;
+    color: #ffffff;
+
+    &:hover:not(:disabled) {
+      background: #7f8c8d;
+      transform: translateY(-1px);
+    }
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #FF3A0F 0%, #ff6b3d 100%);
+    color: #ffffff;
+    box-shadow: 0 4px 15px rgba(255, 58, 15, 0.3);
+
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(255, 58, 15, 0.4);
+    }
+  }
+}
+
+// Animação de rotação para loading
+.c-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Responsividade
+@media (max-width: 768px) {
+  .protocolo-container {
+    margin: 1rem;
+    max-height: 95vh;
+    padding: 1.5rem;
+  }
+
+  .form-header {
+    .form-title {
+      font-size: 1.5rem;
+    }
+
+    .form-subtitle {
+      font-size: 0.9rem;
+    }
+  }
+
+  .protocolo-content {
+    .protocolo-form {
+      gap: 1rem;
+    }
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+    gap: 0.75rem;
+
+    .btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .protocolo-container {
+    margin: 0.5rem;
+    border-radius: 12px;
+    padding: 1rem;
+  }
+
+  .form-header {
+    padding: 1rem;
+    border-radius: 12px 12px 0 0;
+
+    .form-title {
+      font-size: 1.3rem;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+  }
+
+  .form-actions {
+    padding: 1rem;
+    border-radius: 0 0 12px 12px;
+  }
+}
+
+/* 🎯 MODAL OVERLAY */
+.formulario-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+
+  .formulario-container {
+    background: white;
+    border-radius: 16px;
+    max-width: 800px;
+    width: 90%;
+    max-height: 90vh;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: slideIn 0.3s ease;
+  }
+}
+
+/* 🎭 ANIMAÇÕES */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

@@ -1,0 +1,57 @@
+<body style="min-height: 100%;background-color:whitesmoke">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <img src="../../../../assets/Branding/logo.png">
+            </div>
+        </div>
+        <br clear="all">
+        <div class="row">
+            <div class="col-md-8">
+                <mat-card style="background-color:white;">
+                    <mat-card-subtitle>Bem vindo {{equipamentos.requisicao.colaboradorfinal.toUpperCase()}}, confirme os dados abaixo para aceitar o termo de entrega dos recursos abaixo:</mat-card-subtitle>
+                    <br>
+                    <mat-card-subtitle *ngIf="equipamentos.equipamentosRequisicao.length > 0">
+                        <table width="100%" border="0">
+                            <tr>
+                                <th><small><b>Recurso</b></small></th>
+                                <th><small><b>Número série</b></small></th>
+                                <th><small><b>Patrimônio</b></small></th>
+                                <th><small><b>Entrega</b></small></th>
+                            </tr>
+                            <tr *ngFor="let row of equipamentos.equipamentosRequisicao">
+                                <td><small>{{row.equipamento}}</small></td>
+                                <td><small>{{row.numeroserie}}</small></td>
+                                <td><small>{{row.patrimonio}}</small></td>
+                                <td><small>{{row.dtentrega | dateFormat:2}}</small></td>
+                            </tr>
+                        </table>
+                    </mat-card-subtitle>
+                    <mat-card-subtitle *ngIf="equipamentos.equipamentosRequisicao.length == 0">
+                        <b>Colaborador sem recursos pendentes</b>
+                    </mat-card-subtitle>
+                </mat-card>
+            </div>
+            <div class="col-md-4">
+                <mat-card style="background:primary;">
+                    <mat-card-subtitle>
+                        <form [formGroup]="form" (ngSubmit)="salvar()" class="col-sm-12">
+                            <div class="row">
+                                <mat-form-field class="col-md-12" appearance="fill">
+                                    <mat-label color="Primary">CPF (Somente números)</mat-label>
+                                    <input matInput color="Primary" formControlName="cpf" [(ngModel)]="termo.cpf">
+                                </mat-form-field>
+                                <mat-form-field class="col-md-12" appearance="fill">
+                                    <mat-label color="Primary">Palavra chave</mat-label>
+                                    <input matInput color="Primary" formControlName="palavrachave" [(ngModel)]="termo.hashRequisicao">
+                                </mat-form-field>
+                                <small *ngIf="!equipamentos.requisicao.assinaturaeletronica">*Ao clicar em aceitar, você declara aceitar o recebimento dos recursos listados.</small>
+                                <button mat-raised-button type="submit" color="primary" *ngIf="!equipamentos.requisicao.assinaturaeletronica">ACEITAR</button>
+                            </div>
+                        </form>
+                    </mat-card-subtitle>
+                </mat-card>
+            </div>
+        </div>
+    </div>
+</body>

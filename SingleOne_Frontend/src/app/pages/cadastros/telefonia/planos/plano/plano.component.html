@@ -1,0 +1,78 @@
+<!-- 🎯 FORMULÁRIO DE PLANO (MODAL) -->
+<div class="plano-form-container">
+  <!-- Header do Formulário -->
+  <div class="form-header">
+    <h2 class="form-title">{{ getTitulo() }}</h2>
+    <p class="form-subtitle">Preencha os dados do plano de telefonia</p>
+  </div>
+
+  <!-- Formulário -->
+  <form [formGroup]="form" (ngSubmit)="salvar()" class="plano-form">
+    <div class="form-group">
+      <label class="form-label">
+        Operadora <span class="required">*</span>
+      </label>
+      <select 
+        formControlName="operadora" 
+        required 
+        (change)="listarContratos()"
+        class="form-control">
+        <option value="">Selecione uma operadora</option>
+        <option *ngFor="let row of operadoras" [value]="row.id">{{row.nome}}</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">
+        Conta <span class="required">*</span>
+      </label>
+      <select 
+        formControlName="contrato" 
+        required
+        class="form-control">
+        <option value="">Selecione uma conta</option>
+        <option *ngFor="let row of contratos" [value]="row.id">{{row.nome}}</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">
+        Nome do plano <span class="required">*</span>
+      </label>
+      <input 
+        type="text" 
+        formControlName="nome" 
+        required
+        class="form-control"
+        placeholder="Digite o nome do plano">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">
+        Valor R$ <span class="required">*</span>
+      </label>
+      <input 
+        type="number" 
+        formControlName="valor" 
+        required
+        class="form-control"
+        placeholder="0,00"
+        step="0.01"
+        min="0">
+    </div>
+
+    <!-- Ações do Formulário -->
+    <div class="form-actions">
+      <button type="button" class="btn btn-secondary" (click)="cancelar()">
+        <i class="fas fa-times"></i>
+        Cancelar
+      </button>
+      
+      <button type="submit" class="btn btn-primary" [disabled]="carregando">
+        <i *ngIf="!carregando" class="fas fa-save"></i>
+        <i *ngIf="carregando" class="fas fa-spinner fa-spin"></i>
+        {{ getBotaoTexto() }}
+      </button>
+    </div>
+  </form>
+</div>

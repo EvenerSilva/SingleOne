@@ -1,0 +1,130 @@
+<!-- 🎯 HEADER MODERNO DAS FILIAIS -->
+<div class="filiais-header">
+  <div class="header-content">
+    <div class="header-left">
+      <button class="back-button" [routerLink]="['/cadastros']" matTooltip="Voltar para Cadastros">
+        <i class="cil-arrow-left"></i>
+      </button>
+      <div class="header-title">
+        <div class="title-icon">
+          <i class="cil-building"></i>
+        </div>
+        <div class="title-text">
+          <h1>Filiais</h1>
+          <p>Gerenciar filiais das empresas</p>
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="action-btn primary-btn" (click)="novaFilial()" matTooltip="Adicionar nova filial">
+        <i class="cil-plus"></i>
+        <span>Nova Filial</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 🍞 BREADCRUMB MODERNO -->
+<nav class="modern-breadcrumb">
+  <div class="breadcrumb-container">
+    <a [routerLink]="['/dashboard']" class="breadcrumb-item">
+      <i class="cil-home"></i>
+      <span>Dashboard</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a [routerLink]="['/cadastros']" class="breadcrumb-item">
+      <i class="cil-cog"></i>
+      <span>Cadastros</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <span class="breadcrumb-item active">Filiais</span>
+  </div>
+</nav>
+
+<!-- 📋 CONTEÚDO PRINCIPAL -->
+<div class="filiais-content">
+  <!-- 🔍 SEÇÃO DE BUSCA -->
+  <div class="search-section">
+    <div class="search-box">
+      <i class="cil-magnifying-glass search-icon"></i>
+      <input type="text" placeholder="Buscar filial pelo nome, CNPJ ou empresa..." [formControl]="consulta">
+      <button 
+        *ngIf="consulta.value" 
+        class="clear-btn" 
+        (click)="limparBusca()"
+        type="button">
+        <i class="cil-x"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- 📊 TABELA MODERNA -->
+  <div class="table-section">
+    <div class="table-container">
+      <!-- MENSAGEM QUANDO NÃO HÁ DADOS -->
+      <div *ngIf="!dataSource?.data || dataSource.data.length === 0" class="no-data-message">
+        <i class="cil-inbox"></i>
+        <h3>Nenhuma filial encontrada</h3>
+        <p>Não há filiais cadastradas para este cliente ou a busca não retornou resultados.</p>
+      </div>
+      
+      <!-- TABELA COM DADOS -->
+      <table *ngIf="dataSource?.data && dataSource.data.length > 0" class="modern-table">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>CNPJ</th>
+            <th>Empresa</th>
+            <th class="text-center">Status</th>
+            <th class="text-center">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of dadosPaginados; let i = index">
+            <td class="filial-nome">
+              <div class="filial-info">
+                <div class="filial-avatar">
+                  <i class="cil-building"></i>
+                </div>
+                <span>{{row.nome || 'N/A'}}</span>
+              </div>
+            </td>
+            <td class="filial-cnpj">{{row.cnpj ? (row.cnpj | cnpjFormat) : 'Não informado'}}</td>
+            <td class="filial-empresa">{{row.empresa?.nome || 'N/A'}}</td>
+            <td class="filial-status text-center">
+              <div class="status-label" [class.active]="row.ativo" [class.inactive]="!row.ativo">
+                {{ row.ativo ? 'ATIVO' : 'INATIVO' }}
+              </div>
+            </td>
+            <td class="filial-actions text-center">
+              <div class="action-buttons">
+                <button class="action-btn edit-btn" matTooltip="Editar Filial" (click)="editar(row)">
+                  <i class="cil-pencil"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 📄 PAGINAÇÃO -->
+  <div class="pagination-container">
+    <mat-paginator 
+      [pageSizeOptions]="[5, 10, 25, 100]" 
+      [pageSize]="10" 
+      showFirstLastButtons>
+    </mat-paginator>
+  </div>
+</div>
+
+<!-- 🎯 FORMULÁRIO DE FILIAL (MODAL) -->
+<div class="formulario-overlay" *ngIf="mostrarFormulario">
+  <app-filial
+    [filial]="filialEditando"
+    [modo]="modoFormulario"
+    (filialSalva)="onFilialSalva($event)"
+    (cancelado)="onCancelado()"
+  ></app-filial>
+</div>

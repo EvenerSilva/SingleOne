@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Termo de Descarte de Equipamentos</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 40px;
+            color: #2c3e50;
+            line-height: 1.6;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 4px solid #FF3A0F;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: #FF3A0F;
+            font-size: 28px;
+            margin: 0 0 10px 0;
+            text-transform: uppercase;
+        }
+        .header .protocolo {
+            font-size: 18px;
+            font-weight: bold;
+            color: #34495e;
+        }
+        .section {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #FF3A0F;
+        }
+        .section h2 {
+            color: #FF3A0F;
+            font-size: 18px;
+            margin: 0 0 15px 0;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 10px;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 15px 0;
+        }
+        .info-item {
+            margin: 8px 0;
+        }
+        .info-item .label {
+            font-weight: bold;
+            color: #495057;
+            display: inline-block;
+            min-width: 150px;
+        }
+        .info-item .value {
+            color: #2c3e50;
+        }
+        .logistica-reversa {
+            background: #d4edda;
+            border-left-color: #28a745;
+        }
+        .footer {
+            margin-top: 60px;
+            text-align: center;
+            padding-top: 20px;
+            border-top: 2px solid #e9ecef;
+        }
+        .assinatura {
+            margin-top: 50px;
+            text-align: center;
+        }
+        .assinatura-linha {
+            border-top: 2px solid #2c3e50;
+            width: 300px;
+            margin: 0 auto 10px auto;
+        }
+        .data-emissao {
+            font-size: 12px;
+            color: #6c757d;
+            text-align: center;
+            margin-top: 20px;
+        }
+        @page {
+            margin: 20mm;
+        }
+    </style>
+</head>
+<body>
+    <!-- CABEÇALHO -->
+    <div class="header">
+        <h1>🗑️ Termo de Descarte de Equipamentos</h1>
+        <div class="protocolo">Protocolo: {{NUMERO_PROTOCOLO}}</div>
+    </div>
+
+    <!-- INFORMAÇÕES DO PROTOCOLO -->
+    <div class="section">
+        <h2>📋 Informações do Protocolo</h2>
+        <div class="info-grid">
+            <div class="info-item">
+                <span class="label">Cliente:</span>
+                <span class="value">{{CLIENTE}}</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Tipo de Descarte:</span>
+                <span class="value">{{TIPO_DESCARTE}}</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Responsável:</span>
+                <span class="value">{{RESPONSAVEL}}</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Data de Criação:</span>
+                <span class="value">{{DATA_CRIACAO}}</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Data de Conclusão:</span>
+                <span class="value">{{DATA_CONCLUSAO}}</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Total de Equipamentos:</span>
+                <span class="value">{{QUANTIDADE_EQUIPAMENTOS}}</span>
+            </div>
+        </div>
+        <div class="info-item">
+            <span class="label">Motivo do Descarte:</span>
+            <span class="value">{{MOTIVO_DESCARTE}}</span>
+        </div>
+        <div class="info-item">
+            <span class="label">Destino Final:</span>
+            <span class="value">{{DESTINO_FINAL}}</span>
+        </div>
+    </div>
+
+    <!-- LOGÍSTICA REVERSA (Lei 12.305/2010) -->
+    <div class="section logistica-reversa">
+        <h2>🚚 Logística Reversa e Conformidade Ambiental</h2>
+        <div class="info-item">
+            <span class="label">Empresa Destino:</span>
+            <span class="value">{{EMPRESA_DESTINO}}</span>
+        </div>
+        <div class="info-item">
+            <span class="label">CNPJ:</span>
+            <span class="value">{{CNPJ_DESTINO}}</span>
+        </div>
+        <div class="info-item">
+            <span class="label">Certificado de Descarte:</span>
+            <span class="value">{{CERTIFICADO}}</span>
+        </div>
+        <p style="font-size: 12px; color: #155724; margin-top: 15px; font-style: italic;">
+            ⚖️ Em conformidade com a Lei Federal nº 12.305/2010 (Política Nacional de Resíduos Sólidos)
+        </p>
+    </div>
+
+    <!-- LISTA DETALHADA DE EQUIPAMENTOS -->
+    <div class="section">
+        <h2>📦 Equipamentos Descartados</h2>
+        {{LISTA_EQUIPAMENTOS}}
+    </div>
+
+    <!-- OBSERVAÇÕES GERAIS -->
+    <div class="section">
+        <h2>📝 Observações Gerais</h2>
+        <p>{{OBSERVACOES}}</p>
+    </div>
+
+    <!-- ASSINATURA -->
+    <div class="assinatura">
+        <div class="assinatura-linha"></div>
+        <p style="margin: 5px 0; font-weight: bold;">{{RESPONSAVEL}}</p>
+        <p style="margin: 5px 0; font-size: 14px; color: #6c757d;">Responsável pelo Processo de Descarte</p>
+    </div>
+
+    <!-- RODAPÉ -->
+    <div class="footer">
+        <p style="font-size: 11px; color: #6c757d; margin: 5px 0;">
+            Documento gerado automaticamente pelo Sistema SingleOne
+        </p>
+        <p class="data-emissao">
+            Data de Emissão: <span id="dataEmissao"></span>
+        </p>
+    </div>
+
+    <script>
+        document.getElementById('dataEmissao').textContent = new Date().toLocaleString('pt-BR');
+    </script>
+</body>
+</html>
+

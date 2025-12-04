@@ -1,0 +1,73 @@
+<div class="verificar-container">
+  <div class="header">
+    <div class="logo"><app-logo-display></app-logo-display></div>
+    <h1>Verificação de Termo</h1>
+    <p>Token: {{ hash }}</p>
+  </div>
+
+  <div *ngIf="loading" class="loading">Validando...</div>
+  <div *ngIf="erro" class="erro">{{ erro }}</div>
+
+  <div *ngIf="resultado && resultado.sucesso" class="card">
+    <div class="status" [ngClass]="resultado.assinado ? 'ok' : 'no'">
+      <i class="material-icons">{{ resultado.assinado ? 'check_circle' : 'error_outline' }}</i>
+      <span>{{ resultado.assinado ? 'Termo Assinado' : 'Termo Não Assinado' }}</span>
+    </div>
+    <div class="detalhes">
+      <div class="col">
+        <div><strong>Colaborador:</strong> {{ resultado.colaborador || 'Não informado' }}</div>
+        <div><strong>Data da assinatura:</strong> {{ resultado.dataAssinatura | date: 'dd/MM/yyyy HH:mm' }}</div>
+        <div><strong>Entregue por:</strong> {{ resultado.entreguePor || 'Não informado' }}</div>
+        
+        <!-- Dados de Auditoria -->
+        <div *ngIf="resultado.auditoria" class="auditoria-section">
+          <div class="auditoria-title"><strong>Dados de Auditoria:</strong></div>
+          <div class="auditoria-item"><strong>IP:</strong> {{ resultado.auditoria.ip }}</div>
+          <div class="auditoria-item">
+            <strong>Localização:</strong> 
+            {{ resultado.auditoria.cidade }}, {{ resultado.auditoria.regiao }} - {{ resultado.auditoria.pais }}
+          </div>
+          <div class="auditoria-item" *ngIf="resultado.auditoria.latitude && resultado.auditoria.longitude">
+            <strong>Coordenadas:</strong> 
+            Lat: {{ resultado.auditoria.latitude | number:'1.6-6' }}, 
+            Lng: {{ resultado.auditoria.longitude | number:'1.6-6' }}
+            <span *ngIf="resultado.auditoria.precisao"> 
+              (±{{ resultado.auditoria.precisao | number:'1.0-0' }}m)
+            </span>
+          </div>
+          <div class="auditoria-item">
+            <strong>Captura:</strong> {{ resultado.auditoria.dataCaptura | date: 'dd/MM/yyyy HH:mm:ss' }}
+          </div>
+        </div>
+      </div>
+      <div class="col qr">
+        <a class="qr-link" href="https://singleone.com.br/contatos/assinatura/" target="_blank" rel="noopener">
+          <img alt="QR para saber mais" src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https%3A%2F%2Fsingleone.com.br%2Fcontatos%2Fassinatura%2F" width="120" height="120" />
+          <div class="qr-caption">Saiba mais</div>
+        </a>
+      </div>
+    </div>
+    <div class="recursos" *ngIf="resultado.recursos?.length">
+      <h3>Recursos</h3>
+      <ul>
+        <li *ngFor="let r of resultado.recursos">
+          <strong>{{ r.tipoEquipamento }}</strong> ({{ r.tipo }}) —
+          <ng-container *ngIf="r.tipoEquipamento === 'Linha Telefônica'; else patrimonioBlock">
+            Número: {{ r.patrimonio }}
+          </ng-container>
+          <ng-template #patrimonioBlock>
+            Patrimônio: {{ r.patrimonio }}
+          </ng-template>
+          <ng-container *ngIf="r.numeroSerie">
+            — S/N: {{ r.numeroSerie }}
+          </ng-container>
+        </li>
+      </ul>
+    </div>
+    <div class="cta">
+      <a class="link-site" href="https://singleone.com.br/contatos/assinatura/" target="_blank" rel="noopener">Saiba mais sobre nossa assinatura eletrônica</a>
+    </div>
+  </div>
+</div>
+
+

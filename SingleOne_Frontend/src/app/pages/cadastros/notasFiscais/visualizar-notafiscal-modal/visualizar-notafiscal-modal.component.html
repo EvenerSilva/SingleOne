@@ -1,0 +1,129 @@
+<!-- 🎯 MODAL DE VISUALIZAÇÃO DE NOTA FISCAL -->
+<div class="formulario-overlay">
+  <div class="formulario-container">
+    <div class="visualizar-nf-container">
+      <div class="form-header">
+        <h2 class="form-title">Visualizar Nota Fiscal</h2>
+        <p class="form-subtitle">
+          Detalhes da nota fiscal e seus itens
+        </p>
+      </div>
+
+      <!-- Conteúdo do Modal -->
+      <div class="visualizar-nf-content" *ngIf="!carregando && nf">
+        
+        <!-- Informações da Nota Fiscal -->
+        <div class="form-group">
+          <label class="form-label">Fornecedor:</label>
+          <div class="form-value">{{ nf.fornecedor || 'N/A' }}</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Número:</label>
+          <div class="form-value">{{ nf.numero || 'N/A' }}</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Data de Emissão:</label>
+          <div class="form-value">{{ formatarData(nf.dtemissao) }}</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Valor Total:</label>
+          <div class="form-value valor-total">{{ nf.valor || 'R$ 0,00' }}</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Descrição:</label>
+          <div class="form-value">{{ nf.descricao || 'N/A' }}</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Quantidade de Itens:</label>
+          <div class="form-value">{{ nf.quantidadeItens || 0 }}</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Status:</label>
+          <div class="form-value status" [class.processada]="nf.gerouequipamento === 'SIM'">
+            <i class="cil-check-circle" *ngIf="nf.gerouequipamento === 'SIM'"></i>
+            <i class="cil-clock" *ngIf="nf.gerouequipamento === 'NÃO'"></i>
+            {{ nf.gerouequipamento === 'SIM' ? 'Processada' : 'Pendente' }}
+          </div>
+        </div>
+
+        <!-- Itens da Nota Fiscal -->
+        <div class="form-group" *ngIf="nf.itens && nf.itens.length > 0">
+          <label class="form-label">Itens da Nota Fiscal ({{ nf.itens.length }}):</label>
+          <div class="itens-container">
+            <div class="item-card" *ngFor="let item of nf.itens; let i = index">
+              <div class="item-header">
+                <strong>#{{ i + 1 }} - {{ item.tipoequipamento }} {{ item.fabricante }} {{ item.modelo }}</strong>
+              </div>
+              <div class="item-details">
+                <div class="detail-row">
+                  <span class="detail-label">Contrato:</span>
+                  <span class="detail-value">{{ item.contrato || 'N/A' }}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">Valor Unitário:</span>
+                  <span class="detail-value">{{ item.valorunitario || 'R$ 0,00' }}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">Tipo de Aquisição:</span>
+                  <span class="detail-value">{{ item.tipoAquisicao || 'N/A' }}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">Quantidade:</span>
+                  <span class="detail-value">{{ item.quantidade || 0 }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mensagem quando não há itens -->
+        <div class="form-group" *ngIf="!nf.itens || nf.itens.length === 0">
+          <label class="form-label">Itens:</label>
+          <div class="form-value text-muted">
+            <i class="cil-warning"></i>
+            Nenhum item encontrado
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div class="loading-state" *ngIf="carregando">
+        <div class="loading-content">
+          <i class="cil-reload c-spin"></i>
+          <p>Carregando nota fiscal...</p>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div class="loading-state" *ngIf="carregando">
+        <i class="cil-reload"></i>
+        <p>Carregando dados da nota fiscal...</p>
+      </div>
+
+      <!-- Error State -->
+      <div class="loading-state" *ngIf="!carregando && !nf">
+        <i class="cil-warning"></i>
+        <p>Erro ao carregar dados da nota fiscal</p>
+      </div>
+
+      <!-- Botões de Ação -->
+      <div class="form-actions">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="fechar()"
+          [disabled]="carregando"
+        >
+          <i class="cil-x"></i>
+          Fechar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

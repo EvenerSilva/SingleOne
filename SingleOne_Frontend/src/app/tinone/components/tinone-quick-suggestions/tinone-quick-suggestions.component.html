@@ -1,0 +1,47 @@
+<div class="quick-suggestions-container" *ngIf="suggestions.length > 0 && showSuggestions">
+  <!-- Contexto da Página -->
+  <div class="context-header" *ngIf="routeContext">
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+      <circle cx="12" cy="10" r="3"></circle>
+    </svg>
+    <span>Você está em: <strong>{{ routeContext }}</strong></span>
+  </div>
+
+  <!-- Título das Sugestões -->
+  <div class="suggestions-header">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="10"></circle>
+      <line x1="12" y1="8" x2="12" y2="12"></line>
+      <line x1="12" y1="16" x2="12.01" y2="16"></line>
+    </svg>
+    <span>Perguntas sugeridas ({{suggestions.length}}):</span>
+    <button class="btn-close-suggestions" (click)="hideSuggestions()" title="Ocultar sugestões">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Chips de Sugestões -->
+  <div class="suggestions-chips" [attr.data-timestamp]="updateTimestamp">
+    <button 
+      *ngFor="let suggestion of suggestions; let idx = index"
+      class="suggestion-chip"
+      [style.border-color]="corPrimaria"
+      [attr.data-index]="idx"
+      (click)="onSuggestionClick(suggestion)">
+      <span>{{ suggestion.text }}</span>
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="9 18 15 12 9 6"></polyline>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Separador -->
+  <div class="suggestions-divider">
+    <span>ou digite sua pergunta abaixo</span>
+  </div>
+</div>
+

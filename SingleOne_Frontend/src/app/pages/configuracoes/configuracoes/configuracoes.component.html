@@ -1,0 +1,155 @@
+<!-- HEADER MODERNO DAS CONFIGURAÇÕES -->
+<div class="configuracoes-header">
+  <div class="header-content">
+    <div class="header-left">
+      <div class="header-title">
+        <div class="title-icon">
+          <i class="cil-cog"></i>
+        </div>
+        <div class="title-text">
+          <h1>Configurações do Sistema</h1>
+          <p>Gerenciar comportamento e parâmetros do sistema</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BREADCRUMB MODERNO -->
+<nav class="modern-breadcrumb">
+  <div class="breadcrumb-container">
+    <a [routerLink]="['/dashboard']" class="breadcrumb-item">
+      <i class="cil-home"></i>
+      <span>Dashboard</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <span class="breadcrumb-item active">Configurações</span>
+  </div>
+</nav>
+
+<!-- CONTEÚDO PRINCIPAL -->
+<div class="configuracoes-content">
+  
+  <!-- SEÇÃO SISTEMA -->
+  <div class="section-container">
+    <div class="section-header">
+      <div class="section-icon">
+        <i class="cil-cog"></i>
+      </div>
+      <div class="section-title">
+        <h2>Sistema</h2>
+        <p>Configurações fundamentais do sistema</p>
+      </div>
+    </div>
+    
+    <div class="section-grid">
+      <div class="action-card sistema" (click)="navegarParaParametros()">
+        <div class="card-icon">
+          <i class="cil-cog"></i>
+        </div>
+        <div class="card-content">
+          <h3>Parâmetros</h3>
+          <p>Configurações gerais do sistema</p>
+        </div>
+      </div>
+      
+      <div class="action-card sistema" (click)="navegarParaTemplates()">
+        <div class="card-icon">
+          <i class="cil-file"></i>
+        </div>
+        <div class="card-content">
+          <h3>Templates</h3>
+          <p>Modelos de documentos e emails</p>
+        </div>
+      </div>
+      
+      <!-- Card Políticas movido para a nova seção 'Políticas' -->
+    </div>
+  </div>
+
+  <!-- SEÇÃO POLÍTICAS -->
+  <div class="section-container">
+    <div class="section-header">
+      <div class="section-icon">
+        <i class="cil-shield-alt"></i>
+      </div>
+      <div class="section-title">
+        <h2>Políticas</h2>
+        <p>Regras e elegibilidade de acesso</p>
+      </div>
+    </div>
+    
+    <div class="section-grid">
+      <div class="action-card politicas" (click)="navegarParaPoliticasElegibilidade()">
+        <div class="card-icon">
+          <i class="cil-shield-alt"></i>
+        </div>
+        <div class="card-content">
+          <h3>Políticas de Elegibilidade</h3>
+          <p>Regras de acesso a recursos por perfil</p>
+        </div>
+      </div>
+      
+      <div class="action-card politicas" (click)="navegarParaCargosConfianca()">
+        <div class="card-icon">
+          <i class="cil-lock-locked"></i>
+        </div>
+        <div class="card-content">
+          <h3>Cargos de Confiança</h3>
+          <p>Configuração de segurança para descarte de recursos</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEÇÃO USUÁRIOS E PERMISSÕES -->
+  <div class="section-container">
+    <div class="section-header">
+      <div class="section-icon">
+        <i class="cil-user"></i>
+      </div>
+      <div class="section-title">
+        <h2>Usuários e Permissões</h2>
+        <p>Gestão de usuários e controle de acesso</p>
+      </div>
+    </div>
+    
+    <div class="section-grid">
+      <div class="action-card usuarios" (click)="navegarParaUsuarios()">
+        <div class="card-icon">
+          <i class="cil-user"></i>
+        </div>
+        <div class="card-content">
+          <h3>Usuários</h3>
+          <p>Gerenciar usuários do sistema</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEÇÃO ASSISTENTE INTELIGENTE -->
+  <div class="section-container">
+    <div class="section-header">
+      <div class="section-icon">
+        <i class="cil-lightbulb"></i>
+      </div>
+      <div class="section-title">
+        <h2>Assistente Inteligente</h2>
+        <p>Configurações do Oni o Sábio</p>
+      </div>
+    </div>
+    
+    <div class="section-grid">
+      <div class="action-card assistente" (click)="navegarParaTinOne()">
+        <div class="card-icon">
+          <span style="font-size: 32px;">🦉</span>
+        </div>
+        <div class="card-content">
+          <h3>Oni o Sábio</h3>
+          <p>Configurar assistente inteligente e funcionalidades de IA</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

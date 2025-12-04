@@ -1,0 +1,175 @@
+<!-- 🎯 HEADER DO FORMULÁRIO -->
+<div class="form-header">
+  <h2 class="form-title">Visualização do Sinistro</h2>
+  <p class="form-subtitle">
+    Visualize as informações detalhadas do sinistro técnico
+  </p>
+</div>
+
+<!-- 📋 CONTEÚDO PRINCIPAL -->
+<div class="laudo-form-container">
+  <div class="info-grid">
+    <!-- 🖥️ EQUIPAMENTO -->
+    <div class="info-section">
+      <h3>Equipamento</h3>
+      <div class="info-value">{{laudo.equipamento}}</div>
+    </div>
+
+    <!-- 🔢 INFORMAÇÕES TÉCNICAS -->
+    <div class="info-section">
+      <h3>Informações Técnicas</h3>
+      <div class="info-row">
+        <span class="info-label">Número de Série:</span>
+        <span class="info-value">{{laudo.numeroserie}}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Patrimônio:</span>
+        <span class="info-value">{{laudo.patrimonio}}</span>
+      </div>
+    </div>
+
+    <!-- 📝 CARACTERÍSTICAS -->
+    <div class="info-section">
+      <h3>Características de Abertura</h3>
+      <div class="info-value">{{laudo.descricao}}</div>
+    </div>
+
+    <!-- 🧪 LAUDO FINAL -->
+    <div class="info-section">
+      <h3>Laudo Final</h3>
+      <div class="info-value">{{laudo.laudo}}</div>
+    </div>
+
+    <!-- 👨‍💼 TÉCNICO -->
+    <div class="info-section">
+      <h3>Técnico Analista</h3>
+      <div class="info-value">{{laudo.tecniconome}}</div>
+    </div>
+
+    <!-- ✅ AVALIAÇÕES -->
+    <div class="info-section">
+      <h3>Avaliações</h3>
+      <div class="avaliacoes-list">
+        <div class="avaliacao-item">
+          <mat-checkbox [(ngModel)]="laudo.temconserto" readonly disabled>
+            Teve conserto?
+          </mat-checkbox>
+        </div>
+        <div class="avaliacao-item">
+          <mat-checkbox [(ngModel)]="laudo.mauuso" readonly disabled>
+            Caracteriza mau uso?
+          </mat-checkbox>
+        </div>
+      </div>
+    </div>
+
+    <!-- 📅 DATAS -->
+    <div class="info-section">
+      <h3>Datas</h3>
+      <div class="datas-list">
+        <div class="data-item">
+          <span class="data-label">Entrada:</span>
+          <span class="data-value">{{laudo.dtentrada | dateFormat:1}}</span>
+        </div>
+        <div class="data-item">
+          <span class="data-label">Finalização:</span>
+          <span class="data-value">{{laudo.dtlaudo | dateFormat:1}}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 📸 EVIDÊNCIAS -->
+    <div class="info-section evidencias-section">
+      <div class="evidencias-header">
+        <h3>Evidências ({{evidencias.length}}/6)</h3>
+        <button *ngIf="!carregandoEvidencias" 
+                class="btn btn-outline-primary" 
+                (click)="adicionarEvidencias()">
+          <i class="cil-plus"></i>
+          Adicionar Evidências
+        </button>
+      </div>
+      
+      <!-- Loading -->
+      <div *ngIf="carregandoEvidencias" class="loading-evidencias">
+        <p>Carregando evidências...</p>
+      </div>
+
+      <!-- Lista de evidências -->
+      <div *ngIf="!carregandoEvidencias && evidencias.length > 0" 
+           class="evidencias-list" 
+           style="display: grid !important; grid-template-columns: repeat(3, 1fr) !important; grid-template-rows: repeat(2, auto) !important; gap: 1rem !important; width: 100% !important; max-width: 100% !important; overflow: visible !important; flex-direction: unset !important; flex-wrap: unset !important; flex: unset !important;">
+        <div *ngFor="let evidencia of evidencias; trackBy: trackByEvidencia" 
+             class="evidencia-item"
+             style="max-width: 200px !important; width: auto !important; margin: 0 !important; display: block !important; float: none !important; clear: none !important; flex: unset !important; flex-basis: unset !important; flex-grow: unset !important; flex-shrink: unset !important;">
+          
+          <!-- Modo visualização -->
+          <div *ngIf="editandoEvidencia?.id !== evidencia.id" class="evidencia-view">
+            <div class="evidencia-info">
+              <div class="evidencia-ordem">{{evidencia.ordem}}</div>
+              
+                                  <!-- 🖼️ MINIATURA DA EVIDÊNCIA -->
+                    <div class="evidencia-preview" 
+                         style="width: 80px !important; height: 80px !important; max-width: 80px !important; max-height: 80px !important; overflow: hidden !important;">
+                      <div *ngIf="isImageFile(evidencia.nomearquivo)" 
+                           class="image-thumbnail"
+                           style="width: 100% !important; height: 100% !important; overflow: hidden !important;">
+                        <img [src]="getEvidenciaPreview(evidencia)" 
+                             [alt]="evidencia.nomearquivo"
+                             style="width: 100% !important; height: 100% !important; object-fit: cover !important;" />
+                      </div>
+                      <div *ngIf="!isImageFile(evidencia.nomearquivo)" 
+                           class="file-icon"
+                           style="width: 100% !important; height: 100% !important;">
+                        <i [class]="getFileIcon(evidencia.nomearquivo)"></i>
+                      </div>
+                    </div>
+              
+                              <div class="evidencia-details">
+                  <div class="evidencia-nome">{{getDisplayFileName(evidencia.nomearquivo, evidencia)}}</div>
+                  <div class="evidencia-size" *ngIf="evidencia.tamanho">{{formatFileSize(evidencia.tamanho)}}</div>
+                </div>
+              
+              <div class="evidencia-actions">
+                <button class="btn btn-success btn-sm" (click)="downloadEvidencia(evidencia)" title="Download" matTooltip="Download da evidência">
+                  <i class="cil-cloud-download"></i>
+                </button>
+                <button class="btn btn-primary btn-sm" (click)="iniciarEdicao(evidencia)" title="Editar ordem" matTooltip="Editar ordem da evidência">
+                  <i class="cil-pencil"></i>
+                </button>
+                <button class="btn btn-danger btn-sm" (click)="excluirEvidencia(evidencia)" title="Excluir" matTooltip="Excluir evidência">
+                  <i class="cil-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Modo edição -->
+          <div *ngIf="editandoEvidencia?.id === evidencia.id" class="evidencia-edit">
+            <div class="edit-form">
+              <label>Nova ordem:</label>
+              <input type="number" [(ngModel)]="novaOrdem" min="1" [max]="evidencias.length">
+              <div class="edit-buttons">
+                <button class="btn-save" (click)="salvarEdicao()">Salvar</button>
+                <button class="btn-cancel" (click)="cancelarEdicao()">Cancelar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sem evidências -->
+      <div *ngIf="!carregandoEvidencias && evidencias.length === 0" class="sem-evidencias">
+        <p>Nenhuma evidência encontrada.</p>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 🎯 FOOTER COM BOTÃO DE CANCELAR -->
+  <div class="form-footer">
+    <button class="btn-cancel" (click)="fecharVisualizacao()">
+      <i class="cil-x"></i>
+      Fechar
+    </button>
+  </div>
+</div>

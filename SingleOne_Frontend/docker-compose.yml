@@ -1,0 +1,23 @@
+version: "3.8"
+
+services:
+  singleone-frontend:
+    container_name: singleone-frontend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "${FRONT_PORT:-8080}:80"
+    environment:
+      # Mantido para compatibilidade com scripts existentes.
+      # O Nginx interno encaminha todas as chamadas para o host `singleone-backend`.
+      API_URL: "${API_URL:-http://singleone-backend:5000/api/}"
+    networks:
+      - singleone-network
+    restart: unless-stopped
+
+networks:
+  singleone-network:
+    external: true
+    name: singleone-network
+

@@ -1,0 +1,494 @@
+<!-- 🎯 HEADER MODERNO DAS MOVIMENTAÇÕES DE COLABORADORES -->
+<div class="movimentacoes-colaboradores-header">
+  <div class="header-content">
+    <div class="header-left">
+      <button class="back-button" [routerLink]="['/relatorios']" matTooltip="Voltar para Relatórios">
+        <i class="cil-arrow-left"></i>
+      </button>
+      <div class="header-title">
+        <div class="title-icon">
+          <i class="cil-people"></i>
+            </div>
+        <div class="title-text">
+          <h1>Movimentações de Colaboradores</h1>
+          <p>Relatório detalhado de mudanças e movimentações</p>
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="action-btn primary-btn" (click)="exportarDados()" matTooltip="Exportar dados">
+        <i class="cil-download"></i>
+        <span>Exportar</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 🍞 BREADCRUMB MODERNO -->
+<nav class="modern-breadcrumb">
+  <div class="breadcrumb-container">
+    <a [routerLink]="['/dashboard']" class="breadcrumb-item">
+      <i class="cil-home"></i>
+      <span>Dashboard</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a [routerLink]="['/relatorios']" class="breadcrumb-item">
+      <i class="cil-timeline"></i>
+      <span>Relatórios e Timeline</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <span class="breadcrumb-item active">Movimentações de Colaboradores</span>
+  </div>
+</nav>
+
+<!-- 📋 CONTEÚDO PRINCIPAL -->
+<div class="movimentacoes-colaboradores-content">
+  <!-- 🔍 SEÇÃO DE PESQUISA -->
+  <div class="search-section">
+    <div class="search-box">
+      <i class="cil-magnifying-glass search-icon"></i>
+      <input 
+        type="text" 
+        class="search-input" 
+        [formControl]="consulta"
+        placeholder="Buscar pelo nome do colaborador..."
+        matTooltip="Digite o nome do colaborador para filtrar os resultados">
+      <button 
+        *ngIf="consulta.value" 
+        class="clear-btn" 
+        (click)="limparBusca()" 
+        matTooltip="Limpar busca">
+        <i class="cil-x"></i>
+      </button>
+    </div>
+    
+    <div class="results-info" *ngIf="consulta.value">
+      <div class="results-count">
+        <i class="cil-info"></i>
+        <span>Resultados filtrados</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 📊 CARDS DE MÉTRICAS -->
+  <div class="metrics-section" *ngIf="!loading">
+    <div class="metrics-grid">
+      <div class="metric-card primary">
+        <div class="metric-icon">
+          <i class="cil-user-follow"></i>
+        </div>
+        <div class="metric-info">
+          <div class="metric-value">{{ getTotalMovimentacoes() }}</div>
+          <div class="metric-label">Total de Movimentações</div>
+        </div>
+      </div>
+      
+      <div class="metric-card success">
+        <div class="metric-icon">
+          <i class="cil-user"></i>
+        </div>
+        <div class="metric-info">
+          <div class="metric-value">{{ getTotalColaboradores() }}</div>
+          <div class="metric-label">Colaboradores Afetados</div>
+        </div>
+      </div>
+      
+      <div class="metric-card info">
+        <div class="metric-icon">
+          <i class="cil-calendar"></i>
+        </div>
+        <div class="metric-info">
+          <div class="metric-value">{{ getPeriodoAtualizacao() }}</div>
+          <div class="metric-label">Período de Atualização</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🔄 CONTAINER DE LOADING -->
+  <div class="loading-container" *ngIf="loading">
+    <div class="loading-spinner"></div>
+    <p>Carregando movimentações...</p>
+  </div>
+
+  <!-- 📊 TABS DE CONTEÚDO -->
+  <div class="content-tabs" *ngIf="!loading">
+    <div class="tabs-header">
+      <button 
+        class="tab-btn" 
+        [class.active]="selectedTabIndex === 0"
+        (click)="selectedTabIndex = 0">
+        <i class="cil-user-follow"></i>
+        <span>STATUS</span>
+        <span class="quantity-badge">{{totalStatus || 0}}</span>
+      </button>
+      
+      <button 
+        class="tab-btn" 
+        [class.active]="selectedTabIndex === 1"
+        (click)="selectedTabIndex = 1">
+        <i class="cil-building"></i>
+        <span>EMPRESA</span>
+        <span class="quantity-badge">{{totalEmpresa || 0}}</span>
+      </button>
+      
+      <button 
+        class="tab-btn" 
+        [class.active]="selectedTabIndex === 2"
+        (click)="selectedTabIndex = 2">
+        <i class="cil-account-balance"></i>
+        <span>CENTRO DE CUSTO</span>
+        <span class="quantity-badge">{{totalCC || 0}}</span>
+      </button>
+      
+      <button 
+        class="tab-btn" 
+        [class.active]="selectedTabIndex === 3"
+        (click)="selectedTabIndex = 3">
+        <i class="cil-location-pin"></i>
+        <span>LOCALIDADE</span>
+        <span class="quantity-badge">{{totalLocalidade || 0}}</span>
+      </button>
+    </div>
+    
+    <div class="tab-content">
+      <!-- TAB STATUS -->
+      <div *ngIf="selectedTabIndex === 0">
+        <div class="section-header">
+          <h3><i class="cil-user-follow"></i> Mudanças de Status</h3>
+          <p>Histórico de alterações de status dos colaboradores</p>
+        </div>
+        
+        <div class="table-section">
+          <div class="table-container">
+            <table class="modern-table">
+              <thead>
+                <tr>
+                  <th>Colaborador</th>
+                  <th>Matrícula</th>
+                  <th>Mudança de Status</th>
+                  <th class="text-center">Data Atualização</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let row of dataSourceStatus?.data || []">
+                  <td class="colaborador-info">
+                    <div class="colaborador-details">
+                      <div class="colaborador-avatar">
+                        <i class="cil-user"></i>
+                      </div>
+                      <div class="colaborador-text">
+                        <div class="colaborador-nome">{{ row.nome || 'N/A' }}</div>
+                        <div class="colaborador-matricula">Mat: {{ row.matricula || 'N/A' }}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="matricula-info">
+                    <span class="matricula-badge">{{ row.matricula || 'N/A' }}</span>
+                  </td>
+                  <td class="mudanca-info">
+                    <div class="mudanca-flow">
+                      <span class="status-chip old">{{ row.situacaoantiga || 'N/A' }}</span>
+                      <i class="cil-arrow-right"></i>
+                      <span class="status-chip new">{{ row.situacao || 'N/A' }}</span>
+                    </div>
+                  </td>
+                  <td class="text-center">
+                    <span class="date-info">{{ row.dtatualizacao | dateFormat:1 || 'N/A' }}</span>
+                  </td>
+                </tr>
+                
+                <tr *ngIf="!dataSourceStatus || !dataSourceStatus.data || dataSourceStatus.data.length === 0">
+                  <td colspan="4" class="no-data-row">
+                    <div class="no-data-message">
+                      <i class="cil-inbox"></i>
+                      <p>Nenhuma movimentação de status encontrada</p>
+                      <small>Digite um nome de colaborador para buscar</small>
+                    </div>
+                </td>
+                </tr>
+              </tbody>
+        </table>
+            
+            <div class="pagination-container">
+              <mat-paginator 
+                #paginatorStatus 
+                [length]="lengthStatus"
+                [pageIndex]="pageIndexStatus"
+                [pageSize]="pageSizeStatus" 
+                [pageSizeOptions]="[10, 25, 50, 100]" 
+                showFirstLastButtons
+                (page)="listarMovimentacoes('S', $event)">
+              </mat-paginator>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB EMPRESA -->
+      <div *ngIf="selectedTabIndex === 1">
+        <div class="section-header">
+          <h3><i class="cil-building"></i> Mudanças de Empresa</h3>
+          <p>Histórico de transferências entre empresas</p>
+        </div>
+        
+        <div class="table-section">
+          <div class="table-container">
+            <table class="modern-table">
+              <thead>
+                <tr>
+                  <th>Colaborador</th>
+                  <th>Matrícula</th>
+                  <th>Mudança de Empresa</th>
+                  <th class="text-center">Data Atualização</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let row of dataSourceEmpresa?.data || []">
+                  <td class="colaborador-info">
+                    <div class="colaborador-details">
+                      <div class="colaborador-avatar">
+                        <i class="cil-user"></i>
+                      </div>
+                      <div class="colaborador-text">
+                        <div class="colaborador-nome">{{ row.nome || 'N/A' }}</div>
+                        <div class="colaborador-matricula">Mat: {{ row.matricula || 'N/A' }}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="matricula-info">
+                    <span class="matricula-badge">{{ row.matricula || 'N/A' }}</span>
+                  </td>
+                  <td class="mudanca-info">
+                    <div class="mudanca-flow">
+                      <span class="empresa-chip old">{{ row.empresaantiga || 'N/A' }}</span>
+                      <i class="cil-arrow-right"></i>
+                      <span class="empresa-chip new">{{ row.empresaatual || 'N/A' }}</span>
+                    </div>
+                  </td>
+                  <td class="text-center">
+                    <span class="date-info">{{ row.dtatualizacaoempresa | dateFormat:1 || 'N/A' }}</span>
+                  </td>
+                </tr>
+                
+                <tr *ngIf="!dataSourceEmpresa || !dataSourceEmpresa.data || dataSourceEmpresa.data.length === 0">
+                  <td colspan="4" class="no-data-row">
+                    <div class="no-data-message">
+                      <i class="cil-inbox"></i>
+                      <p>Nenhuma movimentação de empresa encontrada</p>
+                      <small>Digite um nome de colaborador para buscar</small>
+                    </div>
+                </td>
+                </tr>
+              </tbody>
+        </table>
+            
+            <div class="pagination-container">
+              <mat-paginator 
+                #paginatorEmpresa 
+                [length]="lengthEmpresa"
+                [pageIndex]="pageIndexEmpresa"
+                [pageSize]="pageSizeEmpresa" 
+                [pageSizeOptions]="[10, 25, 50, 100]" 
+                showFirstLastButtons
+                (page)="listarMovimentacoes('E', $event)">
+              </mat-paginator>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB CENTRO DE CUSTO -->
+      <div *ngIf="selectedTabIndex === 2">
+        <div class="section-header">
+          <h3><i class="cil-account-balance"></i> Mudanças de Centro de Custo</h3>
+          <p>Histórico de alterações de centro de custo</p>
+        </div>
+        
+        <div class="table-section">
+          <div class="table-container">
+            <table class="modern-table">
+              <thead>
+                <tr>
+                  <th>Colaborador</th>
+                  <th>Matrícula</th>
+                  <th>Mudança de Centro de Custo</th>
+                  <th class="text-center">Data Atualização</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let row of dataSourceCC?.data || []">
+                  <td class="colaborador-info">
+                    <div class="colaborador-details">
+                      <div class="colaborador-avatar">
+                        <i class="cil-user"></i>
+                      </div>
+                      <div class="colaborador-text">
+                        <div class="colaborador-nome">{{ row.nome || 'N/A' }}</div>
+                        <div class="colaborador-matricula">Mat: {{ row.matricula || 'N/A' }}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="matricula-info">
+                    <span class="matricula-badge">{{ row.matricula || 'N/A' }}</span>
+                  </td>
+                  <td class="mudanca-info">
+                    <div class="mudanca-flow">
+                      <span class="cc-chip old">{{ row.codigoccantigo }} - {{ row.nomeccantigo || 'N/A' }}</span>
+                      <i class="cil-arrow-right"></i>
+                      <span class="cc-chip new">{{ row.codigoccatual }} - {{ row.nomeccatual || 'N/A' }}</span>
+                    </div>
+                  </td>
+                  <td class="text-center">
+                    <span class="date-info">{{ row.dtatualizacaocentrocusto | dateFormat:1 || 'N/A' }}</span>
+                  </td>
+                </tr>
+                
+                <tr *ngIf="!dataSourceCC || !dataSourceCC.data || dataSourceCC.data.length === 0">
+                  <td colspan="4" class="no-data-row">
+                    <div class="no-data-message">
+                      <i class="cil-inbox"></i>
+                      <p>Nenhuma movimentação de centro de custo encontrada</p>
+                      <small>Digite um nome de colaborador para buscar</small>
+                    </div>
+                </td>
+                </tr>
+              </tbody>
+        </table>
+            
+            <div class="pagination-container">
+              <mat-paginator 
+                #paginatorCC 
+                [length]="lengthCC"
+                [pageIndex]="pageIndexCC"
+                [pageSize]="pageSizeCC" 
+                [pageSizeOptions]="[10, 25, 50, 100]" 
+                showFirstLastButtons
+                (page)="listarMovimentacoes('C', $event)">
+              </mat-paginator>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB LOCALIDADE -->
+      <div *ngIf="selectedTabIndex === 3">
+        <div class="section-header">
+          <h3><i class="cil-location-pin"></i> Mudanças de Localidade</h3>
+          <p>Histórico de alterações de localidade</p>
+        </div>
+        
+        <div class="table-section">
+          <div class="table-container">
+            <table class="modern-table">
+              <thead>
+                <tr>
+                  <th>Colaborador</th>
+                  <th>Matrícula</th>
+                  <th>Mudança de Localidade</th>
+                  <th class="text-center">Data Atualização</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let row of dataSourceLocalidade?.data || []">
+                  <td class="colaborador-info">
+                    <div class="colaborador-details">
+                      <div class="colaborador-avatar">
+                        <i class="cil-user"></i>
+                      </div>
+                      <div class="colaborador-text">
+                        <div class="colaborador-nome">{{ row.nome || 'N/A' }}</div>
+                        <div class="colaborador-matricula">Mat: {{ row.matricula || 'N/A' }}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="matricula-info">
+                    <span class="matricula-badge">{{ row.matricula || 'N/A' }}</span>
+                  </td>
+                  <td class="mudanca-info">
+                    <div class="mudanca-flow">
+                      <span class="localidade-chip old">{{ row.localidadeantiga || 'N/A' }}</span>
+                      <i class="cil-arrow-right"></i>
+                      <span class="localidade-chip new">{{ row.localidadeatual || 'N/A' }}</span>
+                    </div>
+                  </td>
+                  <td class="text-center">
+                    <span class="date-info">{{ row.dtatualizacaolocalidade | dateFormat:1 || 'N/A' }}</span>
+                  </td>
+                </tr>
+                
+                <tr *ngIf="!dataSourceLocalidade || !dataSourceLocalidade.data || dataSourceLocalidade.data.length === 0">
+                  <td colspan="4" class="no-data-row">
+                    <div class="no-data-message">
+                      <i class="cil-inbox"></i>
+                      <p>Nenhuma movimentação de localidade encontrada</p>
+                      <small>Digite um nome de colaborador para buscar</small>
+                    </div>
+                </td>
+                </tr>
+              </tbody>
+        </table>
+            
+            <div class="pagination-container">
+              <mat-paginator 
+                #paginatorLocalidade 
+                [length]="lengthLocalidade"
+                [pageIndex]="pageIndexLocalidade"
+                [pageSize]="pageSizeLocalidade" 
+                [pageSizeOptions]="[10, 25, 50, 100]" 
+                showFirstLastButtons
+                (page)="listarMovimentacoes('L', $event)">
+              </mat-paginator>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 🚀 MODAL DE EXPORTAÇÃO -->
+<div class="export-modal" *ngIf="showExportModal" (click)="closeExportModal($event)">
+  <div class="export-modal-content" (click)="$event.stopPropagation()">
+    <div class="export-modal-header">
+      <h3><i class="cil-download"></i> Exportar Dados</h3>
+      <button class="close-btn" (click)="closeExportModal($event)">
+        <i class="cil-x"></i>
+      </button>
+    </div>
+    
+    <div class="export-modal-body">
+      <p>Escolha o formato de exportação para os dados de movimentações de colaboradores:</p>
+      
+      <div class="export-options">
+        <div class="export-option" (click)="exportarParaExcel()">
+          <div class="export-icon excel">
+            <i class="cil-file"></i>
+          </div>
+          <div class="export-info">
+            <h4>Excel (.xlsx)</h4>
+            <p>Formato ideal para análise e manipulação de dados</p>
+          </div>
+          <i class="cil-chevron-right"></i>
+        </div>
+        
+        <div class="export-option" (click)="exportarParaCSV()">
+          <div class="export-icon csv">
+            <i class="cil-file"></i>
+          </div>
+          <div class="export-info">
+            <h4>CSV (.csv)</h4>
+            <p>Formato universal compatível com qualquer planilha</p>
+          </div>
+          <i class="cil-chevron-right"></i>
+        </div>
+      </div>
+    </div>
+    
+    <div class="export-modal-footer">
+      <button class="btn-secondary" (click)="closeExportModal($event)">
+        Cancelar
+      </button>
+    </div>
+  </div>
+</div>

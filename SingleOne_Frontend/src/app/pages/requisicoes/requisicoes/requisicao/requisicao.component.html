@@ -1,0 +1,329 @@
+<!-- 🎯 HEADER MODERNO DAS REQUISIÇÕES -->
+<div class="requisicoes-header">
+  <div class="header-content">
+    <div class="header-left">
+      <button class="back-button" [routerLink]="['/movimentacoes/requisicoes']" matTooltip="Voltar para Requisições">
+        <i class="cil-arrow-left"></i>
+      </button>
+      <div class="header-title">
+        <div class="title-icon">
+          <span class="icon-text">+</span>
+        </div>
+        <div class="title-text">
+          <h1>Nova Requisição</h1>
+          <p>Criar nova requisição de recursos para colaboradores</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 🍞 BREADCRUMB MODERNO -->
+<nav class="modern-breadcrumb">
+  <div class="breadcrumb-container">
+    <a [routerLink]="['/dashboard']" class="breadcrumb-item">
+      <i class="cil-home"></i>
+      <span>Dashboard</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a [routerLink]="['/movimentacoes']" class="breadcrumb-item">
+      <i class="cil-list"></i>
+      <span>Solicitações</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a [routerLink]="['/movimentacoes/requisicoes']" class="breadcrumb-item">
+      <i class="cil-document"></i>
+      <span>Requisições</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <span class="breadcrumb-item active">Nova Requisição</span>
+  </div>
+</nav>
+
+<!-- 📋 CONTEÚDO PRINCIPAL -->
+<div class="requisicoes-content">
+  <form [formGroup]="form" (ngSubmit)="salvar()" class="requisicao-form">
+    
+    <!-- 🔧 CARD DE CONFIGURAÇÃO -->
+    <div class="config-card">
+      <div class="card-header">
+        <div class="card-icon">
+          <i class="cil-settings"></i>
+        </div>
+        <div class="card-title">
+          <h3>Configuração da Requisição</h3>
+          <p>Defina o tipo de recurso e responsável</p>
+        </div>
+      </div>
+      
+      <div class="card-content">
+        <div class="form-row">
+                                <!-- Tipo de Recurso -->
+                      <div class="form-field">
+                        <label class="field-label">
+                          <i class="cil-tag"></i>
+                          Tipo de Recurso
+                        </label>
+                        <div class="resource-type-buttons">
+                          <button 
+                            type="button"
+                            class="resource-type-btn"
+                            [class.active]="requisicao?.tiporecurso === 0"
+                            (click)="selecionarTipoRecurso(0)">
+                            <i class="cil-devices"></i>
+                            <span>Recursos</span>
+                          </button>
+                          <button 
+                            type="button"
+                            class="resource-type-btn"
+                            [class.active]="requisicao?.tiporecurso === 1"
+                            (click)="selecionarTipoRecurso(1)">
+                            <i class="cil-phone"></i>
+                            <span>Linha Telefônica</span>
+                          </button>
+                        </div>
+                      </div>
+            
+                      <!-- Responsável Provisório -->
+                      <div class="form-field">
+                        <label class="field-label">
+                          <i class="cil-user"></i>
+                          Responsável Provisório <span style="color: red;">*</span>
+                        </label>
+                        <mat-form-field class="resource-select" appearance="outline">
+                          <mat-select 
+                            formControlName="tecnico" 
+                            (selectionChange)="requisicao.tecnicoresponsavel = $event.value"
+                            placeholder="Selecionar responsável"
+                            required>
+                            <mat-option *ngFor="let tecnico of tecnicos" [value]="tecnico.id">
+                              <i class="cil-user-follow"></i>
+                              {{tecnico.nome}}
+                            </mat-option>
+                          </mat-select>
+                          <mat-error *ngIf="form.get('tecnico').hasError('required')">
+                            Campo obrigatório
+                          </mat-error>
+                        </mat-form-field>
+                      </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ➕ CARD DE SELEÇÃO DE RECURSOS -->
+    <div class="resources-card">
+      <div class="card-header">
+        <div class="card-icon">
+          <i class="cil-plus"></i>
+        </div>
+        <div class="card-title">
+          <h3>Adicionar Recursos</h3>
+          <p>Selecione os recursos ou linhas telefônicas</p>
+        </div>
+      </div>
+      
+      <div class="card-content">
+        <div class="form-row">
+          <!-- Campo de Recurso/Equipamento -->
+          <div class="form-field" *ngIf="requisicao?.tiporecurso == 0">
+            <label class="field-label">
+              <i class="cil-devices"></i>
+              Selecionar Recurso
+            </label>
+            <mat-form-field class="resource-select" appearance="outline">
+              <mat-select 
+                [formControl]="recursos" 
+                [(ngModel)]="item.equipamento"
+                placeholder="Selecionar equipamento">
+                <mat-option>
+                  <ngx-mat-select-search 
+                    [formControl]="recursos" 
+                    placeholderLabel="Buscar por fabricante, modelo, S/N ou patrimônio" 
+                    noEntriesFoundLabel="Nenhum equipamento encontrado">
+                  </ngx-mat-select-search>
+                </mat-option>
+                <mat-option *ngFor="let eqp of equipamentos" [value]="eqp.id" class="equipamento-option">
+                  <div class="equipamento-info">
+                    <div class="equipamento-main">
+                      {{eqp.tipoequipamento || ''}} {{eqp.fabricante || ''}} {{eqp.modelo || ''}}
+                    </div>
+                    <div class="equipamento-details">
+                      S/N: {{eqp.numeroserie || ''}} | Patrimônio: {{(eqp.patrimonio == "" || !eqp.patrimonio) ? "-" : eqp.patrimonio}}
+                    </div>
+                  </div>
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          
+          <!-- Campo de Linha Telefônica -->
+          <div class="form-field" *ngIf="requisicao?.tiporecurso == 1">
+            <label class="field-label">
+              <i class="cil-phone"></i>
+              Selecionar Linha Telefônica
+            </label>
+            <mat-form-field class="resource-select" appearance="outline">
+              <mat-select 
+                [formControl]="frmLinhas" 
+                [(ngModel)]="item.linhatelefonica"
+                placeholder="Selecionar linha telefônica">
+                <mat-option>
+                  <ngx-mat-select-search 
+                    [formControl]="frmLinhas" 
+                    placeholderLabel="Buscar pelo número da linha" 
+                    noEntriesFoundLabel="Nenhuma linha encontrada">
+                  </ngx-mat-select-search>
+                </mat-option>
+                <mat-option *ngFor="let linha of linhas" [value]="linha.id" class="linha-option">
+                  <i class="cil-phone"></i>
+                  {{linha.numero}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <!-- Botão Adicionar -->
+          <div class="form-field add-button-field">
+            <button 
+              mat-raised-button 
+              type="button" 
+              color="primary" 
+              (click)="adicionar()"
+              class="add-btn"
+              [disabled]="!item.equipamento && !item.linhatelefonica">
+              <i class="cil-plus"></i>
+              Adicionar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 📋 CARD DE LISTA DE RECURSOS -->
+    <div class="list-card" *ngIf="(requisicao?.requisicoesitens?.length || 0) > 0">
+      <div class="card-header">
+        <div class="card-icon">
+          <i class="cil-list"></i>
+        </div>
+        <div class="card-title">
+          <h3>Recursos Selecionados</h3>
+          <p>{{ (requisicao?.requisicoesitens?.length || 0) }} item(s) adicionado(s)</p>
+        </div>
+      </div>
+      
+      <div class="card-content">
+        <div class="resources-list">
+          <div class="resource-item" *ngFor="let item of requisicao.requisicoesitens; let i = index">
+            <div class="resource-info">
+              <div class="resource-icon">
+                <i class="cil-devices" *ngIf="!item.linhatelefonica"></i>
+                <i class="cil-phone" *ngIf="item.linhatelefonica"></i>
+              </div>
+              <div class="resource-details">
+                <div class="resource-name">
+                  <span *ngIf="!item.linhatelefonica && item.equipamentoNavigation">
+                    {{(item.equipamentoNavigation.tipoequipamento || '') + ' ' + (item.equipamentoNavigation.fabricante || '') + ' ' + (item.equipamentoNavigation.modelo || '')}}
+                  </span>
+                  <span *ngIf="!item.linhatelefonica && !item.equipamentoNavigation">
+                    Carregando equipamento...
+                  </span>
+                  <span *ngIf="item.linhatelefonica && item.linhatelefonica > 0 && item.linhaTelefonicaNavigation">
+                    Linha telefônica {{item.linhaTelefonicaNavigation.numero || item.linhatelefonica}}
+                  </span>
+                  <span *ngIf="item.linhatelefonica && item.linhatelefonica > 0 && !item.linhaTelefonicaNavigation">
+                    Linha telefônica {{item.linhatelefonica}}
+                  </span>
+                  <span *ngIf="!item.equipamentoNavigation && !item.linhatelefonica">
+                    Carregando...
+                  </span>
+                </div>
+                <div class="resource-meta" *ngIf="!item.linhatelefonica && item.equipamentoNavigation">
+                  <span class="serial-number" *ngIf="item.equipamentoNavigation.numeroserie && item.equipamentoNavigation.numeroserie.trim() !== ''">
+                    S/N: {{item.equipamentoNavigation.numeroserie}}
+                  </span>
+                  <span class="patrimonio" *ngIf="item.equipamentoNavigation.patrimonio && item.equipamentoNavigation.patrimonio.trim() !== ''">
+                    Patrimônio: {{item.equipamentoNavigation.patrimonio}}
+                  </span>
+                  <span class="patrimonio" *ngIf="!item.equipamentoNavigation.patrimonio || item.equipamentoNavigation.patrimonio.trim() === ''">
+                    Patrimônio: -
+                  </span>
+                </div>
+                <div class="resource-meta" *ngIf="item.linhatelefonica && item.linhatelefonica > 0 && item.linhaTelefonicaNavigation">
+                  <span class="operadora" *ngIf="item.linhaTelefonicaNavigation.planoNavigation?.contratoNavigation?.operadoraNavigation?.nome && item.linhaTelefonicaNavigation.planoNavigation.contratoNavigation.operadoraNavigation.nome.trim() !== ''">
+                    Operadora: {{item.linhaTelefonicaNavigation.planoNavigation.contratoNavigation.operadoraNavigation.nome}}
+                  </span>
+                  <span class="plano" *ngIf="item.linhaTelefonicaNavigation.planoNavigation?.nome && item.linhaTelefonicaNavigation.planoNavigation.nome.trim() !== ''">
+                    Plano: {{item.linhaTelefonicaNavigation.planoNavigation.nome}}
+                  </span>
+                  <span class="contrato" *ngIf="item.linhaTelefonicaNavigation.planoNavigation?.contratoNavigation?.nome && item.linhaTelefonicaNavigation.planoNavigation.contratoNavigation.nome.trim() !== ''">
+                    Contrato: {{item.linhaTelefonicaNavigation.planoNavigation.contratoNavigation.nome}}
+                  </span>
+                  <span class="iccid" *ngIf="item.linhaTelefonicaNavigation.iccid && item.linhaTelefonicaNavigation.iccid.trim() !== ''">
+                    ICCID: {{item.linhaTelefonicaNavigation.iccid}}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="resource-actions">
+              <button 
+                mat-icon-button 
+                color="warn" 
+                (click)="excluir(item)"
+                class="remove-btn"
+                matTooltip="Remover recurso">
+                <i class="cil-trash"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 🎯 CARD DE AÇÕES -->
+    <div class="actions-card" *ngIf="requisicao.requisicoesitens.length > 0">
+      <div class="card-content">
+        <div class="actions-content">
+          <div class="summary-info">
+            <span class="items-count">
+              <i class="cil-list"></i>
+              {{requisicao.requisicoesitens.length}} recurso(s) selecionado(s)
+            </span>
+          </div>
+          <div class="action-buttons">
+            <button 
+              mat-stroked-button 
+              type="button"
+              (click)="limparFormulario()"
+              class="cancel-btn">
+              <i class="cil-x"></i>
+              Limpar
+            </button>
+            <button 
+              mat-raised-button 
+              type="submit" 
+              color="primary"
+              class="save-btn"
+              [disabled]="!form.valid || !requisicao.tecnicoresponsavel || requisicao.tecnicoresponsavel === 0">
+              <i class="cil-save"></i>
+              Salvar Requisição
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 🚫 ESTADO VAZIO -->
+    <div class="empty-state" *ngIf="requisicao.requisicoesitens.length === 0">
+      <div class="empty-content">
+        <div class="empty-icon">
+          <i class="cil-plus-circle"></i>
+        </div>
+        <h3>Nenhum recurso selecionado</h3>
+        <p>Selecione os recursos ou linhas telefônicas, adicione para continuar</p>
+      </div>
+    </div>
+
+  </form>
+</div>
+
+

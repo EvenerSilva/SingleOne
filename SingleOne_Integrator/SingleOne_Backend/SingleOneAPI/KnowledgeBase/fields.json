@@ -1,0 +1,108 @@
+[
+  {
+    "Campo": "CPF",
+    "Descricao": "Cadastro de Pessoa Física - documento único de identificação do colaborador. Usado para validação e controle de acesso.",
+    "Obrigatorio": true,
+    "Tipo": "Texto",
+    "Palavras-chave": ["cpf", "documento", "identificacao"]
+  },
+  {
+    "Campo": "Patrimônio",
+    "Descricao": "Número único de identificação do equipamento no sistema. Pode ser código de barras, etiqueta ou número sequencial.",
+    "Obrigatorio": true,
+    "Tipo": "Texto",
+    "Palavras-chave": ["patrimonio", "numero", "identificacao", "etiqueta", "codigo"]
+  },
+  {
+    "Campo": "Número de Série",
+    "Descricao": "Identificação única do fabricante para o equipamento. Importante para garantia e suporte técnico.",
+    "Obrigatorio": false,
+    "Tipo": "Texto",
+    "Palavras-chave": ["serie", "serial", "numero de serie", "serial number"]
+  },
+  {
+    "Campo": "Nota Fiscal",
+    "Descricao": "Número da nota fiscal de compra do equipamento. Essencial para garantia, controle financeiro e fiscal.",
+    "Obrigatorio": false,
+    "Tipo": "Texto",
+    "Palavras-chave": ["nota fiscal", "nf", "invoice", "compra"]
+  },
+  {
+    "Campo": "Centro de Custo",
+    "Descricao": "Departamento ou área responsável pelo custo do equipamento ou colaborador. Usado para controle orçamentário.",
+    "Obrigatorio": true,
+    "Tipo": "Seleção",
+    "Palavras-chave": ["centro de custo", "departamento", "area", "orcamento"]
+  },
+  {
+    "Campo": "Localidade",
+    "Descricao": "Local físico onde o colaborador trabalha ou onde o equipamento está alocado (matriz, filial, remoto).",
+    "Obrigatorio": true,
+    "Tipo": "Seleção",
+    "Palavras-chave": ["localidade", "local", "endereco", "filial", "matriz"]
+  },
+  {
+    "Campo": "Cargo",
+    "Descricao": "Função ou posição do colaborador na empresa. Determina política de elegibilidade para equipamentos.",
+    "Obrigatorio": true,
+    "Tipo": "Seleção",
+    "Palavras-chave": ["cargo", "funcao", "posicao", "role"]
+  },
+  {
+    "Campo": "Status",
+    "Descricao": "Situação atual do equipamento: Disponível, Em Uso, Manutenção, Descartado, etc.",
+    "Obrigatorio": true,
+    "Tipo": "Seleção",
+    "Palavras-chave": ["status", "situacao", "estado"]
+  },
+  {
+    "Campo": "Tipo de Equipamento",
+    "Descricao": "Categoria do equipamento: Notebook, Desktop, Monitor, Celular, Tablet, etc.",
+    "Obrigatorio": true,
+    "Tipo": "Seleção",
+    "Palavras-chave": ["tipo", "categoria", "equipamento"]
+  },
+  {
+    "Campo": "Fabricante",
+    "Descricao": "Marca ou empresa que fabricou o equipamento. Ex: Dell, HP, Lenovo, Apple, Samsung.",
+    "Obrigatorio": true,
+    "Tipo": "Seleção",
+    "Palavras-chave": ["fabricante", "marca", "manufacturer"]
+  },
+  {
+    "Campo": "Modelo",
+    "Descricao": "Modelo específico do equipamento fornecido pelo fabricante. Ex: Latitude 7490, ThinkPad X1, iPhone 13.",
+    "Obrigatorio": true,
+    "Tipo": "Seleção",
+    "Palavras-chave": ["modelo", "versao", "model"]
+  },
+  {
+    "Campo": "Data de Garantia",
+    "Descricao": "Data de vencimento da garantia do equipamento. O sistema alerta quando está próxima do vencimento.",
+    "Obrigatorio": false,
+    "Tipo": "Data",
+    "Palavras-chave": ["garantia", "vencimento", "warranty", "validade"]
+  },
+  {
+    "Campo": "Data de Aquisição",
+    "Descricao": "Data em que o equipamento foi comprado ou adquirido pela empresa.",
+    "Obrigatorio": false,
+    "Tipo": "Data",
+    "Palavras-chave": ["aquisicao", "compra", "data de compra"]
+  },
+  {
+    "Campo": "Valor",
+    "Descricao": "Valor de aquisição do equipamento. Usado para controle patrimonial e depreciação.",
+    "Obrigatorio": false,
+    "Tipo": "Numérico",
+    "Palavras-chave": ["valor", "preco", "custo", "price"]
+  },
+  {
+    "Campo": "BYOD",
+    "Descricao": "Indica se o equipamento é próprio do colaborador (Bring Your Own Device).",
+    "Obrigatorio": false,
+    "Tipo": "Sim/Não",
+    "Palavras-chave": ["byod", "proprio", "pessoal"]
+  }
+]
+

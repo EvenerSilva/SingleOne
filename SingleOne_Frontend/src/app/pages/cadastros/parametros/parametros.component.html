@@ -1,0 +1,313 @@
+<!-- 🎯 HEADER MODERNO DOS PARÂMETROS -->
+<div class="parametros-header">
+  <div class="header-content">
+    <div class="header-left">
+      <button class="back-button" [routerLink]="['/configuracoes']" matTooltip="Voltar para Configurações">
+        <i class="material-icons">arrow_back</i>
+      </button>
+      <div class="header-title">
+        <div class="title-icon">
+          <i class="material-icons">settings</i>
+        </div>
+        <div class="title-text">
+          <h1>Parâmetros do Sistema</h1>
+          <p>Configurações gerais e comportamentos do sistema</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 🍞 BREADCRUMB MODERNO -->
+<nav class="modern-breadcrumb">
+  <div class="breadcrumb-container">
+    <a [routerLink]="['/dashboard']" class="breadcrumb-item">
+      <i class="material-icons">home</i>
+      <span>Dashboard</span>
+    </a>
+    <i class="material-icons">chevron_right</i>
+    <a [routerLink]="['/configuracoes']" class="breadcrumb-item">
+      <i class="material-icons">settings</i>
+      <span>Configurações</span>
+    </a>
+    <i class="material-icons">chevron_right</i>
+    <span class="breadcrumb-item active">Parâmetros</span>
+  </div>
+</nav>
+
+<!-- 📋 CONTEÚDO PRINCIPAL -->
+<div class="parametros-content">
+  <form [formGroup]="form" (ngSubmit)="salvar()">
+    
+
+    <!-- 📧 CARD: CONFIGURAÇÃO DE E-MAIL PARA DESCONTOS -->
+    <div class="parametro-card">
+      <div class="card-header">
+        <div class="header-icon">
+          <i class="material-icons">email</i>
+        </div>
+        <div class="header-text">
+          <h2>E-mail para Descontos de Sinistros</h2>
+          <p>Notificações sobre reportes de recursos ou laudos</p>
+        </div>
+        <div class="header-action">
+          <mat-slide-toggle color="primary" formControlName="emailDescontosEnabled" (change)="onEmailDescontosEnabledChange()">
+          </mat-slide-toggle>
+        </div>
+      </div>
+      <div class="card-content">
+        <p>Configuração do e-mail para notificações sobre reportes de recursos ou laudos caracterizando mau uso.</p>
+        
+        <div class="form-row" *ngIf="form.get('emailDescontosEnabled')?.value">
+          <mat-form-field appearance="outline" class="email-input">
+            <mat-label>E-mail do setor responsável</mat-label>
+            <input matInput required formControlName="emailReporte" placeholder="setor@empresa.com">
+            <mat-error *ngIf="form.get('emailReporte')?.hasError('required')">E-mail é obrigatório</mat-error>
+            <mat-error *ngIf="form.get('emailReporte')?.hasError('email')">E-mail inválido</mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="card-actions">
+          <button type="button" 
+                  class="btn-save"
+                  (click)="salvarEmailDescontos()">
+            <i class="material-icons">save</i>
+            {{ form.get('emailDescontosEnabled')?.value ? 'Salvar Configurações' : 'Desabilitar' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 📡 CARD: CONFIGURAÇÕES DE E-MAIL (SMTP) -->
+    <div class="parametro-card" *ngIf="isAdmin">
+      <div class="card-header">
+        <div class="header-icon">
+          <i class="material-icons">dns</i>
+        </div>
+        <div class="header-text">
+          <h2>Configurações de E-mail (SMTP)</h2>
+          <p>Servidor de envio de e-mails do sistema</p>
+        </div>
+        <div class="header-action">
+          <mat-slide-toggle color="primary" formControlName="smtpEnabled" (change)="onSmtpEnabledChange()">
+          </mat-slide-toggle>
+        </div>
+      </div>
+      <div class="card-content">
+        <p>Configurações para envio de e-mails via servidor SMTP. Apenas administradores podem alterar estas configurações.</p>
+        
+        <!-- Dicas de configuração -->
+        <div class="config-tips" *ngIf="form.get('smtpEnabled')?.value">
+          <h4>💡 Dicas de configuração:</h4>
+          <div class="tips-grid">
+            <div class="tip-item">
+              <strong>Gmail:</strong> smtp.gmail.com:587 (TLS) ou 465 (SSL)
+            </div>
+            <div class="tip-item">
+              <strong>Outlook:</strong> smtp-mail.outlook.com:587 (TLS)
+            </div>
+            <div class="tip-item">
+              <strong>Brevo:</strong> smtp-relay.brevo.com:587 (TLS)
+            </div>
+            <div class="tip-item">
+              <strong>Yahoo:</strong> smtp.mail.yahoo.com:587 (TLS) ou 465 (SSL)
+            </div>
+          </div>
+        </div>
+
+        <!-- Campos SMTP -->
+        <div class="form-grid" *ngIf="form.get('smtpEnabled')?.value">
+          <mat-form-field appearance="outline">
+            <mat-label>Host SMTP *</mat-label>
+            <input matInput formControlName="smtpHost" placeholder="smtp.gmail.com">
+            <mat-error *ngIf="form.get('smtpHost')?.hasError('required')">Host SMTP é obrigatório</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Usuário SMTP *</mat-label>
+            <input matInput formControlName="smtpLogin" placeholder="seu-email@gmail.com">
+            <mat-error *ngIf="form.get('smtpLogin')?.hasError('required')">Usuário SMTP é obrigatório</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Senha SMTP *</mat-label>
+            <input matInput type="password" formControlName="smtpPassword" placeholder="Sua senha ou senha de app">
+            <mat-error *ngIf="form.get('smtpPassword')?.hasError('required')">Senha SMTP é obrigatória</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>E-mail de Origem *</mat-label>
+            <input matInput formControlName="smtpEmailFrom" placeholder="noreply@seudominio.com">
+            <mat-error *ngIf="form.get('smtpEmailFrom')?.hasError('required')">E-mail de origem é obrigatório</mat-error>
+            <mat-error *ngIf="form.get('smtpEmailFrom')?.hasError('email')">E-mail inválido</mat-error>
+          </mat-form-field>
+
+          <div class="ssl-toggle">
+            <mat-label>Habilitar SSL</mat-label>
+            <mat-slide-toggle color="primary" formControlName="smtpEnableSSL" (change)="onSslChange()">
+            </mat-slide-toggle>
+          </div>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Porta SMTP *</mat-label>
+            <input matInput type="number" formControlName="smtpPort" 
+                   [placeholder]="form.get('smtpEnableSSL')?.value ? '465' : '587'">
+            <mat-hint>{{ form.get('smtpEnableSSL')?.value ? 'Porta padrão para SSL: 465' : 'Porta padrão para TLS: 587' }}</mat-hint>
+            <mat-error *ngIf="form.get('smtpPort')?.hasError('required')">Porta é obrigatória</mat-error>
+            <mat-error *ngIf="form.get('smtpPort')?.hasError('min')">Porta deve ser maior que 0</mat-error>
+            <mat-error *ngIf="form.get('smtpPort')?.hasError('max')">Porta deve ser menor que 65536</mat-error>
+          </mat-form-field>
+        </div>
+
+        <!-- Status e ações SMTP -->
+        <div class="card-actions" *ngIf="form.get('smtpEnabled')?.value">
+          <div class="action-buttons">
+            <button type="button" 
+                    class="btn-test"
+                    [disabled]="!isFormSMTPValido()" 
+                    (click)="testarConexaoSMTP()">
+              <i class="material-icons">send</i>
+              Testar Conexão
+            </button>
+            
+            <button type="button" 
+                    class="btn-save"
+                    [disabled]="!isFormSMTPValido()" 
+                    (click)="salvarSMTP()">
+              <i class="material-icons">save</i>
+              Salvar SMTP
+            </button>
+          </div>
+
+          <!-- Status da validação -->
+          <div class="validation-status">
+            <div class="alert alert-warning" *ngIf="!isFormSMTPValido()">
+              <i class="material-icons">warning</i>
+              <span>Preencha todos os campos obrigatórios para habilitar o teste de conexão SMTP.</span>
+            </div>
+            <div class="alert alert-success" *ngIf="isFormSMTPValido()">
+              <i class="material-icons">check_circle</i>
+              <span>Configuração válida! Você pode testar a conexão SMTP.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 🔐 CARD: CONFIGURAÇÕES DE AUTENTICAÇÃO DE DUPLO FATOR (2FA) -->
+    <div class="parametro-card" *ngIf="isAdmin">
+      <div class="card-header">
+        <div class="header-icon">
+          <i class="material-icons">two_factor_authentication</i>
+        </div>
+        <div class="header-text">
+          <h2>Autenticação de Duplo Fator (2FA)</h2>
+          <p>Segurança adicional para acesso ao sistema</p>
+        </div>
+        <div class="header-action">
+          <mat-slide-toggle color="primary" formControlName="twoFactorEnabled" (change)="onTwoFactorEnabledChange()">
+          </mat-slide-toggle>
+        </div>
+      </div>
+      <div class="card-content">
+        <p>Configurações para autenticação de duplo fator. <strong>Requer SMTP habilitado.</strong></p>
+        
+        <!-- Aviso sobre dependência SMTP -->
+        <div class="alert alert-info" *ngIf="!form.get('smtpEnabled')?.value">
+          <i class="material-icons">info</i>
+          <span><strong>Pré-requisito:</strong> O SMTP deve estar habilitado para ativar a funcionalidade de 2FA.</span>
+        </div>
+        
+        <!-- Configurações 2FA quando habilitado -->
+        <div class="form-grid" *ngIf="form.get('twoFactorEnabled')?.value && form.get('smtpEnabled')?.value">
+          <mat-form-field appearance="outline">
+            <mat-label>Tipo de 2FA</mat-label>
+            <mat-select formControlName="twoFactorType">
+              <mat-option value="email">Apenas E-mail</mat-option>
+              <mat-option value="app">Aplicativo (Google Authenticator)</mat-option>
+              <mat-option value="both">Ambos (E-mail + App)</mat-option>
+            </mat-select>
+            <mat-hint>Escolha o método de verificação para 2FA</mat-hint>
+          </mat-form-field>
+          
+          <mat-form-field appearance="outline">
+            <mat-label>Tempo de Expiração (minutos)</mat-label>
+            <input matInput type="number" formControlName="twoFactorExpirationMinutes" min="1" max="60">
+            <mat-hint>Tempo de validade do código 2FA</mat-hint>
+            <mat-error *ngIf="form.get('twoFactorExpirationMinutes')?.hasError('min')">Mínimo 1 minuto</mat-error>
+            <mat-error *ngIf="form.get('twoFactorExpirationMinutes')?.hasError('max')">Máximo 60 minutos</mat-error>
+          </mat-form-field>
+          
+          <mat-form-field appearance="outline">
+            <mat-label>Máximo de Tentativas</mat-label>
+            <input matInput type="number" formControlName="twoFactorMaxAttempts" min="1" max="10">
+            <mat-hint>Número máximo de tentativas antes do bloqueio</mat-hint>
+            <mat-error *ngIf="form.get('twoFactorMaxAttempts')?.hasError('min')">Mínimo 1 tentativa</mat-error>
+            <mat-error *ngIf="form.get('twoFactorMaxAttempts')?.hasError('max')">Máximo 10 tentativas</mat-error>
+          </mat-form-field>
+          
+          <mat-form-field appearance="outline">
+            <mat-label>Tempo de Bloqueio (minutos)</mat-label>
+            <input matInput type="number" formControlName="twoFactorLockoutMinutes" min="5" max="1440">
+            <mat-hint>Tempo de bloqueio após exceder tentativas</mat-hint>
+            <mat-error *ngIf="form.get('twoFactorLockoutMinutes')?.hasError('min')">Mínimo 5 minutos</mat-error>
+            <mat-error *ngIf="form.get('twoFactorLockoutMinutes')?.hasError('max')">Máximo 1440 minutos (24h)</mat-error>
+          </mat-form-field>
+          
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Template do E-mail 2FA</mat-label>
+            <textarea matInput formControlName="twoFactorEmailTemplate" rows="3" 
+                      placeholder="Seu código de verificação é: {{ '{' }}CODE{{ '}' }}. Este código expira em {{ '{' }}EXPIRATION{{ '}' }} minutos."></textarea>
+            <mat-hint>Use {{ '{' }}CODE{{ '}' }} para o código e {{ '{' }}EXPIRATION{{ '}' }} para o tempo de expiração</mat-hint>
+            <mat-error *ngIf="form.get('twoFactorEmailTemplate')?.hasError('required')">Template é obrigatório</mat-error>
+          </mat-form-field>
+        </div>
+
+        <!-- Informações sobre 2FA -->
+        <div class="info-section" *ngIf="form.get('twoFactorEnabled')?.value && form.get('smtpEnabled')?.value">
+          <h4>ℹ️ Como funciona o 2FA:</h4>
+          <div class="info-grid">
+            <div class="info-item">
+              <strong>E-mail:</strong> Código enviado por e-mail a cada login
+            </div>
+            <div class="info-item">
+              <strong>App:</strong> Código gerado por aplicativos como Google Authenticator
+            </div>
+            <div class="info-item">
+              <strong>Segurança:</strong> Protege contra acesso não autorizado mesmo com senha comprometida
+            </div>
+          </div>
+        </div>
+
+        <div class="card-actions">
+          <button type="button" 
+                  class="btn-save"
+                  [disabled]="form.get('twoFactorEnabled')?.value && !form.get('smtpEnabled')?.value" 
+                  (click)="salvar2FA()">
+            <i class="material-icons">save</i>
+            {{ form.get('twoFactorEnabled')?.value ? 'Salvar Configurações 2FA' : 'Desabilitar 2FA' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 🚀 AÇÕES GLOBAIS -->
+    <div class="global-actions">
+      <div class="action-buttons">
+        <button type="button" 
+                class="btn-secondary"
+                (click)="route.navigate(['/configuracoes'])">
+          <i class="material-icons">arrow_back</i>
+          Voltar para Configurações
+        </button>
+        
+        <button type="submit" 
+                class="btn-primary">
+          <i class="material-icons">save_all</i>
+          SALVAR TUDO
+        </button>
+      </div>
+    </div>
+
+  </form>
+</div>

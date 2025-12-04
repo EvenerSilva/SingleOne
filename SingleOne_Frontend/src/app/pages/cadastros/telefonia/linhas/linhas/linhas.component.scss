@@ -1,0 +1,585 @@
+/* 🎯 HEADER MODERNO DAS LINHAS */
+.linhas-header {
+  background: linear-gradient(135deg, #080039 0%, #1a1a2e 100%);
+  color: white;
+  padding: 2rem 2rem 2.5rem 2rem;
+  margin-bottom: 2rem;
+  border-radius: 0 0 20px 20px;
+  box-shadow: 0 8px 32px rgba(8, 0, 57, 0.3);
+  
+  .header-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      
+      .back-button {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        padding: 0.75rem;
+        color: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        
+        &:hover {
+          background: rgba(255, 255, 255, 0.2);
+          transform: translateY(-2px);
+        }
+        
+        i {
+          font-size: 20px;
+        }
+      }
+      
+      .header-title {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        
+        .title-icon {
+          background: linear-gradient(135deg, #FF3A0F 0%, #ff6b3d 100%);
+          width: 70px;
+          height: 70px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 8px 25px rgba(255, 58, 15, 0.3);
+          animation: float 3s ease-in-out infinite;
+          
+          i {
+            font-size: 32px;
+            color: white;
+          }
+        }
+        
+        .title-text {
+          h1 {
+            font-size: 3.2rem;
+            font-weight: 700;
+            margin: 0;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            
+            @media (max-width: 768px) {
+              font-size: 2.2rem;
+            }
+          }
+          
+          p {
+            font-size: 1.2rem;
+            margin: 0.5rem 0 0 0;
+            opacity: 0.9;
+            font-weight: 300;
+          }
+        }
+      }
+    }
+    
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      
+      // 🆕 ESTILOS PARA O BOTÃO DE FILTRO
+      .filter-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: 2px solid transparent;
+        border-radius: 12px;
+        padding: 0.875rem 1.25rem;
+        color: white;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        position: relative;
+        
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        &.active {
+          background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+          border-color: #fff;
+          box-shadow: 0 0 20px rgba(40, 167, 69, 0.5);
+        }
+        
+        .filter-content {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          
+          i {
+            font-size: 1.1rem;
+          }
+          
+          span {
+            font-size: 0.9rem;
+            white-space: nowrap;
+          }
+          
+          // 🆕 ESTILOS PARA O TOTALIZADOR
+          .filter-totalizador {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 0.25rem 0.5rem;
+            margin-left: 0.5rem;
+            font-size: 0.8rem;
+            font-weight: 700;
+            
+            .total-livre {
+              color: #ffffff;
+              text-shadow: 0 1px 2px rgba(255, 255, 255, 0.3);
+              font-weight: 800;
+            }
+            
+            .total-separator {
+              color: rgba(255, 255, 255, 0.8);
+              font-weight: 400;
+            }
+            
+            .total-em-uso {
+              color: #ffffff;
+              text-shadow: 0 1px 2px rgba(255, 255, 255, 0.3);
+              font-weight: 800;
+            }
+          }
+        }
+      }
+      
+      .action-btn {
+        background: linear-gradient(135deg, #FF3A0F 0%, #ff6b3d 100%);
+        border: none;
+        border-radius: 12px;
+        padding: 0.875rem 1.5rem;
+        color: white;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-size: 1rem;
+        box-shadow: 0 4px 15px rgba(255, 58, 15, 0.3);
+        
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(255, 58, 15, 0.4);
+        }
+        
+        i {
+          font-size: 18px;
+        }
+        
+        span {
+          font-size: 0.95rem;
+        }
+      }
+    }
+  }
+}
+
+/* 🍞 BREADCRUMB MODERNO */
+.modern-breadcrumb {
+  background: white;
+  padding: 1rem 2rem;
+  margin-bottom: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  
+  .breadcrumb-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.9rem;
+    
+    .breadcrumb-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #6c757d;
+      text-decoration: none;
+      transition: color 0.3s ease;
+      cursor: pointer;
+      
+      &:hover {
+        color: #FF3A0F;
+      }
+      
+      &.active {
+        color: #080039;
+        font-weight: 600;
+      }
+      
+      i {
+        font-size: 16px;
+      }
+    }
+    
+    i.cil-chevron-right {
+      color: #dee2e6;
+      font-size: 14px;
+    }
+  }
+}
+
+/* 📋 CONTEÚDO PRINCIPAL */
+.linhas-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem 2rem 2rem;
+}
+
+/* 🔍 SEÇÃO DE BUSCA */
+.search-section {
+  margin-bottom: 2rem;
+  
+  .search-box {
+    position: relative;
+    max-width: 500px;
+    
+    .search-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #6c757d;
+      font-size: 18px;
+      z-index: 2;
+    }
+    
+    input {
+      width: 100%;
+      height: 44px; /* ✅ ALTURA FIXA: Garantir consistência */
+      padding: 0 1rem 0 3rem; /* ✅ PADDING SIMPLIFICADO: Só horizontal */
+      border: 2px solid #e9ecef;
+      border-radius: 12px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      background: white;
+      box-sizing: border-box; /* ✅ IMPORTANTE: Incluir padding na altura */
+      
+      &:focus {
+        outline: none;
+        border-color: #FF3A0F;
+        box-shadow: 0 0 0 3px rgba(255, 58, 15, 0.1);
+      }
+      
+      &::placeholder {
+        color: #adb5bd;
+      }
+    }
+    
+    /* 🧹 BOTÃO DE LIMPAR */
+    .clear-btn {
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #6c757d;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      z-index: 2;
+      
+      &:hover {
+        background: #495057;
+        transform: translateY(-50%) scale(1.1);
+      }
+      
+      i {
+        font-size: 12px;
+        font-weight: bold;
+      }
+    }
+  }
+}
+
+/* 📊 TABELA MODERNA */
+.table-section {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  margin-bottom: 2rem;
+  
+  .modern-table {
+    width: 100%;
+    
+    th.mat-header-cell {
+      background: #f8f9fa;
+      color: #495057;
+      font-weight: 600;
+      padding: 1rem;
+      border-bottom: 2px solid #e9ecef;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    td.mat-cell {
+      padding: 1rem;
+      border-bottom: 1px solid #f1f3f4;
+      vertical-align: middle;
+    }
+    
+    tr.mat-row {
+      transition: background-color 0.2s ease;
+      
+      &:hover {
+        background-color: #f8f9fa;
+      }
+    }
+  }
+  
+  /* Número Link */
+  .numero-link {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+    cursor: pointer;
+    
+    &:hover {
+      color: #FF3A0F;
+      text-decoration: underline;
+    }
+  }
+  
+  /* Número Simples (quando não está em uso) */
+  .numero-simples {
+    color: #6c757d;
+    font-weight: 500;
+    cursor: default;
+  }
+  
+  /* Status Indicator */
+  .status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    
+    &.em-uso {
+      background: rgba(220, 53, 69, 0.1);
+      color: #dc3545;
+      border: 1px solid rgba(220, 53, 69, 0.2);
+    }
+    
+    &.livre {
+      background: rgba(40, 167, 69, 0.1);
+      color: #28a745;
+      border: 1px solid rgba(40, 167, 69, 0.2);
+    }
+    
+    i {
+      font-size: 14px;
+    }
+  }
+  
+  /* Action Buttons */
+  .action-buttons {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    
+    .action-btn {
+      width: 40px;
+      height: 40px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      
+      &.timeline-btn {
+        background: linear-gradient(135deg, #17a2b8 0%, #20c997 100%);
+        color: white;
+        
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(23, 162, 184, 0.3);
+        }
+      }
+      
+      &.edit-btn {
+        background: linear-gradient(135deg, #2196F3 0%, #42A5F5 100%);
+        color: white;
+        
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(33, 150, 243, 0.3);
+        }
+      }
+      
+      &.delete-btn {
+        background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);
+        color: white;
+        
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(220, 53, 69, 0.3);
+        }
+      }
+      
+      i {
+        font-size: 16px;
+      }
+    }
+  }
+}
+
+/* 📄 PAGINAÇÃO */
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  background: white;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 🎨 ANIMAÇÃO FLOAT */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* 📱 RESPONSIVIDADE */
+@media (max-width: 768px) {
+  .linhas-header .header-content .header-left .header-title {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+    
+    .title-text h1 {
+      font-size: 2.5rem;
+    }
+  }
+  
+  .linhas-content {
+    padding: 0 1rem 1rem 1rem;
+    
+    .search-section .search-box {
+      max-width: 100%;
+    }
+  }
+  
+  .table-section {
+    .modern-table {
+      th.mat-header-cell,
+      td.mat-cell {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.85rem;
+      }
+    }
+    
+    .action-buttons {
+      flex-direction: column;
+      gap: 0.25rem;
+      
+      .action-btn {
+        width: 35px;
+        height: 35px;
+      }
+    }
+  }
+  
+  .pagination-container {
+    margin: 0 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .linhas-header .header-content .header-left .header-title .title-text h1 {
+    font-size: 2rem;
+  }
+  
+  .table-section .modern-table {
+    th.mat-header-cell,
+    td.mat-cell {
+      padding: 0.5rem 0.25rem;
+      font-size: 0.8rem;
+    }
+  }
+}
+
+/* 🎯 FORMULÁRIO MODAL */
+.formulario-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+  
+  .formulario-container {
+    background: white;
+    border-radius: 16px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: slideIn 0.3s ease;
+  }
+}
+
+/* 🎭 ANIMAÇÕES */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

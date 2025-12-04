@@ -1,0 +1,345 @@
+<!-- Modal 2FA - Verificação de Duplo Fator -->
+<div *ngIf="showTwoFactorModal" id="modal-2fa-overlay">
+  <div id="modal-2fa-card">
+    <div class="modal-2fa-header">
+      <div class="security-icon">🔐</div>
+      <h3 class="modal-2fa-title">Verificação de Duplo Fator</h3>
+      <p class="modal-2fa-subtitle">Digite o código enviado para seu e-mail</p>
+    </div>
+    
+    <div class="modal-2fa-body">
+      <!-- SOLUÇÃO SIMPLES: UM ÚNICO ELEMENTO QUE MUDA -->
+      <div id="alert-2fa-message" 
+           [class.alert-error]="twoFactorErrorMessage" 
+           [class.alert-success]="!twoFactorErrorMessage && twoFactorSuccessMessage"
+           [style.display]="twoFactorErrorMessage || twoFactorSuccessMessage ? 'flex' : 'none'"
+           class="alert-2fa">
+        <span class="icon" *ngIf="twoFactorErrorMessage">⚠️</span>
+        <span class="icon" *ngIf="!twoFactorErrorMessage && twoFactorSuccessMessage">✅</span>
+        <span>{{twoFactorErrorMessage || twoFactorSuccessMessage}}</span>
+      </div>
+      
+      <div class="code-input-wrapper">
+        <input 
+          #twoFactorCode
+          type="text" 
+          placeholder="000000" 
+          maxlength="6" 
+          pattern="[0-9]{6}"
+          class="code-input-2fa"
+          autocomplete="off">
+        <div class="code-hint">Código de 6 dígitos</div>
+      </div>
+      
+      <div class="modal-2fa-actions">
+        <button 
+          class="btn-2fa-primary"
+          (click)="verifyTwoFactorCode(twoFactorCode.value)"
+          [disabled]="!twoFactorCode.value || twoFactorCode.value.length < 6">
+          <span class="icon">✅</span>
+          Verificar
+        </button>
+        
+        <button 
+          class="btn-2fa-secondary"
+          (click)="closeTwoFactorModal()">
+          <span class="icon">❌</span>
+          Cancelar
+        </button>
+      </div>
+      
+      <div class="email-info-2fa">
+        <span class="icon">📧</span>
+        <span>Código enviado para <strong>{{twoFactorService.getCurrentUser()?.email}}</strong></span>
+      </div>
+      
+      <button 
+        class="resend-button-2fa"
+        (click)="resendTwoFactorCode()">
+        <span class="icon">🔄</span>
+        Reenviar Código
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="login-container">
+  <!-- Background limpo e profissional -->
+  <div class="background-image">
+    <div class="image-overlay"></div>
+    
+    <!-- Usando imagem real do aeroporto -->
+  </div>
+
+  <!-- Mapa 3D Moderno - Lado Esquerdo -->
+  <div class="modern-map-container">
+    <div class="map-header">
+      <h3 class="map-title">Governança de Recursos</h3>
+      
+      <!-- Frase de Impacto -->
+      <div class="impact-statement">
+        <h4 class="impact-title">Plataforma de Governança Patrimonial</h4>
+        <p class="impact-subtitle">Responsabilidade Corporativa • Da Aquisição ao Descarte</p>
+        <p class="impact-text">
+          "Inventário é saber o que você tem.<br>
+          Governança é saber quem é responsável, desde a nota fiscal até o descarte."
+        </p>
+        <div class="highlight-arrow">⬇️</div>
+      </div>
+    </div>
+    
+    <div class="modern-map">
+      <!-- Fluxo principal -->
+      <div class="flow-line"></div>
+      
+      <!-- Coluna paralela: Compliance e Responsabilidade -->
+      <div class="compliance-column" aria-label="Trilha de compliance e responsabilidade">
+        <div class="compliance-line"></div>
+        
+        <div class="comp-item comp-1">
+          <div class="comp-icon comp-terms">📄</div>
+          <div class="comp-text">Termo de Responsabilidade</div>
+        </div>
+        
+        <div class="comp-item comp-2">
+          <div class="comp-icon comp-audit">🧾</div>
+          <div class="comp-text">Auditoria Governamental</div>
+        </div>
+        
+        <div class="comp-item comp-3">
+          <div class="comp-icon comp-employee">👤</div>
+          <div class="comp-text">Compliance: Colaboradores</div>
+        </div>
+        
+        <div class="comp-item comp-4">
+          <div class="comp-icon comp-third">🤝</div>
+          <div class="comp-text">Compliance: Terceiros/Consultores</div>
+        </div>
+        
+        <div class="comp-item comp-5">
+          <div class="comp-icon comp-byod">📱</div>
+          <div class="comp-text">BYOD</div>
+        </div>
+        
+        <div class="comp-item comp-6">
+          <div class="comp-icon comp-pass">🪪</div>
+          <div class="comp-text">PassCheck</div>
+        </div>
+        
+        <div class="comp-item comp-7">
+          <div class="comp-icon comp-portal">🔎</div>
+          <div class="comp-text">Portal Meu Patrimônio</div>
+        </div>
+        
+        <div class="comp-item comp-8">
+          <div class="comp-icon comp-public">🌐</div>
+          <div class="comp-text">Validação Pública</div>
+        </div>
+      </div>
+      
+      <!-- Container unificado do ciclo de vida -->
+      <div class="lifecycle-container">
+        <div class="lifecycle-card">
+          <div class="lifecycle-item">
+            <div class="step-icon">
+              <div class="icon-bg acquisition-bg"></div>
+              <span class="icon-emoji">📦</span>
+            </div>
+            <div class="step-content">
+              <h4>Aquisição</h4>
+              <p>Novos ativos</p>
+            </div>
+          </div>
+
+          <div class="lifecycle-item">
+            <div class="step-icon">
+              <div class="icon-bg stock-bg"></div>
+              <span class="icon-emoji">🏪</span>
+            </div>
+            <div class="step-content">
+              <h4>Estoque</h4>
+              <p>Armazenamento</p>
+            </div>
+          </div>
+
+          <div class="lifecycle-item">
+            <div class="step-icon">
+              <div class="icon-bg available-bg"></div>
+              <span class="icon-emoji">💻</span>
+            </div>
+            <div class="step-content">
+              <h4>Disponível</h4>
+              <p>Pronto para uso</p>
+            </div>
+          </div>
+
+          <div class="lifecycle-item">
+            <div class="step-icon">
+              <div class="icon-bg request-bg"></div>
+              <span class="icon-emoji">👥</span>
+            </div>
+            <div class="step-content">
+              <h4>Requisição</h4>
+              <p>Solicitação</p>
+            </div>
+          </div>
+
+          <div class="lifecycle-item">
+            <div class="step-icon">
+              <div class="icon-bg maintenance-bg"></div>
+              <span class="icon-emoji">🔧</span>
+            </div>
+            <div class="step-content">
+              <h4>Manutenção</h4>
+              <p>Suporte técnico</p>
+            </div>
+          </div>
+
+          <div class="lifecycle-item">
+            <div class="step-icon">
+              <div class="icon-bg disposal-bg"></div>
+              <span class="icon-emoji">♻️</span>
+            </div>
+            <div class="step-content">
+              <h4>Descarte</h4>
+              <p>Fim do ciclo</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Elementos flutuantes modernos -->
+      <div class="floating-particles">
+        <div class="particle particle-1"></div>
+        <div class="particle particle-2"></div>
+        <div class="particle particle-3"></div>
+        <div class="particle particle-4"></div>
+        <div class="particle particle-5"></div>
+        <div class="particle particle-6"></div>
+      </div>
+
+      <!-- Grid de fundo -->
+      <div class="map-grid"></div>
+    </div>
+  </div>
+
+  <!-- Container principal -->
+  <div class="login-wrapper">
+    <!-- Logo e título -->
+    <div class="brand-section">
+      <div class="logo-container">
+        <!-- Logo do cliente (se disponível) ou logo padrão da SingleOne -->
+        <img 
+          [src]="clienteLogo || '../../../../assets/Branding/logo.png'" 
+          [alt]="clienteLogo ? 'Logo do Cliente' : 'SingleOne'" 
+          class="logo"
+          [class.cliente-logo]="clienteLogo">
+      </div>
+      
+      <!-- Logo da SingleOne (By SingleOne) - sempre visível -->
+      <div class="singleone-logo-container">
+        <span class="by-text">By</span>
+        <img 
+          src="../../../../assets/Branding/logo.png" 
+          alt="SingleOne" 
+          class="singleone-logo">
+      </div>
+      
+      <h1 class="welcome-title">Bem-vindo ao SingleOne</h1>
+      <p class="welcome-subtitle">Sistema de Gestão de Recursos</p>
+    </div>
+
+    <!-- Formulário de login -->
+    <div class="login-form-container">
+      <div class="login-card">
+        <div class="card-header">
+          <h2 class="login-title">
+            <span class="icon">🏛️</span>
+            Acesso à Governança
+          </h2>
+          <p class="login-subtitle">Conecte-se à sua plataforma de compliance</p>
+        </div>
+
+        <form [formGroup]="frmLogin" (ngSubmit)="entrar()" class="login-form">
+          <!-- Campo E-mail -->
+          <div class="form-group">
+            <label class="form-label">
+              <span class="icon">📧</span>
+              E-mail
+            </label>
+            <div class="input-container">
+              <input 
+                type="email" 
+                formControlName="usuario" 
+                placeholder="Digite seu e-mail"
+                class="form-input"
+                required>
+              <div class="input-focus-border"></div>
+            </div>
+          </div>
+
+          <!-- Campo Senha -->
+          <div class="form-group">
+            <label class="form-label">
+              <span class="icon">🔒</span>
+              Senha
+            </label>
+            <div class="input-container password-input-container">
+              <input 
+                [type]="showPassword ? 'text' : 'password'" 
+                formControlName="senha" 
+                placeholder="Digite sua senha"
+                class="form-input"
+                required>
+              <button 
+                type="button" 
+                class="password-toggle-btn"
+                (click)="togglePasswordVisibility()"
+                [attr.aria-label]="showPassword ? 'Ocultar senha' : 'Mostrar senha'">
+                <span class="password-icon" [class.visible]="showPassword">
+                  {{ showPassword ? '👁️' : '👁️‍🗨️' }}
+                </span>
+              </button>
+              <div class="input-focus-border"></div>
+            </div>
+          </div>
+
+          <!-- Botão de Login -->
+          <button type="submit" class="login-button" [disabled]="!frmLogin.valid">
+            <span class="button-text">Acessar Governança</span>
+            <span class="button-icon">⚖️</span>
+          </button>
+
+          <!-- Links de ajuda -->
+          <div class="help-links">
+            <a routerLink="/esqueci-senha" class="help-link">
+              <span class="icon">❓</span>
+              Esqueci minha senha
+            </a>
+          </div>
+        </form>
+
+        <!-- Footer do card -->
+        <div class="card-footer">
+          <p class="footer-text">
+            <span class="icon">🏛️</span>
+            Governança segura e confiável
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Informações adicionais -->
+    <div class="info-section">
+      <div class="info-card">
+        <h3 class="info-title">🏛️ Excelência em Governança</h3>
+        <ul class="info-list">
+          <li>Rastreabilidade completa do ciclo de vida</li>
+          <li>Compliance regulatório e auditoria</li>
+          <li>Responsabilização por todos os stakeholders</li>
+          <li>Segurança e integridade dos dados</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

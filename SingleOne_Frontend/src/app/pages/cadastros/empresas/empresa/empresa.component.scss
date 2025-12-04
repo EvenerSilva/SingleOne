@@ -1,0 +1,915 @@
+/* 🎯 HEADER MODERNO DA EMPRESA */
+.empresa-header {
+  background: linear-gradient(135deg, #080039 0%, #1a1a2e 100%);
+  color: white;
+  padding: 2rem 2rem 2.5rem 2rem;
+  margin-bottom: 2rem;
+  border-radius: 0 0 20px 20px;
+  box-shadow: 0 8px 32px rgba(8, 0, 57, 0.3);
+  
+  .header-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+    @media (max-width: 768px) {
+      flex-direction: column;
+      gap: 1.5rem;
+      text-align: center;
+    }
+  }
+  
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    
+    .back-button {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      padding: 0.75rem;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      
+      &:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-2px);
+      }
+      
+      i {
+        font-size: 20px;
+      }
+    }
+    
+    .header-title {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      
+      .title-icon {
+        background: linear-gradient(135deg, #FF3A0F 0%, #ff6b3d 100%);
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 8px 25px rgba(255, 58, 15, 0.3);
+        animation: float 3s ease-in-out infinite;
+        
+        i {
+          font-size: 32px;
+          color: white;
+        }
+      }
+      
+      .title-text {
+        h1 {
+          font-size: 3.2rem;
+          font-weight: 700;
+          margin: 0;
+          text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+          
+          @media (max-width: 768px) {
+            font-size: 2.2rem;
+          }
+        }
+        
+        p {
+          font-size: 1.2rem;
+          margin: 0.5rem 0 0 0;
+          opacity: 0.9;
+          font-weight: 300;
+        }
+      }
+    }
+  }
+  
+  .header-right {
+    display: flex;
+    gap: 1rem;
+    
+    @media (max-width: 768px) {
+      flex-direction: column;
+      width: 100%;
+    }
+    
+    .action-btn {
+      background: linear-gradient(135deg, #FF3A0F 0%, #ff6b3d 100%);
+      border: none;
+      border-radius: 12px;
+      padding: 0.875rem 1.5rem;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.95rem;
+      
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(255, 58, 15, 0.4);
+      }
+      
+      &.secondary-btn {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        
+        &:hover {
+          background: rgba(255, 255, 255, 0.2);
+        }
+      }
+      
+      i {
+        font-size: 18px;
+      }
+    }
+  }
+}
+
+/* 🍞 BREADCRUMB MODERNO */
+.modern-breadcrumb {
+  background: white;
+  padding: 1rem 2rem;
+  margin-bottom: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  
+  .breadcrumb-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.95rem;
+    
+    .breadcrumb-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #666;
+      text-decoration: none;
+      transition: color 0.3s ease;
+      
+      &:hover {
+        color: #FF3A0F;
+      }
+      
+      &.active {
+        color: #080039;
+        font-weight: 600;
+      }
+      
+      i {
+        font-size: 16px;
+      }
+    }
+    
+    i.cil-chevron-right {
+      color: #ccc;
+      font-size: 14px;
+    }
+  }
+}
+
+/* 📋 CONTEÚDO PRINCIPAL */
+.empresa-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem 2rem 2rem;
+  
+  .form-container {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+  }
+}
+
+/* 🎯 SEÇÕES DO FORMULÁRIO */
+.form-section {
+  padding: 2rem;
+  border-bottom: 1px solid #f0f0f0;
+  
+  &:last-child {
+    border-bottom: none;
+  }
+  
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    
+    .section-icon {
+      background: linear-gradient(135deg, #080039 0%, #1a1a2e 100%);
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      
+      i {
+        font-size: 24px;
+        color: white;
+      }
+    }
+    
+    .section-title {
+      h3 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 0;
+        color: #080039;
+      }
+      
+      p {
+        font-size: 0.95rem;
+        margin: 0.25rem 0 0 0;
+        color: #666;
+      }
+    }
+  }
+}
+
+/* ℹ️ SEÇÃO DE INFORMAÇÃO SOBRE WIZARD */
+.info-section {
+  padding: 2rem;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-bottom: 1px solid #f0f0f0;
+  
+  .info-content {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+    
+    .info-icon {
+      background: linear-gradient(135deg, #17a2b8 0%, #20c997 100%);
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      
+      i {
+        font-size: 28px;
+        color: white;
+      }
+    }
+    
+    .info-text {
+      flex: 1;
+      
+      h3 {
+        font-size: 1.3rem;
+        font-weight: 600;
+        margin: 0 0 0.5rem 0;
+        color: #080039;
+      }
+      
+      p {
+        font-size: 0.95rem;
+        margin: 0 0 1rem 0;
+        color: #666;
+        line-height: 1.5;
+        
+        strong {
+          color: #080039;
+          font-weight: 600;
+        }
+      }
+      
+      .action-btn {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        border: none;
+        border-radius: 12px;
+        padding: 0.75rem 1.5rem;
+        color: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 600;
+        text-decoration: none;
+        
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
+        }
+        
+        i {
+          font-size: 18px;
+        }
+        
+        span {
+          font-size: 0.95rem;
+        }
+      }
+    }
+  }
+}
+
+/* 🔲 GRID DO FORMULÁRIO */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  
+  .form-field {
+    &.full-width {
+      grid-column: 1 / -1;
+    }
+    
+    .field-label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+      color: #080039;
+      margin-bottom: 0.75rem;
+      font-size: 0.95rem;
+      
+      i {
+        font-size: 18px;
+        color: #FF3A0F;
+      }
+    }
+    
+    .modern-input {
+      width: 100%;
+      padding: 0.875rem 1rem;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+      background: white;
+      
+      &:focus {
+        outline: none;
+        border-color: #FF3A0F;
+        box-shadow: 0 0 0 3px rgba(255, 58, 15, 0.1);
+      }
+      
+      &::placeholder {
+        color: #999;
+      }
+    }
+    
+    /* CHECKBOX MODERNO */
+    &.checkbox-field {
+      .checkbox-label {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        cursor: pointer;
+        
+        .modern-checkbox {
+          display: none;
+        }
+        
+        .checkmark {
+          width: 24px;
+          height: 24px;
+          border: 2px solid #e0e0e0;
+          border-radius: 6px;
+          position: relative;
+          transition: all 0.3s ease;
+          
+          &:after {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 4px;
+            width: 6px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+          }
+        }
+        
+        .modern-checkbox:checked + .checkmark {
+          background: #FF3A0F;
+          border-color: #FF3A0F;
+          
+          &:after {
+            opacity: 1;
+          }
+        }
+        
+        .label-text {
+          font-weight: 500;
+          color: #080039;
+        }
+      }
+    }
+  }
+}
+
+/* 🏢 SEÇÃO DE FILIAIS */
+.filiais-container {
+  .filiais-list {
+    margin-bottom: 2rem;
+    
+    .filial-item {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      border: 1px solid #e0e0e0;
+      
+      .filial-info {
+        .filial-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 1rem;
+          
+          h4 {
+            margin: 0;
+            color: #080039;
+            font-size: 1.1rem;
+            font-weight: 600;
+          }
+          
+          .filial-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            
+            .filial-id {
+              font-size: 0.8rem;
+              color: #666;
+              background: #e9ecef;
+              padding: 0.25rem 0.5rem;
+              border-radius: 4px;
+              font-family: monospace;
+            }
+          }
+          
+          .remove-btn {
+            background: #dc3545;
+            border: none;
+            border-radius: 8px;
+            padding: 0.5rem;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            
+            &:hover {
+              background: #c82333;
+              transform: scale(1.05);
+            }
+            
+            i {
+              font-size: 16px;
+            }
+          }
+        }
+        
+        .filial-details {
+          display: flex;
+          gap: 1rem;
+          align-items: center;
+          
+          .filial-localizacao {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #666;
+            font-size: 0.9rem;
+            
+            i {
+              color: #FF3A0F;
+            }
+          }
+          
+          .filial-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            
+            &.active {
+              background: #d4edda;
+              color: #155724;
+            }
+            
+            &.inactive {
+              background: #f8d7da;
+              color: #721c24;
+            }
+          }
+          
+          .filial-cliente {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #666;
+            font-size: 0.9rem;
+            
+            i {
+              color: #FF3A0F;
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  .add-filial-section {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 2px dashed #dee2e6;
+    
+    .add-filial-form {
+      .form-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+        align-items: end;
+      }
+    }
+  }
+  
+  .no-items-message {
+    text-align: center;
+    padding: 2rem;
+    color: #666;
+    background: #f8f9fa;
+    border-radius: 12px;
+    border: 2px dashed #dee2e6;
+    
+    i {
+      font-size: 3rem;
+      color: #ccc;
+      margin-bottom: 1rem;
+      display: block;
+    }
+    
+    p {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 500;
+    }
+  }
+}
+
+/* 📍 SEÇÃO DE LOCALIZAÇÕES */
+.localizacoes-container {
+  .localizacoes-list {
+    margin-bottom: 2rem;
+    
+    .localizacao-item {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      border: 1px solid #e0e0e0;
+      
+      .localizacao-info {
+        .localizacao-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 1rem;
+          
+          h4 {
+            margin: 0;
+            color: #080039;
+            font-size: 1.1rem;
+            font-weight: 600;
+          }
+          
+          .localizacao-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            
+            .localizacao-id {
+              font-size: 0.8rem;
+              color: #666;
+              background: #e9ecef;
+              padding: 0.25rem 0.5rem;
+              border-radius: 4px;
+              font-family: monospace;
+            }
+          }
+          
+          .remove-btn {
+            background: #dc3545;
+            border: none;
+            border-radius: 8px;
+            padding: 0.5rem;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            
+            &:hover {
+              background: #c82333;
+              transform: scale(1.05);
+            }
+            
+            i {
+              font-size: 16px;
+            }
+          }
+        }
+        
+        .localizacao-details {
+          display: flex;
+          gap: 1rem;
+          align-items: center;
+          
+          .localizacao-cidade {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #666;
+            font-size: 0.9rem;
+            
+            i {
+              color: #FF3A0F;
+            }
+          }
+          
+          .localizacao-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            
+            &.active {
+              background: #d4edda;
+              color: #155724;
+            }
+            
+            &.inactive {
+              background: #f8d7da;
+              color: #721c24;
+            }
+          }
+          
+          .localizacao-cliente {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #666;
+            font-size: 0.9rem;
+            
+            i {
+              color: #FF3A0F;
+            }
+          }
+          
+          .localizacao-migrate {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #666;
+            font-size: 0.9rem;
+            
+            i {
+              color: #17a2b8;
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  .add-localizacao-section {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 2px dashed #dee2e6;
+    
+    .add-localizacao-form {
+      .form-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        align-items: end;
+      }
+    }
+  }
+}
+
+/* 🎯 BOTÕES DE AÇÃO */
+.form-actions {
+  padding: 2rem;
+  background: #f8f9fa;
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  border-top: 1px solid #e0e0e0;
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    
+    .action-btn {
+      width: 100%;
+    }
+  }
+  
+  .action-btn {
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+    
+    &:hover {
+      transform: translateY(-2px);
+    }
+    
+    &.primary-btn {
+      background: linear-gradient(135deg, #FF3A0F 0%, #ff6b3d 100%);
+      color: white;
+      
+      &:hover {
+        box-shadow: 0 8px 25px rgba(255, 58, 15, 0.4);
+      }
+      
+      &:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+    }
+    
+    &.secondary-btn {
+      background: white;
+      color: #666;
+      border: 2px solid #e0e0e0;
+      
+      &:hover {
+        border-color: #FF3A0F;
+        color: #FF3A0F;
+      }
+    }
+    
+    i {
+      font-size: 18px;
+    }
+  }
+}
+
+/* 🎨 ANIMAÇÕES */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* 📱 RESPONSIVIDADE */
+@media (max-width: 768px) {
+  .empresa-header {
+    padding: 1.5rem 1rem 2rem 1rem;
+    
+    .header-content {
+      .header-left {
+        .header-title {
+          .title-text {
+            h1 {
+              font-size: 2rem;
+            }
+            
+            p {
+              font-size: 1rem;
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  .modern-breadcrumb {
+    padding: 1rem;
+    margin: 0 1rem 1.5rem 1rem;
+  }
+  
+  .empresa-content {
+    padding: 0 1rem 1.5rem 1rem;
+  }
+  
+  .form-section {
+    padding: 1.5rem;
+    
+    .section-header {
+      flex-direction: column;
+      text-align: center;
+      gap: 0.75rem;
+    }
+  }
+  
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .filiais-container,
+  .localizacoes-container {
+    .add-filial-section,
+    .add-localizacao-section {
+      .add-filial-form,
+      .add-localizacao-form {
+        .form-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    }
+  }
+}
+
+/* 🚨 ESTILOS PARA MENSAGENS DE ERRO */
+.error-message {
+  margin-top: 0.5rem;
+  padding: 0.75rem;
+  background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+  border: 1px solid #f44336;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(244, 67, 54, 0.2);
+  
+  .error-text {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #d32f2f;
+    font-size: 0.9rem;
+    font-weight: 500;
+    
+    i {
+      color: #f44336;
+      font-size: 16px;
+    }
+  }
+}
+
+/* 🎯 ESTILOS PARA CAMPOS COM ERRO */
+.modern-input.error {
+  border-color: #f44336 !important;
+  box-shadow: 0 0 0 2px rgba(244, 67, 54, 0.2) !important;
+  
+  &:focus {
+    border-color: #f44336 !important;
+    box-shadow: 0 0 0 2px rgba(244, 67, 54, 0.3) !important;
+  }
+}
+
+/* 🗺️ ESTILOS PARA SELECT DE LOCALIDADE MELHORADO */
+.localidade-select {
+  width: 100%;
+  min-height: 50px;
+  padding: 12px 16px;
+  font-size: 14px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background: white;
+  transition: all 0.3s ease;
+  
+  &:focus {
+    outline: none;
+    border-color: #FF3A0F;
+    box-shadow: 0 0 0 3px rgba(255, 58, 15, 0.1);
+  }
+  
+  option {
+    padding: 8px 12px;
+    font-size: 14px;
+    
+    &:first-child {
+      color: #666;
+      font-style: italic;
+    }
+  }
+}

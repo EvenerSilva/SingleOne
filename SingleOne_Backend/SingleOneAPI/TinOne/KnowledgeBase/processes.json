@@ -1,0 +1,121 @@
+{
+  "criar-requisicao": {
+    "ProcessoId": "criar-requisicao",
+    "Nome": "Criar Nova Requisição",
+    "Descricao": "Processo completo para criar uma requisição de equipamentos para colaborador",
+    "Passos": [
+      {
+        "Numero": 1,
+        "Titulo": "Acessar o Menu",
+        "Descricao": "Vá em Menu → Requisições → Nova Requisição",
+        "Dica": "Você também pode acessar pelo botão '+' no dashboard"
+      },
+      {
+        "Numero": 2,
+        "Titulo": "Selecionar Colaborador",
+        "Descricao": "Busque e selecione o colaborador que receberá os equipamentos",
+        "Dica": "Você pode buscar por nome, CPF ou matrícula"
+      },
+      {
+        "Numero": 3,
+        "Titulo": "Escolher Equipamentos",
+        "Descricao": "Selecione os equipamentos disponíveis que deseja requisitar",
+        "Dica": "Filtre por tipo, localização ou status para encontrar mais rápido"
+      },
+      {
+        "Numero": 4,
+        "Titulo": "Definir Data de Entrega",
+        "Descricao": "Informe a data prevista para entrega dos equipamentos",
+        "Dica": "A data não pode ser anterior à data atual"
+      },
+      {
+        "Numero": 5,
+        "Titulo": "Revisar e Salvar",
+        "Descricao": "Revise todos os dados e clique em 'Salvar'",
+        "Dica": "Após salvar, o colaborador receberá um email com o termo de responsabilidade"
+      }
+    ],
+    "UrlDestino": "/requisicao/nova",
+    "TempoEstimado": "3-5 minutos"
+  },
+  
+  "cadastrar-equipamento": {
+    "ProcessoId": "cadastrar-equipamento",
+    "Nome": "Cadastrar Equipamento",
+    "Descricao": "Como cadastrar um novo equipamento no sistema",
+    "Passos": [
+      {
+        "Numero": 1,
+        "Titulo": "Acessar Cadastros",
+        "Descricao": "Menu → Cadastros → Equipamentos → Novo",
+        "Dica": "Tenha em mãos: nota fiscal, número de série e dados do equipamento"
+      },
+      {
+        "Numero": 2,
+        "Titulo": "Dados Básicos",
+        "Descricao": "Preencha tipo, fabricante, modelo e número de série",
+        "Dica": "O número de série deve ser único no sistema"
+      },
+      {
+        "Numero": 3,
+        "Titulo": "Patrimônio",
+        "Descricao": "Informe o número de patrimônio (se houver)",
+        "Dica": "Patrimônio é opcional mas recomendado para controle"
+      },
+      {
+        "Numero": 4,
+        "Titulo": "Nota Fiscal",
+        "Descricao": "Vincule a nota fiscal de aquisição",
+        "Dica": "Isso ajuda no controle de garantias e valor"
+      },
+      {
+        "Numero": 5,
+        "Titulo": "Localização",
+        "Descricao": "Defina empresa, centro de custo e localidade",
+        "Dica": "Isso facilita encontrar o equipamento depois"
+      }
+    ],
+    "UrlDestino": "/equipamento/novo",
+    "TempoEstimado": "5-7 minutos"
+  },
+  
+  "fazer-devolucao": {
+    "ProcessoId": "fazer-devolucao",
+    "Nome": "Devolver Equipamento",
+    "Descricao": "Como fazer a devolução de equipamentos de colaboradores",
+    "Passos": [
+      {
+        "Numero": 1,
+        "Titulo": "Acessar Movimentações",
+        "Descricao": "Menu → Movimentações → Entregas e Devoluções",
+        "Dica": "Use os filtros para encontrar o equipamento mais rápido"
+      },
+      {
+        "Numero": 2,
+        "Titulo": "Localizar Equipamento",
+        "Descricao": "Busque o equipamento que será devolvido",
+        "Dica": "Você pode buscar por número de série ou patrimônio"
+      },
+      {
+        "Numero": 3,
+        "Titulo": "Iniciar Devolução",
+        "Descricao": "Clique no botão 'Devolver' do equipamento",
+        "Dica": "Verifique se o equipamento está realmente com o colaborador"
+      },
+      {
+        "Numero": 4,
+        "Titulo": "Informar Motivo",
+        "Descricao": "Preencha o motivo da devolução",
+        "Dica": "Isso é importante para histórico e auditoria"
+      },
+      {
+        "Numero": 5,
+        "Titulo": "Confirmar",
+        "Descricao": "Revise e confirme a devolução",
+        "Dica": "O colaborador receberá confirmação por email"
+      }
+    ],
+    "UrlDestino": "/movimentacoes/entregas-devolucoes",
+    "TempoEstimado": "2-3 minutos"
+  }
+}

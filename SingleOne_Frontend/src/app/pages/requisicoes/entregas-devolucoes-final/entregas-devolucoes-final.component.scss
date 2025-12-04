@@ -1,0 +1,404 @@
+/* 🎯 HEADER MODERNO */
+.entrega-header {
+  background: linear-gradient(135deg, #080039 0%, #1a1a2e 100%);
+  color: white;
+  padding: 2rem 2rem 2.5rem 2rem;
+  margin-bottom: 2rem;
+  border-radius: 0 0 20px 20px;
+  box-shadow: 0 8px 32px rgba(8, 0, 57, 0.3);
+  
+  .header-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      
+      .back-button {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        padding: 0.75rem;
+        color: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        
+        &:hover {
+          background: rgba(255, 255, 255, 0.2);
+          transform: translateY(-2px);
+        }
+        
+        i {
+          font-size: 20px;
+        }
+      }
+      
+      .header-icon {
+        background: linear-gradient(135deg, #FF3A0F 0%, #ff6b3d 100%);
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 15px rgba(255, 58, 15, 0.3);
+        
+        i {
+          font-size: 28px;
+          color: white;
+        }
+      }
+      
+      .header-text {
+        h1 {
+          font-size: 2.5rem;
+          font-weight: 700;
+          margin: 0;
+          color: white;
+          text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+          
+          @media (max-width: 768px) {
+            font-size: 2rem;
+          }
+        }
+        
+        p {
+          font-size: 1rem;
+          margin: 0.5rem 0 0 0;
+          color: rgba(255, 255, 255, 0.8);
+          font-weight: 400;
+        }
+      }
+    }
+  }
+}
+
+/* 🍞 BREADCRUMB MODERNO */
+.modern-breadcrumb {
+  background: white;
+  padding: 1rem 2rem;
+  margin: 0 2rem 2rem 2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  max-width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
+  
+  .breadcrumb-container {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.9rem;
+    
+    .breadcrumb-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #6c757d;
+      text-decoration: none;
+      transition: color 0.3s ease;
+      
+      &:hover {
+        color: #FF3A0F;
+      }
+      
+      &.active {
+        color: #2c3e50;
+        font-weight: 600;
+      }
+      
+      i {
+        font-size: 16px;
+      }
+    }
+    
+    .breadcrumb-separator {
+      color: #dee2e6;
+      font-size: 18px;
+    }
+  }
+}
+
+/* 📋 CONTEÚDO PRINCIPAL */
+.entrega-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem 2rem 2rem;
+}
+
+/* 🎯 SEÇÕES */
+.colaborador-section,
+.recursos-section {
+  margin-bottom: 3rem;
+  
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 16px;
+    border: 1px solid #dee2e6;
+    
+    @media (max-width: 768px) {
+      flex-direction: column;
+      text-align: center;
+      gap: 1rem;
+    }
+    
+    .header-content {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      
+      @media (max-width: 768px) {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      
+      .header-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        
+        i {
+          font-size: 24px;
+          color: white;
+        }
+      }
+      
+      .header-text {
+        h2 {
+          font-size: 1.5rem;
+          font-weight: 600;
+          color: #2c3e50;
+          margin: 0 0 0.5rem 0;
+        }
+        
+        p {
+          color: #6c757d;
+          margin: 0;
+          font-size: 0.9rem;
+        }
+      }
+    }
+  }
+}
+
+/* 🎯 CARD DE COLABORADOR */
+.colaborador-card {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e9ecef;
+  
+  .colaborador-select {
+    width: 100%;
+    
+    ::ng-deep .mat-form-field-wrapper {
+      padding-bottom: 0;
+    }
+    
+    ::ng-deep .mat-form-field-outline {
+      color: #dee2e6;
+    }
+    
+    ::ng-deep .mat-form-field-outline-thick {
+      color: #FF3A0F;
+    }
+  }
+}
+
+/* 📦 CARD DE INFORMAÇÕES */
+.info-card {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border: 1px solid #90caf9;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  
+  .info-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    
+    i {
+      color: #1976d2;
+      font-size: 24px;
+    }
+    
+    p {
+      margin: 0;
+      color: #1565c0;
+      font-weight: 500;
+    }
+  }
+}
+
+/* 📊 TABELA DE RECURSOS */
+.recursos-table-container {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e9ecef;
+  overflow-x: auto;
+  
+  .recursos-table {
+    width: 100%;
+    
+    .header-row {
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      
+      .header-cell {
+        font-weight: 600;
+        color: #2c3e50;
+        padding: 1rem;
+        border-bottom: 2px solid #dee2e6;
+        
+        i {
+          margin-right: 0.5rem;
+          color: #FF3A0F;
+          font-size: 18px;
+        }
+      }
+    }
+    
+    .data-row {
+      &:hover {
+        background: #f8f9fa;
+      }
+      
+      .data-cell {
+        padding: 1.5rem 1rem;
+        border-bottom: 1px solid #e9ecef;
+        vertical-align: top;
+        
+        .recurso-info {
+          .recurso-nome {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.25rem;
+          }
+          
+          .recurso-serial {
+            color: #6c757d;
+            font-size: 0.9rem;
+          }
+        }
+        
+        .observacao-field,
+        .data-field {
+          width: 100%;
+          
+          ::ng-deep .mat-form-field-wrapper {
+            padding-bottom: 0;
+          }
+          
+          ::ng-deep .mat-form-field-outline {
+            color: #dee2e6;
+          }
+          
+          ::ng-deep .mat-form-field-outline-thick {
+            color: #FF3A0F;
+          }
+        }
+      }
+    }
+  }
+}
+
+/* 🎯 SEÇÃO DE AÇÕES */
+.actions-section {
+  margin-top: 3rem;
+  padding: 2rem 0;
+  
+  .actions-container {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    
+    @media (max-width: 768px) {
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .action-button {
+      min-width: 200px;
+      height: 50px;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: all 0.3s ease;
+      
+      i {
+        font-size: 20px;
+      }
+      
+      &.primary {
+        background: linear-gradient(135deg, #FF3A0F 0%, #ff6b3d 100%);
+        color: white;
+        box-shadow: 0 4px 15px rgba(255, 58, 15, 0.3);
+        
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(255, 58, 15, 0.4);
+        }
+      }
+      
+      &.secondary {
+        background: white;
+        color: #6c757d;
+        border: 2px solid #dee2e6;
+        
+        &:hover {
+          background: #f8f9fa;
+          border-color: #FF3A0F;
+          color: #FF3A0F;
+        }
+      }
+    }
+  }
+}
+
+
+/* 📱 RESPONSIVIDADE */
+@media (max-width: 768px) {
+  .entrega-content {
+    padding: 0 1rem 2rem 1rem;
+  }
+  
+  .modern-breadcrumb {
+    margin: 0 1rem 2rem 1rem;
+    padding: 1rem;
+  }
+  
+  .recursos-table-container {
+    padding: 1rem;
+  }
+  
+  .recursos-table {
+    .header-cell,
+    .data-cell {
+      padding: 0.75rem 0.5rem;
+    }
+  }
+}

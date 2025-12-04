@@ -1,0 +1,551 @@
+<!-- 🎯 HEADER MODERNO DA ANÁLISE DE COLABORADORES SEM RECURSOS -->
+<div class="colaboradores-sem-recursos-header">
+  <div class="header-content">
+    <div class="header-left">
+      <button class="back-button" [routerLink]="['/relatorios']" matTooltip="Voltar para Relatórios">
+        <i class="cil-arrow-left"></i>
+      </button>
+      <div class="header-title">
+        <div class="title-icon">
+          <i class="cil-people"></i>
+        </div>
+        <div class="title-text">
+          <h1>Colaboradores sem Recursos</h1>
+          <p>Análise de inconsistências e elegibilidade para recursos</p>
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="btn-forcar-inventario" 
+              (click)="abrirModalForcarInventario()" 
+              matTooltip="Forçar Inventário para Selecionados"
+              [disabled]="colaboradoresSelecionados.length === 0">
+        <i class="cil-task"></i>
+        <span>Forçar Inventário ({{colaboradoresSelecionados.length}})</span>
+      </button>
+      <button class="btn-exportar" 
+              (click)="exportarDados()" 
+              matTooltip="Exportar Dados" 
+              [disabled]="!colaboradores || colaboradores.length === 0">
+        <i class="cil-cloud-download"></i>
+        <span>Exportar Dados</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 🍞 BREADCRUMB MODERNO -->
+<nav class="modern-breadcrumb">
+  <div class="breadcrumb-container">
+    <a [routerLink]="['/dashboard']" class="breadcrumb-item">
+      <i class="cil-home"></i>
+      <span>Dashboard</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a [routerLink]="['/relatorios']" class="breadcrumb-item">
+      <i class="cil-timeline"></i>
+      <span>Relatórios e Timeline</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <span class="breadcrumb-item active">Colaboradores sem Recursos</span>
+  </div>
+</nav>
+
+<!-- 📋 CONTEÚDO PRINCIPAL -->
+<div class="colaboradores-sem-recursos-content">
+  <!-- 🔍 SEÇÃO DE FILTROS -->
+  <div class="filters-section">
+    <div class="filters-container">
+      <div class="filters-header">
+        <button class="toggle-filters-btn">
+          <i class="cil-filter"></i>
+          <span>Filtros de Pesquisa</span>
+        </button>
+      </div>
+      <div class="filters-content">
+        <div class="filters-grid">
+          <!-- Cargo (Campo de Texto Livre) -->
+          <div class="filter-field highlighted">
+            <label><i class="cil-briefcase"></i> Cargo (Principal)</label>
+            <input type="text" class="modern-input" [(ngModel)]="filtros.cargo" 
+                   placeholder="Digite o cargo para buscar" />
+          </div>
+
+          <!-- Tipo de Colaborador -->
+          <div class="filter-field">
+            <label><i class="cil-user"></i> Tipo de Colaborador</label>
+            <select class="modern-select" [(ngModel)]="filtros.tipoColaborador">
+              <option [ngValue]="null">Todos os tipos</option>
+              <option *ngFor="let tipo of tiposColaborador" [ngValue]="tipo.id">
+                {{ tipo.descricao }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Empresa -->
+          <div class="filter-field">
+            <label><i class="cil-building"></i> Empresa</label>
+            <select class="modern-select" [(ngModel)]="filtros.empresa">
+              <option [ngValue]="null">Todas as empresas</option>
+              <option *ngFor="let empresa of empresas" [ngValue]="empresa.id">
+                {{ empresa.nome }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Localidade -->
+          <div class="filter-field">
+            <label><i class="cil-location-pin"></i> Localidade</label>
+            <select class="modern-select" [(ngModel)]="filtros.localidade">
+              <option [ngValue]="null">Todas as localidades</option>
+              <option *ngFor="let localidade of localidades" [ngValue]="localidade.id">
+                {{ localidade.descricao }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Centro de Custo -->
+          <div class="filter-field">
+            <label><i class="cil-dollar"></i> Centro de Custo</label>
+            <select class="modern-select" [(ngModel)]="filtros.centroCusto">
+              <option [ngValue]="null">Todos os centros</option>
+              <option *ngFor="let centro of centrosCusto" [ngValue]="centro.id">
+                {{ centro.nome }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Nome do Colaborador -->
+          <div class="filter-field">
+            <label><i class="cil-magnifying-glass"></i> Nome do Colaborador</label>
+            <input type="text" class="modern-input" [(ngModel)]="filtros.nome" 
+                   placeholder="Digite o nome do colaborador" />
+          </div>
+
+          <div class="filter-actions">
+            <!-- Grupo de Ações (Esquerda) -->
+            <div class="actions-left">
+              <button class="action-btn primary-btn" (click)="consultar()" [disabled]="loading">
+                <i class="cil-search"></i>
+                <span>Pesquisar</span>
+              </button>
+              <button class="action-btn secondary-btn" (click)="limparBusca()">
+                <i class="cil-x-circle"></i>
+                <span>Limpar</span>
+              </button>
+            </div>
+            
+            <!-- Grupo de Toggles (Direita) -->
+            <div class="actions-right">
+              <!-- 🚫 Toggle para ocultar desligados -->
+              <div class="toggle-filter" [class.active]="ocultarDesligados">
+                <label class="toggle-label">
+                  <input type="checkbox" 
+                         [(ngModel)]="ocultarDesligados" 
+                         (change)="toggleOcultarDesligados()" />
+                  <span class="toggle-text">
+                    <i class="cil-user-unfollow"></i>
+                    Ocultar desligados
+                  </span>
+                </label>
+              </div>
+              
+              <!-- 📋 Toggle para ocultar colaboradores com inventário pendente -->
+              <div class="toggle-filter" [class.active]="ocultarComInventarioPendente">
+                <label class="toggle-label">
+                  <input type="checkbox" 
+                         [(ngModel)]="ocultarComInventarioPendente" 
+                         (change)="toggleOcultarComInventarioPendente()" />
+                  <span class="toggle-text">
+                    <i class="cil-clipboard"></i>
+                    Ocultar com inventário pendente
+                  </span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 📊 SEÇÃO DE MÉTRICAS -->
+  <div class="metrics-section" *ngIf="colaboradores && colaboradores.length > 0">
+    <div class="metrics-grid">
+      <div class="metric-card primary">
+        <div class="metric-icon">
+          <i class="cil-people"></i>
+        </div>
+        <div class="metric-info">
+          <div class="metric-value">{{ getTotalColaboradores() }}</div>
+          <div class="metric-label">Total de Colaboradores</div>
+        </div>
+      </div>
+      
+      <div class="metric-card danger">
+        <div class="metric-icon">
+          <i class="cil-warning"></i>
+        </div>
+        <div class="metric-info">
+          <div class="metric-value">{{ colaboradoresSelecionados.length }}</div>
+          <div class="metric-label">Selecionados para Inventário</div>
+        </div>
+      </div>
+      
+      <div class="metric-card info">
+        <div class="metric-icon">
+          <i class="cil-clipboard"></i>
+        </div>
+        <div class="metric-info">
+          <div class="metric-value">{{ colaboradoresComInventarioPendente.length }}</div>
+          <div class="metric-label">Com Inventário Pendente</div>
+        </div>
+      </div>
+      
+      <div class="metric-card info">
+        <div class="metric-icon">
+          <i class="cil-people"></i>
+        </div>
+        <div class="metric-info">
+          <div class="metric-value">{{ getTiposDistintos() }}</div>
+          <div class="metric-label">Tipos de Colaborador</div>
+        </div>
+      </div>
+
+      <div class="metric-card warning">
+        <div class="metric-icon">
+          <i class="cil-building"></i>
+        </div>
+        <div class="metric-info">
+          <div class="metric-value">{{ getEmpresasDistintas() }}</div>
+          <div class="metric-label">Empresas Distintas</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🚨 ALERTA DE INCONSISTÊNCIAS -->
+  <div class="alert-section" *ngIf="colaboradores && colaboradores.length > 0">
+    <div class="alert-box warning-alert">
+      <div class="alert-icon">
+        <i class="cil-warning"></i>
+      </div>
+      <div class="alert-content">
+        <h3>⚠️ Colaboradores Sem Recursos Detectados</h3>
+        <p>Foram encontrados <strong>{{ getTotalColaboradores() }}</strong> colaboradores que não possuem nenhum recurso associado.</p>
+        <p class="alert-detail">
+          <strong>Ação recomendada:</strong> Analise se esses colaboradores são elegíveis para receber recursos. 
+          Caso sejam, selecione-os e force o inventário para que eles informem seus recursos ativos.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🔄 CONTAINER DE LOADING -->
+  <div class="loading-container" *ngIf="loading">
+    <div class="loading-spinner"></div>
+    <p>Carregando dados...</p>
+  </div>
+
+  <!-- 📋 SEÇÃO DA TABELA -->
+  <div class="table-section" *ngIf="!loading">
+    <div class="table-container">
+      <div class="scroll-indicator" *ngIf="dadosPagina.length > 0">
+        <i class="cil-arrow-left"></i>
+        <span>Deslize horizontalmente para ver mais colunas</span>
+        <i class="cil-arrow-right"></i>
+      </div>
+      
+      <table class="modern-table detailed-table">
+        <thead>
+          <tr>
+            <th class="checkbox-column">
+              <input type="checkbox" 
+                     [checked]="isTodosSelecionados()" 
+                     (change)="selecionarTodos()"
+                     [disabled]="dadosPagina.length === 0" />
+            </th>
+            <th>Nome</th>
+            <th>Matrícula</th>
+            <th>Cargo</th>
+            <th>Empresa</th>
+            <th>Localidade</th>
+            <th>Centro de Custo</th>
+            <th>Tipo</th>
+            <th>Data Admissão</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let colaborador of dadosPagina" [class.selected-row]="isColaboradorSelecionado(colaborador)">
+            <td class="checkbox-column">
+              <input type="checkbox" 
+                     [checked]="isColaboradorSelecionado(colaborador)" 
+                     (change)="toggleColaboradorSelecionado(colaborador)" />
+            </td>
+            <td class="text-left">
+              <div class="colaborador-info">
+                <i class="cil-user"></i>
+                <span class="nome-badge">{{ colaborador.nome || 'N/A' }}</span>
+              </div>
+            </td>
+            <td class="text-center">
+              <span class="matricula-badge">{{ colaborador.matricula || 'N/A' }}</span>
+            </td>
+            <td class="text-center">
+              <span class="cargo-badge">{{ colaborador.cargoDescricao || 'N/A' }}</span>
+            </td>
+            <td class="text-center">
+              <span class="empresa-info">{{ colaborador.empresaDescricao || 'N/A' }}</span>
+            </td>
+            <td class="text-center">
+              <span class="localidade-info">{{ colaborador.localidadeDescricao || 'N/A' }}</span>
+            </td>
+            <td class="text-center">
+              <span class="centro-custo-info">{{ colaborador.centroCustoDescricao || 'N/A' }}</span>
+            </td>
+            <td class="text-center">
+              <span class="tipo-badge">{{ colaborador.tipoColaboradorDescricao || 'N/A' }}</span>
+            </td>
+            <td class="text-center">
+              <span class="data-badge">{{ colaborador.dataAdmissao ? formatarData(colaborador.dataAdmissao) : 'N/A' }}</span>
+            </td>
+            <td class="text-center">
+              <div class="action-buttons">
+                <!-- Ver Detalhes -->
+                <button class="action-btn view-btn" 
+                        (click)="verDetalhes(colaborador)" 
+                        matTooltip="Ver Detalhes">
+                  <i class="cil-zoom-in"></i>
+                </button>
+                
+                <!-- Forçar Inventário OU Link para Inventário Pendente -->
+                <button *ngIf="!temInventarioPendente(colaborador)"
+                        class="action-btn inventory-btn" 
+                        (click)="abrirModalForcarInventario(colaborador)" 
+                        matTooltip="Forçar Inventário">
+                  <i class="cil-task"></i>
+                </button>
+                
+                <!-- Link para Inventário em Aberto -->
+                <button *ngIf="temInventarioPendente(colaborador)"
+                        class="action-btn inventory-open-btn" 
+                        (click)="navegarParaInventarioPendente(colaborador)" 
+                        matTooltip="Visualizar inventário forçado em aberto">
+                  <i class="cil-check-circle"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          
+          <!-- Mensagem quando não há dados -->
+          <tr *ngIf="!loading && (!dadosPagina || dadosPagina.length === 0)">
+            <td colspan="10" class="no-data-row">
+              <div class="no-data-message">
+                <i class="cil-inbox"></i>
+                <p>Nenhum colaborador sem recursos encontrado</p>
+                <small>Clique em "Pesquisar" para carregar dados ou ajuste os filtros</small>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <div class="pagination-container">
+      <mat-paginator 
+        [length]="totalLength" 
+        [pageSize]="pageSize" 
+        [pageSizeOptions]="[10, 25, 50, 100]" 
+        (page)="onPageChange($event)"
+        showFirstLastButtons>
+      </mat-paginator>
+    </div>
+  </div>
+</div>
+
+<!-- 🚀 MODAL DE EXPORTAÇÃO -->
+<div class="export-modal" *ngIf="showExportModal" (click)="closeExportModal($event)">
+  <div class="export-modal-content" (click)="$event.stopPropagation()">
+    <div class="export-modal-header">
+      <h3><i class="cil-download"></i> Exportar Dados</h3>
+      <button class="close-btn" (click)="closeExportModal($event)">
+        <i class="cil-x"></i>
+      </button>
+    </div>
+    
+    <div class="export-modal-body">
+      <p>Escolha o formato de exportação para os colaboradores sem recursos:</p>
+      
+      <div class="export-options">
+        <div class="export-option" (click)="exportar('excel')">
+          <div class="export-icon excel">
+            <i class="cil-file"></i>
+          </div>
+          <div class="export-info">
+            <h4>Excel (.xlsx)</h4>
+            <p>Formato ideal para análise e manipulação de dados</p>
+          </div>
+          <i class="cil-chevron-right"></i>
+        </div>
+        
+        <div class="export-option" (click)="exportar('csv')">
+          <div class="export-icon csv">
+            <i class="cil-file"></i>
+          </div>
+          <div class="export-info">
+            <h4>CSV (.csv)</h4>
+            <p>Formato universal compatível com qualquer planilha</p>
+          </div>
+          <i class="cil-chevron-right"></i>
+        </div>
+      </div>
+    </div>
+    
+    <div class="export-modal-footer">
+      <button class="btn-secondary" (click)="closeExportModal($event)">
+        Cancelar
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 🔍 MODAL DE DETALHES -->
+<div class="details-modal" *ngIf="showDetalhesModal" (click)="closeDetalhesModal($event)">
+  <div class="details-modal-content" (click)="$event.stopPropagation()">
+    <div class="details-modal-header">
+      <h3><i class="cil-info"></i> Detalhes do Colaborador</h3>
+      <button class="close-btn" (click)="closeDetalhesModal($event)">
+        <i class="cil-x"></i>
+      </button>
+    </div>
+    
+    <div class="details-modal-body" *ngIf="colaboradorSelecionado">
+      <div class="details-grid">
+        <div class="detail-item">
+          <label>Nome:</label>
+          <span>{{ colaboradorSelecionado.nome || 'N/A' }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Matrícula:</label>
+          <span>{{ colaboradorSelecionado.matricula || 'N/A' }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Cargo:</label>
+          <span>{{ colaboradorSelecionado.cargoDescricao || 'N/A' }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Empresa:</label>
+          <span>{{ colaboradorSelecionado.empresaDescricao || 'N/A' }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Localidade:</label>
+          <span>{{ colaboradorSelecionado.localidadeDescricao || 'N/A' }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Centro de Custo:</label>
+          <span>{{ colaboradorSelecionado.centroCustoDescricao || 'N/A' }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Tipo de Colaborador:</label>
+          <span>{{ colaboradorSelecionado.tipoColaboradorDescricao || 'N/A' }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Data de Admissão:</label>
+          <span>{{ colaboradorSelecionado.dataAdmissao ? formatarData(colaboradorSelecionado.dataAdmissao) : 'N/A' }}</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="details-modal-footer">
+      <button class="btn-danger" (click)="abrirModalForcarInventario(colaboradorSelecionado)">
+        <i class="cil-task"></i> Forçar Inventário
+      </button>
+      <button class="btn-primary" (click)="navegarParaColaborador(colaboradorSelecionado.id)">
+        <i class="cil-pencil"></i> Ver Colaborador
+      </button>
+      <button class="btn-secondary" (click)="closeDetalhesModal($event)">
+        Fechar
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ⚠️ MODAL DE FORÇAR INVENTÁRIO -->
+<div class="inventory-modal" *ngIf="showForcarInventarioModal" (click)="closeForcarInventarioModal($event)">
+  <div class="inventory-modal-content" (click)="$event.stopPropagation()">
+    <div class="inventory-modal-header">
+      <h3><i class="cil-task"></i> Forçar Inventário</h3>
+      <button class="close-btn" (click)="closeForcarInventarioModal($event)">
+        <i class="cil-x"></i>
+      </button>
+    </div>
+    
+    <div class="inventory-modal-body">
+      <div class="warning-box">
+        <i class="cil-warning"></i>
+        <p><strong>Atenção!</strong> Você está prestes a forçar o inventário para <strong>{{ colaboradoresSelecionados.length }}</strong> colaborador(es).</p>
+      </div>
+      
+      <p class="inventory-explanation">
+        Ao forçar o inventário, os colaboradores selecionados receberão uma notificação para informar 
+        os recursos que estão sob sua responsabilidade. Isso é útil quando você identifica que um 
+        colaborador elegível não possui recursos cadastrados no sistema.
+      </p>
+      
+      <div class="selected-list" *ngIf="colaboradoresSelecionados.length <= 5">
+        <h4>Colaboradores Selecionados:</h4>
+        <ul>
+          <li *ngFor="let col of colaboradoresSelecionados">
+            {{ col.nome }} ({{ col.matricula }}) - {{ col.cargoDescricao }}
+          </li>
+        </ul>
+      </div>
+      
+      <div class="selected-summary" *ngIf="colaboradoresSelecionados.length > 5">
+        <p><strong>{{ colaboradoresSelecionados.length }}</strong> colaboradores selecionados</p>
+      </div>
+
+      <!-- ✉️ OPÇÃO DE ENVIO DE EMAIL -->
+      <div class="email-notification-section">
+        <div class="checkbox-container">
+          <input type="checkbox" id="enviarEmailNotificacao" [(ngModel)]="enviarEmailNotificacao">
+          <label for="enviarEmailNotificacao">
+            <i class="cil-envelope-closed"></i>
+            <span>Enviar e-mail de notificação aos colaboradores</span>
+          </label>
+        </div>
+        <p class="email-info" *ngIf="enviarEmailNotificacao">
+          <i class="cil-info"></i>
+          Os colaboradores receberão um e-mail informando sobre o levantamento de recursos que será realizado.
+        </p>
+      </div>
+
+      <!-- 📝 MENSAGEM ADICIONAL (aparece apenas se email estiver habilitado) -->
+      <div class="additional-message-section" *ngIf="enviarEmailNotificacao">
+        <label for="mensagemAdicional">
+          <i class="cil-speech"></i>
+          Mensagem Adicional (Opcional)
+        </label>
+        <textarea 
+          id="mensagemAdicional" 
+          [(ngModel)]="mensagemAdicional"
+          placeholder="Digite uma mensagem adicional que será incluída no e-mail (opcional)"
+          rows="4"
+          maxlength="500"
+          class="modern-textarea"></textarea>
+        <small class="char-counter">{{ mensagemAdicional?.length || 0 }} / 500 caracteres</small>
+      </div>
+    </div>
+    
+    <div class="inventory-modal-footer">
+      <button class="btn-danger" (click)="confirmarForcarInventario()">
+        <i class="cil-task"></i> Confirmar e Forçar Inventário
+      </button>
+      <button class="btn-secondary" (click)="closeForcarInventarioModal($event)">
+        Cancelar
+      </button>
+    </div>
+  </div>
+</div>
+

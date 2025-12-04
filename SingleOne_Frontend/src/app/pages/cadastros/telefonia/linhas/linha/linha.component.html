@@ -1,0 +1,89 @@
+<!-- 🎯 FORMULÁRIO DE LINHA (MODAL) -->
+<div class="linha-form-container">
+  <!-- Header do Formulário -->
+  <div class="form-header">
+    <h2 class="form-title">{{ getTitulo() }}</h2>
+    <p class="form-subtitle">Preencha os dados da linha telefônica</p>
+  </div>
+
+  <!-- Formulário -->
+  <form [formGroup]="form" (ngSubmit)="salvar()" class="linha-form">
+    <div class="form-group">
+      <label class="form-label">
+        Operadora <span class="required">*</span>
+      </label>
+      <select 
+        formControlName="operadora" 
+        required 
+        (change)="listarContratos()"
+        class="form-control">
+        <option value="">Selecione uma operadora</option>
+        <option *ngFor="let row of operadoras" [value]="row.id">{{row.nome}}</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">
+        Conta <span class="required">*</span>
+      </label>
+      <select 
+        formControlName="contrato" 
+        required
+        (change)="listarPlanos()"
+        class="form-control">
+        <option value="">Selecione uma conta</option>
+        <option *ngFor="let row of contratos" [value]="row.id">{{row.nome}}</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">
+        Plano <span class="required">*</span>
+      </label>
+      <select 
+        formControlName="plano" 
+        required
+        class="form-control">
+        <option value="">Selecione um plano</option>
+        <option *ngFor="let row of planos" [value]="row.id">{{row.plano}}</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">
+        Número <span class="required">*</span>
+      </label>
+      <input 
+        type="number" 
+        formControlName="numero" 
+        required
+        class="form-control"
+        placeholder="Digite o número da linha">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">
+        ICCID
+      </label>
+      <input 
+        type="text" 
+        formControlName="iccid" 
+        class="form-control"
+        placeholder="Digite o ICCID (opcional)">
+    </div>
+
+    <!-- Ações do Formulário -->
+    <div class="form-actions">
+      <button type="button" class="btn btn-secondary" (click)="cancelar()">
+        <i class="fas fa-times"></i>
+        Cancelar
+      </button>
+      
+      <button type="submit" class="btn btn-primary" [disabled]="carregando">
+        <i *ngIf="!carregando" class="fas fa-save"></i>
+        <i *ngIf="carregando" class="fas fa-spinner fa-spin"></i>
+        {{ getBotaoTexto() }}
+      </button>
+    </div>
+  </form>
+</div>

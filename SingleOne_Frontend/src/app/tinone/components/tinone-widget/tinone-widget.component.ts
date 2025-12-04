@@ -1,0 +1,120 @@
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Subscription, interval } from 'rxjs';
+import { TinOneConfigService } from '../../services/tinone-config.service';
+
+/**
+ * Componente principal do widget TinOne
+ * Botão flutuante que abre o chat
+ */
+@Component({
+  selector: 'app-tinone-widget',
+  templateUrl: './tinone-widget.component.html',
+  styleUrls: ['./tinone-widget.component.scss']
+})
+export class TinOneWidgetComponent implements OnInit, OnDestroy {
+  isEnabled = false;
+  isChatOpen = false;
+  posicao = 'bottom-right';
+  corPrimaria = '#4a90e2';
+  isAuthenticated = false;
+  
+  private wasAuthenticatedBefore = false;
+  private subscriptions: Subscription[] = [];
+
+  constructor(private configService: TinOneConfigService) {}
+
+  ngOnInit(): void {
+    // Verifica autenticação continuamente (a cada 2 segundos)
+    const authCheckSub = interval(2000).subscribe(() => {
+      this.checkAuthentication();
+      this.updateEnabledState();
+    });
+
+    // Verificação inicial
+    this.checkAuthentication();
+    this.updateEnabledState();
+
+    this.subscriptions.push(authCheckSub);
+  }
+
+  /**
+   * Atualiza o estado habilitado do widget
+   */
+  private updateEnabledState(): void {
+    if (!this.isAuthenticated) {
+      this.isEnabled = false;
+      this.wasAuthenticatedBefore = false;
+      return;
+    }
+
+    // Se acabou de autenticar, recarrega a configuração
+    if (this.isAuthenticated && !this.wasAuthenticatedBefore) {
+      this.configService.reload();
+      this.wasAuthenticatedBefore = true;
+      
+      // Aguarda um pouco para a config carregar
+      setTimeout(() => {
+        const config = this.configService.getConfig();
+        if (config) {
+          this.posicao = config.posicao;
+          this.corPrimaria = config.corPrimaria;
+          this.isEnabled = config.habilitado && config.chatHabilitado;
+        }
+      }, 500);
+      return;
+    }
+
+    // Verifica config normalmente
+    const config = this.configService.getConfig();
+    
+    if (config) {
+      this.posicao = config.posicao;
+      this.corPrimaria = config.corPrimaria;
+      this.isEnabled = config.habilitado && config.chatHabilitado;
+    } else {
+      this.isEnabled = false;
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+  }
+
+  /**
+   * Alterna abertura do chat
+   */
+  toggleChat(): void {
+    this.isChatOpen = !this.isChatOpen;
+  }
+
+  /**
+   * Fecha o chat
+   */
+  closeChat(): void {
+    this.isChatOpen = false;
+  }
+
+  /**
+   * Obtém classes CSS baseadas na posição
+   */
+  getPositionClass(): string {
+    return `tinone-widget-${this.posicao}`;
+  }
+
+  /**
+   * Verifica se o usuário está autenticado
+   */
+  private checkAuthentication(): void {
+    try {
+      const token = localStorage.getItem('token');
+      const usuario = localStorage.getItem('usuario');
+      
+      // Considera autenticado se tiver token E usuário
+      this.isAuthenticated = !!(token && usuario);
+    } catch (error) {
+      console.error('[Oni Widget] Erro ao verificar autenticação:', error);
+      this.isAuthenticated = false;
+    }
+  }
+}
+

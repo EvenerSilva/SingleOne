@@ -1,0 +1,121 @@
+<div class="modern-dialog">
+  <!-- Header com ícone e título -->
+  <div class="dialog-header">
+    <div class="header-icon">
+      <i class="material-icons">schedule</i>
+    </div>
+    <h2 class="dialog-title">Devoluções Programadas</h2>
+    <p class="dialog-subtitle">Recursos com prazo de devolução vencendo</p>
+  </div>
+
+  <!-- Resumo rápido -->
+  <div class="dialog-summary">
+    <div class="summary-item">
+      <div class="summary-icon total">
+        <i class="material-icons">inventory_2</i>
+      </div>
+      <div class="summary-content">
+        <div class="summary-number">{{getTotalDevolucoes()}}</div>
+        <div class="summary-label">Total</div>
+      </div>
+    </div>
+    
+    <div class="summary-item">
+      <div class="summary-icon vencidas">
+        <i class="material-icons">error</i>
+      </div>
+      <div class="summary-content">
+        <div class="summary-number">{{getTotalVencidas()}}</div>
+        <div class="summary-label">Vencidas</div>
+      </div>
+    </div>
+    
+    <div class="summary-item">
+      <div class="summary-icon proximas">
+        <i class="material-icons">warning</i>
+      </div>
+      <div class="summary-content">
+        <div class="summary-number">{{getTotalProximas()}}</div>
+        <div class="summary-label">Vence em breve</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Conteúdo do modal -->
+  <div class="dialog-content">
+    <div class="table-container">
+      <table class="devolucoes-table">
+        <thead>
+          <tr>
+            <th>Recurso</th>
+            <th>Colaborador</th>
+            <th class="text-center">Data Devolução</th>
+            <th class="text-center">Status</th>
+            <th class="text-center">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let it of data.itens" [ngClass]="getStatusClass(it)">
+            <td>
+              <div class="equipamento-info">
+                <i class="material-icons">devices</i>
+                <div>
+                  <strong>{{ getEquipamento(it) }}</strong>
+                  <small *ngIf="it.serial || it.patrimonio">
+                    <span *ngIf="it.serial">S/N: {{ it.serial }}</span>
+                    <span *ngIf="it.serial && it.patrimonio"> | </span>
+                    <span *ngIf="it.patrimonio">Patr: {{ it.patrimonio }}</span>
+                  </small>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="colaborador-info">
+                <strong>{{ getColaborador(it) }}</strong>
+                <small *ngIf="it.matricula">Mat: {{ it.matricula }}</small>
+              </div>
+            </td>
+            <td class="text-center">
+              <div class="data-info">
+                {{ getDataDevolucao(it) | date:'dd/MM/yyyy' }}
+                <small *ngIf="!isDataVencida(getDataDevolucao(it))">
+                  ({{ getDiasParaVencimento(getDataDevolucao(it)) }} dias)
+                </small>
+              </div>
+            </td>
+            <td class="text-center">
+              <span class="badge-status" [ngClass]="getStatusClass(it)">
+                {{ getStatusDevolucao(it) }}
+              </span>
+            </td>
+            <td class="text-center">
+              <button 
+                class="btn-action" 
+                (click)="navegarParaEntregasDevolucoes(it)"
+                matTooltip="Realizar devolução ou reprogramar">
+                <i class="material-icons">assignment_return</i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <!-- Mensagem quando não há devoluções -->
+      <div *ngIf="!data.itens || data.itens.length === 0" class="empty-state">
+        <i class="material-icons">check_circle</i>
+        <p>Nenhuma devolução programada no momento</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Botões de ação -->
+  <div class="dialog-actions">
+    <button 
+      class="btn btn-secondary" 
+      (click)="fechar()">
+      <i class="material-icons">close</i>
+      Fechar
+    </button>
+  </div>
+</div>
+

@@ -1,0 +1,84 @@
+<div class="modern-dialog">
+  <div class="dialog-header">
+    <div class="header-icon">
+      <i class="cil-people"></i>
+    </div>
+    <h2 class="dialog-title">Compartilhar Recurso</h2>
+  </div>
+
+  <div class="dialog-content">
+    <!-- ✅ INFORMAÇÕES PARA LINHA TELEFÔNICA -->
+    <div class="resource-info" *ngIf="isLinhaItem()">
+      <p><strong>{{ getNomeLinha() }}</strong></p>
+      <p *ngIf="equipamento.patrimonio || equipamento.numero"><strong>Número:</strong> {{ equipamento.patrimonio || equipamento.numero }}</p>
+      <p *ngIf="getOperadoraPlano()"><strong>Operadora/Plano:</strong> {{ getOperadoraPlano() }}</p>
+      <p *ngIf="equipamento.numeroSerie || equipamento.iccid"><strong>ICCID:</strong> {{ equipamento.numeroSerie || equipamento.iccid }}</p>
+    </div>
+
+    <!-- ✅ INFORMAÇÕES PARA EQUIPAMENTO NORMAL -->
+    <div class="resource-info" *ngIf="!isLinhaItem()">
+      <p><strong>Recurso:</strong> {{ equipamento.equipamento || equipamento.nome || 'Recurso' }}</p>
+      <p *ngIf="equipamento.numeroSerie"><strong>S/N:</strong> {{ equipamento.numeroSerie }}</p>
+      <p *ngIf="equipamento.patrimonio"><strong>Patrimônio:</strong> {{ equipamento.patrimonio }}</p>
+    </div>
+
+    <div class="lista-vinculos">
+      <div class="titulo">Co-responsáveis</div>
+      <div *ngFor="let v of compartilhados" class="vinculo">
+        <i class="material-icons">person</i>
+        <span>{{ v.colaboradorNome || v.colaboradorId }}</span>
+        <span class="status" [ngClass]="{ativo: v.ativo, inativo: !v.ativo}">{{ v.ativo ? 'Ativo' : 'Encerrado' }}</span>
+        <span class="obs" *ngIf="v.observacao">— {{ v.observacao }}</span>
+        <button class="btn btn-danger" *ngIf="v.ativo" (click)="encerrar(v)">
+          <i class="cil-x"></i>
+          Encerrar
+        </button>
+      </div>
+      <div *ngIf="!compartilhados?.length" class="hint">Nenhum co-responsável cadastrado.</div>
+      <div *ngIf="temCompartilhadosEncerrados()" class="info-box">
+        <i class="material-icons">info</i>
+        <span>Para reativar um compartilhamento encerrado, basta adicionar o colaborador novamente abaixo.</span>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Adicionar co-responsáveis:</label>
+      <mat-form-field class="w-100" appearance="outline">
+        <mat-chip-list #chipList aria-label="Seleção de co-responsáveis">
+          <mat-chip *ngFor="let c of selecionados" [selectable]="true" [removable]="true" (removed)="remover(c)">
+            {{ c.nome }} - {{ c.matricula }}
+            <button matChipRemove>
+              <mat-icon>cancel</mat-icon>
+            </button>
+          </mat-chip>
+          <input
+            placeholder="Digite para buscar..."
+            [formControl]="searchCtrl"
+            [matAutocomplete]="auto"
+            [matChipInputFor]="chipList" />
+        </mat-chip-list>
+        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selecionar($event.option.value)">
+          <mat-option *ngFor="let c of opcoes" [value]="c">
+            {{ c.nome }} - {{ c.matricula }}
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+    </div>
+
+    <div class="form-group">
+      <label>Observação:</label>
+      <textarea class="form-control" rows="3" placeholder="Observação do compartilhamento (opcional)" [(ngModel)]="observacaoNova"></textarea>
+    </div>
+  </div>
+
+  <div class="dialog-actions">
+    <button class="btn btn-primary" (click)="adicionar()">
+      <i class="cil-check"></i>
+      Adicionar
+    </button>
+    <button class="btn btn-secondary" (click)="dialogRef.close()">
+      <i class="cil-x"></i>
+      Cancelar
+    </button>
+  </div>
+</div>

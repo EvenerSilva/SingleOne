@@ -1,0 +1,390 @@
+<!-- 🎯 HEADER MODERNO DA NOVA NOTA FISCAL -->
+<div class="nota-fiscal-header">
+  <div class="header-content">
+    <div class="header-left">
+      <button class="back-button" (click)="voltar()" matTooltip="Voltar para Notas Fiscais">
+        <i class="cil-arrow-left"></i>
+      </button>
+      <div class="header-title">
+        <div class="title-icon">
+          <i class="material-icons">description</i>
+        </div>
+        <div class="title-text">
+          <h1>{{ nota.id == 0 ? 'Nova Nota Fiscal' : 'Editar Nota Fiscal' }}</h1>
+          <p>{{ nota.id == 0 ? 'Criar nova nota fiscal no sistema' : 'Editar nota fiscal existente' }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="action-btn secondary-btn" matTooltip="Cancelar operação" (click)="cancelar()">
+        <i class="cil-x"></i>
+        <span>Cancelar</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 🍞 BREADCRUMB MODERNO -->
+<nav class="modern-breadcrumb">
+  <div class="breadcrumb-container">
+    <a [routerLink]="['/dashboard']" class="breadcrumb-item">
+      <i class="cil-home"></i>
+      <span>Dashboard</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a [routerLink]="['/cadastros']" class="breadcrumb-item">
+      <i class="cil-cog"></i>
+      <span>Cadastros</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a (click)="voltar()" class="breadcrumb-item" style="cursor: pointer;">
+      <i class="cil-receipt"></i>
+      <span>Notas Fiscais</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <span class="breadcrumb-item active">{{ nota.id == 0 ? 'Nova' : 'Editar' }}</span>
+  </div>
+</nav>
+
+<!-- 📋 CONTEÚDO PRINCIPAL -->
+<div class="nota-fiscal-content">
+  <form [formGroup]="form" (ngSubmit)="salvar()">
+    <!-- 🚀 STEPPER MODERNO -->
+    <div class="modern-stepper">
+      <!-- PASSO 1: DADOS DA NOTA FISCAL -->
+      <div class="stepper-step active" [class.completed]="step1Completed">
+        <div class="step-header">
+          <div class="step-number">1</div>
+          <div class="step-title">
+            <h3>Dados da Nota Fiscal</h3>
+            <p>Informações básicas da nota</p>
+          </div>
+          <div class="step-icon">
+            <i class="cil-file"></i>
+          </div>
+        </div>
+        
+        <div class="step-content">
+          <div class="form-grid">
+            <!-- Fornecedor -->
+            <div class="form-field full-width">
+              <label class="form-label">
+                <i class="cil-building"></i>
+                Fornecedor *
+              </label>
+              <mat-select formControlName="fornecedor" 
+                         [(ngModel)]="nota.fornecedor" 
+                         (selectionChange)="listarContratosFornecedor()"
+                         class="modern-select">
+                <mat-option *ngFor="let row of fornecedores" [value]="row.id">
+                  {{row.nome}}
+                </mat-option>
+              </mat-select>
+            </div>
+
+            <!-- Número da Nota -->
+            <div class="form-field">
+              <label class="form-label">
+                <i class="cil-hashtag"></i>
+                Número da Nota Fiscal *
+              </label>
+              <input matInput required formControlName="numero" 
+                     [(ngModel)]="nota.numero" 
+                     type="number"
+                     min="1"
+                     max="999999999"
+                     class="modern-input"
+                     [class.error]="form.get('numero')?.invalid && form.get('numero')?.touched"
+                     placeholder="Digite o número da nota (máx. 9 dígitos)">
+              <div class="field-error" *ngIf="form.get('numero')?.hasError('required') && form.get('numero')?.touched">
+                <i class="cil-warning"></i>
+                Número da nota é obrigatório
+              </div>
+              <div class="field-error" *ngIf="form.get('numero')?.hasError('max') && form.get('numero')?.touched">
+                <i class="cil-warning"></i>
+                Número da nota inválido! Máximo: 999.999.999 (padrão SEFAZ - 9 dígitos)
+              </div>
+              <div class="field-info" *ngIf="!form.get('numero')?.invalid">
+                <i class="cil-info"></i>
+                Padrão NF-e: até 9 dígitos (999.999.999)
+              </div>
+            </div>
+
+            <!-- Data de Emissão -->
+            <div class="form-field">
+              <label class="form-label">
+                <i class="cil-calendar"></i>
+                Data de Emissão *
+              </label>
+              <input matInput [matDatepicker]="dpemissao" readonly 
+                     formControlName="emissao" required 
+                     [(ngModel)]="nota.dtemissao"
+                     class="modern-input"
+                     placeholder="Selecione a data">
+              <mat-datepicker-toggle matSuffix [for]="dpemissao"></mat-datepicker-toggle>
+              <mat-datepicker #dpemissao disabled="false"></mat-datepicker>
+            </div>
+
+            <!-- Nota Virtual -->
+            <div class="form-field">
+              <label class="form-label">
+                <i class="cil-cloud"></i>
+                Nota Virtual
+              </label>
+              <div class="toggle-container">
+                <mat-slide-toggle color="primary" formControlName="virtual" 
+                                 [(ngModel)]="nota.virtual"
+                                 class="modern-toggle">
+                </mat-slide-toggle>
+                <span class="toggle-label">{{ nota.virtual ? 'Sim' : 'Não' }}</span>
+              </div>
+            </div>
+
+            <!-- Descrição -->
+            <div class="form-field full-width">
+              <label class="form-label">
+                <i class="cil-description"></i>
+                Descrição
+              </label>
+              <textarea matInput cols="5" formControlName="descricao" 
+                        [(ngModel)]="nota.descricao"
+                        class="modern-textarea"
+                        placeholder="Descreva a nota fiscal"></textarea>
+            </div>
+          </div>
+
+          <div class="step-actions">
+            <button type="button" class="btn-next" (click)="avancarPasso1()">
+              <i class="cil-arrow-right"></i>
+              Avançar
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PASSO 2: COMPOSIÇÃO -->
+      <div class="stepper-step" [class.active]="step2Active" [class.completed]="step2Completed">
+        <div class="step-header">
+          <div class="step-number">2</div>
+          <div class="step-title">
+            <h3>Composição da Nota</h3>
+            <p>Itens e recursos da nota fiscal</p>
+          </div>
+          <div class="step-icon">
+            <i class="cil-list"></i>
+          </div>
+        </div>
+        
+        <div class="step-content">
+          <div class="form-grid">
+            <!-- Tipo de Equipamento -->
+            <div class="form-field full-width">
+              <label class="form-label">
+                <i class="cil-devices"></i>
+                Tipo de Recurso
+              </label>
+              <mat-select formControlName="tipoequipamento" 
+                         [(ngModel)]="notaItem.tipoequipamento" 
+                         (selectionChange)="listarFabricantes()"
+                         class="modern-select">
+                <mat-option *ngFor="let row of tipos" [value]="row.id">
+                  {{row.descricao}}
+                </mat-option>
+              </mat-select>
+            </div>
+
+            <!-- Fabricante -->
+            <div class="form-field">
+              <label class="form-label">
+                <i class="cil-factory"></i>
+                Fabricante
+              </label>
+              <mat-select formControlName="fabricante" 
+                         [(ngModel)]="notaItem.fabricante" 
+                         (selectionChange)="listarModelos()"
+                         class="modern-select">
+                <mat-option *ngFor="let row of fabricantes" [value]="row.id">
+                  {{row.descricao}}
+                </mat-option>
+              </mat-select>
+            </div>
+
+            <!-- Modelo -->
+            <div class="form-field">
+              <label class="form-label">
+                <i class="cil-tag"></i>
+                Modelo
+              </label>
+              <mat-select formControlName="modelo" 
+                         [(ngModel)]="notaItem.modelo"
+                         class="modern-select">
+                <mat-option *ngFor="let row of modelos" [value]="row.id">
+                  {{row.descricao}}
+                </mat-option>
+              </mat-select>
+            </div>
+
+            <!-- Quantidade -->
+            <div class="form-field">
+              <label class="form-label">
+                <i class="cil-calculator"></i>
+                Quantidade
+              </label>
+              <input matInput formControlName="quantidade" 
+                     [(ngModel)]="notaItem.quantidade"
+                     class="modern-input"
+                     type="number"
+                     placeholder="0">
+            </div>
+
+            <!-- Valor Unitário -->
+            <div class="form-field">
+              <label class="form-label">
+                <i class="cil-dollar"></i>
+                Valor Unitário
+              </label>
+              <input matInput formControlName="valorunitario" 
+                     currencyMask [(ngModel)]="notaItem.valorunitario"
+                     [options]="{ prefix: 'R$ ', thousands: '.', decimal: ',' }"
+                     class="modern-input"
+                     placeholder="R$ 0,00">
+            </div>
+
+            <!-- Tipo de Aquisição -->
+            <div class="form-field">
+              <label class="form-label">
+                <i class="cil-handshake"></i>
+                Tipo de Aquisição
+              </label>
+              <mat-select formControlName="tipoaquisicao" 
+                         [(ngModel)]="notaItem.tipoaquisicao"
+                         (selectionChange)="onTipoAquisicaoChange($event)"
+                         class="modern-select">
+                <mat-option value=1>Alugado</mat-option>
+                <mat-option value=2>Próprio</mat-option>
+                <mat-option value=3>Corporativo</mat-option>
+              </mat-select>
+            </div>
+
+            <!-- Contrato (condicional) -->
+            <div class="form-field" *ngIf="notaItem.tipoaquisicao == 1 || notaItem.tipoaquisicao === '1'">
+              <label class="form-label">
+                <i class="cil-file"></i>
+                Contrato
+              </label>
+              <mat-select formControlName="contrato" 
+                         [(ngModel)]="notaItem.contrato"
+                         class="modern-select">
+                <mat-option *ngFor="let row of contratos" [value]="row.id">
+                  {{row.numero}}/{{row.aditivo}} - {{row.descricao}}
+                </mat-option>
+                <mat-option *ngIf="contratos.length === 0" disabled>
+                  Nenhum contrato encontrado para este fornecedor
+                </mat-option>
+              </mat-select>
+            </div>
+
+            <!-- Data Limite de Garantia -->
+            <div class="form-field">
+              <label class="form-label">
+                <i class="cil-shield-check"></i>
+                Data Limite de Garantia
+              </label>
+              <input matInput [matDatepicker]="dplimitegarantia" 
+                     formControlName="dtlimitegarantia" 
+                     [(ngModel)]="notaItem.dtlimitegarantia"
+                     class="modern-input"
+                     placeholder="Selecione a data">
+              <mat-datepicker-toggle matSuffix [for]="dplimitegarantia"></mat-datepicker-toggle>
+              <mat-datepicker #dplimitegarantia disabled="false"></mat-datepicker>
+            </div>
+          </div>
+
+          <!-- Botão Adicionar -->
+          <div class="add-item-section">
+            <button type="button" class="btn-add" (click)="adicionarComposicao()" 
+                    *ngIf="!nota.gerouequipamento">
+              <i class="cil-plus"></i>
+              Adicionar Item
+            </button>
+          </div>
+
+          <!-- Tabela de Itens -->
+          <div class="items-table-section" *ngIf="nota.notasfiscaisitens.length > 0">
+            <h4 class="section-title">
+              <i class="cil-list"></i>
+              Itens Adicionados
+            </h4>
+            
+            <div class="table-container">
+              <table class="modern-table">
+                <thead>
+                  <tr>
+                    <th>Recurso</th>
+                    <th>Quantidade</th>
+                    <th>Valor Unitário</th>
+                    <th>Valor Total</th>
+                    <th class="text-center">Ações</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let row of nota.notasfiscaisitens">
+                    <td class="item-produto">
+                      <div class="produto-info">
+                        <div class="produto-avatar">
+                          <i class="cil-devices"></i>
+                        </div>
+                        <span>{{row.tipoequipamentoNavigation?.descricao}} {{row.fabricanteNavigation?.descricao}} {{row.modeloNavigation?.descricao}}</span>
+                      </div>
+                    </td>
+                    <td class="item-quantidade">{{row.quantidade}}</td>
+                    <td class="item-valor-unitario">{{row.valorunitario | currencyFormat}}</td>
+                    <td class="item-valor-total">{{(row.quantidade * row.valorunitario) | currencyFormat}}</td>
+                    <td class="item-actions text-center">
+                      <button type="button" class="action-btn delete-btn" 
+                              matTooltip="Excluir item" 
+                              (click)="excluirComposicao(row)" 
+                              *ngIf="!nota.gerouequipamento">
+                        <i class="cil-trash"></i>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Mensagem quando não há itens -->
+          <div class="empty-state" *ngIf="nota.notasfiscaisitens.length == 0">
+            <div class="empty-icon">
+              <i class="cil-list"></i>
+            </div>
+            <h4>Nenhum item adicionado</h4>
+            <p>Adicione itens à composição da nota fiscal</p>
+          </div>
+
+          <div class="step-actions">
+            <button type="button" class="btn-prev" (click)="voltar()">
+              <i class="cil-arrow-left"></i>
+              Voltar
+            </button>
+            <button type="submit" class="btn-save" 
+                    [disabled]="!form.valid || nota.notasfiscaisitens.length == 0"
+                    *ngIf="!nota.gerouequipamento">
+              <i class="cil-save"></i>
+              Salvar Nota Fiscal
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Validação do Formulário -->
+    <div class="form-validation" *ngIf="!form.valid">
+      <div class="validation-message">
+        <i class="cil-warning"></i>
+        <span>Preencha todos os campos obrigatórios antes de salvar</span>
+      </div>
+    </div>
+  </form>
+</div>

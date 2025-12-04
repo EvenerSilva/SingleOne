@@ -1,0 +1,344 @@
+<!-- 🎯 HEADER MODERNO DOS EQUIPAMENTOS STATUS DETALHE -->
+<div class="equipamentos-status-detalhe-header">
+  <div class="header-content">
+    <div class="header-left">
+      <button class="back-button" [routerLink]="['/relatorios']" matTooltip="Voltar para Relatórios">
+        <i class="cil-arrow-left"></i>
+      </button>
+      <div class="header-title">
+        <div class="title-icon">
+          <i class="cil-settings"></i>
+            </div>
+        <div class="title-text">
+          <h1>Equipamentos por Status - Detalhe</h1>
+          <p>Relatório detalhado de equipamentos por situação</p>
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="btn-exportar" (click)="exportarDados()" matTooltip="Exportar Dados" [disabled]="!todosEquipamentos || todosEquipamentos.length === 0">
+        <i class="cil-cloud-download"></i>
+        <span>Exportar Dados</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 🍞 BREADCRUMB MODERNO -->
+<nav class="modern-breadcrumb">
+  <div class="breadcrumb-container">
+    <a [routerLink]="['/dashboard']" class="breadcrumb-item">
+      <i class="cil-home"></i>
+      <span>Dashboard</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a [routerLink]="['/relatorios']" class="breadcrumb-item">
+      <i class="cil-timeline"></i>
+      <span>Relatórios e Timeline</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <span class="breadcrumb-item active">Equipamentos por Status</span>
+  </div>
+    </nav>
+
+<!-- 📋 CONTEÚDO PRINCIPAL -->
+<div class="equipamentos-status-detalhe-content">
+  <!-- 🔍 SEÇÃO DE FILTROS -->
+  <div class="filters-section">
+    <div class="filters-container">
+      <div class="filters-header">
+        <button class="toggle-filters-btn">
+          <i class="cil-filter"></i>
+          <span>Filtros de Pesquisa</span>
+        </button>
+      </div>
+      <div class="filters-content">
+        <div class="filters-grid">
+          <!-- 1) Categoria -->
+          <div class="filter-field">
+            <label>Categoria</label>
+            <select class="modern-select" [(ngModel)]="relatorio.categoriaid">
+              <option [ngValue]="null">Selecione uma categoria</option>
+              <option *ngFor="let cat of categorias" [ngValue]="cat.id">{{ cat.nome || cat.descricao }}</option>
+            </select>
+          </div>
+
+          <!-- 2) Tipo de Recurso -->
+          <div class="filter-field">
+            <label>Tipo de Recurso</label>
+            <select class="modern-select" [(ngModel)]="relatorio.tipoequipamentoid" (change)="onTipoChange()">
+              <option [ngValue]="null">Selecione um tipo</option>
+              <option *ngFor="let row of tipoEquipamentos" [ngValue]="row.id">
+                                    {{row.descricao}}
+              </option>
+            </select>
+          </div>
+
+          <!-- 3) Fabricante -->
+          <div class="filter-field">
+            <label>Fabricante</label>
+            <select class="modern-select" [(ngModel)]="relatorio.fabricanteid" (change)="onFabricanteChange()" [disabled]="!relatorio.tipoequipamentoid">
+              <option [ngValue]="null">Selecione um fabricante</option>
+              <option *ngFor="let fab of fabricantes" [ngValue]="fab.id">{{ fab.descricao }}</option>
+            </select>
+          </div>
+
+          <!-- 4) Modelo -->
+          <div class="filter-field">
+            <label>Modelo</label>
+            <select class="modern-select" [(ngModel)]="relatorio.modeloid" [disabled]="!relatorio.fabricanteid">
+              <option [ngValue]="null">Selecione um modelo</option>
+              <option *ngFor="let mod of modelos" [ngValue]="mod.id">{{ mod.descricao }}</option>
+            </select>
+          </div>
+
+          <!-- 5) Status do Recurso -->
+          <div class="filter-field">
+            <label>Status do Recurso</label>
+            <select class="modern-select" [(ngModel)]="relatorio.equipamentostatusid">
+              <option [ngValue]="null">Selecione um status</option>
+              <option *ngFor="let row of statusEqp" [ngValue]="row.id">
+                                    {{row.descricao}}
+              </option>
+            </select>
+          </div>
+
+          <!-- 6) Tipo de Aquisição (mantido) -->
+          <div class="filter-field">
+            <label>Tipo de Aquisição</label>
+            <select class="modern-select" [(ngModel)]="relatorio.tipoaquisicao">
+              <option [ngValue]="null">Selecione um tipo</option>
+              <option *ngFor="let ta of tiposAquisicao" [ngValue]="ta.id">{{ ta.nome || ta.descricao }}</option>
+            </select>
+          </div>
+
+          <!-- 7) Empresa -->
+          <div class="filter-field">
+            <label>Empresa</label>
+            <select class="modern-select" [(ngModel)]="relatorio.empresaid" (change)="listarCentrosCustos()">
+              <option [ngValue]="null">Selecione uma empresa</option>
+              <option *ngFor="let row of empresas" [ngValue]="row.id">
+                                    {{row.nome}}
+              </option>
+            </select>
+          </div>
+
+          <!-- 8) Localização -->
+          <div class="filter-field">
+            <label>Localização</label>
+            <select class="modern-select" [(ngModel)]="relatorio.localidadeid">
+              <option [ngValue]="null">Selecione uma localização</option>
+              <option *ngFor="let row of localidades" [ngValue]="row.id">
+                                    {{row.descricao}}
+              </option>
+            </select>
+          </div>
+
+          <!-- 9) Centro de Custo -->
+          <div class="filter-field">
+            <label>Centro de Custo</label>
+            <select class="modern-select" [(ngModel)]="relatorio.centrocustoid">
+              <option [ngValue]="null">Selecione um centro de custo</option>
+              <option *ngFor="let row of centros" [ngValue]="row.id">
+                                    {{row.nome}}
+              </option>
+            </select>
+          </div>
+
+          <div class="filter-actions">
+            <button class="action-btn primary-btn" (click)="consultar()" [disabled]="loading">
+              <i class="cil-search"></i>
+              <span>Pesquisar</span>
+            </button>
+            <button class="action-btn secondary-btn" (click)="limparBusca()">
+              <i class="cil-x-circle"></i>
+              <span>Limpar</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 📊 SEÇÃO DE MÉTRICAS -->
+  <div class="metrics-section" *ngIf="todosEquipamentos && todosEquipamentos.length > 0">
+    <div class="metrics-grid">
+      <div class="metric-card primary">
+        <div class="metric-icon">
+          <i class="cil-settings"></i>
+        </div>
+        <div class="metric-info">
+          <div class="metric-value">{{ getTotalEquipamentos() }}</div>
+          <div class="metric-label">Total de Equipamentos</div>
+        </div>
+      </div>
+      
+      <div class="metric-card success">
+        <div class="metric-icon">
+          <i class="cil-check-circle"></i>
+        </div>
+        <div class="metric-info">
+          <div class="metric-value">{{ getTotalStatus() }}</div>
+          <div class="metric-label">Status Diferentes</div>
+        </div>
+      </div>
+      
+      <div class="metric-card info">
+        <div class="metric-icon">
+          <i class="cil-location-pin"></i>
+        </div>
+        <div class="metric-info">
+          <div class="metric-value">{{ getTotalLocalidades() }}</div>
+          <div class="metric-label">Localizações</div>
+        </div>
+                    </div>
+    </div>
+  </div>
+
+  <!-- 🔄 CONTAINER DE LOADING -->
+  <div class="loading-container" *ngIf="loading">
+    <div class="loading-spinner"></div>
+    <p>Carregando dados...</p>
+  </div>
+
+  <!-- 📋 SEÇÃO DA TABELA -->
+  <div class="table-section" *ngIf="!loading && todosEquipamentos">
+    <div class="table-container">
+      <div class="scroll-indicator" *ngIf="todosEquipamentos.length > 0">
+        <i class="cil-arrow-left"></i>
+        <span>Deslize horizontalmente para ver mais colunas</span>
+        <i class="cil-arrow-right"></i>
+      </div>
+      
+      <table class="modern-table detailed-table">
+        <thead>
+          <tr>
+            <th>Equipamento</th>
+            <th>Número de Série</th>
+            <th>Patrimônio</th>
+            <th>Situação</th>
+            <th>Localização</th>
+            <th>Empresa</th>
+            <th>Centro de Custo</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of dadosPagina">
+            <td class="equipamento-info">
+              <div class="recurso-details">
+                <div class="recurso-avatar">
+                  <i class="cil-settings"></i>
+                </div>
+                <div class="recurso-text">
+                  <div class="recurso-nome">{{ row.tipoequipamento }} {{ row.fabricante }} {{ row.modelo }}</div>
+                  <div class="recurso-sn">
+                    S/N: 
+                    <a 
+                      class="serial-number-link"
+                      [matTooltip]="'Clique para ver detalhes do recurso: ' + (row.tipoequipamento || 'N/A') + ' (S/N: ' + row.numeroserie + ')'"
+                      [matTooltipClass]="'resource-tooltip'"
+                      [matTooltipPosition]="'above'"
+                      [matTooltipShowDelay]="500"
+                      (click)="navegarParaRecurso(row.numeroserie)">
+                      {{ row.numeroserie }}
+                      <i class="cil-external-link"></i>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </td>
+            <td class="text-center">
+              <span class="serial-badge">{{ row.numeroserie || 'N/A' }}</span>
+            </td>
+            <td class="text-center">
+              <span class="patrimonio-badge">{{ row.patrimonio || 'N/A' }}</span>
+            </td>
+            <td class="text-center">
+              <span class="status-badge" [class]="'status-' + (row.equipamentostatus?.toLowerCase() || 'default')">
+                {{ row.equipamentostatus || 'N/A' }}
+              </span>
+            </td>
+            <td class="text-center">
+              <span class="localidade-info">{{ row.localidade || 'N/A' }}</span>
+            </td>
+            <td class="text-center">
+              <span class="empresa-info">{{ row.empresa || 'N/A' }}</span>
+            </td>
+            <td class="text-center">
+              <span class="centro-info">{{ row.centrocusto || 'N/A' }}</span>
+            </td>
+          </tr>
+          
+          <!-- Mensagem quando não há dados -->
+          <tr *ngIf="!todosEquipamentos || todosEquipamentos.length === 0">
+            <td colspan="7" class="no-data-row">
+              <div class="no-data-message">
+                <i class="cil-inbox"></i>
+                <p>Nenhum equipamento encontrado</p>
+                <small>Selecione filtros e clique em "Pesquisar" para carregar dados</small>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+        </table>
+    </div>
+    
+    <div class="pagination-container">
+      <mat-paginator 
+        #paginator 
+        [length]="totalLength"
+        [pageSize]="pageSize"
+        [pageIndex]="currentPageIndex"
+        [pageSizeOptions]="[10, 25, 50, 100]"
+        (page)="onPageChange($event)"
+        showFirstLastButtons>
+      </mat-paginator>
+    </div>
+  </div>
+</div>
+
+<!-- 🚀 MODAL DE EXPORTAÇÃO -->
+<div class="export-modal" *ngIf="showExportModal" (click)="closeExportModal($event)">
+  <div class="export-modal-content" (click)="$event.stopPropagation()">
+    <div class="export-modal-header">
+      <h3><i class="cil-download"></i> Exportar Dados</h3>
+      <button class="close-btn" (click)="closeExportModal($event)">
+        <i class="cil-x"></i>
+      </button>
+    </div>
+    
+    <div class="export-modal-body">
+      <p>Escolha o formato de exportação para os dados de equipamentos por status:</p>
+      
+      <div class="export-options">
+        <div class="export-option" (click)="exportarParaExcel()">
+          <div class="export-icon excel">
+            <i class="cil-file"></i>
+          </div>
+          <div class="export-info">
+            <h4>Excel (.xlsx)</h4>
+            <p>Formato ideal para análise e manipulação de dados</p>
+          </div>
+          <i class="cil-chevron-right"></i>
+        </div>
+        
+        <div class="export-option" (click)="exportarParaCSV()">
+          <div class="export-icon csv">
+            <i class="cil-file"></i>
+          </div>
+          <div class="export-info">
+            <h4>CSV (.csv)</h4>
+            <p>Formato universal compatível com qualquer planilha</p>
+          </div>
+          <i class="cil-chevron-right"></i>
+        </div>
+      </div>
+    </div>
+    
+    <div class="export-modal-footer">
+      <button class="btn-secondary" (click)="closeExportModal($event)">
+        Cancelar
+      </button>
+    </div>
+    </div>
+</div>

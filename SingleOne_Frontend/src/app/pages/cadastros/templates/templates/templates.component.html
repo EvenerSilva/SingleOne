@@ -1,0 +1,97 @@
+<!-- 🎯 HEADER MODERNO DOS TEMPLATES -->
+<div class="templates-header">
+  <div class="header-content">
+    <div class="header-left">
+      <button class="back-button" [routerLink]="['/configuracoes']" matTooltip="Voltar para Configurações">
+        <i class="cil-arrow-left"></i>
+      </button>
+      <div class="header-title">
+        <div class="title-icon">
+          <i class="cil-description"></i>
+        </div>
+        <div class="title-text">
+          <h1>Templates</h1>
+          <p>Gerenciar templates do sistema</p>
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="action-btn primary-btn" routerLink="/template" matTooltip="Adicionar novo template">
+        <i class="cil-plus"></i>
+        <span>Novo Template</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 🍞 BREADCRUMB MODERNO -->
+<nav class="modern-breadcrumb">
+  <div class="breadcrumb-container">
+    <a [routerLink]="['/dashboard']" class="breadcrumb-item">
+      <i class="cil-home"></i>
+      <span>Dashboard</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a [routerLink]="['/configuracoes']" class="breadcrumb-item">
+      <i class="cil-cog"></i>
+      <span>Configurações</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <span class="breadcrumb-item active">Templates</span>
+  </div>
+</nav>
+
+<!-- 📋 CONTEÚDO PRINCIPAL -->
+<div class="templates-content">
+  <!-- 🔍 SEÇÃO DE BUSCA -->
+  <div class="search-section">
+    <div class="search-box">
+      <i class="cil-magnifying-glass search-icon"></i>
+      <input type="text" placeholder="Buscar template por tipo, título ou versão..." [formControl]="consulta">
+    </div>
+  </div>
+
+  <!-- 📊 TABELA MODERNA -->
+  <div class="table-section">
+    <div class="table-container">
+      <table class="modern-table">
+        <thead>
+          <tr>
+            <th>Tipo</th>
+            <th>Título</th>
+            <th>Versão</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of dadosPaginados">
+            <td class="template-type">
+              <div class="template-info">
+                <div class="template-avatar">
+                  <i class="cil-description"></i>
+                </div>
+                <span>{{row.tipoNavigation.descricao}}</span>
+              </div>
+            </td>
+            <td class="template-title">{{row.titulo}}</td>
+            <td class="template-version">
+              <span class="version-badge">{{row.versao}}</span>
+            </td>
+            <td class="template-actions">
+              <div class="action-buttons">
+                <button class="action-btn edit-btn" matTooltip="Editar template" [routerLink]="['/template', row.id]">
+                  <i class="cil-pencil"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 📄 PAGINAÇÃO -->
+  <div class="pagination-container">
+    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [pageSize]="10" showFirstLastButtons></mat-paginator>
+  </div>
+</div>

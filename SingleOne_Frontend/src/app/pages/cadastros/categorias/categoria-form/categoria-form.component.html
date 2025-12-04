@@ -1,0 +1,81 @@
+<!-- 🎯 FORMULÁRIO DE CATEGORIA -->
+<div class="categoria-form-container">
+  <div class="form-header">
+    <h2 class="form-title">{{ getTitulo() }}</h2>
+    <p class="form-subtitle">
+      {{ modo === 'criar' ? 'Crie uma nova categoria para organizar seus tipos de equipamento' : 'Edite as informações da categoria selecionada' }}
+    </p>
+  </div>
+
+  <form [formGroup]="categoriaForm" (ngSubmit)="onSubmit()" class="categoria-form">
+    
+    <!-- Campo Nome -->
+    <div class="form-group">
+      <label for="nome" class="form-label">
+        Nome da Categoria <span class="required">*</span>
+      </label>
+      <input
+        type="text"
+        id="nome"
+        formControlName="nome"
+        class="form-control"
+        [class.is-invalid]="categoriaForm.get('nome')?.invalid && categoriaForm.get('nome')?.touched"
+        placeholder="Ex: Eletrônicos, Móveis, Veículos..."
+        maxlength="100"
+      >
+      <div class="invalid-feedback" *ngIf="categoriaForm.get('nome')?.invalid && categoriaForm.get('nome')?.touched">
+        <span *ngIf="categoriaForm.get('nome')?.errors?.required">Nome é obrigatório</span>
+        <span *ngIf="categoriaForm.get('nome')?.errors?.maxlength">Nome deve ter no máximo 100 caracteres</span>
+      </div>
+      <small class="form-text text-muted">
+        Nome único para identificar a categoria
+      </small>
+    </div>
+
+    <!-- Campo Descrição -->
+    <div class="form-group">
+      <label for="descricao" class="form-label">
+        Descrição
+      </label>
+      <textarea
+        id="descricao"
+        formControlName="descricao"
+        class="form-control"
+        rows="3"
+        placeholder="Descreva brevemente o que esta categoria representa..."
+        maxlength="500"
+      ></textarea>
+      <div class="invalid-feedback" *ngIf="categoriaForm.get('descricao')?.invalid && categoriaForm.get('descricao')?.touched">
+        <span *ngIf="categoriaForm.get('descricao')?.errors?.maxlength">Descrição deve ter no máximo 500 caracteres</span>
+      </div>
+      <small class="form-text text-muted">
+        Descrição opcional para melhor compreensão da categoria
+      </small>
+    </div>
+
+
+
+    <!-- Botões de Ação -->
+    <div class="form-actions">
+      <button
+        type="button"
+        class="btn btn-secondary"
+        (click)="onCancelar()"
+        [disabled]="carregando"
+      >
+        <i class="fas fa-times"></i>
+        Cancelar
+      </button>
+      
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="categoriaForm.invalid || carregando"
+      >
+        <i class="fas fa-save" *ngIf="!carregando"></i>
+        <i class="fas fa-spinner fa-spin" *ngIf="carregando"></i>
+        {{ getBotaoTexto() }}
+      </button>
+    </div>
+  </form>
+</div>

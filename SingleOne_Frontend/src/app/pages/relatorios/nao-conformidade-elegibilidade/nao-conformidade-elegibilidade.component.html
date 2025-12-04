@@ -1,0 +1,312 @@
+<!-- 🎯 HEADER MODERNO DE NÃO CONFORMIDADE -->
+<div class="nao-conformidade-header">
+  <div class="header-content">
+    <div class="header-left">
+      <button class="back-button" [routerLink]="['/relatorios']" matTooltip="Voltar para Relatórios">
+        <i class="cil-arrow-left"></i>
+      </button>
+      <div class="header-title">
+        <div class="title-icon">
+          <i class="cil-warning"></i>
+        </div>
+        <div class="title-text">
+          <h1>Não Conformidade de Elegibilidade</h1>
+          <p>Identificação de colaboradores fora da política de elegibilidade</p>
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="btn-exportar" (click)="exportarParaExcel()" matTooltip="Exportar Excel" [disabled]="!registros || registros.length === 0">
+        <i class="cil-cloud-download"></i>
+        <span>Exportar Dados</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 🍞 BREADCRUMB MODERNO -->
+<nav class="modern-breadcrumb">
+  <div class="breadcrumb-container">
+    <a [routerLink]="['/dashboard']" class="breadcrumb-item">
+      <i class="cil-home"></i>
+      <span>Dashboard</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a [routerLink]="['/relatorios']" class="breadcrumb-item">
+      <i class="cil-timeline"></i>
+      <span>Relatórios e Timeline</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <span class="breadcrumb-item active">Não Conformidade</span>
+  </div>
+</nav>
+
+<!-- 📋 CONTEÚDO PRINCIPAL -->
+<div class="nao-conformidade-content">
+
+  <!-- 🔍 FILTROS -->
+  <div class="filters-section">
+    <div class="filters-container">
+      <div class="filtros-card">
+    <div class="filtros-header">
+      <i class="material-icons">filter_list</i>
+      <span>Filtros</span>
+    </div>
+    <div class="filtros-content">
+      <mat-form-field appearance="outline" class="filtro-field">
+        <mat-label>Tipo de Colaborador</mat-label>
+        <mat-select [(ngModel)]="filtros.tipoColaborador">
+          <mat-option [value]="null">Todos</mat-option>
+          <mat-option *ngFor="let tipo of tiposColaborador" [value]="tipo.codigo">
+            {{tipo.descricao}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="filtro-field">
+        <mat-label>Tipo de Equipamento</mat-label>
+        <mat-select [(ngModel)]="filtros.tipoEquipamentoId">
+          <mat-option [value]="null">Todos</mat-option>
+          <mat-option *ngFor="let tipo of tiposEquipamento" [value]="tipo.id">
+            {{tipo.descricao}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="filtro-field">
+        <mat-label>Nome do Colaborador</mat-label>
+        <input matInput [(ngModel)]="filtros.colaboradorNome" placeholder="Digite o nome">
+      </mat-form-field>
+
+      <div class="filtros-actions">
+        <button class="btn-consultar" (click)="consultar()" [disabled]="loading">
+          <i class="material-icons">search</i>
+          Pesquisar
+        </button>
+        <button class="btn-limpar" (click)="limparFiltros()">
+          <i class="material-icons">clear</i>
+          Limpar
+        </button>
+      </div>
+    </div>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div class="loading-container" *ngIf="loading">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Consultando não conformidades...</p>
+  </div>
+
+  <!-- ESTATÍSTICAS -->
+  <div class="stats-container" *ngIf="resultado && !loading">
+    <div class="stat-card total">
+      <div class="stat-icon">
+        <i class="material-icons">error_outline</i>
+      </div>
+      <div class="stat-info">
+        <span class="stat-label">Total de Não Conformidades</span>
+        <span class="stat-value">{{resultado.totalRegistros}}</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon colaboradores">
+        <i class="material-icons">people</i>
+      </div>
+      <div class="stat-info">
+        <span class="stat-label">Colaboradores Afetados</span>
+        <span class="stat-value">{{resultado.totalColaboradores}}</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon equipamentos">
+        <i class="material-icons">devices</i>
+      </div>
+      <div class="stat-info">
+        <span class="stat-label">Equipamentos Envolvidos</span>
+        <span class="stat-value">{{resultado.totalEquipamentos}}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ESTATÍSTICAS DETALHADAS -->
+  <div class="detailed-stats" *ngIf="resultado && !loading && registros.length > 0">
+    <div class="stat-section">
+      <h3><i class="material-icons">person</i> Por Tipo de Colaborador</h3>
+      <div class="stat-items">
+        <div class="stat-item" *ngFor="let key of getChavesEstatistica(resultado.porTipoColaborador)">
+          <span class="stat-item-label">{{key}}</span>
+          <span class="stat-item-value">{{getValorEstatisticaPorChave(resultado.porTipoColaborador, key)}}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="stat-section">
+      <h3><i class="material-icons">devices</i> Por Tipo de Equipamento</h3>
+      <div class="stat-items">
+        <div class="stat-item" *ngFor="let key of getChavesEstatistica(resultado.porTipoEquipamento)">
+          <span class="stat-item-label">{{key}}</span>
+          <span class="stat-item-value">{{getValorEstatistica(resultado.porTipoEquipamento, key)}}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEM DADOS -->
+  <div class="sem-dados" *ngIf="resultado && registros.length === 0 && !loading">
+    <i class="material-icons">check_circle</i>
+    <h3>Nenhuma Não Conformidade Encontrada!</h3>
+    <p>Todas as políticas de elegibilidade estão sendo respeitadas.</p>
+  </div>
+
+  <!-- TABELA DE REGISTROS -->
+  <div class="table-container" *ngIf="registros && registros.length > 0 && !loading">
+    <div class="table-header">
+      <h3>
+        <i class="material-icons">list</i>
+        Registros de Não Conformidade
+      </h3>
+      <span class="table-count">
+        Mostrando {{(currentPage * pageSize) + 1}} - {{Math.min((currentPage + 1) * pageSize, registros.length)}} de {{registros.length}}
+      </span>
+    </div>
+
+    <div class="table-scroll">
+      <table class="registros-table">
+        <thead>
+          <tr>
+            <th>Colaborador</th>
+            <th>Tipo</th>
+            <th>Equipamento</th>
+            <th>Patrimônio</th>
+            <th>Motivo da Não Conformidade</th>
+            <th>Qtd.</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let registro of registrosPaginados" class="registro-row">
+            <td>
+              <div class="colaborador-info">
+                <strong>{{registro.colaboradorNome}}</strong>
+                <small>{{decodificarCpf(registro.colaboradorCpf)}}</small>
+                <small *ngIf="registro.colaboradorCargo">{{registro.colaboradorCargo}}</small>
+              </div>
+            </td>
+            <td>
+              <span class="tipo-badge">{{mapearTipoColaborador(registro.tipoColaborador)}}</span>
+            </td>
+            <td>
+              <div class="equipamento-info">
+                <strong>{{registro.tipoEquipamentoDescricao}}</strong>
+                <small *ngIf="registro.fabricante && registro.modelo">
+                  {{registro.fabricante}} {{registro.modelo}}
+                </small>
+              </div>
+            </td>
+            <td>
+              <span class="patrimonio">{{registro.equipamentoPatrimonio}}</span>
+              <small class="serie">SN: {{registro.equipamentoSerie}}</small>
+            </td>
+            <td>
+              <div class="motivo">
+                <i class="material-icons">warning</i>
+                {{registro.motivoNaoConformidade}}
+              </div>
+              <div class="observacoes" *ngIf="registro.politicaObservacoes">
+                <small>{{registro.politicaObservacoes}}</small>
+              </div>
+            </td>
+            <td>
+              <div class="quantidade-info">
+                <span class="atual">{{registro.quantidadeAtual}}</span>
+                <span class="separador">/</span>
+                <span class="maxima">{{registro.quantidadeMaxima || '∞'}}</span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Paginação -->
+    <div class="pagination">
+      <button mat-icon-button 
+              [disabled]="currentPage === 0" 
+              (click)="paginaAnterior()">
+        <i class="material-icons">chevron_left</i>
+      </button>
+      <span class="page-info">
+        Página {{currentPage + 1}} de {{Math.ceil(registros.length / pageSize)}}
+      </span>
+      <button mat-icon-button 
+              [disabled]="(currentPage + 1) * pageSize >= registros.length" 
+              (click)="proximaPagina()">
+        <i class="material-icons">chevron_right</i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 🎯 MODAL DE EXPORTAÇÃO -->
+<div class="export-modal-overlay" *ngIf="showExportModal" (click)="fecharModalExportacao()">
+  <div class="export-modal" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="modal-header-export">
+      <h2>
+        <i class="material-icons">cloud_download</i>
+        Exportar Dados
+      </h2>
+      <button class="btn-close" (click)="fecharModalExportacao()">
+        <i class="material-icons">close</i>
+      </button>
+    </div>
+
+    <!-- Conteúdo -->
+    <div class="modal-content-export">
+      <p class="modal-description">
+        Escolha o formato de exportação para os dados de não conformidades de elegibilidade:
+      </p>
+
+      <!-- Opções de Formato -->
+      <div class="format-options">
+        <!-- Excel -->
+        <div class="format-card" (click)="exportar('excel')">
+          <div class="format-icon excel">
+            <i class="material-icons">description</i>
+          </div>
+          <div class="format-info">
+            <h3>Excel (.xlsx)</h3>
+            <p>Formato ideal para análise e manipulação de dados</p>
+          </div>
+          <div class="format-action">
+            <i class="material-icons">arrow_forward</i>
+          </div>
+        </div>
+
+        <!-- CSV -->
+        <div class="format-card" (click)="exportar('csv')">
+          <div class="format-icon csv">
+            <i class="material-icons">description</i>
+          </div>
+          <div class="format-info">
+            <h3>CSV (.csv)</h3>
+            <p>Formato universal compatível com qualquer planilha</p>
+          </div>
+          <div class="format-action">
+            <i class="material-icons">arrow_forward</i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer-export">
+      <button class="btn-cancelar" (click)="fecharModalExportacao()">
+        Cancelar
+      </button>
+    </div>
+  </div>
+</div>
+

@@ -1,0 +1,440 @@
+<!-- 🎯 HEADER MODERNO DA GESTÃO DE GARANTIAS -->
+<div class="gestao-garantias-header">
+  <div class="header-content">
+    <div class="header-left">
+      <button class="back-button" [routerLink]="['/relatorios']" matTooltip="Voltar para Relatórios">
+        <i class="cil-arrow-left"></i>
+      </button>
+      <div class="header-title">
+        <div class="title-icon">
+          <i class="cil-shield-alt"></i>
+        </div>
+        <div class="title-text">
+          <h1>Gestão de Garantias</h1>
+          <p>Controle e acompanhamento de garantias de equipamentos</p>
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="btn-exportar" (click)="exportarDados()" matTooltip="Exportar Dados" [disabled]="!equipamentos || equipamentos.length === 0">
+        <i class="cil-cloud-download"></i>
+        <span>Exportar Dados</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 🍞 BREADCRUMB MODERNO -->
+<nav class="modern-breadcrumb">
+  <div class="breadcrumb-container">
+    <a [routerLink]="['/dashboard']" class="breadcrumb-item">
+      <i class="cil-home"></i>
+      <span>Dashboard</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a [routerLink]="['/relatorios']" class="breadcrumb-item">
+      <i class="cil-timeline"></i>
+      <span>Relatórios e Timeline</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <span class="breadcrumb-item active">Gestão de Garantias</span>
+  </div>
+</nav>
+
+<!-- 📋 CONTEÚDO PRINCIPAL -->
+<div class="gestao-garantias-content">
+  <!-- 🔍 SEÇÃO DE FILTROS -->
+  <div class="filters-section">
+    <div class="filters-container">
+      <div class="filters-header">
+        <button class="toggle-filters-btn">
+          <i class="cil-filter"></i>
+          <span>Filtros de Pesquisa</span>
+        </button>
+      </div>
+      <div class="filters-content">
+        <div class="filters-grid">
+          <!-- Status Garantia -->
+          <div class="filter-field">
+            <label>Status da Garantia</label>
+            <select class="modern-select" [(ngModel)]="filtros.statusGarantia">
+              <option [ngValue]="null">Todos os status</option>
+              <option *ngFor="let status of statusGarantia" [ngValue]="status.valor">
+                {{ status.descricao }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Tipo de Recurso -->
+          <div class="filter-field">
+            <label>Tipo de Recurso</label>
+            <select class="modern-select" [(ngModel)]="filtros.tipoRecurso">
+              <option [ngValue]="null">Todos os tipos</option>
+              <option *ngFor="let tipo of tiposRecursos" [ngValue]="tipo.descricao">
+                {{ tipo.descricao }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Fabricante -->
+          <div class="filter-field">
+            <label>Fabricante</label>
+            <input type="text" class="modern-input" [(ngModel)]="filtros.fabricante" 
+                   placeholder="Digite o fabricante" />
+          </div>
+
+          <!-- Patrimônio -->
+          <div class="filter-field">
+            <label>Patrimônio</label>
+            <input type="text" class="modern-input" [(ngModel)]="filtros.patrimonio" 
+                   placeholder="Digite o patrimônio" />
+          </div>
+
+          <div class="filter-actions">
+            <button class="action-btn primary-btn" (click)="consultar()" [disabled]="loading">
+              <i class="cil-search"></i>
+              <span>Pesquisar</span>
+            </button>
+            <button class="action-btn secondary-btn" (click)="limparBusca()">
+              <i class="cil-x-circle"></i>
+              <span>Limpar</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 📊 SEÇÃO DE MÉTRICAS -->
+  <div class="metrics-section" *ngIf="equipamentos && equipamentos.length > 0">
+    <div class="metrics-grid">
+      <div class="metric-card danger">
+        <div class="metric-icon">
+          <i class="cil-warning"></i>
+        </div>
+        <div class="metric-info">
+          <div class="metric-value">{{ getTotalExpiradas() }}</div>
+          <div class="metric-label">Expiradas</div>
+        </div>
+      </div>
+      
+      <div class="metric-card danger-light">
+        <div class="metric-icon">
+          <i class="cil-bell"></i>
+        </div>
+        <div class="metric-info">
+          <div class="metric-value">{{ getTotalVencendo30() }}</div>
+          <div class="metric-label">Vencendo em 30 dias</div>
+        </div>
+      </div>
+      
+      <div class="metric-card warning">
+        <div class="metric-icon">
+          <i class="cil-clock"></i>
+        </div>
+        <div class="metric-info">
+          <div class="metric-value">{{ getTotalVencendo90() }}</div>
+          <div class="metric-label">Vencendo em 90 dias</div>
+        </div>
+      </div>
+
+      <div class="metric-card info">
+        <div class="metric-icon">
+          <i class="cil-calendar"></i>
+        </div>
+        <div class="metric-info">
+          <div class="metric-value">{{ getTotalVencendo180() }}</div>
+          <div class="metric-label">Vencendo em 180 dias</div>
+        </div>
+      </div>
+
+      <div class="metric-card success">
+        <div class="metric-icon">
+          <i class="cil-check-circle"></i>
+        </div>
+        <div class="metric-info">
+          <div class="metric-value">{{ getTotalVigentes() }}</div>
+          <div class="metric-label">Vigentes</div>
+        </div>
+      </div>
+
+      <div class="metric-card secondary">
+        <div class="metric-icon">
+          <i class="cil-info"></i>
+        </div>
+        <div class="metric-info">
+          <div class="metric-value">{{ getTotalNaoInformado() }}</div>
+          <div class="metric-label">Não Informado</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🔄 CONTAINER DE LOADING -->
+  <div class="loading-container" *ngIf="loading">
+    <div class="loading-spinner"></div>
+    <p>Carregando dados...</p>
+  </div>
+
+  <!-- 📋 SEÇÃO DA TABELA -->
+  <div class="table-section" *ngIf="!loading">
+    <div class="table-container">
+      <div class="scroll-indicator" *ngIf="dadosPagina.length > 0">
+        <i class="cil-arrow-left"></i>
+        <span>Deslize horizontalmente para ver mais colunas</span>
+        <i class="cil-arrow-right"></i>
+      </div>
+      
+      <table class="modern-table detailed-table">
+        <thead>
+          <tr>
+            <th>Patrimônio</th>
+            <th>Tipo de Recurso</th>
+            <th>Fabricante</th>
+            <th>Modelo</th>
+            <th>Número de Série</th>
+            <th>Data de Garantia</th>
+            <th>Dias Restantes</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let equipamento of dadosPagina">
+            <td class="text-center">
+              <span class="patrimonio-badge">{{ equipamento.patrimonio || 'N/A' }}</span>
+            </td>
+            <td class="text-center">
+              <span class="tipo-badge">{{ equipamento.tipoEquipamento || 'N/A' }}</span>
+            </td>
+            <td class="text-center">
+              <span class="fabricante-info">{{ equipamento.fabricante || 'N/A' }}</span>
+            </td>
+            <td class="text-center">
+              <span class="modelo-info">{{ equipamento.modelo || 'N/A' }}</span>
+            </td>
+            <td class="text-center">
+              <span class="serie-badge">{{ equipamento.numeroSerie || 'N/A' }}</span>
+            </td>
+            <td class="text-center">
+              <span class="data-badge">{{ equipamento.dataGarantia ? formatarData(equipamento.dataGarantia) : 'Não Informado' }}</span>
+            </td>
+            <td class="text-center">
+              <span class="dias-badge" [ngClass]="getDiasRestantesClass(equipamento.diasRestantes)">
+                <ng-container *ngIf="equipamento.diasRestantes !== null">
+                  <ng-container *ngIf="equipamento.diasRestantes < 0">
+                    Expirado há {{ -equipamento.diasRestantes }} dias
+                  </ng-container>
+                  <ng-container *ngIf="equipamento.diasRestantes >= 0">
+                    {{ equipamento.diasRestantes }} dias
+                  </ng-container>
+                </ng-container>
+                <ng-container *ngIf="equipamento.diasRestantes === null">
+                  N/A
+                </ng-container>
+              </span>
+            </td>
+            <td class="text-center">
+              <span class="status-badge" [ngClass]="getStatusGarantiaClass(equipamento.statusGarantia)">
+                <i [class]="getStatusGarantiaIcone(equipamento.statusGarantia)"></i>
+                {{ getStatusGarantiaDescricao(equipamento.statusGarantia) }}
+              </span>
+            </td>
+            <td class="text-center">
+              <div class="action-buttons">
+                <!-- Ver Detalhes -->
+                <button class="action-btn view-btn" 
+                        (click)="verDetalhes(equipamento)" 
+                        matTooltip="Ver Detalhes">
+                  <i class="cil-zoom-in"></i>
+                </button>
+                
+                <!-- Editar Recurso -->
+                <button class="action-btn edit-btn" 
+                        matTooltip="Editar Recurso" 
+                        [routerLink]="['/recurso', equipamento.id]">
+                  <i class="cil-pencil"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          
+          <!-- Mensagem quando não há dados -->
+          <tr *ngIf="!loading && (!dadosPagina || dadosPagina.length === 0)">
+            <td colspan="9" class="no-data-row">
+              <div class="no-data-message">
+                <i class="cil-inbox"></i>
+                <p>Nenhum equipamento encontrado</p>
+                <small>Clique em "Pesquisar" para carregar dados de garantias</small>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <div class="pagination-container">
+      <mat-paginator 
+        [length]="totalLength" 
+        [pageSize]="pageSize" 
+        [pageSizeOptions]="[10, 25, 50, 100]" 
+        (page)="onPageChange($event)"
+        showFirstLastButtons>
+      </mat-paginator>
+    </div>
+  </div>
+</div>
+
+<!-- 🚀 MODAL DE EXPORTAÇÃO -->
+<div class="export-modal" *ngIf="showExportModal" (click)="closeExportModal($event)">
+  <div class="export-modal-content" (click)="$event.stopPropagation()">
+    <div class="export-modal-header">
+      <h3><i class="cil-download"></i> Exportar Dados</h3>
+      <button class="close-btn" (click)="closeExportModal($event)">
+        <i class="cil-x"></i>
+      </button>
+    </div>
+    
+    <div class="export-modal-body">
+      <p>Escolha o formato de exportação para os dados de garantias:</p>
+      
+      <div class="export-options">
+        <div class="export-option" (click)="exportarParaCSV()">
+          <div class="export-icon csv">
+            <i class="cil-file"></i>
+          </div>
+          <div class="export-info">
+            <h4>CSV (.csv)</h4>
+            <p>Formato universal compatível com qualquer planilha</p>
+          </div>
+          <i class="cil-chevron-right"></i>
+        </div>
+      </div>
+    </div>
+    
+    <div class="export-modal-footer">
+      <button class="btn-secondary" (click)="closeExportModal($event)">
+        Cancelar
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 🔍 MODAL DE DETALHES -->
+<div class="details-modal" *ngIf="showDetalhesModal" (click)="closeDetalhesModal($event)">
+  <div class="details-modal-content" (click)="$event.stopPropagation()">
+    <div class="details-modal-header">
+      <h3><i class="cil-info"></i> Detalhes do Equipamento</h3>
+      <button class="close-btn" (click)="closeDetalhesModal($event)">
+        <i class="cil-x"></i>
+      </button>
+    </div>
+    
+    <div class="details-modal-body" *ngIf="equipamentoSelecionado">
+      <div class="details-grid">
+        <div class="detail-item">
+          <label>Patrimônio:</label>
+          <span>{{ equipamentoSelecionado.patrimonio || 'N/A' }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Tipo de Recurso:</label>
+          <span>{{ equipamentoSelecionado.tipoEquipamento || 'N/A' }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Fabricante:</label>
+          <span>{{ equipamentoSelecionado.fabricante || 'N/A' }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Modelo:</label>
+          <span>{{ equipamentoSelecionado.modelo || 'N/A' }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Número de Série:</label>
+          <span>{{ equipamentoSelecionado.numeroSerie || 'N/A' }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Data de Garantia:</label>
+          <span>{{ equipamentoSelecionado.dataGarantia ? formatarData(equipamentoSelecionado.dataGarantia) : 'Não Informado' }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Dias Restantes:</label>
+          <span [ngClass]="getDiasRestantesClass(equipamentoSelecionado.diasRestantes)">
+            <ng-container *ngIf="equipamentoSelecionado.diasRestantes !== null">
+              <ng-container *ngIf="equipamentoSelecionado.diasRestantes < 0">
+                Expirado há {{ -equipamentoSelecionado.diasRestantes }} dias
+              </ng-container>
+              <ng-container *ngIf="equipamentoSelecionado.diasRestantes >= 0">
+                {{ equipamentoSelecionado.diasRestantes }} dias
+              </ng-container>
+            </ng-container>
+            <ng-container *ngIf="equipamentoSelecionado.diasRestantes === null">
+              N/A
+            </ng-container>
+          </span>
+        </div>
+        <div class="detail-item">
+          <label>Status da Garantia:</label>
+          <span class="status-badge" [ngClass]="getStatusGarantiaClass(equipamentoSelecionado.statusGarantia)">
+            <i [class]="getStatusGarantiaIcone(equipamentoSelecionado.statusGarantia)"></i>
+            {{ getStatusGarantiaDescricao(equipamentoSelecionado.statusGarantia) }}
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="details-modal-footer">
+      <button class="btn-primary" [routerLink]="['/recurso', equipamentoSelecionado.id]" (click)="closeDetalhesModal($event)">
+        <i class="cil-pencil"></i> Editar Recurso
+      </button>
+      <button class="btn-secondary" (click)="closeDetalhesModal($event)">
+        Fechar
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 🚀 MODAL DE EXPORTAÇÃO -->
+<div class="export-modal" *ngIf="showExportModal" (click)="closeExportModal($event)">
+  <div class="export-modal-content" (click)="$event.stopPropagation()">
+    <div class="export-modal-header">
+      <h3><i class="cil-download"></i> Exportar Dados</h3>
+      <button class="close-btn" (click)="closeExportModal($event)">
+        <i class="cil-x"></i>
+      </button>
+    </div>
+    
+    <div class="export-modal-body">
+      <p>Escolha o formato de exportação para os dados de gestão de garantias:</p>
+      
+      <div class="export-options">
+        <div class="export-option" (click)="exportar('excel')">
+          <div class="export-icon excel">
+            <i class="cil-file"></i>
+          </div>
+          <div class="export-info">
+            <h4>Excel (.xlsx)</h4>
+            <p>Formato ideal para análise e manipulação de dados</p>
+          </div>
+          <i class="cil-chevron-right"></i>
+        </div>
+        
+        <div class="export-option" (click)="exportar('csv')">
+          <div class="export-icon csv">
+            <i class="cil-file"></i>
+          </div>
+          <div class="export-info">
+            <h4>CSV (.csv)</h4>
+            <p>Formato universal compatível com qualquer planilha</p>
+          </div>
+          <i class="cil-chevron-right"></i>
+        </div>
+      </div>
+    </div>
+    
+    <div class="export-modal-footer">
+      <button class="btn-secondary" (click)="closeExportModal($event)">
+        Cancelar
+      </button>
+    </div>
+  </div>
+</div>

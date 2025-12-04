@@ -1,0 +1,299 @@
+// 🎯 ESTILOS DO FORMULÁRIO DE FABRICANTE
+.fabricante-form-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  min-height: 400px; /* Garantir altura mínima para o formulário */
+}
+
+// Header do Formulário
+.form-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid #f0f0f0;
+
+  .form-title {
+    color: #2c3e50;
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  .form-subtitle {
+    color: #7f8c8d;
+    font-size: 1rem;
+    margin: 0;
+    line-height: 1.5;
+  }
+}
+
+// Formulário
+.fabricante-form {
+  .form-group {
+    margin-bottom: 1.5rem;
+    
+    /* Estilo específico para o campo de tipo de recurso */
+    &:first-child {
+      margin-bottom: 2rem; /* Mais espaço para o primeiro campo */
+    }
+
+    .form-label {
+      display: block;
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 0.5rem;
+      font-size: 0.95rem;
+
+      .required {
+        color: #e74c3c;
+        font-weight: 700;
+      }
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 2px solid #e1e8ed;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      background: #fafbfc;
+
+      &:focus {
+        outline: none;
+        border-color: #3498db;
+        background: #ffffff;
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+      }
+
+      &.is-invalid {
+        border-color: #e74c3c;
+        background: #fdf2f2;
+
+        &:focus {
+          box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+        }
+      }
+
+      &::placeholder {
+        color: #bdc3c7;
+      }
+    }
+
+    select.form-control {
+      cursor: pointer;
+      height: auto;
+      min-height: 48px; /* Garantir altura mínima para o texto */
+      line-height: 1.5;
+      padding: 0.75rem 1rem;
+      
+      /* Garantir que o texto seja exibido completamente */
+      white-space: nowrap;
+      overflow: visible;
+      text-overflow: clip;
+      
+      /* Estilizar as opções */
+      option {
+        padding: 0.5rem;
+        line-height: 1.4;
+        white-space: normal;
+        word-wrap: break-word;
+        min-height: 1.5em;
+      }
+      
+      /* Estilo específico para o dropdown */
+      &:focus {
+        outline: none;
+        border-color: #3498db;
+        background: #ffffff;
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+      }
+      
+      /* Garantir que o texto selecionado seja exibido completamente */
+      &[size] {
+        height: auto;
+      }
+      
+      /* Estilo para o texto do placeholder */
+      &:invalid {
+        color: #6c757d;
+      }
+      
+      /* Estilo específico para o campo de tipo de recurso */
+      &#tipo {
+        font-size: 1rem;
+        font-weight: 500;
+        color: #2c3e50;
+        
+        /* Garantir que o texto seja exibido completamente */
+        text-align: left;
+        vertical-align: middle;
+        
+        /* Ajustar altura para o texto */
+        height: 48px;
+        line-height: 1.2;
+        
+        /* Garantir que o texto não seja cortado */
+        padding-top: 0.875rem;
+        padding-bottom: 0.875rem;
+        
+        /* Forçar exibição completa do texto */
+        display: block;
+        box-sizing: border-box;
+        
+        /* Garantir que o texto seja visível */
+        overflow: visible;
+        text-overflow: unset;
+      }
+    }
+
+    .invalid-feedback {
+      display: block;
+      color: #e74c3c;
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+      font-weight: 500;
+    }
+
+    .form-text {
+      font-size: 0.875rem;
+      color: #7f8c8d;
+      margin-top: 0.25rem;
+      line-height: 1.4;
+    }
+  }
+}
+
+// Botões de Ação
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 2px solid #f0f0f0;
+
+  .btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 140px;
+    justify-content: center;
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    i {
+      font-size: 0.9rem;
+    }
+  }
+
+  .btn-secondary {
+    background: #95a5a6;
+    color: #ffffff;
+
+    &:hover:not(:disabled) {
+      background: #7f8c8d;
+      transform: translateY(-1px);
+    }
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: #ffffff;
+
+    &:hover:not(:disabled) {
+      background: linear-gradient(135deg, #2980b9, #1f5f8b);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+    }
+  }
+}
+
+// Responsividade
+@media (max-width: 768px) {
+  .fabricante-form-container {
+    padding: 1.5rem;
+    margin: 1rem;
+  }
+
+  .form-actions {
+    flex-direction: column;
+
+    .btn {
+      width: 100%;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .fabricante-form-container {
+    padding: 1rem;
+  }
+
+  .form-header {
+    .form-title {
+      font-size: 1.5rem;
+    }
+  }
+}
+
+/* 🎯 FORMULÁRIO MODAL */
+.formulario-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5); /* ✅ AJUSTADO: Mais claro como categorias */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+  
+  .formulario-container {
+    background: white;
+    border-radius: 16px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: slideIn 0.3s ease;
+  }
+}
+
+/* 🎭 ANIMAÇÕES */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

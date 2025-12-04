@@ -1,0 +1,535 @@
+/* 🎯 HEADER MODERNO DO CLIENTE */
+.cliente-header {
+  background: linear-gradient(135deg, #080039 0%, #1a1a2e 100%);
+  color: white;
+  padding: 2rem 2rem 2.5rem 2rem;
+  margin-bottom: 2rem;
+  border-radius: 0 0 20px 20px;
+  box-shadow: 0 8px 32px rgba(8, 0, 57, 0.3);
+  
+  .header-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      
+      .back-button {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        padding: 0.75rem;
+        color: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        
+        &:hover {
+          background: rgba(255, 255, 255, 0.2);
+          transform: translateY(-2px);
+        }
+        
+        i {
+          font-size: 20px;
+        }
+      }
+      
+      .header-title {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        
+        .title-icon {
+          background: linear-gradient(135deg, #FF3A0F 0%, #ff6b3d 100%);
+          width: 70px;
+          height: 70px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 8px 25px rgba(255, 58, 15, 0.3);
+          animation: float 3s ease-in-out infinite;
+          
+          i {
+            font-size: 32px;
+            color: white;
+          }
+        }
+        
+        .title-text {
+          h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin: 0;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            
+            @media (max-width: 768px) {
+              font-size: 2.2rem;
+            }
+          }
+          
+          p {
+            font-size: 1.2rem;
+            margin: 0.5rem 0 0 0;
+            opacity: 0.9;
+            font-weight: 300;
+          }
+        }
+      }
+    }
+  }
+}
+
+/* 🍞 BREADCRUMB MODERNO */
+.modern-breadcrumb {
+  background: white;
+  padding: 1rem 2rem;
+  margin-bottom: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  
+  .breadcrumb-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.9rem;
+    
+    .breadcrumb-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #666;
+      text-decoration: none;
+      transition: color 0.3s ease;
+      
+      &:hover {
+        color: #FF3A0F;
+      }
+      
+      &.active {
+        color: #FF3A0F;
+        font-weight: 600;
+      }
+      
+      i {
+        font-size: 16px;
+      }
+    }
+    
+    i.cil-chevron-right {
+      color: #ccc;
+      font-size: 14px;
+    }
+  }
+}
+
+/* 📋 CONTEÚDO PRINCIPAL */
+.cliente-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  
+  .cliente-form {
+    .form-card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      margin-bottom: 2rem;
+      overflow: hidden;
+      
+      .card-header {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 1.5rem 2rem;
+        border-bottom: 2px solid #dee2e6;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        
+        .header-icon {
+          background: linear-gradient(135deg, #FF3A0F 0%, #ff6b3d 100%);
+          width: 48px;
+          height: 48px;
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 4px 12px rgba(255, 58, 15, 0.2);
+          
+          i {
+            font-size: 24px;
+            color: white;
+          }
+        }
+        
+        .header-content {
+          h3 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2c3e50;
+          }
+          
+          p {
+            margin: 0.25rem 0 0 0;
+            color: #6c757d;
+            font-size: 0.95rem;
+          }
+        }
+      }
+      
+      .card-body {
+        padding: 2rem;
+        
+        .form-row {
+          display: flex;
+          gap: 1.5rem;
+          margin-bottom: 1.5rem;
+          
+          @media (max-width: 768px) {
+            flex-direction: column;
+            gap: 1rem;
+          }
+          
+          .form-field {
+            flex: 1;
+            
+            &.full-width {
+              flex: 2;
+            }
+            
+            .field-label {
+              display: flex;
+              align-items: center;
+              gap: 0.5rem;
+              margin-bottom: 0.75rem;
+              font-weight: 600;
+              color: #2c3e50;
+              font-size: 0.95rem;
+              
+              i {
+                color: #FF3A0F;
+                font-size: 16px;
+              }
+            }
+            
+            .form-input {
+              width: 100%;
+              padding: 1rem;
+              border: 2px solid #e0e0e0;
+              border-radius: 12px;
+              font-size: 1rem;
+              transition: all 0.3s ease;
+              background: white;
+              
+              &:focus {
+                outline: none;
+                border-color: #FF3A0F;
+                box-shadow: 0 0 0 3px rgba(255, 58, 15, 0.1);
+              }
+              
+              &::placeholder {
+                color: #999;
+              }
+              
+              &:disabled {
+                background: #f8f9fa;
+                color: #6c757d;
+                cursor: not-allowed;
+              }
+            }
+            
+            .field-error {
+              color: #dc3545;
+              font-size: 0.85rem;
+              margin-top: 0.5rem;
+              display: flex;
+              align-items: center;
+              gap: 0.25rem;
+              
+              &::before {
+                content: "⚠";
+                font-size: 14px;
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    .actions-card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      padding: 2rem;
+      margin-bottom: 2rem;
+      
+      .actions-content {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+        
+        @media (max-width: 768px) {
+          flex-direction: column;
+        }
+        
+        button {
+          padding: 0.875rem 1.5rem;
+          border: none;
+          border-radius: 12px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          font-size: 1rem;
+          
+          i {
+            font-size: 18px;
+          }
+          
+          &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+          }
+          
+          &.btn-secondary {
+            background: #6c757d;
+            color: white;
+            
+            &:hover:not(:disabled) {
+              background: #5a6268;
+              transform: translateY(-2px);
+              box-shadow: 0 6px 20px rgba(108, 117, 125, 0.3);
+            }
+          }
+          
+          &.btn-primary {
+            background: linear-gradient(135deg, #FF3A0F 0%, #ff6b3d 100%);
+            color: white;
+            
+            &:hover:not(:disabled) {
+              transform: translateY(-2px);
+              box-shadow: 0 6px 20px rgba(255, 58, 15, 0.3);
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+/* 🎨 ANIMAÇÕES */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* 📱 RESPONSIVIDADE */
+@media (max-width: 768px) {
+  .cliente-header {
+    padding: 1.5rem 1rem 2rem 1rem;
+    
+    .header-content {
+      .header-left {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+      }
+    }
+  }
+  
+  .modern-breadcrumb {
+    padding: 1rem;
+    
+    .breadcrumb-container {
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+  }
+  
+  .cliente-content {
+    padding: 0 1rem;
+    
+    .cliente-form {
+      .form-card {
+        .card-header {
+          padding: 1rem;
+          flex-direction: column;
+          text-align: center;
+          gap: 0.75rem;
+        }
+        
+        .card-body {
+          padding: 1rem;
+        }
+      }
+      
+      .actions-card {
+        padding: 1rem;
+      }
+    }
+  }
+}
+
+/* 🖼️ ESTILOS PARA UPLOAD DE LOGO */
+.logo-upload-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 0.5rem;
+
+  .logo-preview {
+    position: relative;
+    display: inline-block;
+    max-width: 200px;
+    
+    .logo-image {
+      width: 100%;
+      height: auto;
+      max-height: 120px;
+      object-fit: contain;
+      border-radius: 8px;
+      border: 2px solid #e9ecef;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .remove-logo-btn {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+      
+      &:hover {
+        background: #c82333;
+        transform: scale(1.1);
+      }
+      
+      i {
+        font-size: 12px;
+      }
+    }
+  }
+
+  .upload-area {
+    position: relative;
+    border: 2px dashed #dee2e6;
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    background: #f8f9fa;
+    
+    &:hover {
+      border-color: #080039;
+      background: #e9ecef;
+    }
+    
+    &.has-logo {
+      border-style: solid;
+      border-color: #28a745;
+      background: rgba(40, 167, 69, 0.05);
+    }
+    
+    .file-input {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+      z-index: 2;
+    }
+    
+    .upload-placeholder {
+      color: #6c757d;
+      
+      i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: #080039;
+        opacity: 0.6;
+      }
+      
+      p {
+        margin: 0.5rem 0;
+        font-weight: 500;
+        color: #080039;
+      }
+      
+      small {
+        color: #6c757d;
+        font-size: 0.875rem;
+      }
+    }
+    
+    .change-logo-btn {
+      background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin: 0 auto;
+      
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+      }
+      
+      i {
+        font-size: 16px;
+      }
+    }
+  }
+}
+
+.field-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background: rgba(13, 202, 240, 0.1);
+  border-radius: 6px;
+  border-left: 3px solid #0dcaf0;
+  
+  i {
+    color: #0dcaf0;
+    font-size: 14px;
+  }
+  
+  span {
+    color: #055160;
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+}

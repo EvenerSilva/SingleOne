@@ -1,0 +1,257 @@
+<!-- 🎯 HEADER MODERNO DAS NOTAS FISCAIS -->
+<div class="notas-fiscais-header">
+  <div class="header-content">
+    <div class="header-left">
+      <button class="back-button" [routerLink]="['/cadastros']" matTooltip="Voltar para Cadastros">
+        <i class="cil-arrow-left"></i>
+      </button>
+      <div class="header-title">
+        <div class="title-icon">
+          <i class="cil-notes"></i>
+        </div>
+        <div class="title-text">
+          <h1>Notas Fiscais</h1>
+          <p>Gerenciar notas fiscais e documentos do sistema</p>
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="action-btn primary-btn" routerLink="/nota-fiscal" matTooltip="Adicionar nova nota fiscal">
+        <i class="cil-plus"></i>
+        <span>Nova Nota Fiscal</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 🍞 BREADCRUMB MODERNO -->
+<nav class="modern-breadcrumb">
+  <div class="breadcrumb-container">
+    <a [routerLink]="['/dashboard']" class="breadcrumb-item">
+      <i class="cil-home"></i>
+      <span>Dashboard</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a [routerLink]="['/cadastros']" class="breadcrumb-item">
+      <i class="cil-cog"></i>
+      <span>Cadastros</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <span class="breadcrumb-item active">Notas Fiscais</span>
+  </div>
+</nav>
+
+<!-- 📋 CONTEÚDO PRINCIPAL -->
+<div class="notas-fiscais-content">
+  <!-- 🔍 SEÇÃO DE BUSCA -->
+  <div class="search-section">
+    <div class="search-box">
+      <i class="cil-magnifying-glass search-icon"></i>
+      <input type="text" placeholder="Buscar por número da nota fiscal ou nome do fornecedor..." [formControl]="consulta">
+      <button 
+        *ngIf="consulta.value" 
+        class="clear-btn" 
+        (click)="limparBusca()"
+        type="button">
+        <i class="cil-x"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- 📊 TABELA MODERNA -->
+  <div class="table-section">
+    <div class="table-container">
+      <table class="modern-table">
+        <thead>
+          <tr>
+            <th>Fornecedor</th>
+            <th>Número</th>
+            <th>Data Emissão</th>
+            <th>Valor</th>
+            <th>Descrição</th>
+            <th class="text-center">Status</th>
+            <th class="text-center">Arquivo</th>
+            <th class="text-center">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of dadosPaginados">
+            <td class="nota-fornecedor">
+              <div class="fornecedor-info">
+                <div class="fornecedor-avatar">
+                  <i class="cil-building"></i>
+                </div>
+                <span>{{ row.fornecedorNome || 'N/A' }}</span>
+              </div>
+            </td>
+            <td class="nota-numero">{{ row.numero }}</td>
+            <td class="nota-emissao">{{ row.dtemissao | dateFormat : 2 }}</td>
+            <td class="nota-valor">{{ row.valor | currencyFormat }}</td>
+            <td class="nota-descricao">{{ row.descricao }}</td>
+            <td class="nota-status text-center">
+              <div class="status-badge" [class.processada]="row.gerouequipamento" [class.pendente]="!row.gerouequipamento">
+                <i class="cil-check" *ngIf="row.gerouequipamento"></i>
+                <i class="cil-clock" *ngIf="!row.gerouequipamento"></i>
+                <span>{{ row.gerouequipamento ? 'Processada' : 'Pendente' }}</span>
+              </div>
+            </td>
+            <td class="nota-arquivo text-center">
+              <div class="arquivo-actions">
+                <ng-container *ngIf="row.temArquivo">
+                  <button 
+                    class="action-btn download-btn" 
+                    matTooltip="Baixar: {{ row.nomeArquivoOriginal }}" 
+                    (click)="downloadArquivo(row.id, row.nomeArquivoOriginal)">
+                    <i class="cil-cloud-download"></i>
+                  </button>
+                  <button 
+                    class="action-btn delete-btn-file" 
+                    matTooltip="Remover arquivo" 
+                    (click)="removerArquivo(row.id)">
+                    <i class="cil-trash"></i>
+                  </button>
+                </ng-container>
+                <ng-container *ngIf="!row.temArquivo">
+                  <label class="action-btn upload-btn" matTooltip="Anexar nota fiscal">
+                    <i class="cil-cloud-upload"></i>
+                    <input 
+                      type="file" 
+                      accept=".pdf,.xml,.jpg,.jpeg,.png" 
+                      (change)="uploadArquivo($event, row.id)" 
+                      style="display: none;">
+                  </label>
+                </ng-container>
+              </div>
+            </td>
+            <td class="nota-actions text-center">
+              <div class="action-buttons">
+                <!-- Botão para liberar para estoque -->
+                <button 
+                  *ngIf="row.podeAdicionarRecursos" 
+                  class="action-btn resources-btn" 
+                  matTooltip="Cadastrar em recursos" 
+                  (click)="liberarParaEstoque(row)">
+                  <i class="cil-laptop"></i>
+                </button>
+
+                                    <!-- Botão para visualizar -->
+                    <button
+                      *ngIf="row.podeVisualizar"
+                      class="action-btn view-btn"
+                      matTooltip="Visualizar"
+                      (click)="visualizarNotaFiscal(row.id)">
+                      <i class="cil-magnifying-glass"></i>
+                    </button>
+
+                <!-- Botão para editar -->
+                <button 
+                  *ngIf="!row.gerouequipamento" 
+                  class="action-btn edit-btn" 
+                  matTooltip="Editar" 
+                  (click)="editar(row)">
+                  <i class="cil-pencil"></i>
+                </button>
+
+                <!-- Botão para excluir -->
+                <button 
+                  *ngIf="row.podeExcluir" 
+                  class="action-btn delete-btn" 
+                  matTooltip="Excluir" 
+                  (click)="excluir(row)">
+                  <i class="cil-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 📄 PAGINAÇÃO -->
+  <div class="pagination-container">
+    <mat-paginator 
+      [pageSizeOptions]="[5, 10, 25, 100]" 
+      [pageSize]="10" 
+      showFirstLastButtons>
+    </mat-paginator>
+  </div>
+</div>
+
+<!-- 🎯 MODAL DE VISUALIZAÇÃO DE NOTA FISCAL -->
+<div class="modal-overlay" *ngIf="mostrarModalVisualizar" (click)="onModalFechado()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <app-visualizar-notafiscal-modal
+      [notaFiscalId]="notaFiscalSelecionada"
+      (fechado)="onModalFechado()"
+    ></app-visualizar-notafiscal-modal>
+  </div>
+</div>
+
+<!-- 🚀 MODAL DE PROGRESSO PARA CADASTRO DE RECURSOS -->
+<div *ngIf="mostrarModalProgresso" class="modal-progresso-overlay">
+  <div class="modal-progresso-container">
+    <div class="modal-progresso-header">
+      <div class="progresso-icon">
+        <i class="cil-sync" [class.rotating]="progresso.percentual < 100"></i>
+      </div>
+      <div class="progresso-title">
+        <h2>Cadastrando Recursos</h2>
+        <p>Nota Fiscal: {{ progresso.notaFiscal }}</p>
+      </div>
+    </div>
+
+    <div class="modal-progresso-content">
+      <!-- Barra de progresso -->
+      <div class="progresso-bar-container">
+        <div class="progresso-bar">
+          <div class="progresso-fill" [style.width.%]="progresso.percentual"></div>
+        </div>
+        <div class="progresso-percentual">{{ progresso.percentual | number:'1.0-0' }}%</div>
+      </div>
+
+      <!-- Estatísticas -->
+      <div class="progresso-stats">
+        <div class="stat-item">
+          <i class="cil-check-circle"></i>
+          <span class="stat-label">Processados:</span>
+          <span class="stat-value">{{ progresso.equipamentosProcessados | number }}</span>
+        </div>
+        <div class="stat-item">
+          <i class="cil-list"></i>
+          <span class="stat-label">Total:</span>
+          <span class="stat-value">{{ progresso.totalEquipamentos | number }}</span>
+        </div>
+        <div class="stat-item">
+          <i class="cil-clock"></i>
+          <span class="stat-label">Tempo:</span>
+          <span class="stat-value">{{ progresso.tempoDecorrido }}s / {{ progresso.tempoEstimado }}s</span>
+        </div>
+      </div>
+
+      <!-- Status -->
+      <div class="progresso-status">
+        <i class="cil-info"></i>
+        <span>{{ progresso.status }}</span>
+      </div>
+
+      <!-- Estimativa de tempo restante -->
+      <div *ngIf="progresso.percentual < 100" class="progresso-tempo-restante">
+        <i class="cil-timer"></i>
+        <span>Tempo estimado restante: {{ calcularTempoRestante() }} segundos</span>
+      </div>
+    </div>
+
+    <div class="modal-progresso-footer">
+      <div class="progresso-warning">
+        <i class="cil-warning"></i>
+        <span>Não feche esta janela durante o processamento</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Debug do modal -->
+<div *ngIf="mostrarModalVisualizar" style="position: fixed; top: 10px; right: 10px; background: red; color: white; padding: 10px; z-index: 10000;">
+  Modal ativo: {{ mostrarModalVisualizar }} | ID: {{ notaFiscalSelecionada }}
+</div>

@@ -1,0 +1,277 @@
+/* 🎯 WIDGET DE ESTOQUE MÍNIMO */
+
+.estoque-minimo-widget {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* =====================================================
+   HEADER DO WIDGET
+   ===================================================== */
+.widget-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.widget-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.widget-title h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.widget-actions .btn {
+  padding: 6px 10px;
+  border-radius: 6px;
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.widget-actions .btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* =====================================================
+   LOADING
+   ===================================================== */
+.widget-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+}
+
+/* =====================================================
+   CONTEÚDO DO WIDGET
+   ===================================================== */
+.widget-content {
+  padding: 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* =====================================================
+   ESTATÍSTICAS
+   ===================================================== */
+.widget-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.stat-item {
+  text-align: center;
+  padding: 15px 10px;
+  border-radius: 8px;
+  background: #f8f9fa;
+  transition: all 0.3s ease;
+}
+
+.stat-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.stat-item.total {
+  border-left: 4px solid #6c757d;
+}
+
+.stat-item.criticos {
+  border-left: 4px solid #dc3545;
+}
+
+.stat-item.moderados {
+  border-left: 4px solid #fd7e14;
+}
+
+.stat-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 5px;
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: #6c757d;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* =====================================================
+   ALERTAS CRÍTICOS
+   ===================================================== */
+.alertas-criticos {
+  flex: 1;
+}
+
+.alertas-header {
+  margin-bottom: 15px;
+}
+
+.alertas-header h4 {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.alertas-list {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.alerta-item {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  border-left: 4px solid;
+  transition: all 0.3s ease;
+}
+
+.alerta-item:hover {
+  transform: translateX(2px);
+}
+
+.alerta-item.severidade-critica {
+  background: #fff5f5;
+  border-left-color: #dc3545;
+}
+
+.alerta-item.severidade-moderada {
+  background: #fff8f0;
+  border-left-color: #fd7e14;
+}
+
+.alerta-item.severidade-baixa {
+  background: #f0f9ff;
+  border-left-color: #17a2b8;
+}
+
+.alerta-icon {
+  font-size: 1.2rem;
+  margin-right: 12px;
+  opacity: 0.8;
+}
+
+.alerta-item.severidade-critica .alerta-icon {
+  color: #dc3545;
+}
+
+.alerta-item.severidade-moderada .alerta-icon {
+  color: #fd7e14;
+}
+
+.alerta-item.severidade-baixa .alerta-icon {
+  color: #17a2b8;
+}
+
+.alerta-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.alerta-descricao {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.alerta-details {
+  display: flex;
+  gap: 10px;
+  font-size: 0.8rem;
+  color: #6c757d;
+}
+
+.localidade {
+  font-weight: 500;
+}
+
+.faltante {
+  color: #dc3545;
+  font-weight: 600;
+}
+
+/* =====================================================
+   SEM ALERTAS
+   ===================================================== */
+.no-alerts,
+.no-critical-alerts {
+  text-align: center;
+  padding: 20px;
+  color: #6c757d;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.no-alerts-icon {
+  font-size: 2.5rem;
+  color: #28a745;
+  margin-bottom: 10px;
+}
+
+.no-critical-icon {
+  font-size: 2.5rem;
+  color: #17a2b8;
+  margin-bottom: 10px;
+}
+
+.no-alerts p,
+.no-critical-alerts p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+/* =====================================================
+   RESPONSIVIDADE
+   ===================================================== */
+@media (max-width: 768px) {
+  .widget-stats {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  
+  .alerta-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .alerta-details {
+    flex-direction: column;
+    gap: 4px;
+  }
+}

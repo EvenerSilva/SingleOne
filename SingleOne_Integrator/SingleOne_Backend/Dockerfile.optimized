@@ -1,0 +1,83 @@
+# ============================================
+# Dockerfile - SingleOne Backend (.NET 6.0)
+# Versão Otimizada para Deploy
+# ============================================
+
+# Estágio 1: Build
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
+WORKDIR /src
+
+# Copiar o arquivo .csproj e restaurar dependências
+COPY SingleOneAPI/SingleOneAPI.csproj SingleOneAPI/
+RUN dotnet restore "SingleOneAPI/SingleOneAPI.csproj"
+
+# Copiar todo o código fonte
+COPY . .
+
+# Build da aplicação
+WORKDIR /src/SingleOneAPI
+RUN dotnet build "SingleOneAPI.csproj" -c Release -o /app/build
+
+# Estágio 2: Publish
+FROM build AS publish
+RUN dotnet publish "SingleOneAPI.csproj" -c Release -o /app/publish /p:UseAppHost=false
+
+# Estágio 3: Runtime
+FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS final
+WORKDIR /app
+
+# Configurar apt para usar mirrors mais rápidos e retry
+RUN echo 'Acquire::Retries "3";' > /etc/apt/apt.conf.d/80-retries && \
+    echo 'Acquire::http::Timeout "30";' >> /etc/apt/apt.conf.d/80-retries && \
+    echo 'Acquire::ftp::Timeout "30";' >> /etc/apt/apt.conf.d/80-retries
+
+# Instalar dependências essenciais para wkhtmltopdf (otimizado)
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    curl \
+    libgdiplus \
+    libc6-dev \
+    libx11-6 \
+    libxrender1 \
+    libfontconfig1 \
+    fontconfig \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copiar os arquivos publicados
+COPY --from=publish /app/publish .
+
+# Garantir permissões de execução para o wkhtmltopdf
+RUN chmod +x /app/Rotativa/Linux/wkhtmltopdf || true
+
+# Criar diretórios necessários
+RUN mkdir -p /app/wwwroot/logos /app/evidencias /app/documentos
+
+# Expor a porta
+EXPOSE 80
+
+# Variáveis de ambiente padrão
+ENV ASPNETCORE_URLS=http://+:80
+ENV ASPNETCORE_ENVIRONMENT=Production
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+  CMD curl -f http://localhost:80/health || exit 1
+
+# Executar a aplicação
+ENTRYPOINT ["dotnet", "SingleOneAPI.dll"]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

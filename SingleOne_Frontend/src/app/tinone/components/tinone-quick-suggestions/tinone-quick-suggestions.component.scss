@@ -1,0 +1,154 @@
+.quick-suggestions-container {
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 8px;
+  margin-bottom: 12px;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Contexto da página
+.context-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+
+  svg {
+    flex-shrink: 0;
+    stroke: #4a90e2;
+  }
+
+  strong {
+    color: #333;
+  }
+}
+
+// Header das sugestões
+.suggestions-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 10px;
+
+  > svg {
+    flex-shrink: 0;
+    stroke: #ffc107;
+  }
+
+  .btn-close-suggestions {
+    margin-left: auto;
+    background: none;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    color: #999;
+    transition: color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    svg {
+      stroke: #999;
+      transition: stroke 0.2s;
+    }
+
+    &:hover svg {
+      stroke: #333;
+    }
+  }
+}
+
+// Chips de sugestões
+.suggestions-chips {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.suggestion-chip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 13px;
+  font-weight: 500;
+  color: #333;
+  text-align: left;
+
+  &:hover {
+    transform: translateX(4px);
+    border-color: currentColor;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    background: #f8f9fa;
+  }
+
+  &:active {
+    transform: translateX(2px) scale(0.98);
+  }
+
+  span {
+    flex: 1;
+  }
+
+  svg {
+    flex-shrink: 0;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+    stroke: currentColor;
+  }
+
+  &:hover svg {
+    opacity: 1;
+  }
+}
+
+// Separador
+.suggestions-divider {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed rgba(0, 0, 0, 0.1);
+  text-align: center;
+  font-size: 12px;
+  color: #999;
+  font-style: italic;
+}
+
+// Responsivo
+@media (max-width: 400px) {
+  .quick-suggestions-container {
+    padding: 10px 12px;
+  }
+
+  .suggestion-chip {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+
+  .context-header {
+    font-size: 12px;
+  }
+}
+

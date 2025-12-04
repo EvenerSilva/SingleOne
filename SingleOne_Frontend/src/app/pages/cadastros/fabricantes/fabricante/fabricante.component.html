@@ -1,0 +1,106 @@
+<!-- 🎯 FORMULÁRIO MODAL DE FABRICANTE -->
+<div class="formulario-overlay">
+  <div class="formulario-container">
+    <div class="fabricante-form-container">
+  <div class="form-header">
+    <h2 class="form-title">{{ getTitulo() }}</h2>
+    <p class="form-subtitle">
+      {{ modo === 'criar' ? 'Crie um novo fabricante para seus equipamentos' : 'Edite as informações do fabricante selecionado' }}
+    </p>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="salvar()" class="fabricante-form">
+    
+    <!-- Campo Categoria -->
+    <div class="form-group">
+      <label for="categoria" class="form-label">
+        Categoria <span class="required">*</span>
+      </label>
+      <select 
+        id="categoria"
+        formControlName="categoriaId" 
+        class="form-control"
+        [class.is-invalid]="form.get('categoriaId')?.invalid && form.get('categoriaId')?.touched"
+        (change)="onCategoriaChange($event)"
+      >
+        <option value="">Selecione a categoria</option>
+        <option *ngFor="let categoria of categorias" [value]="categoria.id">{{categoria.nome}}</option>
+      </select>
+      <div class="invalid-feedback" *ngIf="form.get('categoriaId')?.invalid && form.get('categoriaId')?.touched">
+        <span *ngIf="form.get('categoriaId')?.errors?.required">Categoria é obrigatória</span>
+      </div>
+      <small class="form-text text-muted">
+        Selecione a categoria para filtrar os tipos de equipamento
+      </small>
+    </div>
+
+    <!-- Campo Tipo de Recurso -->
+    <div class="form-group">
+      <label for="tipo" class="form-label">
+        Tipo de Recurso <span class="required">*</span>
+      </label>
+      <select 
+        id="tipo"
+        formControlName="tipo" 
+        class="form-control"
+        [class.is-invalid]="form.get('tipo')?.invalid && form.get('tipo')?.touched"
+      >
+        <option value="">Selecione o tipo de recurso</option>
+        <option *ngFor="let row of tiposrecursos" [value]="row.id">{{row.descricao}}</option>
+      </select>
+      <div class="invalid-feedback" *ngIf="form.get('tipo')?.invalid && form.get('tipo')?.touched">
+        <span *ngIf="form.get('tipo')?.errors?.required">Tipo de recurso é obrigatório</span>
+      </div>
+      <small class="form-text text-muted">
+        Selecione o tipo de equipamento para este fabricante
+      </small>
+    </div>
+
+    <!-- Campo Nome do Fabricante -->
+    <div class="form-group">
+      <label for="descricao" class="form-label">
+        Nome do Fabricante <span class="required">*</span>
+      </label>
+      <input 
+        type="text" 
+        id="descricao"
+        formControlName="descricao" 
+        class="form-control"
+        [class.is-invalid]="form.get('descricao')?.invalid && form.get('descricao')?.touched"
+        placeholder="Ex: Dell, HP, Samsung..."
+        maxlength="200"
+      >
+      <div class="invalid-feedback" *ngIf="form.get('descricao')?.invalid && form.get('descricao')?.touched">
+        <span *ngIf="form.get('descricao')?.errors?.required">Nome do fabricante é obrigatório</span>
+        <span *ngIf="form.get('descricao')?.errors?.maxlength">Nome deve ter no máximo 200 caracteres</span>
+      </div>
+      <small class="form-text text-muted">
+        Nome único para identificar o fabricante
+      </small>
+    </div>
+    <!-- Botões de Ação -->
+    <div class="form-actions">
+              <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="cancelar()"
+          [disabled]="carregando"
+        >
+          <i class="fas fa-times"></i>
+          Cancelar
+        </button>
+      
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="form.invalid || carregando"
+      >
+        <i class="fas fa-save" *ngIf="!carregando"></i>
+        <i class="fas fa-spinner fa-spin" *ngIf="carregando"></i>
+        {{ getBotaoTexto() }}
+      </button>
+    </div>
+  </form>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,64 @@
+<mat-toolbar color="accent">
+    <div class="container" style="color:#080039">
+        <button mat-icon-button [routerLink]="['/recursos']"><mat-icon>chevron_left</mat-icon></button>Visualizar Recurso
+    </div>
+</mat-toolbar>
+<div class="container p-4">
+    <mat-card>
+        <mat-card-content>
+            <div class="row">
+                <div class="col-md-4" appearance="fill">
+                    <strong>Tipo Recurso:</strong> {{tipoequipamento}}
+                </div>
+                <div class="col-md-4" appearance="fill">
+                    <strong>Fabricante:</strong> {{fabricante}}
+                </div>
+                <div class="col-md-4" appearance="fill">
+                    <strong>Modelo:</strong> {{modelo}}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4" appearance="fill">
+                    <strong>Nota Fiscal:</strong> {{notafiscal}}
+                </div>
+                <div class="col-md-4" appearance="fill">
+                    <strong>Localidade:</strong> {{localizacao}}
+                </div>
+                <div class="col-md-4" appearance="fill">
+                    <strong>Empresa:</strong> {{empresa}}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4" appearance="fill">
+                    <strong>Centro de Custo:</strong> {{centrocusto}}
+                </div>
+                <div class="col-md-4" appearance="fill">
+                    <strong>Número de Série:</strong> {{numeroserie}}
+                </div>
+                <div class="col-md-4" appearance="fill">
+                    <strong>Patrimônio:</strong> {{patrimonio}}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4" appearance="fill">
+                    <strong>Dt. Limite Garantia:</strong> 
+                    <span 
+                    [ngStyle]="{ color: dataMenorQueHoje(dtlimitegarantia) ? 'red' : 'green' }"> 
+                        {{ dtlimitegarantia | dateFormat:2 }}
+                    </span>
+                </div>
+                <div class="col-md-4" appearance="fill">
+                    <strong>Tipo Aquisição:</strong> {{tipoaquisicao}}
+                </div>
+                <div class="col-md-4" appearance="fill">
+                    <strong>Status:</strong> {{equipamentostatus}}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4" appearance="fill">
+                    <strong>Contrato:</strong> {{contrato}}
+                </div>
+            </div>
+        </mat-card-content>
+    </mat-card>
+</div>

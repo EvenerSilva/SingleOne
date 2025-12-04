@@ -1,0 +1,63 @@
+<!-- 🎯 FORMULÁRIO MODAL DE OPERADORA -->
+<div class="formulario-overlay">
+  <div class="formulario-container">
+    <div class="operadora-form-container">
+      <div class="form-header">
+        <h2 class="form-title">{{ getTitulo() }}</h2>
+        <p class="form-subtitle">
+          {{ modo === 'criar' ? 'Crie uma nova operadora de telefonia para gerenciar seus serviços' : 'Edite as informações da operadora selecionada' }}
+        </p>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="salvar()" class="operadora-form">
+        
+        <!-- Campo Nome da Operadora -->
+        <div class="form-group">
+          <label for="operadora" class="form-label">
+            Nome da Operadora <span class="required">*</span>
+          </label>
+          <input
+            type="text"
+            id="operadora"
+            formControlName="operadora"
+            class="form-control"
+            [class.is-invalid]="form.get('operadora')?.invalid && form.get('operadora')?.touched"
+            placeholder="Ex: Vivo, Claro, TIM, Oi..."
+            maxlength="100"
+          >
+          <div class="invalid-feedback" *ngIf="form.get('operadora')?.invalid && form.get('operadora')?.touched">
+            <span *ngIf="form.get('operadora')?.errors?.required">Nome da operadora é obrigatório</span>
+            <span *ngIf="form.get('operadora')?.errors?.minlength">Nome deve ter pelo menos 2 caracteres</span>
+            <span *ngIf="form.get('operadora')?.errors?.maxlength">Nome deve ter no máximo 100 caracteres</span>
+          </div>
+          <small class="form-text text-muted">
+            Nome único para identificar a operadora de telefonia
+          </small>
+        </div>
+
+        <!-- Botões de Ação -->
+        <div class="form-actions">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="cancelar()"
+            [disabled]="carregando"
+          >
+            <i class="fas fa-times"></i>
+            Cancelar
+          </button>
+          
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="form.invalid || carregando"
+          >
+            <i class="fas fa-save" *ngIf="!carregando"></i>
+            <i class="fas fa-spinner fa-spin" *ngIf="carregando"></i>
+            {{ getBotaoTexto() }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

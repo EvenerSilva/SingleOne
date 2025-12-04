@@ -1,0 +1,471 @@
+<div class="container-fluid">
+  <!-- Header -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h2 class="mb-1">
+            <i class="cil-cloud-upload me-2"></i>
+            Importar Linhas Telefônicas
+          </h2>
+          <p class="text-muted">
+            Faça upload de arquivo Excel para importar linhas em massa
+          </p>
+        </div>
+        <button class="btn btn-outline-primary" (click)="baixarTemplate()" type="button">
+          <i class="cil-data-transfer-down me-1"></i>
+          Baixar Template
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PASSO 1: SELEÇÃO DE ARQUIVO -->
+  <div class="row" *ngIf="passoAtual === 1">
+    <div class="col-lg-8 offset-lg-2">
+      <div class="card">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">
+            <i class="cil-file me-2"></i>
+            PASSO 1: Selecionar Arquivo
+          </h5>
+        </div>
+        <div class="card-body text-center py-5">
+          <div class="upload-area" (click)="fileInput.click()">
+            <i class="cil-cloud-upload" style="font-size: 3rem; color: #007bff;"></i>
+            <h5 class="mt-3">Clique ou arraste o arquivo aqui</h5>
+            <p class="text-muted">Arquivos aceitos: .xlsx, .xls (Máximo: 10MB)</p>
+            <input 
+              #fileInput 
+              type="file" 
+              class="d-none" 
+              accept=".xlsx,.xls" 
+              (change)="onArquivoSelecionado($event)">
+            <button class="btn btn-primary mt-2" type="button">
+              <i class="cil-folder-open me-1"></i>
+              Escolher Arquivo
+            </button>
+          </div>
+
+          <!-- Info Box -->
+          <div class="alert alert-info mt-4 text-start">
+            <h6><i class="cil-info me-2"></i>O arquivo deve conter as seguintes colunas:</h6>
+            <ul class="mb-0">
+              <li><strong>Operadora</strong> - Nome da operadora (ex: Vivo, Claro, TIM)</li>
+              <li><strong>Contrato</strong> - Nome do contrato</li>
+              <li><strong>Plano</strong> - Nome do plano</li>
+              <li><strong>Valor</strong> - Valor mensal do plano</li>
+              <li><strong>Número</strong> - Número da linha com DDD</li>
+              <li><strong>ICCID</strong> - Código do chip (opcional)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PASSO 2: VALIDAÇÃO -->
+  <div class="row" *ngIf="passoAtual === 2">
+    <div class="col-lg-10 offset-lg-1">
+      <!-- Loading -->
+      <div class="card" *ngIf="uploadando">
+        <div class="card-body text-center py-5">
+          <div class="spinner-border text-primary mb-3" role="status">
+            <span class="visually-hidden">Carregando...</span>
+          </div>
+          <h5>Processando arquivo...</h5>
+          <p class="text-muted">Aguarde enquanto validamos os dados</p>
+        </div>
+      </div>
+
+      <!-- Resultado da Validação -->
+      <div *ngIf="!uploadando && resultadoValidacao">
+        <div class="card">
+          <div class="card-header bg-success text-white">
+            <h5 class="mb-0">
+              <i class="cil-check-circle me-2"></i>
+              PASSO 2: Validação
+            </h5>
+          </div>
+          <div class="card-body">
+            <!-- Status Geral -->
+            <div class="alert" 
+                 [ngClass]="resultadoValidacao.podeImportar ? 'alert-success' : 'alert-warning'">
+              <h6 class="mb-1">
+                <i [ngClass]="resultadoValidacao.podeImportar ? 'cil-check-circle' : 'cil-warning'"></i>
+                {{ resultadoValidacao.mensagem }}
+              </h6>
+            </div>
+
+            <!-- Resumo Geral -->
+            <div class="row g-3 mb-4">
+              <div class="col-md-3">
+                <div class="stat-card">
+                  <div class="stat-icon bg-primary">
+                    <i class="cil-file"></i>
+                  </div>
+                  <div class="stat-content">
+                    <h3>{{ resultadoValidacao.totalRegistros }}</h3>
+                    <p>Total de Registros</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="col-md-3">
+                <div class="stat-card">
+                  <div class="stat-icon bg-success">
+                    <i class="cil-check-circle"></i>
+                  </div>
+                  <div class="stat-content">
+                    <h3>{{ resultadoValidacao.totalValidos }}</h3>
+                    <p>Válidos</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="col-md-3" *ngIf="resultadoValidacao.totalAvisos > 0">
+                <div class="stat-card">
+                  <div class="stat-icon bg-warning">
+                    <i class="cil-warning"></i>
+                  </div>
+                  <div class="stat-content">
+                    <h3>{{ resultadoValidacao.totalAvisos }}</h3>
+                    <p>Avisos</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="col-md-3" *ngIf="resultadoValidacao.totalErros > 0">
+                <div class="stat-card">
+                  <div class="stat-icon bg-danger">
+                    <i class="cil-x-circle"></i>
+                  </div>
+                  <div class="stat-content">
+                    <h3>{{ resultadoValidacao.totalErros }}</h3>
+                    <p>Erros</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Novos Registros que Serão Criados -->
+            <div class="alert alert-info" *ngIf="resumoValidacao && (resumoValidacao.novasOperadoras > 0 || resumoValidacao.novosContratos > 0 || resumoValidacao.novosPlanos > 0)">
+              <h6><i class="cil-star me-2"></i>Novos registros que serão criados automaticamente:</h6>
+              <div class="row">
+                <div class="col-md-4" *ngIf="resumoValidacao.novasOperadoras > 0">
+                  <strong>{{ resumoValidacao.novasOperadoras }}</strong> Operadora(s)
+                  <ul class="small mb-0">
+                    <li *ngFor="let nome of resumoValidacao.nomesOperadorasNovas">{{ nome }}</li>
+                  </ul>
+                </div>
+                <div class="col-md-4" *ngIf="resumoValidacao.novosContratos > 0">
+                  <strong>{{ resumoValidacao.novosContratos }}</strong> Contrato(s)
+                  <ul class="small mb-0">
+                    <li *ngFor="let nome of resumoValidacao.nomesContratosNovos">{{ nome }}</li>
+                  </ul>
+                </div>
+                <div class="col-md-4" *ngIf="resumoValidacao.novosPlanos > 0">
+                  <strong>{{ resumoValidacao.novosPlanos }}</strong> Plano(s)
+                  <ul class="small mb-0">
+                    <li *ngFor="let nome of resumoValidacao.nomesPlanosNovos">{{ nome }}</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- Botão Ver Detalhes -->
+            <div class="text-center mb-3">
+              <button class="btn btn-outline-primary" (click)="abrirDetalhes()" type="button">
+                <i class="cil-zoom me-1"></i>
+                Ver Detalhes da Validação
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ações -->
+        <div class="card mt-3">
+          <div class="card-header">
+            <h5 class="mb-0">
+              <i class="cil-settings me-2"></i>
+              PASSO 3: Importar
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="alert alert-warning" *ngIf="!resultadoValidacao.podeImportar">
+              <i class="cil-warning me-2"></i>
+              <strong>Atenção:</strong> Corrija os erros antes de prosseguir com a importação.
+            </div>
+
+            <div class="alert alert-info" *ngIf="resultadoValidacao.podeImportar">
+              <i class="cil-info me-2"></i>
+              Esta ação irá criar <strong>{{ resultadoValidacao.totalValidos }} linhas telefônicas</strong> no banco de dados.
+              <span *ngIf="resultadoValidacao.novasOperadoras + resultadoValidacao.novosContratos + resultadoValidacao.novosPlanos > 0">
+                <br>Também serão criados automaticamente: 
+                <strong *ngIf="resultadoValidacao.novasOperadoras > 0">{{ resultadoValidacao.novasOperadoras }} operadora(s)</strong>
+                <strong *ngIf="resultadoValidacao.novosContratos > 0">, {{ resultadoValidacao.novosContratos }} contrato(s)</strong>
+                <strong *ngIf="resultadoValidacao.novosPlanos > 0">, {{ resultadoValidacao.novosPlanos }} plano(s)</strong>
+              </span>
+            </div>
+
+            <div class="d-flex gap-2">
+              <button 
+                class="btn btn-danger"
+                (click)="cancelarImportacao()"
+                type="button">
+                <i class="cil-x me-1"></i>
+                Cancelar
+              </button>
+              <button 
+                class="btn btn-success"
+                (click)="confirmarImportacao()"
+                [disabled]="!resultadoValidacao.podeImportar"
+                type="button">
+                <i class="cil-check me-1"></i>
+                Confirmar Importação
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PASSO 3: IMPORTANDO -->
+  <div class="row" *ngIf="passoAtual === 3">
+    <div class="col-lg-6 offset-lg-3">
+      <div class="card">
+        <div class="card-body text-center py-5">
+          <div class="spinner-border text-success mb-3" style="width: 3rem; height: 3rem;" role="status">
+            <span class="visually-hidden">Importando...</span>
+          </div>
+          <h4>Importando dados...</h4>
+          <p class="text-muted">Aguarde enquanto criamos os registros no banco de dados</p>
+          <div class="progress mt-3">
+            <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                 role="progressbar" 
+                 style="width: 100%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PASSO 4: CONCLUÍDO -->
+  <div class="row" *ngIf="passoAtual === 4 && resultadoImportacao">
+    <div class="col-lg-8 offset-lg-2">
+      <div class="card">
+        <div class="card-header bg-success text-white">
+          <h5 class="mb-0">
+            <i class="cil-check-circle me-2"></i>
+            Importação Concluída com Sucesso!
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-success">
+            <h5><i class="cil-check-circle me-2"></i>{{ resultadoImportacao.mensagem }}</h5>
+          </div>
+
+          <div class="row g-3">
+            <div class="col-md-3" *ngIf="resultadoImportacao.operadorasCriadas > 0">
+              <div class="result-stat">
+                <div class="result-icon bg-primary">
+                  <i class="cil-building"></i>
+                </div>
+                <h4>{{ resultadoImportacao.operadorasCriadas }}</h4>
+                <p>Operadoras Criadas</p>
+              </div>
+            </div>
+
+            <div class="col-md-3" *ngIf="resultadoImportacao.contratosCriados > 0">
+              <div class="result-stat">
+                <div class="result-icon bg-info">
+                  <i class="cil-file"></i>
+                </div>
+                <h4>{{ resultadoImportacao.contratosCriados }}</h4>
+                <p>Contratos Criados</p>
+              </div>
+            </div>
+
+            <div class="col-md-3" *ngIf="resultadoImportacao.planosCriados > 0">
+              <div class="result-stat">
+                <div class="result-icon bg-warning">
+                  <i class="cil-list"></i>
+                </div>
+                <h4>{{ resultadoImportacao.planosCriados }}</h4>
+                <p>Planos Criados</p>
+              </div>
+            </div>
+
+            <div class="col-md-3">
+              <div class="result-stat">
+                <div class="result-icon bg-success">
+                  <i class="cil-phone"></i>
+                </div>
+                <h4>{{ resultadoImportacao.linhasCriadas }}</h4>
+                <p>Linhas Criadas</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="text-center mt-4">
+            <button class="btn btn-primary" (click)="resetarFormulario()" type="button">
+              <i class="cil-reload me-1"></i>
+              Nova Importação
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HISTÓRICO -->
+  <div class="row mt-4" *ngIf="historico.length > 0">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="cil-history me-2"></i>
+            Histórico de Importações
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Data/Hora</th>
+                  <th>Arquivo</th>
+                  <th>Usuário</th>
+                  <th>Registros</th>
+                  <th>Status</th>
+                  <th>Observações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of historico">
+                  <td>{{ formatarData(item.dataInicio) }}</td>
+                  <td>
+                    <i class="cil-file me-1"></i>
+                    {{ item.nomeArquivo }}
+                  </td>
+                  <td>{{ item.usuarioNome }}</td>
+                  <td>
+                    <span class="badge bg-primary">{{ item.totalImportados }}/{{ item.totalRegistros }}</span>
+                  </td>
+                  <td>
+                    <span class="badge" [ngClass]="getStatusLogClass(item.status)">
+                      {{ item.statusDescricao }}
+                    </span>
+                  </td>
+                  <td class="small text-muted">{{ item.observacoes || '-' }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DE DETALHES -->
+<div class="modal fade" [class.show]="modalDetalhesAberto" [style.display]="modalDetalhesAberto ? 'block' : 'none'" 
+     tabindex="-1" role="dialog" *ngIf="modalDetalhesAberto">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">
+          <i class="cil-zoom me-2"></i>
+          Detalhes da Validação
+        </h5>
+        <button type="button" class="btn-close btn-close-white" (click)="fecharDetalhes()"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Filtros -->
+        <div class="btn-group mb-3" role="group">
+          <button type="button" class="btn" [ngClass]="filtroStatus === '' ? 'btn-primary' : 'btn-outline-primary'" 
+                  (click)="filtrarDetalhes('')">
+            Todos
+          </button>
+          <button type="button" class="btn" [ngClass]="filtroStatus === 'V' ? 'btn-success' : 'btn-outline-success'" 
+                  (click)="filtrarDetalhes('V')">
+            Válidos
+          </button>
+          <button type="button" class="btn" [ngClass]="filtroStatus === 'E' ? 'btn-danger' : 'btn-outline-danger'" 
+                  (click)="filtrarDetalhes('E')">
+            Erros
+          </button>
+        </div>
+
+        <!-- Loading -->
+        <div class="text-center py-4" *ngIf="carregandoDetalhes">
+          <div class="spinner-border" role="status"></div>
+        </div>
+
+        <!-- Tabela de Detalhes -->
+        <div class="table-responsive" *ngIf="!carregandoDetalhes">
+          <table class="table table-sm table-hover">
+            <thead>
+              <tr>
+                <th width="50">Linha</th>
+                <th width="80">Status</th>
+                <th>Operadora</th>
+                <th>Contrato</th>
+                <th>Plano</th>
+                <th>Valor</th>
+                <th>Número</th>
+                <th>Mensagens</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let detalhe of detalhesValidacao">
+                <td>{{ detalhe.linhaArquivo }}</td>
+                <td>
+                  <span class="badge" [ngClass]="getStatusClass(detalhe.status)">
+                    <i [ngClass]="getStatusIcon(detalhe.status)"></i>
+                    {{ detalhe.statusDescricao }}
+                  </span>
+                </td>
+                <td>
+                  {{ detalhe.operadoraNome }}
+                  <span class="badge bg-info ms-1" *ngIf="detalhe.criarOperadora" title="Será criada">✨</span>
+                </td>
+                <td>
+                  {{ detalhe.contratoNome }}
+                  <span class="badge bg-info ms-1" *ngIf="detalhe.criarContrato" title="Será criado">✨</span>
+                </td>
+                <td>
+                  {{ detalhe.planoNome }}
+                  <span class="badge bg-info ms-1" *ngIf="detalhe.criarPlano" title="Será criado">✨</span>
+                </td>
+                <td>R$ {{ detalhe.planoValor | number:'1.2-2' }}</td>
+                <td>{{ formatarTelefone(detalhe.numeroLinha) }}</td>
+                <td>
+                  <div *ngIf="detalhe.erros.length > 0">
+                    <div class="text-danger small" *ngFor="let erro of detalhe.erros">
+                      • {{ erro }}
+                    </div>
+                  </div>
+                  <div *ngIf="detalhe.avisos.length > 0">
+                    <div class="text-warning small" *ngFor="let aviso of detalhe.avisos">
+                      • {{ aviso }}
+                    </div>
+                  </div>
+                  <span class="text-success" *ngIf="detalhe.erros.length === 0 && detalhe.avisos.length === 0">
+                    ✓ OK
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="fecharDetalhes()">Fechar</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal-backdrop fade" [class.show]="modalDetalhesAberto" *ngIf="modalDetalhesAberto"></div>
+

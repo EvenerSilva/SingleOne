@@ -1,0 +1,74 @@
+<mat-toolbar color="accent">
+  <div class="container" style="color: #080039">
+    <button mat-icon-button [routerLink]="['/recursos']">
+      <mat-icon>chevron_left</mat-icon></button
+    >Reportar recurso
+  </div>
+</mat-toolbar>
+<div class="container p-4">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <!--  <li class="breadcrumb-item"><a [routerLink]="['/dashboard']">Home</a></li>
+            <li class="breadcrumb-item"><a [routerLink]="['/recursos']">Recursos</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Reportar equipamento</li> -->
+    </ol>
+  </nav>
+  <div class="row">
+    <form [formGroup]="form" (ngSubmit)="salvar()" class="col-sm-12">
+      <mat-card>
+        <mat-card-content>
+          <h4>
+            Você está reportando um
+            {{ equipamento.tipoequipamentoNavigation.descricao }}
+            {{ equipamento.fabricanteNavigation.descricao }}
+            {{ equipamento.modeloNavigation.descricao }} S/N:{{
+              equipamento.numeroserie
+            }}, Patrimônio: {{ equipamento.patrimonio }}
+          </h4>
+          <div class="row">
+            <mat-form-field class="col-md-12" appearance="fill">
+              <mat-label>Descreva o que aconteceu</mat-label>
+              <textarea
+                rows="10"
+                matInput
+                formControlName="descricaobo"
+                [readonly]="equipamento.possuibo"
+                [disabled]="equipamento.possuibo"
+                [(ngModel)]="equipamento.descricaobo"
+              ></textarea>
+            </mat-form-field>
+            <div class="col-md-12" appearance="fill">
+              <mat-label>Anexo</mat-label><br />
+              <input
+                type="file"
+                formControlName="anexo"
+                (change)="converterAnexoParaByteArray($event)"
+              />
+            </div>
+            <div class="col-md-12"><br clear="all" /></div>
+            <div class="col-md-12" *ngIf="anexos.length > 0">
+              <mat-label>Anexos</mat-label>
+              <div
+                style="width: 100%"
+                class="ion-text-center"
+                *ngFor="let arquivo of anexos"
+              >
+                <img [src]="arquivo.arquivo" class="ion-padding" />
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+        <mat-card-actions>
+          <button
+            mat-stroked-button
+            type="submit"
+            color="primary"
+            *ngIf="equipamento.possuibo == false"
+          >
+            SALVAR
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    </form>
+  </div>
+</div>

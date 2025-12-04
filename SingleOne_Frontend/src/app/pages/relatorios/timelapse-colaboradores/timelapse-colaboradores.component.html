@@ -1,0 +1,201 @@
+<!-- 🎯 HEADER MODERNO DO TIMELINE DE COLABORADORES -->
+<div class="timeline-colaboradores-header">
+  <div class="header-content">
+    <div class="header-left">
+      <button class="back-button" [routerLink]="['/relatorios']" matTooltip="Voltar para Timeline">
+        <i class="cil-arrow-left"></i>
+      </button>
+      <div class="header-title">
+        <div class="title-icon">
+          <i class="cil-people"></i>
+        </div>
+        <div class="title-text">
+          <h1>Timeline de Colaboradores</h1>
+          <p>Histórico completo de movimentações por colaborador</p>
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="action-btn clear-filters-btn" (click)="limparFiltros()" matTooltip="Limpar todos os filtros e parâmetros de busca">
+        <i class="cil-filter-x"></i>
+        <span>Limpar Filtros</span>
+      </button>
+      <div class="header-stats">
+        <div class="stat-item">
+          <div class="stat-number">{{historicos.length}}</div>
+          <div class="stat-label">Registros</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">{{colaboradores.length}}</div>
+          <div class="stat-label">Colaboradores</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 🍞 BREADCRUMB MODERNO -->
+<nav class="modern-breadcrumb">
+  <div class="breadcrumb-container">
+    <a [routerLink]="['/dashboard']" class="breadcrumb-item">
+      <i class="cil-home"></i>
+      <span>Dashboard</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a [routerLink]="['/relatorios']" class="breadcrumb-item">
+      <i class="cil-timeline"></i>
+      <span>Relatórios e Timeline</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <span class="breadcrumb-item active">Colaboradores</span>
+  </div>
+</nav>
+
+<!-- 📋 CONTEÚDO PRINCIPAL -->
+<div class="timeline-colaboradores-content">
+
+  <!-- 🔍 SEÇÃO DE PESQUISA -->
+  <div class="search-card">
+    <div class="search-content">
+      <div class="search-header">
+        <div class="search-icon">
+          <i class="material-icons">search</i>
+        </div>
+        <div class="search-title">
+          <h3>Selecionar Colaborador</h3>
+          <p>Escolha um colaborador para visualizar seu histórico completo</p>
+        </div>
+      </div>
+      
+      <div class="search-form">
+        <div class="form-group">
+          <mat-form-field appearance="outline" class="search-select">
+            <mat-label>Selecione o colaborador</mat-label>
+            <mat-select [formControl]="colaboradorSelecionado" #singleSelect (selectionChange)="onColaboradorSelecionado($event)">
+              <mat-option>
+                <ngx-mat-select-search 
+                  [formControl]="buscarColaboradores" 
+                  placeholderLabel="Buscar pelo nome ou matrícula" 
+                  noEntriesFoundLabel="Nenhum colaborador encontrado">
+                </ngx-mat-select-search>
+              </mat-option>
+              <mat-option *ngFor="let row of colaboradores" [value]="row.id">
+                {{row.nome}} - Matrícula: {{row.matricula}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        
+        <div class="form-actions">
+          <button class="btn-search" (click)="consultarHistorico()" [disabled]="!colaborador.id">
+            <i class="material-icons">timeline</i>
+            Pesquisar Histórico
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 📊 SEÇÃO DE TIMELINE -->
+  <div class="timeline-section" *ngIf="historicos.length > 0">
+    <div class="timeline-header">
+      <div class="timeline-info">
+        <div class="timeline-icon">
+          <i class="material-icons">person</i>
+        </div>
+        <div class="timeline-details">
+          <h3>{{colaborador.descricao}}</h3>
+          <p>{{historicos.length}} movimentações registradas</p>
+        </div>
+      </div>
+      <div class="timeline-actions">
+        <button class="btn-print" (click)="imprimirTimeline()" matTooltip="Imprimir Timeline">
+          <i class="material-icons">print</i>
+          Imprimir
+        </button>
+      </div>
+    </div>
+    
+    <!-- Timeline compacto -->
+    <div class="timeline-container">
+      <div class="compact-timeline">
+        <div class="timeline-item-compact" *ngFor="let item of historicos; let i = index">
+          
+          <!-- Linha única com status e informações -->
+          <div class="timeline-line" [ngClass]="getStatusClass(item.title)">
+            
+            <!-- Status e ícone -->
+            <div class="status-section">
+              <i class="material-icons status-icon">
+                {{item.title?.toLowerCase().includes('entregue') ? 'check_circle' : 
+                  item.title?.toLowerCase().includes('devolvido') ? 'check_circle' : 
+                  item.title?.toLowerCase().includes('requisitado') ? 'schedule' : 'info'}}
+              </i>
+              <span class="status-text">{{item.title}}</span>
+            </div>
+            
+            <!-- Informações dos equipamentos -->
+            <div class="equipment-section" *ngIf="item.content && item.content.length > 0">
+              <div class="equipment-list">
+                <span class="equipment-item" *ngFor="let equipamento of item.content; let last = last">
+                  <i class="material-icons equipment-icon" 
+                     [ngClass]="equipamento.devolvido ? 'icon-devolvido' : 'icon-ativo'">
+                    {{equipamento.devolvido ? 'check_circle' : 'radio_button_checked'}}
+                  </i>
+                  <span class="equipment-text">{{equipamento.texto}}</span>
+                  <span class="equipment-status-badge" 
+                        [ngClass]="equipamento.devolvido ? 'status-devolvido' : 'status-ativo'">
+                    {{equipamento.devolvido ? 'Devolvido' : 'Ativo'}}
+                  </span>
+                </span>
+              </div>
+            </div>
+            
+            <!-- Data e hora -->
+            <div class="date-section">
+              <span class="date">{{item.date}}</span>
+            </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🚫 ESTADO VAZIO -->
+  <div class="empty-state" *ngIf="historicos.length === 0 && colaborador.id">
+    <div class="empty-content">
+      <div class="empty-icon">
+        <i class="material-icons">timeline</i>
+      </div>
+      <h3>Nenhum histórico encontrado</h3>
+      <p>O colaborador selecionado ainda não possui registros de movimentação.</p>
+    </div>
+  </div>
+
+  <!-- 💡 ESTADO INICIAL -->
+  <div class="initial-state" *ngIf="!colaborador.id">
+    <div class="initial-content">
+      <div class="initial-icon">
+        <i class="material-icons">search</i>
+      </div>
+      <h3>Selecione um colaborador</h3>
+      <p>Use o campo de pesquisa acima para encontrar e selecionar um colaborador e visualizar seu timeline completo.</p>
+      <div class="initial-tips">
+        <div class="tip-item">
+          <i class="material-icons">info</i>
+          <span>Você pode buscar por nome ou matrícula</span>
+        </div>
+        <div class="tip-item">
+          <i class="material-icons">timeline</i>
+          <span>O histórico mostra todas as movimentações de recursos</span>
+        </div>
+        <div class="tip-item">
+          <i class="material-icons">date_range</i>
+          <span>Entregas e devoluções são exibidas com data e hora</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

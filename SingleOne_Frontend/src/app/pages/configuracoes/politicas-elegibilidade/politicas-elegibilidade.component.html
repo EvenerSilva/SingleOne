@@ -1,0 +1,378 @@
+<!-- 🎯 HEADER MODERNO DAS POLÍTICAS DE ELEGIBILIDADE -->
+<div class="politicas-header">
+  <div class="header-content">
+    <div class="header-left">
+      <button class="back-button" [routerLink]="['/configuracoes']" matTooltip="Voltar para Configurações">
+        <i class="cil-arrow-left"></i>
+      </button>
+      <div class="header-title">
+        <div class="title-icon">
+          <i class="cil-shield-alt"></i>
+        </div>
+        <div class="title-text">
+          <h1>Políticas de Elegibilidade</h1>
+          <p>Gerencie quais perfis podem ter acesso a recursos</p>
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="action-btn primary-btn" (click)="abrirModalNovo()" matTooltip="Adicionar nova política">
+        <i class="cil-plus"></i>
+        <span>Nova Política</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 🍞 BREADCRUMB MODERNO -->
+<nav class="modern-breadcrumb">
+  <div class="breadcrumb-container">
+    <a [routerLink]="['/dashboard']" class="breadcrumb-item">
+      <i class="cil-home"></i>
+      <span>Dashboard</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a [routerLink]="['/configuracoes']" class="breadcrumb-item">
+      <i class="cil-cog"></i>
+      <span>Configurações</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <span class="breadcrumb-item active">Políticas de Elegibilidade</span>
+  </div>
+</nav>
+
+<!-- 📋 CONTEÚDO PRINCIPAL -->
+<div class="politicas-content">
+  <!-- 🔍 SEÇÃO DE BUSCA -->
+  <div class="search-section">
+    <div class="search-box">
+      <i class="cil-magnifying-glass search-icon"></i>
+      <input type="text" placeholder="Buscar por tipo de colaborador ou recurso..." [formControl]="consulta">
+      <button 
+        *ngIf="consulta.value" 
+        class="clear-btn" 
+        (click)="limparBusca()"
+        type="button">
+        <i class="cil-x"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- 📊 TABELA MODERNA -->
+  <div class="table-section">
+    <div class="table-container">
+      <table class="modern-table">
+        <thead>
+          <tr>
+            <th>Tipo de Colaborador</th>
+            <th>Cargo</th>
+            <th>Tipo de Recurso</th>
+            <th class="text-center">Permite Acesso</th>
+            <th class="text-center">Qtd. Máxima</th>
+            <th class="text-center">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of dadosPaginados">
+            <td class="politica-colaborador">
+              <div class="politica-info">
+                <div class="politica-avatar">
+                  <i class="cil-user"></i>
+                </div>
+                <div class="politica-details">
+                  <span class="politica-tipo">{{row.tipoColaboradorDescricao}}</span>
+                </div>
+              </div>
+            </td>
+            <td class="politica-cargo">
+              <div *ngIf="row.cargo" class="cargo-info">
+                <span class="cargo-nome">{{row.cargo}}</span>
+                <span class="cargo-tipo-badge" [ngClass]="getTipoBuscaClass(row)">
+                  {{getTipoBuscaCargo(row)}}
+                </span>
+              </div>
+              <span *ngIf="!row.cargo" class="cargo-todos">Todos os cargos</span>
+            </td>
+            <td class="politica-recurso">
+              <div class="recurso-badge">
+                <i class="cil-devices"></i>
+                <span>{{row.tipoEquipamentoDescricao}}</span>
+              </div>
+            </td>
+            <td class="text-center">
+              <span class="status-badge" [ngClass]="row.permiteAcesso ? 'permitido' : 'negado'">
+                <i [class]="row.permiteAcesso ? 'cil-check-circle' : 'cil-x-circle'"></i>
+                {{row.permiteAcesso ? 'SIM' : 'NÃO'}}
+              </span>
+            </td>
+            <td class="text-center">
+              <span class="quantidade-badge" *ngIf="row.permiteAcesso && row.quantidadeMaxima">
+                {{row.quantidadeMaxima}}
+              </span>
+              <span class="ilimitado" *ngIf="row.permiteAcesso && !row.quantidadeMaxima">
+                Ilimitado
+              </span>
+              <span class="na" *ngIf="!row.permiteAcesso">—</span>
+            </td>
+            <td class="politica-actions">
+              <div class="action-buttons">
+                <button class="action-btn edit-btn" matTooltip="Editar política" (click)="abrirModalEditar(row)">
+                  <i class="cil-pencil"></i>
+                </button>
+                <button class="action-btn delete-btn" matTooltip="Excluir política" (click)="confirmarExclusao(row)">
+                  <i class="cil-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 📄 PAGINAÇÃO -->
+  <div class="pagination-container">
+    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [pageSize]="10" showFirstLastButtons></mat-paginator>
+  </div>
+</div>
+
+<!-- 🎯 MODAL POLÍTICA DE ELEGIBILIDADE - BASEADO NO MODAL DE ESTOQUE MÍNIMO -->
+<div class="formulario-overlay" *ngIf="showModal" (click)="fecharModal()">
+  <div class="formulario-container" (click)="$event.stopPropagation()">
+    <div class="fabricante-form-container">
+      
+      <!-- Header do Formulário -->
+      <div class="form-header">
+        <h2 class="form-title">
+          <i class="cil-shield-alt"></i>
+          {{ politicaAtual.id === 0 ? 'Nova Política de Elegibilidade' : 'Editar Política de Elegibilidade' }}
+        </h2>
+        <p class="form-subtitle">
+          {{ politicaAtual.id === 0 ? 'Configure regras de acesso e quantidade de recursos para colaboradores' : 'Edite as regras de acesso e quantidade de recursos para colaboradores' }}
+        </p>
+      </div>
+
+      <form #politicaForm="ngForm" class="fabricante-form">
+        
+        <!-- Tipo de Política: Permissão ou Negação -->
+        <div class="form-group">
+          <label class="form-label">
+            <i class="cil-shield-alt"></i>
+            Tipo de Política <span class="required">*</span>
+          </label>
+          <div class="policy-type-buttons">
+            <button 
+              type="button"
+              class="policy-btn"
+              [class.active]="politicaAtual.permiteAcesso === true"
+              (click)="politicaAtual.permiteAcesso = true">
+              <i class="cil-check-circle"></i>
+              <div class="btn-content">
+                <strong>Permissão</strong>
+                <small>Permitir acesso ao recurso</small>
+              </div>
+            </button>
+            <button 
+              type="button"
+              class="policy-btn deny"
+              [class.active]="politicaAtual.permiteAcesso === false"
+              (click)="politicaAtual.permiteAcesso = false; politicaAtual.quantidadeMaxima = null;">
+              <i class="cil-ban"></i>
+              <div class="btn-content">
+                <strong>Negação</strong>
+                <small>Negar acesso ao recurso</small>
+              </div>
+            </button>
+          </div>
+          <small class="form-text text-muted">
+            Escolha se esta política vai permitir ou negar acesso ao tipo de recurso
+          </small>
+        </div>
+        
+        <!-- Tipo de Colaborador -->
+        <div class="form-group">
+          <label for="tipoColaborador" class="form-label">
+            <i class="cil-people"></i>
+            Tipo de Colaborador <span class="required">*</span>
+          </label>
+          <select 
+            id="tipoColaborador"
+            [(ngModel)]="politicaAtual.tipoColaborador" 
+            name="tipoColaborador" 
+            class="form-control"
+            [class.is-invalid]="politicaForm.submitted && !politicaAtual.tipoColaborador"
+            required>
+            <option value="">Selecione o tipo de colaborador</option>
+            <option 
+              *ngFor="let tipo of tiposColaboradorDisponiveis; trackBy: trackByTipo" 
+              [value]="tipo.codigo">
+              {{tipo.descricao}}
+            </option>
+          </select>
+          <div class="invalid-feedback" *ngIf="politicaForm.submitted && !politicaAtual.tipoColaborador">
+            <span>Tipo de colaborador é obrigatório</span>
+          </div>
+          <small class="form-text text-muted">
+            Selecione o tipo de colaborador que terá esta política aplicada
+          </small>
+        </div>
+
+        <!-- Cargo Específico -->
+        <div class="form-group">
+          <label for="cargo" class="form-label">
+            <i class="cil-briefcase"></i>
+            Cargo Específico (opcional)
+          </label>
+          <input 
+            type="text"
+            id="cargo"
+            [(ngModel)]="politicaAtual.cargo" 
+            name="cargo" 
+            class="form-control"
+            placeholder="Ex: Analista, Gerente, Diretor">
+          <small class="form-text text-muted">
+            Deixe em branco para aplicar a todos os cargos do tipo selecionado
+          </small>
+        </div>
+
+        <!-- Usar Padrão (só aparece se cargo estiver preenchido) -->
+        <div class="form-group checkbox-group" *ngIf="politicaAtual.cargo">
+          <label class="checkbox-container">
+            <input 
+              type="checkbox" 
+              [(ngModel)]="politicaAtual.usarPadrao" 
+              name="usarPadrao">
+            <span class="checkbox-label">Usar busca por padrão (contém)</span>
+          </label>
+          <small class="form-text text-muted" *ngIf="politicaAtual.usarPadrao">
+            ✓ Se informar "Analista", qualquer cargo que contenha "Analista" entrará na regra
+          </small>
+          <small class="form-text text-muted warning-text" *ngIf="!politicaAtual.usarPadrao">
+            ⚠ Apenas o cargo exato será considerado (match preciso)
+          </small>
+        </div>
+
+        <!-- Tipo de Recurso -->
+        <div class="form-group">
+          <label for="tipoEquipamento" class="form-label">
+            <i class="cil-laptop"></i>
+            Tipo de Recurso <span class="required">*</span>
+          </label>
+          <select 
+            id="tipoEquipamento"
+            [(ngModel)]="politicaAtual.tipoEquipamentoId" 
+            name="tipoEquipamento" 
+            class="form-control"
+            [class.is-invalid]="politicaForm.submitted && !politicaAtual.tipoEquipamentoId"
+            required>
+            <option value="">Selecione o tipo de recurso</option>
+            <option 
+              *ngFor="let tipo of tiposEquipamentoDisponiveis; trackBy: trackByEquipamento" 
+              [value]="tipo.id">
+              {{tipo.descricao}}
+            </option>
+          </select>
+          <div class="invalid-feedback" *ngIf="politicaForm.submitted && !politicaAtual.tipoEquipamentoId">
+            <span>Tipo de recurso é obrigatório</span>
+          </div>
+          <small class="form-text text-muted">
+            Selecione o tipo de recurso para aplicar a política
+          </small>
+        </div>
+
+        <!-- Quantidade Máxima (só aparece para políticas de Permissão) -->
+        <div class="form-group" *ngIf="politicaAtual.permiteAcesso === true">
+          <label for="quantidadeMaxima" class="form-label">
+            <i class="cil-calculator"></i>
+            Quantidade Máxima
+          </label>
+          <input 
+            type="number"
+            id="quantidadeMaxima"
+            [(ngModel)]="politicaAtual.quantidadeMaxima" 
+            name="quantidadeMaxima" 
+            class="form-control"
+            min="1"
+            placeholder="Ex: 2">
+          <small class="form-text text-muted">
+            Deixe vazio para ilimitado
+          </small>
+        </div>
+
+        <!-- Observações -->
+        <div class="form-group">
+          <label for="observacoes" class="form-label">
+            <i class="cil-notes"></i>
+            Observações
+          </label>
+          <textarea 
+            id="observacoes"
+            [(ngModel)]="politicaAtual.observacoes" 
+            name="observacoes" 
+            class="form-control"
+            rows="3"
+            placeholder="Justificativa ou observações sobre esta política"></textarea>
+          <small class="form-text text-muted">
+            Informações adicionais sobre esta política
+          </small>
+        </div>
+
+        <!-- Botões de Ação -->
+        <div class="form-actions">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="fecharModal()">
+            <i class="fas fa-times"></i>
+            Cancelar
+          </button>
+        
+          <button
+            type="button"
+            class="btn btn-primary"
+            (click)="salvar()">
+            <i class="fas fa-save"></i>
+            {{ politicaAtual.id === 0 ? 'Cadastrar' : 'Salvar' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: CONFIRMAR EXCLUSÃO -->
+<div class="modal-overlay" *ngIf="showDeleteModal" (click)="fecharModalExcluir()">
+  <div class="modal-container modal-small" (click)="$event.stopPropagation()">
+    <div class="modal-header danger">
+      <h2>
+        <i class="material-icons">warning</i>
+        Confirmar Exclusão
+      </h2>
+      <button mat-icon-button (click)="fecharModalExcluir()">
+        <i class="material-icons">close</i>
+      </button>
+    </div>
+
+    <div class="modal-content">
+      <p>Deseja realmente excluir esta política de elegibilidade?</p>
+      <div class="politica-info" *ngIf="politicaExcluir">
+        <strong>{{politicaExcluir.tipoColaboradorDescricao}}</strong> 
+        →
+        <strong>{{politicaExcluir.tipoEquipamentoDescricao}}</strong>
+      </div>
+      <p class="warning-text">
+        <i class="material-icons">info</i>
+        Esta ação não pode ser desfeita!
+      </p>
+    </div>
+
+    <div class="modal-footer">
+      <button mat-button (click)="fecharModalExcluir()">Cancelar</button>
+      <button mat-raised-button color="warn" (click)="excluir()">
+        <i class="material-icons">delete</i>
+        Excluir
+      </button>
+    </div>
+  </div>
+</div>
+

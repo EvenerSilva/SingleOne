@@ -1,0 +1,124 @@
+<!-- 🎯 HEADER MODERNO DOS CENTROS DE CUSTO -->
+<div class="centro-custos-header">
+  <div class="header-content">
+    <div class="header-left">
+      <button class="back-button" [routerLink]="['/cadastros']" matTooltip="Voltar para Cadastros">
+        <i class="cil-arrow-left"></i>
+      </button>
+      <div class="header-title">
+        <div class="title-icon">
+          <i class="cil-dollar"></i>
+        </div>
+        <div class="title-text">
+          <h1>Centros de Custo</h1>
+          <p>Gerenciar centros de custo do sistema</p>
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="action-btn primary-btn" (click)="novoCentroCusto()" matTooltip="Adicionar novo centro de custo">
+        <i class="cil-plus"></i>
+        <span>Novo Centro de Custo</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 🍞 BREADCRUMB MODERNO -->
+<nav class="modern-breadcrumb">
+  <div class="breadcrumb-container">
+    <a [routerLink]="['/dashboard']" class="breadcrumb-item">
+      <i class="cil-home"></i>
+      <span>Dashboard</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a [routerLink]="['/cadastros']" class="breadcrumb-item">
+      <i class="cil-cog"></i>
+      <span>Cadastros</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <span class="breadcrumb-item active">Centros de Custo</span>
+  </div>
+</nav>
+
+<!-- 📋 CONTEÚDO PRINCIPAL -->
+<div class="centro-custos-content">
+  <!-- 🔍 SEÇÃO DE BUSCA -->
+  <div class="search-section">
+    <div class="search-box">
+      <i class="cil-magnifying-glass search-icon"></i>
+      <input type="text" placeholder="Buscar centro de custo pelo nome, código ou empresa..." [formControl]="consulta">
+      <button 
+        *ngIf="consulta.value" 
+        class="clear-btn" 
+        (click)="limparBusca()"
+        type="button">
+        <i class="cil-x"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- 📊 TABELA MODERNA -->
+  <div class="table-section">
+    <div class="table-container">
+      <table class="modern-table">
+        <thead>
+          <tr>
+            <th>Centro de Custo</th>
+            <th>Código</th>
+            <th>Empresa</th>
+            <th class="text-center">Status</th>
+            <th class="text-center">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of dadosPaginados">
+            <td class="centro-custo-nome">
+              <div class="centro-custo-info">
+                <div class="centro-custo-avatar">
+                  <i class="cil-dollar"></i>
+                </div>
+                <span>{{row.nome}}</span>
+              </div>
+            </td>
+            <td class="centro-custo-codigo">{{row.codigo}}</td>
+            <td class="centro-custo-empresa">{{row.empresa || 'N/A'}}</td>
+            <td class="centro-custo-status text-center">
+              <div class="status-label" [class.active]="row.ativo" [class.inactive]="!row.ativo">
+                {{ row.ativo ? 'ATIVO' : 'INATIVO' }}
+              </div>
+            </td>
+            <td class="centro-custo-actions text-center">
+              <div class="action-buttons">
+                <button class="action-btn edit-btn" matTooltip="Editar Centro de Custo" (click)="editar(row)">
+                  <i class="cil-pencil"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 📄 PAGINAÇÃO -->
+  <div class="pagination-container">
+    <mat-paginator 
+      [pageSizeOptions]="[5, 10, 25, 100]" 
+      [pageSize]="10" 
+      showFirstLastButtons>
+    </mat-paginator>
+  </div>
+</div>
+
+<!-- 🎯 FORMULÁRIO DE CENTRO DE CUSTO (MODAL) -->
+<div class="formulario-overlay" *ngIf="mostrarFormulario">
+  <div class="formulario-container">
+    <app-centro-custo
+      [centro]="centroEditando"
+      [modo]="modoFormulario"
+      (centroSalvo)="onCentroSalvo($event)"
+      (cancelado)="onCancelado()"
+    ></app-centro-custo>
+  </div>
+</div>

@@ -1,0 +1,216 @@
+<!-- 🎯 FORMULÁRIO MODAL DE LAUDO -->
+<div class="laudo-form-container">
+  <div class="form-header">
+    <h2 class="form-title">{{ getTitulo() }}</h2>
+    <p class="form-subtitle">
+      {{ modo === 'criar' ? 'Crie um novo sinistro técnico para o recurso' : 'Edite as informações do sinistro selecionado' }}
+    </p>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="salvar()" class="laudo-form">
+    
+    <!-- Campo Recurso -->
+    <div class="form-group">
+      <label for="recurso" class="form-label">
+        Recurso <span class="required">*</span>
+      </label>
+      
+      <!-- Campo de busca com autocomplete -->
+      <input 
+        type="text"
+        [formControl]="recursosControl"
+        class="form-control"
+        placeholder="Digite para buscar e selecionar um recurso..."
+        [class.is-invalid]="form.get('recurso')?.invalid && form.get('recurso')?.touched"
+        (blur)="onRecursoBlur()"
+        (focus)="onRecursoFocus()"
+      >
+      
+      <!-- Lista de recursos encontrados (dropdown) -->
+      <div class="dropdown-recursos" *ngIf="mostrarDropdown && recursos.length > 0">
+        <div 
+          class="dropdown-item-recurso" 
+          *ngFor="let row of recursos" 
+          (click)="selecionarRecurso(row)"
+        >
+          <strong>{{row.tipoequipamento}} {{row.fabricante}} {{row.modelo}}</strong><br>
+          <small>S/N: {{row.numeroserie}} | Patrimônio: {{(row.patrimonio == "") ? "-" : row.patrimonio}}</small>
+        </div>
+      </div>
+      
+      <!-- Campo hidden para o formulário -->
+      <input type="hidden" formControlName="recurso" [(ngModel)]="laudo.equipamento">
+      
+      <div class="invalid-feedback" *ngIf="form.get('recurso')?.invalid && form.get('recurso')?.touched">
+        <span *ngIf="form.get('recurso')?.errors?.required">Recurso é obrigatório</span>
+      </div>
+      <small class="form-text text-muted">
+        Digite para buscar e selecionar o recurso para o qual será criado o sinistro
+      </small>
+    </div>
+
+    <!-- Campo Técnico -->
+    <div class="form-group">
+      <label for="tecnico" class="form-label">
+        Técnico <span class="required">*</span>
+      </label>
+      <select 
+        id="tecnico"
+        formControlName="tecnico" 
+        class="form-control"
+        [class.is-invalid]="form.get('tecnico')?.invalid && form.get('tecnico')?.touched"
+        [(ngModel)]="laudo.tecnico"
+      >
+        <option value="">Selecione o técnico</option>
+        <option *ngFor="let row of tecnicos" [value]="row.id">{{row.nome}}</option>
+        <option *ngIf="tecnicos.length === 0" value="" disabled>Nenhum técnico disponível</option>
+      </select>
+      <div class="invalid-feedback" *ngIf="form.get('tecnico')?.invalid && form.get('tecnico')?.touched">
+        <span *ngIf="form.get('tecnico')?.errors?.required">Técnico é obrigatório</span>
+      </div>
+      <small class="form-text text-muted">
+        Selecione o técnico responsável pelo sinistro
+      </small>
+    </div>
+
+    <!-- Campo Descrição do Problema -->
+    <div class="form-group">
+      <label for="descricao" class="form-label">
+        Descrição do Problema <span class="required">*</span>
+      </label>
+      <textarea 
+        id="descricao"
+        formControlName="descricao" 
+        class="form-control"
+        [class.is-invalid]="form.get('descricao')?.invalid && form.get('descricao')?.touched"
+        [(ngModel)]="laudo.descricao"
+        placeholder="Descreva detalhadamente o problema encontrado no recurso..."
+        rows="4"
+        maxlength="1000"
+      ></textarea>
+      <div class="invalid-feedback" *ngIf="form.get('descricao')?.invalid && form.get('descricao')?.touched">
+        <span *ngIf="form.get('descricao')?.errors?.required">Descrição do problema é obrigatória</span>
+        <span *ngIf="form.get('descricao')?.errors?.maxlength">Descrição deve ter no máximo 1000 caracteres</span>
+      </div>
+      <small class="form-text text-muted">
+        Descreva o problema encontrado no recurso
+      </small>
+    </div>
+
+    <!-- Seção de Evidências Fotográficas -->
+    <div class="form-group evidencias-section">
+      <label class="form-label">
+        <i class="fas fa-camera"></i>
+        Evidências Fotográficas
+        <span class="evidencias-counter" *ngIf="evidencias.length > 0">({{ evidencias.length }}/6)</span>
+      </label>
+      
+      <!-- Área de Upload -->
+      <div class="upload-area" 
+           [class.drag-over]="dragOver"
+           (dragover)="onDragOver($event)" 
+           (dragleave)="onDragLeave($event)" 
+           (drop)="onDrop($event)"
+           (click)="fileInput.click()"
+           *ngIf="evidencias.length < 6">
+        <div class="upload-content">
+          <i class="fas fa-cloud-upload-alt upload-icon"></i>
+          <p class="upload-text">
+            Clique aqui ou arraste as fotos para fazer upload
+          </p>
+          <small class="upload-hint">
+            Máximo 6 fotos • Formatos: JPG, PNG, GIF • Até 10MB cada
+          </small>
+        </div>
+        <input 
+          #fileInput
+          type="file" 
+          multiple 
+          accept="image/*"
+          (change)="onFileSelected($event)"
+          style="display: none;"
+        />
+      </div>
+
+      <!-- Preview das Evidências -->
+      <div class="evidencias-grid" *ngIf="evidencias.length > 0">
+        <div 
+          class="evidencia-item" 
+          *ngFor="let evidencia of evidencias; let i = index"
+          [attr.data-index]="i"
+          draggable="true"
+          (dragstart)="onDragStart($event, i)"
+          (dragend)="onDragEnd($event)"
+          (dragover)="onDragOverItem($event, i)"
+          (dragenter)="onDragEnter($event, i)"
+          (dragleave)="onDragLeaveItem($event, i)"
+        >
+          <div class="evidencia-preview">
+            <img 
+              [src]="evidencia.preview || evidencia.url" 
+              [alt]="evidencia.nomeOriginal"
+              class="evidencia-imagem"
+            />
+            <div class="evidencia-overlay">
+              <button 
+                type="button" 
+                class="btn btn-sm btn-danger evidencia-remove"
+                (click)="removerEvidencia(i)"
+                title="Remover evidência"
+              >
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </div>
+          <div class="evidencia-info">
+            <small class="evidencia-nome">{{ evidencia.nomeOriginal }}</small>
+            <small class="evidencia-ordem">{{ i + 1 }}ª evidência</small>
+        <small class="evidencia-drag-hint">
+          <i class="fas fa-grip-vertical"></i> Arrastar para reordenar
+        </small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Indicador de Upload -->
+      <div class="upload-progress" *ngIf="uploadProgress > 0 && uploadProgress < 100">
+        <div class="progress">
+          <div 
+            class="progress-bar" 
+            [style.width.%]="uploadProgress"
+            role="progressbar"
+          ></div>
+        </div>
+        <small>Enviando evidência... {{ uploadProgress }}%</small>
+      </div>
+
+      <small class="form-text text-muted">
+        <i class="fas fa-info-circle"></i>
+        As evidências fotográficas ajudam a documentar o estado do recurso e serão incluídas no relatório final.
+        Você pode reordenar as fotos arrastando-as para a posição desejada.
+      </small>
+    </div>
+
+    <!-- Botões de Ação -->
+    <div class="form-actions">
+      <button
+        type="button"
+        class="btn btn-secondary"
+        (click)="cancelar()"
+        [disabled]="carregando"
+      >
+        <i class="fas fa-times"></i>
+        Cancelar
+      </button>
+      
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="form.invalid || carregando"
+      >
+        <i class="fas fa-save"></i>
+        {{ getBotaoTexto() }}
+      </button>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,279 @@
+<!-- 🎯 SEÇÃO MINHAS CONTESTAÇÕES - SEGUINDO PADRÃO BYOD -->
+<div class="secao-recursos contestacoes-section" *ngIf="contestoes.length > 0">
+  <div class="secao-header contestacoes-header" (click)="toggleSection('principal')">
+    <div class="header-content">
+      <div class="header-icon">
+        <i class="material-icons">report_problem</i>
+      </div>
+      <div class="header-text">
+        <h3>Minhas Contestações e Auto Inventário</h3>
+        <p>Status das suas contestações patrimoniais</p>
+      </div>
+      <div class="header-badge contestacoes-badge">
+        <span class="badge-count">{{ contestoes.length }}</span>
+      </div>
+    </div>
+    <div class="expand-toggle">
+      <i class="material-icons" [class.rotated]="isSectionExpanded('principal')">expand_more</i>
+    </div>
+  </div>
+  
+  <div class="secao-content" *ngIf="isSectionExpanded('principal')">
+    
+    <!-- 📊 CARDS DE ESTATÍSTICAS DAS CONTESTAÇÕES -->
+    <div class="contestacoes-stats">
+      <div class="stat-card pendente" title="Contestações aguardando análise">
+        <div class="stat-content">
+          <div class="stat-icon">
+            <i class="material-icons">hourglass_empty</i>
+          </div>
+          <div class="stat-info">
+            <div class="stat-number">{{ getContestacoesPendentes().length }}</div>
+            <div class="stat-label">Pendentes</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="stat-card resolvida" title="Contestações aceitas e resolvidas">
+        <div class="stat-content">
+          <div class="stat-icon">
+            <i class="material-icons">check_circle</i>
+          </div>
+          <div class="stat-info">
+            <div class="stat-number">{{ getContestacoesResolvidas().length }}</div>
+            <div class="stat-label">Resolvidas</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="stat-card negada" title="Contestações rejeitadas">
+        <div class="stat-content">
+          <div class="stat-icon">
+            <i class="material-icons">cancel</i>
+          </div>
+          <div class="stat-info">
+            <div class="stat-number">{{ getContestacoesNegadas().length }}</div>
+            <div class="stat-label">Negadas</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="stat-card cancelada" title="Contestações canceladas por você">
+        <div class="stat-content">
+          <div class="stat-icon">
+            <i class="material-icons">block</i>
+          </div>
+          <div class="stat-info">
+            <div class="stat-number">{{ getContestacoesCanceladas().length }}</div>
+            <div class="stat-label">Canceladas</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 📋 CONTESTAÇÕES PENDENTES -->
+    <div class="contestacoes-subsection" *ngIf="getContestacoesPendentes().length > 0">
+      <div class="subsection-header" (click)="toggleSection('pendentes')">
+        <div class="subsection-title">
+          <i class="material-icons">hourglass_empty</i>
+          <span>Pendentes ({{ getContestacoesPendentes().length }})</span>
+        </div>
+        <div class="subsection-toggle">
+          <i class="material-icons" [class.rotated]="isSectionExpanded('pendentes')">expand_more</i>
+        </div>
+      </div>
+      
+      <div class="contestacoes-grid" *ngIf="isSectionExpanded('pendentes')">
+        <div class="contestacao-card pendente-card" *ngFor="let contestacao of getContestacoesPendentes()">
+          <div class="contestacao-info">
+            <div class="contestacao-header">
+              <div class="contestacao-id">{{ getTipoLabel(contestacao) }} #{{ contestacao.id }}</div>
+              <div class="contestacao-status">
+                <span class="status-badge" [class]="getStatusClass(contestacao.status)">
+                  <i class="material-icons">{{ getStatusIcon(contestacao.status) }}</i>
+                  {{ contestacao.status }}
+                </span>
+              </div>
+            </div>
+            
+            <div class="contestacao-detalhes">
+              <div class="detalhe-item" *ngIf="!isAutoInventario(contestacao)">
+                <span class="detalhe-label">Equipamento:</span>
+                <span class="detalhe-value">{{ contestacao.equipamento?.nome || 'N/A' }}</span>
+              </div>
+              <div class="detalhe-item" *ngIf="!isAutoInventario(contestacao)">
+                <span class="detalhe-label">S/N:</span>
+                <span class="detalhe-value">{{ contestacao.equipamento?.numeroSerie || 'N/A' }}</span>
+              </div>
+              <div class="detalhe-item" *ngIf="isAutoInventario(contestacao)">
+                <span class="detalhe-label">Descrição:</span>
+                <span class="detalhe-value">{{ contestacao.descricao || 'N/A' }}</span>
+              </div>
+              <div class="detalhe-item">
+                <span class="detalhe-label">Motivo:</span>
+                <span class="detalhe-value">{{ contestacao.motivo }}</span>
+              </div>
+              <div class="detalhe-item">
+                <span class="detalhe-label">Data:</span>
+                <span class="detalhe-value">{{ formatarData(contestacao.dataContestacao) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ✅ CONTESTAÇÕES RESOLVIDAS -->
+    <div class="contestacoes-subsection" *ngIf="getContestacoesResolvidas().length > 0">
+      <div class="subsection-header" (click)="toggleSection('resolvidas')">
+        <div class="subsection-title">
+          <i class="material-icons">check_circle</i>
+          <span>Resolvidas ({{ getContestacoesResolvidas().length }})</span>
+        </div>
+        <div class="subsection-toggle">
+          <i class="material-icons" [class.rotated]="isSectionExpanded('resolvidas')">expand_more</i>
+        </div>
+      </div>
+      
+      <div class="contestacoes-grid" *ngIf="isSectionExpanded('resolvidas')">
+        <div class="contestacao-card resolvida-card" *ngFor="let contestacao of getContestacoesResolvidas()">
+          <div class="contestacao-info">
+            <div class="contestacao-header">
+              <div class="contestacao-id">{{ getTipoLabel(contestacao) }} #{{ contestacao.id }}</div>
+              <div class="contestacao-status">
+                <span class="status-badge" [class]="getStatusClass(contestacao.status)">
+                  <i class="material-icons">{{ getStatusIcon(contestacao.status) }}</i>
+                  {{ contestacao.status }}
+                </span>
+              </div>
+            </div>
+            
+            <div class="contestacao-detalhes">
+              <div class="detalhe-item" *ngIf="!isAutoInventario(contestacao)">
+                <span class="detalhe-label">Equipamento:</span>
+                <span class="detalhe-value">{{ contestacao.equipamento?.nome || 'N/A' }}</span>
+              </div>
+              <div class="detalhe-item" *ngIf="isAutoInventario(contestacao)">
+                <span class="detalhe-label">Descrição:</span>
+                <span class="detalhe-value">{{ contestacao.descricao || 'N/A' }}</span>
+              </div>
+              <div class="detalhe-item">
+                <span class="detalhe-label">Motivo:</span>
+                <span class="detalhe-value">{{ contestacao.motivo }}</span>
+              </div>
+              <div class="detalhe-item">
+                <span class="detalhe-label">Resolvida em:</span>
+                <span class="detalhe-value">{{ formatarData(contestacao.dataResolucao) }}</span>
+              </div>
+              <div class="detalhe-item" *ngIf="contestacao.observacoesResolucao">
+                <span class="detalhe-label">Observações:</span>
+                <span class="detalhe-value">{{ contestacao.observacoesResolucao }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ❌ CONTESTAÇÕES NEGADAS -->
+    <div class="contestacoes-subsection" *ngIf="getContestacoesNegadas().length > 0">
+      <div class="subsection-header" (click)="toggleSection('negadas')">
+        <div class="subsection-title">
+          <i class="material-icons">cancel</i>
+          <span>Negadas ({{ getContestacoesNegadas().length }})</span>
+        </div>
+        <div class="subsection-toggle">
+          <i class="material-icons" [class.rotated]="isSectionExpanded('negadas')">expand_more</i>
+        </div>
+      </div>
+      
+      <div class="contestacoes-grid" *ngIf="isSectionExpanded('negadas')">
+        <div class="contestacao-card negada-card" *ngFor="let contestacao of getContestacoesNegadas()">
+          <div class="contestacao-info">
+            <div class="contestacao-header">
+              <div class="contestacao-id">{{ getTipoLabel(contestacao) }} #{{ contestacao.id }}</div>
+              <div class="contestacao-status">
+                <span class="status-badge" [class]="getStatusClass(contestacao.status)">
+                  <i class="material-icons">{{ getStatusIcon(contestacao.status) }}</i>
+                  {{ contestacao.status }}
+                </span>
+              </div>
+            </div>
+            
+            <div class="contestacao-detalhes">
+              <div class="detalhe-item" *ngIf="!isAutoInventario(contestacao)">
+                <span class="detalhe-label">Equipamento:</span>
+                <span class="detalhe-value">{{ contestacao.equipamento?.nome || 'N/A' }}</span>
+              </div>
+              <div class="detalhe-item" *ngIf="isAutoInventario(contestacao)">
+                <span class="detalhe-label">Descrição:</span>
+                <span class="detalhe-value">{{ contestacao.descricao || 'N/A' }}</span>
+              </div>
+              <div class="detalhe-item">
+                <span class="detalhe-label">Motivo:</span>
+                <span class="detalhe-value">{{ contestacao.motivo }}</span>
+              </div>
+              <div class="detalhe-item">
+                <span class="detalhe-label">Negada em:</span>
+                <span class="detalhe-value">{{ formatarData(contestacao.dataResolucao) }}</span>
+              </div>
+              <div class="detalhe-item" *ngIf="contestacao.observacoesResolucao">
+                <span class="detalhe-label">Justificativa:</span>
+                <span class="detalhe-value">{{ contestacao.observacoesResolucao }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 🚫 CONTESTAÇÕES CANCELADAS -->
+    <div class="contestacoes-subsection" *ngIf="getContestacoesCanceladas().length > 0">
+      <div class="subsection-header" (click)="toggleSection('canceladas')">
+        <div class="subsection-title">
+          <i class="material-icons">block</i>
+          <span>Canceladas ({{ getContestacoesCanceladas().length }})</span>
+        </div>
+        <div class="subsection-toggle">
+          <i class="material-icons" [class.rotated]="isSectionExpanded('canceladas')">expand_more</i>
+        </div>
+      </div>
+      
+      <div class="contestacoes-grid" *ngIf="isSectionExpanded('canceladas')">
+        <div class="contestacao-card cancelada-card" *ngFor="let contestacao of getContestacoesCanceladas()">
+          <div class="contestacao-info">
+            <div class="contestacao-header">
+              <div class="contestacao-id">{{ getTipoLabel(contestacao) }} #{{ contestacao.id }}</div>
+              <div class="contestacao-status">
+                <span class="status-badge" [class]="getStatusClass(contestacao.status)">
+                  <i class="material-icons">{{ getStatusIcon(contestacao.status) }}</i>
+                  {{ contestacao.status }}
+                </span>
+              </div>
+            </div>
+            
+            <div class="contestacao-detalhes">
+              <div class="detalhe-item" *ngIf="!isAutoInventario(contestacao)">
+                <span class="detalhe-label">Equipamento:</span>
+                <span class="detalhe-value">{{ contestacao.equipamento?.nome || 'N/A' }}</span>
+              </div>
+              <div class="detalhe-item" *ngIf="isAutoInventario(contestacao)">
+                <span class="detalhe-label">Descrição:</span>
+                <span class="detalhe-value">{{ contestacao.descricao || 'N/A' }}</span>
+              </div>
+              <div class="detalhe-item">
+                <span class="detalhe-label">Motivo:</span>
+                <span class="detalhe-value">{{ contestacao.motivo }}</span>
+              </div>
+              <div class="detalhe-item">
+                <span class="detalhe-label">Data de cancelamento:</span>
+                <span class="detalhe-value">{{ formatarData(contestacao.dataResolucao) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

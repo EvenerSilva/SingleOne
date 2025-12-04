@@ -1,0 +1,700 @@
+<!-- 🎯 HEADER MODERNO DO DESCARTE -->
+<div class="descarte-header">
+  <div class="header-content">
+    <div class="header-left">
+      <button class="back-button" [routerLink]="['/movimentacoes']" matTooltip="Voltar para Solicitações">
+        <i class="cil-arrow-left"></i>
+      </button>
+      <div class="header-title">
+        <div class="title-icon">
+          <i class="cil-trash"></i>
+        </div>
+        <div class="title-text">
+          <h1>Processo de Descartes</h1>
+          <p>Gestão de descarte de recursos com protocolo</p>
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="header-stats">
+        <div class="stat-item" *ngIf="protocoloAtual">
+          <div class="stat-number">{{ estatisticas?.totalEquipamentos || 0 }}</div>
+          <div class="stat-label">Equipamentos no Protocolo</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">{{ protocolos.length }}</div>
+          <div class="stat-label">Protocolos Ativos</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 🍞 BREADCRUMB MODERNO -->
+<nav class="modern-breadcrumb">
+  <div class="breadcrumb-container">
+    <a [routerLink]="['/dashboard']" class="breadcrumb-item">
+      <i class="cil-home"></i>
+      <span>Dashboard</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a [routerLink]="['/movimentacoes']" class="breadcrumb-item">
+      <i class="cil-transfer"></i>
+      <span>Solicitações</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <span class="breadcrumb-item active">Processo de Descartes</span>
+  </div>
+</nav>
+
+<!-- 📋 CONTEÚDO PRINCIPAL -->
+<div class="descarte-content">
+  
+  <!-- 🆕 MODO PROTOCOLO -->
+  <div class="protocolo-mode">
+    
+    <!-- 📋 LISTA DE PROTOCOLOS -->
+    <div class="protocolos-section">
+      <div class="section-header">
+        <h2>
+          <i class="material-icons">assignment</i>
+          Protocolos de Descarte
+        </h2>
+        <button mat-raised-button color="primary" (click)="criarNovoProtocolo()">
+          <i class="material-icons">add</i>
+          Novo Protocolo
+        </button>
+      </div>
+
+      <!-- 🔄 PROTOCOLOS EM ANDAMENTO -->
+      <mat-expansion-panel [expanded]="true" class="protocolos-panel em-andamento" *ngIf="protocolos.length > 0">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <i class="material-icons">hourglass_empty</i>
+            <span>Em Andamento</span>
+            <span class="count-badge">{{ getProtocolosEmAndamento().length }}</span>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <div class="protocolos-grid" *ngIf="getProtocolosEmAndamento().length > 0">
+          <div *ngFor="let protocolo of getProtocolosEmAndamento()" 
+               class="protocolo-card" 
+               [class.selected]="protocoloAtual?.id === protocolo.id"
+               (click)="selecionarProtocolo(protocolo)">
+            
+            <div class="protocolo-header">
+              <div class="protocolo-number">{{ protocolo.protocolo }}</div>
+              <div class="protocolo-status" [ngClass]="obterClasseStatus(protocolo.status)">
+                {{ obterDescricaoStatus(protocolo.status) }}
+              </div>
+            </div>
+
+            <div class="protocolo-info">
+              <div class="info-item">
+                <i class="material-icons">category</i>
+                <span>{{ obterDescricaoTipoDescarte(protocolo.tipoDescarte) }}</span>
+              </div>
+              <div class="info-item">
+                <i class="material-icons">person</i>
+                <span>{{ protocolo.nomeResponsavel }}</span>
+              </div>
+              <div class="info-item">
+                <i class="material-icons">date_range</i>
+                <span>{{ protocolo.dataCriacao | date:'dd/MM/yyyy HH:mm' }}</span>
+              </div>
+              <div class="info-item">
+                <i class="material-icons">inventory</i>
+                <span>{{ protocolo.quantidadeEquipamentos || 0 }} equipamentos</span>
+              </div>
+            </div>
+
+            <div class="protocolo-progress" *ngIf="protocolo.percentualConclusao !== undefined">
+              <div class="progress-bar">
+                <div class="progress-fill" [style.width.%]="protocolo.percentualConclusao"></div>
+              </div>
+              <span class="progress-text">{{ protocolo.percentualConclusao | number:'1.0-0' }}% concluído</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="sem-protocolos-painel" *ngIf="getProtocolosEmAndamento().length === 0">
+          <i class="material-icons">check_circle</i>
+          <p>Nenhum protocolo em andamento</p>
+        </div>
+      </mat-expansion-panel>
+
+      <!-- ✅ PROTOCOLOS CONCLUÍDOS -->
+      <mat-expansion-panel [expanded]="false" class="protocolos-panel concluidos" *ngIf="protocolos.length > 0">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <i class="material-icons">check_circle</i>
+            <span>Concluídos</span>
+            <span class="count-badge success">{{ getProtocolosConcluidos().length }}</span>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <div class="protocolos-grid" *ngIf="getProtocolosConcluidos().length > 0">
+          <div *ngFor="let protocolo of getProtocolosConcluidos()" 
+               class="protocolo-card concluido" 
+               [class.selected]="protocoloAtual?.id === protocolo.id"
+               (click)="selecionarProtocolo(protocolo)">
+            
+            <div class="protocolo-header">
+              <div class="protocolo-number">{{ protocolo.protocolo }}</div>
+              <div class="protocolo-status status-concluido">
+                <i class="material-icons">check</i>
+                {{ obterDescricaoStatus(protocolo.status) }}
+              </div>
+            </div>
+
+            <div class="protocolo-info">
+              <div class="info-item">
+                <i class="material-icons">category</i>
+                <span>{{ obterDescricaoTipoDescarte(protocolo.tipoDescarte) }}</span>
+              </div>
+              <div class="info-item">
+                <i class="material-icons">person</i>
+                <span>{{ protocolo.nomeResponsavel }}</span>
+              </div>
+              <div class="info-item">
+                <i class="material-icons">event_available</i>
+                <span>Concluído: {{ protocolo.dataConclusao | date:'dd/MM/yyyy' }}</span>
+              </div>
+              <div class="info-item">
+                <i class="material-icons">inventory</i>
+                <span>{{ protocolo.quantidadeEquipamentos || 0 }} equipamentos</span>
+              </div>
+            </div>
+
+            <div class="protocolo-concluido-badge">
+              <i class="material-icons">verified</i>
+              <span>100% Concluído</span>
+            </div>
+
+            <!-- Botão para Gerar Documento -->
+            <div class="protocolo-actions">
+              <button mat-raised-button 
+                      color="primary" 
+                      (click)="gerarDocumentoDescarte(protocolo, $event)"
+                      class="btn-documento">
+                <i class="material-icons">description</i>
+                Emitir Documento
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="sem-protocolos-painel" *ngIf="getProtocolosConcluidos().length === 0">
+          <i class="material-icons">pending</i>
+          <p>Nenhum protocolo concluído ainda</p>
+        </div>
+      </mat-expansion-panel>
+
+      <!-- Mensagem quando não há nenhum protocolo -->
+      <div *ngIf="protocolos.length === 0" class="empty-state">
+        <i class="material-icons">assignment</i>
+        <h3>Nenhum protocolo encontrado</h3>
+        <p>Crie um novo protocolo para começar o processo de descarte</p>
+        <button mat-raised-button color="primary" (click)="criarNovoProtocolo()">
+          <i class="material-icons">add</i>
+          Criar Primeiro Protocolo
+        </button>
+      </div>
+    </div>
+
+    <!-- 📦 PROTOCOLO SELECIONADO -->
+    <div *ngIf="protocoloAtual" class="protocolo-detail">
+      <div class="detail-header">
+        <h3>
+          <i class="material-icons">assignment</i>
+          {{ protocoloAtual.protocolo }} - {{ obterDescricaoTipoDescarte(protocoloAtual.tipoDescarte) }}
+        </h3>
+        <div class="detail-actions">
+          <!-- Botão Finalizar (só se estiver EM_ANDAMENTO) -->
+          <button mat-raised-button 
+                  (click)="finalizarProtocolo()" 
+                  *ngIf="protocoloAtual.status === 'EM_ANDAMENTO' && estatisticas?.podeFinalizar"
+                  color="primary"
+                  class="btn-finalizar">
+            <i class="material-icons">check_circle</i>
+            Finalizar Protocolo
+          </button>
+
+          <!-- Mensagem quando protocolo está concluído -->
+          <div class="protocolo-concluido-info" *ngIf="protocoloAtual.status === 'CONCLUIDO'">
+            <i class="material-icons">verified</i>
+            <span>Protocolo Finalizado em {{ protocoloAtual.dataConclusao | date:'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+
+          <!-- Botão Gerar Documento (só se estiver CONCLUIDO) -->
+          <button mat-raised-button 
+                  (click)="gerarDocumentoDescarte(protocoloAtual, $event)" 
+                  *ngIf="protocoloAtual.status === 'CONCLUIDO'"
+                  color="accent"
+                  class="btn-documento-detail">
+            <i class="material-icons">description</i>
+            Emitir Documento
+          </button>
+        </div>
+      </div>
+
+      <!-- 📊 ESTATÍSTICAS -->
+      <div class="estatisticas-grid" *ngIf="estatisticas">
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="material-icons">inventory</i>
+          </div>
+          <div class="stat-content">
+            <div class="stat-number">{{ estatisticas.totalEquipamentos }}</div>
+            <div class="stat-label">Total de Equipamentos</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="material-icons">pending</i>
+          </div>
+          <div class="stat-content">
+            <div class="stat-number">{{ estatisticas.equipamentosPendentes }}</div>
+            <div class="stat-label">Pendentes</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="material-icons">work</i>
+          </div>
+          <div class="stat-content">
+            <div class="stat-number">{{ estatisticas.equipamentosEmProcesso }}</div>
+            <div class="stat-label">Em Processo</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="material-icons">check_circle</i>
+          </div>
+          <div class="stat-content">
+            <div class="stat-number">{{ estatisticas.equipamentosConcluidos }}</div>
+            <div class="stat-label">Concluídos</div>
+          </div>
+        </div>
+      </div>
+
+          <!-- 📦 EQUIPAMENTOS NO PROTOCOLO -->
+          <div class="equipamentos-section" *ngIf="protocoloAtual.itens && protocoloAtual.itens.length > 0">
+            
+            <!-- ========== PROTOCOLO EM ANDAMENTO: Divisão por status ========== -->
+            <ng-container *ngIf="protocoloAtual.status === 'EM_ANDAMENTO'">
+              <!-- 🔄 EQUIPAMENTOS EM PROCESSO / PENDENTES -->
+              <mat-expansion-panel [expanded]="true" class="equipamentos-panel em-processo">
+                <mat-expansion-panel-header>
+                  <mat-panel-title>
+                    <i class="material-icons">hourglass_empty</i>
+                    <span>Em Processo / Pendentes</span>
+                    <span class="count-badge">{{ getItensEmProcesso().length }}</span>
+                  </mat-panel-title>
+                </mat-expansion-panel-header>
+
+              <div class="equipamentos-list">
+                <div *ngFor="let item of getItensEmProcesso()" 
+                     class="equipamento-card-detail">
+                  
+                  <!-- Cabeçalho do Equipamento -->
+                  <div class="equipamento-header">
+                    <div class="equipamento-info">
+                      <div class="equipamento-serie">
+                        <i class="material-icons">computer</i>
+                        <a [routerLink]="['/relatorios/timeline-recursos']" [queryParams]="{ id: item.equipamentoNavigation?.id || item.equipamento }" 
+                           class="serial-link"
+                           style="color: #007bff; text-decoration: none; cursor: pointer; transition: color 0.2s ease;"
+                           onmouseover="this.style.color='#0056b3'"
+                           onmouseout="this.style.color='#007bff'"
+                           matTooltip="Ver timeline do recurso">
+                          {{ item.equipamentoNavigation?.numeroserie || item.equipamento }}
+                        </a>
+                      </div>
+                      <div class="equipamento-patrimonio">
+                        Patrimônio: {{ item.equipamentoNavigation?.patrimonio }}
+                      </div>
+                      <div class="equipamento-descricao">
+                        <div class="equipamento-info-principal">
+                          <span class="fabricante-modelo">{{ item.equipamentoNavigation?.fabricante }} {{ item.equipamentoNavigation?.modelo }}</span>
+                        </div>
+                        <div class="equipamento-info-adicional">
+                          <span class="tipo-recurso" *ngIf="item.equipamentoNavigation?.tipoequipamento || item.equipamentoNavigation?.tipoEquipamento || item.equipamentoNavigation?.Tipoequipamento">
+                            <i class="material-icons">category</i>
+                            {{ item.equipamentoNavigation?.tipoequipamento || item.equipamentoNavigation?.tipoEquipamento || item.equipamentoNavigation?.Tipoequipamento }}
+                          </span>
+                          <span class="tipo-aquisicao" *ngIf="item.equipamentoNavigation?.tipoAquisicaoNome || item.equipamentoNavigation?.TipoAquisicaoNome">
+                            <i class="material-icons">shopping_cart</i>
+                            {{ item.equipamentoNavigation?.tipoAquisicaoNome || item.equipamentoNavigation?.TipoAquisicaoNome }}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div class="equipamento-status-actions">
+                      <!-- ✅ CORREÇÃO: Não usar fallback 'PENDENTE' - o backend define o status correto -->
+                      <div class="status-item-badge" [ngClass]="'status-' + (item.statusItem || 'concluido').toLowerCase()">
+                        {{ item.statusItem || 'CONCLUIDO' }}
+                      </div>
+                      <button mat-icon-button 
+                              color="warn" 
+                              (click)="removerEquipamentoDoProtocolo(item)"
+                              matTooltip="Remover do protocolo">
+                        <i class="material-icons">remove_circle</i>
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Processos Obrigatórios -->
+                  <div class="processos-container" *ngIf="item.processosObrigatorios">
+                    <div class="processos-header">
+                      <i class="material-icons">security</i>
+                      <span>Processos Obrigatórios (Cargo de Confiança)</span>
+                    </div>
+                    
+                    <div class="processos-grid">
+                      <!-- Sanitização -->
+                      <div class="processo-item" *ngIf="item.obrigarSanitizacao">
+                        <mat-checkbox 
+                          [(ngModel)]="item.processoSanitizacao"
+                          (change)="atualizarProcesso(item, 'sanitizacao', $event.checked)"
+                          [disabled]="protocoloAtual.status !== 'EM_ANDAMENTO'">
+                          <div class="processo-label">
+                            <i class="material-icons">cleaning_services</i>
+                            <span>Sanitização de Dados</span>
+                          </div>
+                        </mat-checkbox>
+                      </div>
+
+                      <!-- Descaracterização -->
+                      <div class="processo-item" *ngIf="item.obrigarDescaracterizacao">
+                        <mat-checkbox 
+                          [(ngModel)]="item.processoDescaracterizacao"
+                          (change)="atualizarProcesso(item, 'descaracterizacao', $event.checked)"
+                          [disabled]="protocoloAtual.status !== 'EM_ANDAMENTO'">
+                          <div class="processo-label">
+                            <i class="material-icons">build</i>
+                            <span>Descaracterização</span>
+                          </div>
+                        </mat-checkbox>
+                      </div>
+
+                      <!-- Perfuração de Disco -->
+                      <div class="processo-item" *ngIf="item.obrigarPerfuracaoDisco">
+                        <mat-checkbox 
+                          [(ngModel)]="item.processoPerfuracaoDisco"
+                          (change)="atualizarProcesso(item, 'perfuracao', $event.checked)"
+                          [disabled]="protocoloAtual.status !== 'EM_ANDAMENTO'">
+                          <div class="processo-label">
+                            <i class="material-icons">album</i>
+                            <span>Perfuração de Disco</span>
+                          </div>
+                        </mat-checkbox>
+                      </div>
+
+                      <!-- Evidências -->
+                      <div class="processo-item evidencias-item" *ngIf="item.evidenciasObrigatorias">
+                        <div class="evidencias-info">
+                          <i class="material-icons">photo_camera</i>
+                          <span>Evidências ({{ item.quantidadeEvidencias || 0 }})</span>
+                        </div>
+                        <button mat-raised-button 
+                                color="primary" 
+                                (click)="abrirModalEvidencias(item)"
+                                [disabled]="protocoloAtual.status !== 'EM_ANDAMENTO'">
+                          <i class="material-icons">add_a_photo</i>
+                          Upload
+                        </button>
+                      </div>
+                    </div>
+
+                    <!-- 📋 DETALHES DA SANITIZAÇÃO (aparece quando qualquer processo estiver marcado) -->
+                    <div class="sanitizacao-detalhes" *ngIf="item.processosObrigatorios && temAlgumProcessoMarcado(item)">
+                      <div class="detalhes-header">
+                        <i class="material-icons">description</i>
+                        <span>Detalhes do Processo de Descarte</span>
+                      </div>
+
+                      <div class="detalhes-grid">
+                        <!-- Método de Sanitização -->
+                        <mat-form-field appearance="outline" class="detalhes-field">
+                          <mat-label>Método de Sanitização</mat-label>
+                          <mat-select [(ngModel)]="item.metodoSanitizacao" 
+                                      (selectionChange)="atualizarMetodoSanitizacao(item)"
+                                      [disabled]="protocoloAtual.status !== 'EM_ANDAMENTO'">
+                            <mat-option value="FORMATACAO_SIMPLES">Formatação Simples</mat-option>
+                            <mat-option value="SOBREGRAVAR_MIDIA">Sobregravar Mídia (DoD 5220.22-M)</mat-option>
+                            <mat-option value="DESTRUICAO_FISICA">Destruição Física</mat-option>
+                            <mat-option value="DESMAGNETIZACAO">Desmagnetização</mat-option>
+                            <mat-option value="RESTAURACAO_FABRICA">Restauração de Fábrica</mat-option>
+                          </mat-select>
+                          <mat-icon matSuffix>settings</mat-icon>
+                        </mat-form-field>
+
+                        <!-- Ferramenta Utilizada -->
+                        <mat-form-field appearance="outline" class="detalhes-field">
+                          <mat-label>Ferramenta Utilizada</mat-label>
+                          <input matInput [(ngModel)]="item.ferramentaUtilizada"
+                                 (blur)="atualizarFerramentaUtilizada(item)"
+                                 placeholder="Ex: HDDErase v4.0, Perfurador Industrial"
+                                 [disabled]="protocoloAtual.status !== 'EM_ANDAMENTO'">
+                          <mat-icon matSuffix>build_circle</mat-icon>
+                        </mat-form-field>
+
+                        <!-- Observações da Sanitização -->
+                        <mat-form-field appearance="outline" class="detalhes-field full-width">
+                          <mat-label>Observações da Sanitização</mat-label>
+                          <textarea matInput [(ngModel)]="item.observacoesSanitizacao"
+                                    (blur)="atualizarObservacoesSanitizacao(item)"
+                                    rows="2"
+                                    placeholder="Detalhes do processo executado..."
+                                    [disabled]="protocoloAtual.status !== 'EM_ANDAMENTO'"></textarea>
+                          <mat-icon matSuffix>notes</mat-icon>
+                        </mat-form-field>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Mensagem quando não tem processos obrigatórios -->
+                  <div class="sem-processos" *ngIf="!item.processosObrigatorios">
+                    <i class="material-icons">info</i>
+                    <span>Este equipamento não possui processos obrigatórios</span>
+                  </div>
+
+                </div>
+
+                <!-- Mensagem quando não há itens em processo -->
+                <div class="sem-itens" *ngIf="getItensEmProcesso().length === 0">
+                  <i class="material-icons">check_circle</i>
+                  <p>Nenhum equipamento pendente ou em processo</p>
+                </div>
+              </div>
+            </mat-expansion-panel>
+
+            <!-- ✅ EQUIPAMENTOS CONCLUÍDOS -->
+            <mat-expansion-panel [expanded]="false" class="equipamentos-panel concluidos">
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  <i class="material-icons">check_circle</i>
+                  <span>Concluídos</span>
+                  <span class="count-badge success">{{ getItensConcluidos().length }}</span>
+                </mat-panel-title>
+              </mat-expansion-panel-header>
+
+              <div class="equipamentos-list">
+                <div *ngFor="let item of getItensConcluidos()" 
+                     class="equipamento-card-detail concluido">
+                  
+                  <!-- Cabeçalho do Equipamento -->
+                  <div class="equipamento-header">
+                    <div class="equipamento-info">
+                      <div class="equipamento-serie">
+                        <i class="material-icons">computer</i>
+                        <a [routerLink]="['/relatorios/timeline-recursos']" [queryParams]="{ id: item.equipamentoNavigation?.id || item.equipamento }" 
+                           class="serial-link"
+                           style="color: #007bff; text-decoration: none; cursor: pointer; transition: color 0.2s ease;"
+                           onmouseover="this.style.color='#0056b3'"
+                           onmouseout="this.style.color='#007bff'"
+                           matTooltip="Ver timeline do recurso">
+                          {{ item.equipamentoNavigation?.numeroserie || item.equipamento }}
+                        </a>
+                      </div>
+                      <div class="equipamento-patrimonio">
+                        Patrimônio: {{ item.equipamentoNavigation?.patrimonio }}
+                      </div>
+                      <div class="equipamento-descricao">
+                        <div class="equipamento-info-principal">
+                          <span class="fabricante-modelo">{{ item.equipamentoNavigation?.fabricante }} {{ item.equipamentoNavigation?.modelo }}</span>
+                        </div>
+                        <div class="equipamento-info-adicional">
+                          <span class="tipo-recurso" *ngIf="item.equipamentoNavigation?.tipoequipamento || item.equipamentoNavigation?.tipoEquipamento || item.equipamentoNavigation?.Tipoequipamento">
+                            <i class="material-icons">category</i>
+                            {{ item.equipamentoNavigation?.tipoequipamento || item.equipamentoNavigation?.tipoEquipamento || item.equipamentoNavigation?.Tipoequipamento }}
+                          </span>
+                          <span class="tipo-aquisicao" *ngIf="item.equipamentoNavigation?.tipoAquisicaoNome || item.equipamentoNavigation?.TipoAquisicaoNome">
+                            <i class="material-icons">shopping_cart</i>
+                            {{ item.equipamentoNavigation?.tipoAquisicaoNome || item.equipamentoNavigation?.TipoAquisicaoNome }}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div class="equipamento-status-actions">
+                      <div class="status-item-badge status-concluido">
+                        <i class="material-icons">check</i>
+                        CONCLUÍDO
+                      </div>
+                      <button mat-icon-button 
+                              color="warn" 
+                              (click)="removerEquipamentoDoProtocolo(item)"
+                              matTooltip="Remover do protocolo"
+                              [disabled]="protocoloAtual.status !== 'EM_ANDAMENTO'">
+                        <i class="material-icons">remove_circle</i>
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Resumo dos Processos Concluídos -->
+                  <div class="processos-concluidos" *ngIf="item.processosObrigatorios">
+                    <div class="processo-concluido" *ngIf="item.obrigarSanitizacao">
+                      <i class="material-icons">check_circle</i>
+                      <span>Sanitização</span>
+                    </div>
+                    <div class="processo-concluido" *ngIf="item.obrigarDescaracterizacao">
+                      <i class="material-icons">check_circle</i>
+                      <span>Descaracterização</span>
+                    </div>
+                    <div class="processo-concluido" *ngIf="item.obrigarPerfuracaoDisco">
+                      <i class="material-icons">check_circle</i>
+                      <span>Perfuração de Disco</span>
+                    </div>
+                    <div class="processo-concluido" *ngIf="item.evidenciasObrigatorias">
+                      <i class="material-icons">check_circle</i>
+                      <span>Evidências ({{ item.quantidadeEvidencias || 0 }})</span>
+                    </div>
+                  </div>
+
+                  <div class="sem-processos" *ngIf="!item.processosObrigatorios">
+                    <i class="material-icons">info</i>
+                    <span>Sem processos obrigatórios</span>
+                  </div>
+
+                </div>
+
+                <!-- Mensagem quando não há itens concluídos -->
+                <div class="sem-itens" *ngIf="getItensConcluidos().length === 0">
+                  <i class="material-icons">pending</i>
+                  <p>Nenhum equipamento concluído ainda</p>
+                </div>
+              </div>
+            </mat-expansion-panel>
+            </ng-container>
+
+            <!-- ========== PROTOCOLO CONCLUÍDO: Lista única simplificada ========== -->
+            <ng-container *ngIf="protocoloAtual.status === 'CONCLUIDO'">
+              <div class="equipamentos-finalizados-header">
+                <i class="material-icons">inventory_2</i>
+                <h4>Equipamentos Descartados ({{ protocoloAtual.itens.length }})</h4>
+              </div>
+
+              <div class="equipamentos-list-concluido">
+                <div *ngFor="let item of protocoloAtual.itens; let i = index" 
+                     class="equipamento-card-finalizado"
+                     style="display: flex !important; align-items: center !important; gap: 20px !important; padding: 20px !important; background: white !important; border: 2px solid rgba(40, 167, 69, 0.2) !important; border-radius: 12px !important; margin-bottom: 16px !important; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05) !important;">
+                  
+                  <div class="equipamento-numero" style="flex-shrink: 0 !important;">
+                    <span class="numero-badge" style="display: flex !important; align-items: center !important; justify-content: center !important; width: 48px !important; height: 48px !important; background: linear-gradient(135deg, #28a745 0%, #45a049 100%) !important; color: white !important; border-radius: 50% !important; font-weight: 700 !important; font-size: 18px !important; box-shadow: 0 3px 8px rgba(40, 167, 69, 0.3) !important;">#{{ i + 1 }}</span>
+                  </div>
+
+                  <div class="equipamento-info-principal" style="flex: 1 !important;">
+                    <div class="equipamento-titulo" style="display: flex !important; align-items: center !important; gap: 10px !important; margin-bottom: 8px !important; font-size: 16px !important; color: #2c3e50 !important;">
+                      <i class="material-icons" style="font-size: 22px !important; color: #FF3A0F !important;">computer</i>
+                      <a [routerLink]="['/relatorios/timeline-recursos']" [queryParams]="{ id: item.equipamentoNavigation?.id || item.equipamento }" 
+                         class="serial-link"
+                         style="font-weight: 600 !important; color: #007bff !important; text-decoration: none !important; cursor: pointer !important; transition: color 0.2s ease !important;"
+                         onmouseover="this.style.color='#0056b3'"
+                         onmouseout="this.style.color='#007bff'"
+                         matTooltip="Ver timeline do recurso">
+                        {{ item.equipamentoNavigation?.numeroserie || item.equipamento }}
+                      </a>
+                    </div>
+                    <div class="equipamento-detalhes" style="display: flex !important; flex-wrap: wrap !important; gap: 16px !important; font-size: 13px !important; color: #6c757d !important;">
+                      <span class="detalhe-item" style="display: flex !important; align-items: center !important; gap: 6px !important;">
+                        <i class="material-icons" style="font-size: 16px !important; color: #6c757d !important;">label</i>
+                        Patrimônio: {{ item.equipamentoNavigation?.patrimonio }}
+                      </span>
+                      <span class="detalhe-item" style="display: flex !important; align-items: center !important; gap: 6px !important;">
+                        <i class="material-icons" style="font-size: 16px !important; color: #6c757d !important;">devices</i>
+                        {{ item.equipamentoNavigation?.fabricante }} {{ item.equipamentoNavigation?.modelo }}
+                      </span>
+                    </div>
+                  </div>
+
+                  <!-- Processos executados (só se teve) -->
+                  <div class="processos-executados" *ngIf="item.processosObrigatorios" style="display: flex !important; flex-wrap: wrap !important; gap: 8px !important; padding: 0 12px !important; border-left: 2px solid #e9ecef !important;">
+                    <div class="processo-badge" *ngIf="item.obrigarSanitizacao && item.processoSanitizacao" style="display: flex !important; align-items: center !important; gap: 6px !important; padding: 6px 12px !important; background: rgba(33, 150, 243, 0.1) !important; border-radius: 20px !important; font-size: 12px !important; font-weight: 600 !important; color: #2196f3 !important; border: 1px solid rgba(33, 150, 243, 0.3) !important;">
+                      <i class="material-icons" style="font-size: 16px !important;">cleaning_services</i>
+                      <span>Sanitização</span>
+                    </div>
+                    <div class="processo-badge" *ngIf="item.obrigarDescaracterizacao && item.processoDescaracterizacao" style="display: flex !important; align-items: center !important; gap: 6px !important; padding: 6px 12px !important; background: rgba(33, 150, 243, 0.1) !important; border-radius: 20px !important; font-size: 12px !important; font-weight: 600 !important; color: #2196f3 !important; border: 1px solid rgba(33, 150, 243, 0.3) !important;">
+                      <i class="material-icons" style="font-size: 16px !important;">build</i>
+                      <span>Descaracterização</span>
+                    </div>
+                    <div class="processo-badge" *ngIf="item.obrigarPerfuracaoDisco && item.processoPerfuracaoDisco" style="display: flex !important; align-items: center !important; gap: 6px !important; padding: 6px 12px !important; background: rgba(33, 150, 243, 0.1) !important; border-radius: 20px !important; font-size: 12px !important; font-weight: 600 !important; color: #2196f3 !important; border: 1px solid rgba(33, 150, 243, 0.3) !important;">
+                      <i class="material-icons" style="font-size: 16px !important;">album</i>
+                      <span>Perfuração</span>
+                    </div>
+                    <div class="processo-badge" *ngIf="item.evidenciasObrigatorias && item.evidenciasExecutadas" style="display: flex !important; align-items: center !important; gap: 6px !important; padding: 6px 12px !important; background: rgba(33, 150, 243, 0.1) !important; border-radius: 20px !important; font-size: 12px !important; font-weight: 600 !important; color: #2196f3 !important; border: 1px solid rgba(33, 150, 243, 0.3) !important;">
+                      <i class="material-icons" style="font-size: 16px !important;">photo_camera</i>
+                      <span>{{ item.quantidadeEvidencias || 0 }} Evidências</span>
+                    </div>
+                  </div>
+
+                  <div class="status-final" style="display: flex !important; flex-direction: column !important; align-items: center !important; gap: 6px !important; padding: 12px 20px !important; background: rgba(40, 167, 69, 0.1) !important; border-radius: 8px !important; border: 2px solid rgba(40, 167, 69, 0.3) !important;">
+                    <i class="material-icons" style="font-size: 32px !important; color: #28a745 !important;">verified</i>
+                    <span style="font-size: 12px !important; font-weight: 700 !important; text-transform: uppercase !important; color: #28a745 !important; letter-spacing: 0.5px !important;">Descartado</span>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+
+          </div>
+
+      <!-- 📋 EQUIPAMENTOS DISPONÍVEIS (só exibe se protocolo estiver EM_ANDAMENTO) -->
+      <div class="equipamentos-section" *ngIf="protocoloAtual.status === 'EM_ANDAMENTO'">
+        <h4>
+          <i class="material-icons">add_circle</i>
+          Adicionar Equipamentos
+        </h4>
+        
+        <div class="equipamentos-grid" *ngIf="equipamentosDisponiveis.length > 0">
+          <div *ngFor="let equipamento of equipamentosDisponiveis" 
+               class="equipamento-card"
+               [class.disabled]="equipamento.jaEstaEmProtocolo">
+            
+            <div class="equipamento-info">
+              <div class="equipamento-serie">{{ equipamento.numeroSerie }}</div>
+              <div class="equipamento-patrimonio">{{ equipamento.patrimonio }}</div>
+              <div class="equipamento-descricao">
+                <div class="equipamento-info-principal">
+                  <span class="fabricante-modelo">{{ equipamento.descricao }}</span>
+                </div>
+                <div class="equipamento-info-adicional">
+                  <span class="tipo-recurso" *ngIf="equipamento.tipoEquipamento">
+                    <i class="material-icons">category</i>
+                    {{ equipamento.tipoEquipamento }}
+                  </span>
+                  <span class="tipo-aquisicao" *ngIf="equipamento.tipoAquisicao">
+                    <i class="material-icons">shopping_cart</i>
+                    {{ equipamento.tipoAquisicao }}
+                  </span>
+                </div>
+              </div>
+              <div class="equipamento-status">{{ equipamento.status }}</div>
+            </div>
+
+            <div class="equipamento-actions">
+              <button *ngIf="!equipamento.jaEstaEmProtocolo" 
+                      mat-raised-button 
+                      color="primary" 
+                      (click)="adicionarEquipamentoAoProtocolo(equipamento)">
+                <i class="material-icons">add</i>
+                Adicionar
+              </button>
+              <span *ngIf="equipamento.jaEstaEmProtocolo" class="already-added">
+                <i class="material-icons">check_circle</i>
+                Já adicionado
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="equipamentosDisponiveis.length === 0" class="empty-state">
+          <i class="material-icons">computer</i>
+          <h4>Nenhum equipamento disponível</h4>
+          <p>Não há equipamentos sinistrados disponíveis para descarte</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

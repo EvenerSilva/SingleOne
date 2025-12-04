@@ -1,0 +1,467 @@
+<div class="importacao-colaboradores">
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-left">
+        <button class="back-button" [routerLink]="['/colaboradores']" matTooltip="Voltar para colaboradores">
+          <i class="material-icons">arrow_back</i>
+        </button>
+        <div class="header-title">
+          <div class="title-icon">
+            <i class="cil-cloud"></i>
+          </div>
+          <div class="title-text">
+            <h1>Central de Importação</h1>
+            <p>Valide, revise e acompanhe as importações de colaboradores em um fluxo simples</p>
+          </div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="btn-colaboradores" [routerLink]="['/colaboradores']">
+          <i class="material-icons">people</i>
+          Ver colaboradores
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <section class="summary-section">
+    <div class="summary-card pendentes" (click)="mudarParaAba('pendentes')">
+      <div class="summary-icon"><i class="cil-clock"></i></div>
+      <div class="summary-info">
+        <span class="summary-label">Pendentes</span>
+        <span class="summary-value">{{ totalPendentes }}</span>
+        <p>Lotes aguardando revisão e confirmação.</p>
+      </div>
+    </div>
+    <div class="summary-card processando" (click)="mudarParaAba('processando')">
+      <div class="summary-icon"><i class="cil-loop"></i></div>
+      <div class="summary-info">
+        <span class="summary-label">Em processamento</span>
+        <span class="summary-value">{{ totalProcessando }}</span>
+        <p>Jobs ativos sendo aplicados na base.</p>
+      </div>
+    </div>
+    <div class="summary-card concluidos">
+      <div class="summary-icon"><i class="cil-check-circle"></i></div>
+      <div class="summary-info">
+        <span class="summary-label">Concluídos (24h)</span>
+        <span class="summary-value">{{ totalConcluidosHoje }}</span>
+        <p>Importações efetivadas nas últimas 24 horas.</p>
+      </div>
+    </div>
+    <div class="summary-card alerta" (click)="mudarParaAba('historico')">
+      <div class="summary-icon"><i class="cil-warning"></i></div>
+      <div class="summary-info">
+        <span class="summary-label">Cancelados / Erro</span>
+        <span class="summary-value">{{ totalCanceladosRecentes }}</span>
+        <p>Lotes que exigem atenção recente.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="page-layout" [class.show-details]="mostrarPainelDetalhes">
+    <div class="main-content">
+      <mat-tab-group class="status-tabs" [(selectedIndex)]="abaAtiva">
+        <mat-tab label="Pendentes">
+          <div class="tab-header">
+            <div>
+              <h2>Lotes aguardando confirmação</h2>
+              <p>Valide as informações e confirme apenas o que está correto antes de aplicar os dados.</p>
+            </div>
+            <button mat-stroked-button color="primary" (click)="irParaImportar()">
+              <mat-icon>cloud_upload</mat-icon>
+              Importar novo arquivo
+            </button>
+          </div>
+
+          <ng-container *ngIf="carregandoHistorico">
+            <div class="content-placeholder">
+              <mat-progress-spinner diameter="40" mode="indeterminate"></mat-progress-spinner>
+              <span>Carregando pendências...</span>
+            </div>
+          </ng-container>
+
+          <div class="lote-grid" *ngIf="!carregandoHistorico">
+            <mat-card class="empty-state" *ngIf="pendentes?.length === 0">
+              <div class="empty-icon"><i class="cil-inbox"></i></div>
+              <h3>Nenhum lote pendente</h3>
+              <p>Importe um novo arquivo para liberar a etapa de validação.</p>
+              <button mat-flat-button color="primary" (click)="irParaImportar()">Importar colaboradores</button>
+            </mat-card>
+
+            <mat-card class="lote-card" *ngFor="let lote of pendentes">
+              <div class="lote-card__header">
+                <div>
+                  <h3>{{ lote.nomeArquivo || 'Arquivo sem nome' }}</h3>
+                  <p>Enviado por {{ lote.usuarioNome || 'Usuário desconhecido' }} em {{ formatarData(lote.dataInicio) }}</p>
+                </div>
+                <span class="badge status-validado">Validado</span>
+              </div>
+
+              <div class="lote-card__metrics">
+                <div>
+                  <span>Total</span>
+                  <strong>{{ lote.totalRegistros }}</strong>
+                </div>
+                <div>
+                  <span>Válidos</span>
+                  <strong>{{ lote.totalValidados }}</strong>
+                </div>
+                <div>
+                  <span>Avisos*</span>
+                  <strong>{{ resumoSelecionado?.loteId === lote.loteId ? resumoSelecionado?.avisos : '-' }}</strong>
+                </div>
+                <div>
+                  <span class="erro">Erros</span>
+                  <strong class="erro">{{ lote.totalErros }}</strong>
+                </div>
+              </div>
+
+              <div class="lote-card__actions">
+                <button mat-stroked-button (click)="baixarErros(lote)" [disabled]="baixandoErros">
+                  <mat-icon>file_download</mat-icon>
+                  Baixar erros
+                </button>
+                <span class="flex-spacer"></span>
+                <button mat-stroked-button color="warn" 
+                        [disabled]="!podeCancelar(lote.status)"
+                        (click)="cancelarLote(lote)">
+                  Cancelar lote
+                </button>
+                <button mat-flat-button color="primary" (click)="abrirDetalhes(lote)">
+                  Analisar lote
+                </button>
+              </div>
+            </mat-card>
+          </div>
+        </mat-tab>
+
+        <mat-tab label="Em processamento">
+          <div class="tab-header">
+            <div>
+              <h2>Jobs em execução</h2>
+              <p>Acompanhe os lotes que já estão sendo aplicados na base.</p>
+            </div>
+          </div>
+
+          <ng-container *ngIf="carregandoHistorico">
+            <div class="content-placeholder">
+              <mat-progress-spinner diameter="40" mode="indeterminate"></mat-progress-spinner>
+              <span>Consultando jobs ativos...</span>
+            </div>
+          </ng-container>
+
+          <div class="lote-grid" *ngIf="!carregandoHistorico">
+            <mat-card class="empty-state" *ngIf="lotesProcessando.length === 0">
+              <div class="empty-icon"><i class="cil-check-alt"></i></div>
+              <h3>Nenhum processamento ativo</h3>
+              <p>Assim que uma importação for confirmada ela será exibida aqui.</p>
+            </mat-card>
+
+            <mat-card class="lote-card process" *ngFor="let lote of lotesProcessando">
+              <div class="lote-card__header">
+                <div>
+                  <h3>{{ lote.nomeArquivo || 'Arquivo em processamento' }}</h3>
+                  <p>Iniciado em {{ formatarData(lote.dataInicio) }}</p>
+                </div>
+                <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+              </div>
+
+              <div class="lote-card__metrics">
+                <div>
+                  <span>Total</span>
+                  <strong>{{ lote.totalRegistros }}</strong>
+                </div>
+                <div>
+                  <span>Importados</span>
+                  <strong>{{ lote.totalImportados || 0 }}</strong>
+                </div>
+                <div>
+                  <span>Status</span>
+                  <strong>{{ getStatusDescricao(lote.status, lote.statusDescricao) }}</strong>
+                </div>
+              </div>
+
+              <div class="lote-card__actions">
+                <button mat-flat-button color="primary" (click)="abrirDetalhes(lote)">
+                  Acompanhar lote
+                </button>
+              </div>
+            </mat-card>
+          </div>
+        </mat-tab>
+
+        <mat-tab label="Histórico">
+          <div class="tab-header">
+            <div>
+              <h2>Histórico de importações</h2>
+              <p>Consulte os últimos lotes enviados e seus respectivos status.</p>
+            </div>
+            <button mat-stroked-button (click)="carregarHistorico()">
+              <mat-icon>refresh</mat-icon>
+              Atualizar
+            </button>
+          </div>
+
+          <ng-container *ngIf="carregandoHistorico">
+            <div class="content-placeholder">
+              <mat-progress-spinner diameter="40" mode="indeterminate"></mat-progress-spinner>
+              <span>Carregando histórico...</span>
+            </div>
+          </ng-container>
+
+          <div class="historico-tabela" *ngIf="!carregandoHistorico && historico?.length > 0">
+            <table mat-table [dataSource]="historico" class="mat-elevation-z1">
+              <ng-container matColumnDef="data">
+                <th mat-header-cell *matHeaderCellDef>Data</th>
+                <td mat-cell *matCellDef="let item">{{ formatarData(item.dataInicio) }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="arquivo">
+                <th mat-header-cell *matHeaderCellDef>Arquivo</th>
+                <td mat-cell *matCellDef="let item">
+                  <button class="link" (click)="abrirDetalhes(item)">
+                    {{ item.nomeArquivo || 'Arquivo não informado' }}
+                  </button>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="usuario">
+                <th mat-header-cell *matHeaderCellDef>Usuário</th>
+                <td mat-cell *matCellDef="let item">{{ item.usuarioNome || 'Sistema' }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef>Status</th>
+                <td mat-cell *matCellDef="let item">
+                  <span class="badge" [class]="'status-' + (item.status || '').toLowerCase()">
+                    {{ getStatusDescricao(item.status, item.statusDescricao) }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="totais">
+                <th mat-header-cell *matHeaderCellDef>Registros</th>
+                <td mat-cell *matCellDef="let item">
+                  <div class="totais">
+                    <span><strong>{{ item.totalRegistros }}</strong> total</span>
+                    <span><strong>{{ item.totalImportados || 0 }}</strong> importados</span>
+                    <span><strong>{{ item.totalErros }}</strong> erros</span>
+                  </div>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="acoes">
+                <th mat-header-cell *matHeaderCellDef>Ações</th>
+                <td mat-cell *matCellDef="let item">
+                  <button mat-button color="primary" (click)="abrirDetalhes(item)">
+                    <mat-icon>visibility</mat-icon>
+                    Detalhes
+                  </button>
+                  <button mat-button [disabled]="baixandoErros" (click)="baixarErros(item)">
+                    <mat-icon>file_download</mat-icon>
+                    Erros
+                  </button>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="['data','arquivo','usuario','status','totais','acoes']"></tr>
+              <tr mat-row *matRowDef="let row; columns: ['data','arquivo','usuario','status','totais','acoes'];"></tr>
+            </table>
+          </div>
+
+          <div class="content-placeholder" *ngIf="!carregandoHistorico && (!historico || historico.length === 0)">
+            <div class="empty-icon"><i class="cil-history"></i></div>
+            <h3>Nenhuma importação registrada</h3>
+            <p>Os lotes confirmados aparecerão aqui automaticamente.</p>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </div>
+
+    <aside class="details-panel" *ngIf="mostrarPainelDetalhes">
+      <div class="details-header">
+        <div>
+          <span class="badge" [class]="'status-' + (loteSelecionado?.status || '').toLowerCase()">
+            {{ getStatusDescricao(loteSelecionado?.status || '', loteSelecionado?.statusDescricao) }}
+          </span>
+          <h3>{{ loteSelecionado?.nomeArquivo || 'Lote sem identificação' }}</h3>
+          <p>Lote {{ loteSelecionado?.loteId }}</p>
+        </div>
+        <button mat-icon-button (click)="fecharPainelDetalhes()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+      <div class="details-meta">
+        <div>
+          <span>Enviado por</span>
+          <strong>{{ loteSelecionado?.usuarioNome || 'Não informado' }}</strong>
+        </div>
+        <div>
+          <span>Data de envio</span>
+          <strong>{{ formatarData(loteSelecionado?.dataInicio) }}</strong>
+        </div>
+        <div>
+          <span>Registros</span>
+          <strong>{{ loteSelecionado?.totalRegistros || 0 }}</strong>
+        </div>
+      </div>
+
+      <nav class="details-tabs">
+        <button type="button" [class.active]="detalheAbaAtiva === 'resumo'" (click)="selecionarAbaDetalhes('resumo')">
+          Resumo
+        </button>
+        <button type="button" [class.active]="detalheAbaAtiva === 'registros'" (click)="selecionarAbaDetalhes('registros')">
+          Registros ({{ detalhesSelecionados.length }})
+        </button>
+      </nav>
+
+      <div class="details-body" *ngIf="detalheAbaAtiva === 'resumo'">
+        <ng-container *ngIf="carregandoResumo">
+          <div class="content-placeholder">
+            <mat-progress-spinner diameter="32" mode="indeterminate"></mat-progress-spinner>
+            <span>Carregando resumo...</span>
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="!carregandoResumo && resumoSelecionado">
+          <div class="details-metrics">
+            <div>
+              <span>Total recebido</span>
+              <strong>{{ resumoSelecionado.total }}</strong>
+            </div>
+            <div>
+              <span>Validados</span>
+              <strong>{{ resumoSelecionado.validos }}</strong>
+            </div>
+            <div>
+              <span>Avisos</span>
+              <strong>{{ resumoSelecionado.avisos }}</strong>
+            </div>
+            <div>
+              <span>Erros</span>
+              <strong class="erro">{{ resumoSelecionado.erros }}</strong>
+            </div>
+          </div>
+
+          <h4>Impacto previsto</h4>
+          <ul class="impact-list">
+            <li><span>Novos colaboradores</span><strong>{{ resumoSelecionado.totalNovos }}</strong></li>
+            <li><span>Atualizações</span><strong>{{ resumoSelecionado.totalAtualizacoes }}</strong></li>
+            <li><span>Sem alteração</span><strong>{{ resumoSelecionado.totalSemAlteracao }}</strong></li>
+          </ul>
+
+          <div class="pill-list" *ngIf="resumoSelecionado.nomesEmpresasNovas?.length">
+            <h5>Empresas novas</h5>
+            <span class="pill" *ngFor="let empresa of resumoSelecionado.nomesEmpresasNovas">{{ empresa }}</span>
+          </div>
+
+          <div class="pill-list" *ngIf="resumoSelecionado.nomesLocalidadesNovas?.length">
+            <h5>Localidades novas</h5>
+            <span class="pill" *ngFor="let localidade of resumoSelecionado.nomesLocalidadesNovas">{{ localidade }}</span>
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="!carregandoResumo && !resumoSelecionado">
+          <div class="content-placeholder">
+            <mat-icon>info</mat-icon>
+            <span>Selecione um lote para visualizar o resumo.</span>
+          </div>
+        </ng-container>
+      </div>
+
+      <div class="details-body" *ngIf="detalheAbaAtiva === 'registros'">
+        <div class="registros-toolbar">
+          <span>Filtrar registros</span>
+          <button mat-button [class.active]="!filtroDetalhes" (click)="limparFiltroDetalhes()">Todos</button>
+          <button mat-button [class.active]="filtroDetalhes === 'V'" (click)="selecionarStatusDetalhe('V')">Validados</button>
+          <button mat-button [class.active]="filtroDetalhes === 'E'" (click)="selecionarStatusDetalhe('E')">Erros</button>
+          <button mat-button [class.active]="filtroDetalhes === 'P'" (click)="selecionarStatusDetalhe('P')">Pendentes</button>
+        </div>
+
+        <ng-container *ngIf="carregandoDetalhes">
+          <div class="content-placeholder">
+            <mat-progress-spinner diameter="28" mode="indeterminate"></mat-progress-spinner>
+            <span>Carregando registros...</span>
+          </div>
+        </ng-container>
+
+        <div class="registros-table" *ngIf="!carregandoDetalhes">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Colaborador</th>
+                <th>Empresa / Centro de Custo</th>
+                <th>Status</th>
+                <th>Mensagens</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of detalhesSelecionados">
+                <td>{{ item.linhaArquivo }}</td>
+                <td>
+                  <strong>{{ item.nomeColaborador }}</strong>
+                  <small>{{ item.cpf }}</small>
+                </td>
+                <td>
+                  {{ item.empresaNome }}<br>
+                  <small>{{ item.centroCustoCodigo }} - {{ item.centroCustoNome }}</small>
+                </td>
+                <td>{{ item.statusDescricao }}</td>
+                <td>
+                  <div class="mensagens">
+                    <p class="erro" *ngFor="let erro of item.erros">❌ {{ erro }}</p>
+                    <p class="aviso" *ngFor="let aviso of item.avisos">⚠️ {{ aviso }}</p>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="details-actions">
+        <div class="info-text" *ngIf="!podeConfirmar(loteSelecionado?.status)">
+          Apenas lotes validados podem ser confirmados.
+        </div>
+        <span class="flex-spacer"></span>
+        <button mat-stroked-button color="warn" 
+                [disabled]="!podeCancelar(loteSelecionado?.status)"
+                (click)="cancelarLote(loteSelecionado!)">
+          Cancelar lote
+        </button>
+        <button mat-flat-button color="primary"
+                [disabled]="!podeConfirmar(loteSelecionado?.status)"
+                (click)="confirmarLote(loteSelecionado!)">
+          Confirmar importação
+        </button>
+      </div>
+    </aside>
+  </div>
+
+  <div class="support-actions">
+    <mat-card class="support-card" (click)="irParaImportar()">
+      <div class="support-icon">
+        <mat-icon>cloud_upload</mat-icon>
+      </div>
+      <div>
+        <h4>Importar novo arquivo</h4>
+        <p>Utilize nosso template oficial para garantir a validação correta do lote.</p>
+      </div>
+    </mat-card>
+
+    <mat-card class="support-card" (click)="irParaExportar()">
+      <div class="support-icon secondary">
+        <mat-icon>file_download</mat-icon>
+      </div>
+      <div>
+        <h4>Exportar base atual</h4>
+        <p>Baixe um relatório completo com os colaboradores do cliente.</p>
+      </div>
+    </mat-card>
+  </div>
+</div>
+
+

@@ -1,0 +1,29 @@
+<!-- ===================================================== -->
+<!-- COMPONENTE DE EXIBIÇÃO DE LOGOS - ESTILO LOGIN -->
+<!-- ===================================================== -->
+
+<div class="logo-display-container" *ngIf="!loading">
+  <!-- Logo do Cliente (se disponível) -->
+  <div class="cliente-logo" *ngIf="clienteLogo">
+    <img [src]="clienteLogo" 
+         alt="Logo do Cliente" 
+         class="logo-image cliente"
+         title="Logo do Cliente">
+  </div>
+
+  <!-- By SingleOne -->
+  <div class="singleone-logo-container">
+    <span class="by-text">By</span>
+    <img [src]="singleoneLogo" 
+         alt="SingleOne" 
+         class="logo-image singleone"
+         title="SingleOne">
+  </div>
+</div>
+
+<!-- Loading state -->
+<div class="logo-loading" *ngIf="loading">
+  <div class="loading-spinner">
+    <i class="fas fa-spinner fa-spin"></i>
+  </div>
+</div>

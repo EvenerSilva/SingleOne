@@ -1,0 +1,25 @@
+<h2 mat-dialog-title>Confirmação</h2>
+<form [formGroup]="form" (ngSubmit)="salvar()" class="col-sm-12">
+  <div mat-dialog-content>
+    <p>Por favor, informe a empresa e centro de custo a qual este recurso pertence.</p>
+    <small style="font-weight:bold">{{nomeEquipamento}}</small>
+      <div class="row">
+        <mat-form-field class="col-md-12" appearance="fill">
+          <mat-label>Empresa</mat-label>
+          <mat-select formControlName="empresa" [(ngModel)]="equipamento.empresa" (selectionChange)="listarCentrosCustos()">
+              <mat-option *ngFor="let row of empresas" [value]="row.id">{{row.nome}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field class="col-md-12" appearance="fill">
+            <mat-label>Centro Custo</mat-label>
+            <mat-select formControlName="centrocusto" [(ngModel)]="equipamento.centrocusto" >
+                <mat-option *ngFor="let row of centros" [value]="row.id">{{row.nome}}</mat-option>
+            </mat-select>
+        </mat-form-field>
+      </div>
+  </div>
+  <div mat-dialog-actions>
+    <button type="submit" mat-button cdkFocusInitial>OK</button>
+    <button type="button" mat-button (click)="dialogRef.close(false)">Cancelar</button>
+  </div>
+</form>

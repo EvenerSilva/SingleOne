@@ -1,0 +1,517 @@
+<!-- HEADER MODERNO DAS ENTREGAS & DEVOLUÇÕES -->
+<div class="entregas-devolucoes-header">
+  <div class="header-content">
+    <div class="header-left">
+      <button class="back-button" [routerLink]="['/movimentacoes']" matTooltip="Voltar para Solicitações">
+        <i class="cil-arrow-left"></i>
+      </button>
+      <div class="header-title">
+        <div class="title-icon">
+          <i class="cil-inbox"></i>
+        </div>
+        <div class="title-text">
+          <h1>Entregas & Devoluções</h1>
+          <p>Gestão de recursos entregues e devoluções pendentes</p>
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="action-btn clear-filters-btn" (click)="limparFiltros()" matTooltip="Limpar todos os filtros e parâmetros de busca">
+        <i class="cil-filter-x"></i>
+        <span>Limpar Filtros</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- BREADCRUMB MODERNO -->
+<nav class="modern-breadcrumb">
+  <div class="breadcrumb-container">
+    <a [routerLink]="['/dashboard']" class="breadcrumb-item">
+      <i class="cil-home"></i>
+      <span>Dashboard</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a [routerLink]="['/movimentacoes']" class="breadcrumb-item">
+      <i class="cil-transfer"></i>
+      <span>Solicitações</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <span class="breadcrumb-item active">Entregas & Devoluções</span>
+  </div>
+</nav>
+
+<!-- CONTEÚDO PRINCIPAL -->
+<div class="entregas-devolucoes-content">
+  <!-- SEÇÃO DE BUSCA -->
+  <div class="search-section">
+    <div class="search-box">
+      <i class="cil-magnifying-glass search-icon"></i>
+      <input type="text" placeholder="Buscar por nome, matrícula, número de série, patrimônio ou número da linha telefônica..." [formControl]="consulta">
+      <button 
+        *ngIf="consulta.value" 
+        class="clear-btn" 
+        (click)="consulta.setValue('')"
+        type="button">
+        <i class="cil-x"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- ABAS MODERNAS -->
+  <div class="tabs-container">
+    <mat-tab-group #abas class="modern-tabs">
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <span class="tab-label">
+            <span>Entregas Ativas</span>
+            <span class="tab-badge" [class.zero]="!dataSourceDevolucoes?.data?.length">{{ dataSourceDevolucoes?.data?.length || 0 }}</span>
+          </span>
+        </ng-template>
+        
+        <!-- TABELA DE ENTREGAS ATIVAS -->
+        <div class="table-section">
+          <div class="table-container">
+            
+            <div class="colaborador-list" *ngIf="dataSourceDevolucoes?.data?.length; else noDataTemplate">
+              <div class="colaborador-item" *ngFor="let row of dataSourceDevolucoes.data">
+                <div class="colaborador-header">
+                  <div class="colaborador-info" (click)="toggleColaboradorExpansion(row.colaboradorId)">
+                    <div class="colaborador-avatar" [ngClass]="getStatusClass(row)">
+                      {{ row.colaborador?.charAt(0)?.toUpperCase() }}
+                      <div class="status-indicator" [ngClass]="getStatusClass(row)"></div>
+                    </div>
+                    <div class="colaborador-details">
+                      <h3 class="colaborador-nome">
+                        {{ row.colaborador }}
+                        <span class="colaborador-matricula-inline" *ngIf="row.matricula"> • Mat. {{ row.matricula }}</span>
+                      </h3>
+                      <div class="colaborador-status" [ngClass]="getStatusClass(row)">
+                        <i class="material-icons">{{ getStatusIcon(row) }}</i>
+                        <span>{{ getStatusText(row) }}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="colaborador-actions">
+                    <div class="recursos-info" *ngIf="!isColaboradorExpanded(row.colaboradorId)">
+                      <i class="material-icons">inventory_2</i>
+                      <span class="recursos-count">{{ getRecursosText(row.requisicoesColaborador) }}</span>
+                    </div>
+                    <button class="action-btn devolver-btn" (click)="devolverEquipamentosColaborador(row)" matTooltip="Devolver tudo">
+                      <i class="material-icons">call_received</i>
+                    </button>
+                    <button class="action-btn print-btn" (click)="imprimirTermo(row.colaboradorId)" matTooltip="Imprimir termo">
+                      <i class="material-icons">print</i>
+                    </button>
+                    <button class="action-btn email-btn" (click)="enviarTermo(row.colaboradorId)" matTooltip="Enviar por email">
+                      <i class="material-icons">email</i>
+                    </button>
+                    <button class="expand-btn" (click)="toggleColaboradorExpansion(row.colaboradorId)" matTooltip="Ver detalhes">
+                      <i class="material-icons expand-icon" [class.rotated]="isColaboradorExpanded(row.colaboradorId)">expand_more</i>
+                    </button>
+                  </div>
+                </div>
+                
+                <!-- EQUIPAMENTOS DO COLABORADOR (EXPANDIDO) -->
+                <div class="equipamentos-container" *ngIf="isColaboradorExpanded(row.colaboradorId)">
+                  
+                  <!-- INDICADOR DE CARREGAMENTO -->
+                  <div class="loading-container" *ngIf="estaCarregandoRequisicoes(row.colaboradorId)">
+                    <div class="loading-spinner">
+                      <i class="material-icons">refresh</i>
+                      <span>Carregando requisições...</span>
+                    </div>
+                  </div>
+                  
+                  <!-- CADA REQUISIÇÃO COMO CABEÇALHO SEPARADO -->
+                  <div *ngIf="!estaCarregandoRequisicoes(row.colaboradorId)">
+                    <div *ngFor="let requisicao of row.requisicoesColaborador">
+                      <div class="requisicao-section" *ngIf="requisicao">
+                        <!-- CABEÇALHO DA REQUISIÇÃO COMPACTO -->
+                        <div class="requisicao-header-compact">
+                          <div class="requisicao-title">
+                            <i class="material-icons">assignment</i>
+                            <h3>Requisição {{ requisicao?.requisicaoId || 'N/A' }}</h3>
+                          </div>
+                          <div class="signature-status" [ngClass]="'signature-' + getSignatureStatus(requisicao)" *ngIf="getSignatureStatusText(requisicao)">
+                            <i class="material-icons">
+                              {{ getSignatureStatus(requisicao) === 'pending' ? 'warning' : 
+                                 getSignatureStatus(requisicao) === 'completed' ? 'check_circle' : '' }}
+                            </i>
+                            <span>{{ getSignatureStatusText(requisicao) }}</span>
+                          </div>
+                          <div class="requisicao-details-compact">
+                            <div class="detail-badge">
+                              <i class="material-icons">person</i>
+                              <div class="detail-content">
+                                <span class="detail-label">Responsável Provisório:</span>
+                                <span class="detail-value">{{ getResponsavelProvisorio(requisicao) }}</span>
+                              </div>
+                            </div>
+                            <div class="detail-badge">
+                              <i class="material-icons">admin_panel_settings</i>
+                              <div class="detail-content">
+                                <span class="detail-label">Usuário:</span>
+                                <span class="detail-value">{{ getUsuarioProcesso(requisicao) }}</span>
+                              </div>
+                            </div>
+                            <div class="detail-badge">
+                              <i class="material-icons">schedule</i>
+                              <div class="detail-content">
+                                <span class="detail-label">Solicitado:</span>
+                                <span class="detail-value">{{ getDataSolicitacao(requisicao) }}</span>
+                              </div>
+                            </div>
+                            <div class="detail-badge">
+                              <i class="material-icons">check_circle</i>
+                              <div class="detail-content">
+                                <span class="detail-label">Entregue:</span>
+                                <span class="detail-value">{{ getDataEntrega(requisicao) }}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <!-- RECURSOS DA REQUISIÇÃO -->
+                      <div class="requisicao-resources" *ngIf="requisicao?.equipamentosRequisicao?.length">
+                        <div class="equipamentos-grid" [ngClass]="currentGridClass">
+                          <div class="equipamento-card" *ngFor="let eqp of requisicao.equipamentosRequisicao">
+                            
+                            <!-- INFORMAÇÕES DO EQUIPAMENTO - EXATO PADRÃO MEU PATRIMÔNIO -->
+                            <div class="recurso-info">
+                              <!-- Nome do equipamento normal -->
+                              <div class="recurso-nome" *ngIf="!isLinhaItem(eqp)">{{ eqp.equipamento }}</div>
+                              
+                              <!-- Nome da linha telefônica com número clicável -->
+                              <div class="recurso-nome" *ngIf="isLinhaItem(eqp)">
+                                Linha telefônica <a 
+                                  [routerLink]="['/linhas']"
+                                  [queryParams]="{search: getNumeroLinha(eqp)}"
+                                  [matTooltip]="'Clique para ver detalhes da linha telefônica'"
+                                  [matTooltipClass]="'resource-tooltip'"
+                                  [matTooltipPosition]="'above'"
+                                  [matTooltipShowDelay]="500"
+                                  class="patrimonio-link">{{ getNumeroLinha(eqp) }}</a>
+                              </div>
+                              
+                              <div class="recurso-detalhes">
+                                <!-- ✅ EQUIPAMENTO NORMAL -->
+                                <div class="patrimonio" *ngIf="!isLinhaItem(eqp)">
+                                  Patrimônio: <a 
+                                    [routerLink]="['/recursos']"
+                                    [queryParams]="{search: eqp.numeroSerie}"
+                                    [matTooltip]="'Clique para ver detalhes do recurso: ' + eqp.equipamento + ' (S/N: ' + eqp.numeroSerie + ')'"
+                                    [matTooltipClass]="'resource-tooltip'"
+                                    [matTooltipPosition]="'above'"
+                                    [matTooltipShowDelay]="500"
+                                    class="patrimonio-link">{{ eqp.patrimonio }}</a>
+                                </div>
+                                <div class="serial" *ngIf="!isLinhaItem(eqp)">S/N: {{ eqp.numeroSerie }}</div>
+                                <div class="fabricante-modelo" *ngIf="!isLinhaItem(eqp) && eqp.fabricante && eqp.modelo">Fabricante: {{ eqp.fabricante }} | Modelo: {{ eqp.modelo }}</div>
+                                <div class="fabricante-modelo" *ngIf="!isLinhaItem(eqp) && eqp.fabricante && !eqp.modelo">Fabricante: {{ eqp.fabricante }}</div>
+                                <div class="fabricante-modelo" *ngIf="!isLinhaItem(eqp) && !eqp.fabricante && eqp.modelo">Modelo: {{ eqp.modelo }}</div>
+                                
+                                <!-- ✅ LINHA TELEFÔNICA: Exibição específica -->
+                                <div class="patrimonio" *ngIf="isLinhaItem(eqp)">Operadora: {{ getOperadoraLinha(eqp) }}</div>
+                                <div class="operadora-plano" *ngIf="isLinhaItem(eqp)">Plano: {{ getPlanoLinha(eqp) }}</div>
+                                <div class="serial" *ngIf="isLinhaItem(eqp) && eqp.numeroSerie">ICCID: {{ eqp.numeroSerie }}</div>
+                                
+                                <div class="tipo-aquisicao" *ngIf="!eqp.isByod && !isLinhaItem(eqp)">Tipo de Aquisição: {{ getTipoAquisicao(eqp) }}</div>
+                                <div class="compartilhado" *ngIf="eqp.compartilhadosAtivosNomes">Compartilhado com: {{ eqp.compartilhadosAtivosNomes }}</div>
+                              </div>
+                            </div>
+                            
+                            <!-- AÇÕES DO EQUIPAMENTO -->
+                            <div class="card-actions">
+                              <button class="action-btn observacao-btn" (click)="adicionarObservacao(eqp)">
+                                <i class="material-icons">description</i>
+                                <span>Observação</span>
+                              </button>
+                              <button class="action-btn agendar-btn" (click)="agendamento(eqp)">
+                                <i class="material-icons">schedule</i>
+                                <span>Agendar</span>
+                              </button>
+                              <button class="action-btn devolver-btn" (click)="devolverEquipamento(eqp, row)">
+                                <i class="material-icons">keyboard_arrow_left</i>
+                                <span>Devolver</span>
+                              </button>
+                              <button class="action-btn" *ngIf="!isLinhaItem(eqp) && !eqp.isByod" (click)="abrirModalCompartilhar(eqp, row)" matTooltip="Compartilhar">
+                                <i class="material-icons">groups</i>
+                                <span>Compartilhar</span>
+                              </button>
+                            </div>
+                            
+                            <!-- INFORMAÇÕES EXTRAS -->
+                            <div class="card-footer" *ngIf="eqp.dTProgramadaRetorno || eqp.observacaoEntrega">
+                              <div class="extra-info" *ngIf="eqp.dTProgramadaRetorno">
+                                <i class="material-icons">schedule</i>
+                                <span>Devolução programada para {{ eqp.dTProgramadaRetorno | dateFormat : 2 }}</span>
+                              </div>
+                              <div class="extra-info" *ngIf="eqp.observacaoEntrega">
+                                <i class="material-icons">note</i>
+                                <span>{{ eqp.observacaoEntrega }}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- MENSAGEM QUANDO NÃO HÁ REQUISIÇÕES -->
+                  <div class="no-requisicoes" *ngIf="!estaCarregandoRequisicoes(row.colaboradorId) && !row.requisicoesColaborador?.length">
+                    <div class="no-requisicoes-content">
+                      <i class="material-icons">inbox</i>
+                      <h4>Nenhuma requisição encontrada</h4>
+                      <p>Este colaborador não possui requisições ativas no momento.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <ng-template #noDataTemplate>
+              <div class="no-data">
+                <i class="material-icons">business</i>
+                <h3>Nenhuma entrega ativa encontrada</h3>
+                <p>Não há recursos corporativos pendentes de devolução no momento.</p>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+        
+        <!-- PAGINAÇÃO -->
+        <div class="pagination-container">
+          <mat-paginator
+            #paginatorDevolucao
+            [pageSizeOptions]="[5, 10, 25, 50]"
+            [pageSize]="10"
+            showFirstLastButtons
+            (page)="listarDevolucoes($event)">
+          </mat-paginator>
+        </div>
+      </mat-tab>
+      
+      <!-- ABA BYOD -->
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <span class="tab-label">
+            <span>BYOD</span>
+            <span class="tab-badge" [class.zero]="!dataSourceBYOD?.data?.length">{{ dataSourceBYOD?.data?.length || 0 }}</span>
+          </span>
+        </ng-template>
+        
+        <!-- TABELA BYOD -->
+        <div class="table-section">
+          <div class="table-container">
+            <div class="colaborador-list" *ngIf="dataSourceBYOD?.data?.length; else noDataBYODTemplate">
+              <div class="colaborador-item" *ngFor="let row of dataSourceBYOD.data">
+                <div class="colaborador-header">
+                  <div class="colaborador-info" (click)="toggleColaboradorExpansion(row.colaboradorId)">
+                    <div class="colaborador-avatar byod-avatar" [ngClass]="getStatusClass(row)">
+                      {{ row.colaborador?.charAt(0)?.toUpperCase() }}
+                      <div class="status-indicator" [ngClass]="getStatusClass(row)"></div>
+                    </div>
+                    <div class="colaborador-details">
+                      <h3 class="colaborador-nome">
+                        {{ row.colaborador }}
+                        <span class="colaborador-matricula-inline" *ngIf="row.matricula"> • Mat. {{ row.matricula }}</span>
+                      </h3>
+                      <div class="colaborador-status" [ngClass]="getStatusClass(row)">
+                        <i class="material-icons">{{ getStatusIcon(row) }}</i>
+                        <span>{{ getStatusText(row) }}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="colaborador-actions">
+                    <div class="recursos-info" *ngIf="!isColaboradorExpanded(row.colaboradorId)">
+                      <i class="material-icons">inventory_2</i>
+                      <span class="recursos-count">{{ getRecursosText(row.requisicoesColaborador) }}</span>
+                    </div>
+                    <button class="action-btn devolver-btn" (click)="devolverEquipamentosColaboradorBYOD(row)" matTooltip="Devolver tudo">
+                      <i class="material-icons">call_received</i>
+                    </button>
+                    <button class="action-btn print-btn" (click)="imprimirTermoBYOD(row.colaboradorId)" matTooltip="Imprimir termo">
+                      <i class="material-icons">print</i>
+                    </button>
+                    <button class="action-btn email-btn" (click)="enviarTermoBYOD(row.colaboradorId)" matTooltip="Enviar por email">
+                      <i class="material-icons">email</i>
+                    </button>
+                    <button class="expand-btn" (click)="toggleColaboradorExpansion(row.colaboradorId)" matTooltip="Ver detalhes">
+                      <i class="material-icons expand-icon" [class.rotated]="isColaboradorExpanded(row.colaboradorId)">expand_more</i>
+                    </button>
+                  </div>
+                </div>
+                
+                <!-- EQUIPAMENTOS BYOD (EXPANDIDO) -->
+                <div class="equipamentos-container" *ngIf="isColaboradorExpanded(row.colaboradorId)">
+                  
+                  <!-- INDICADOR DE CARREGAMENTO -->
+                  <div class="loading-container" *ngIf="estaCarregandoRequisicoes(row.colaboradorId)">
+                    <div class="loading-spinner">
+                      <i class="material-icons">refresh</i>
+                      <span>Carregando requisições...</span>
+                    </div>
+                  </div>
+                  
+                  <!-- CADA REQUISIÇÃO COMO CABEÇALHO SEPARADO -->
+                  <div *ngIf="!estaCarregandoRequisicoes(row.colaboradorId)">
+                    <div *ngFor="let requisicao of row.requisicoesColaborador">
+                      <div class="requisicao-section" *ngIf="requisicao">
+                        <!-- CABEÇALHO DA REQUISIÇÃO COMPACTO BYOD -->
+                        <div class="requisicao-header-compact byod-header">
+                          <div class="requisicao-title">
+                            <i class="material-icons">assignment</i>
+                            <h3>Requisição {{ requisicao?.requisicaoId || 'N/A' }}</h3>
+                          </div>
+                          <div class="signature-status" [ngClass]="'signature-' + getSignatureStatus(requisicao)" *ngIf="getSignatureStatusText(requisicao)">
+                            <i class="material-icons">
+                              {{ getSignatureStatus(requisicao) === 'pending' ? 'warning' : 
+                                 getSignatureStatus(requisicao) === 'completed' ? 'check_circle' : '' }}
+                            </i>
+                            <span>{{ getSignatureStatusText(requisicao) }}</span>
+                          </div>
+                          <div class="requisicao-details-compact">
+                            <div class="detail-badge">
+                              <i class="material-icons">person</i>
+                              <div class="detail-content">
+                                <span class="detail-label">Técnico:</span>
+                                <span class="detail-value">{{ requisicao?.tecnicoResponsavel || 'N/A' }}</span>
+                              </div>
+                            </div>
+                            <div class="detail-badge">
+                              <i class="material-icons">schedule</i>
+                              <div class="detail-content">
+                                <span class="detail-label">Solicitado:</span>
+                                <span class="detail-value">{{ requisicao?.dtSolicitacao | date:'dd/MM/yyyy' }}</span>
+                              </div>
+                            </div>
+                            <div class="detail-badge">
+                              <i class="material-icons">check_circle</i>
+                              <div class="detail-content">
+                                <span class="detail-label">Entregue:</span>
+                                <span class="detail-value">{{ requisicao?.dtProcessamento | date:'dd/MM/yyyy' }}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <!-- RECURSOS DA REQUISIÇÃO -->
+                      <div class="requisicao-resources" *ngIf="requisicao?.equipamentosRequisicao?.length">
+                        <div class="equipamentos-grid" [ngClass]="currentGridClass">
+                          <div class="equipamento-card byod-card recurso-card" *ngFor="let eqp of requisicao.equipamentosRequisicao">
+                            
+                            <!-- INFORMAÇÕES DO RECURSO - PADRÃO MEU PATRIMÔNIO -->
+                            <div class="recurso-info">
+                              <!-- Nome do equipamento normal -->
+                              <div class="recurso-nome" *ngIf="!isLinhaItem(eqp)">{{ eqp.equipamento }}</div>
+                              
+                              <!-- Nome da linha telefônica com número clicável -->
+                              <div class="recurso-nome" *ngIf="isLinhaItem(eqp)">
+                                Linha telefônica <a 
+                                  [routerLink]="['/linhas']"
+                                  [queryParams]="{search: getNumeroLinha(eqp)}"
+                                  [matTooltip]="'Clique para ver detalhes da linha telefônica'"
+                                  [matTooltipClass]="'resource-tooltip'"
+                                  [matTooltipPosition]="'above'"
+                                  [matTooltipShowDelay]="500"
+                                  class="patrimonio-link">{{ getNumeroLinha(eqp) }}</a>
+                              </div>
+                              
+                              <div class="recurso-detalhes">
+                                <!-- ✅ EQUIPAMENTO NORMAL -->
+                                <div class="patrimonio" *ngIf="!isLinhaItem(eqp)">
+                                  Patrimônio: <a 
+                                    [routerLink]="['/recursos']"
+                                    [queryParams]="{search: eqp.numeroSerie}"
+                                    [matTooltip]="'Clique para ver detalhes do recurso: ' + eqp.equipamento + ' (S/N: ' + eqp.numeroSerie + ')'"
+                                    [matTooltipClass]="'resource-tooltip'"
+                                    [matTooltipPosition]="'above'"
+                                    [matTooltipShowDelay]="500"
+                                    class="patrimonio-link">{{ eqp.patrimonio }}</a>
+                                </div>
+                                <div class="serial" *ngIf="!isLinhaItem(eqp)">S/N: {{ eqp.numeroSerie }}</div>
+                                <div class="fabricante-modelo" *ngIf="!isLinhaItem(eqp) && eqp.fabricante && eqp.modelo">Fabricante: {{ eqp.fabricante }} | Modelo: {{ eqp.modelo }}</div>
+                                <div class="fabricante-modelo" *ngIf="!isLinhaItem(eqp) && eqp.fabricante && !eqp.modelo">Fabricante: {{ eqp.fabricante }}</div>
+                                <div class="fabricante-modelo" *ngIf="!isLinhaItem(eqp) && !eqp.fabricante && eqp.modelo">Modelo: {{ eqp.modelo }}</div>
+                                
+                                <!-- ✅ LINHA TELEFÔNICA: Exibição específica -->
+                                <div class="patrimonio" *ngIf="isLinhaItem(eqp)">Operadora: {{ getOperadoraLinha(eqp) }}</div>
+                                <div class="operadora-plano" *ngIf="isLinhaItem(eqp)">Plano: {{ getPlanoLinha(eqp) }}</div>
+                                <div class="serial" *ngIf="isLinhaItem(eqp) && eqp.numeroSerie">ICCID: {{ eqp.numeroSerie }}</div>
+                                
+                                <div class="compartilhado" *ngIf="eqp.compartilhadosAtivosNomes">Compartilhado com: {{ eqp.compartilhadosAtivosNomes }}</div>
+                              </div>
+                            </div>
+
+                            <!-- AÇÕES DO RECURSO -->
+                            <div class="card-actions">
+                              <button class="action-btn observacao-btn" (click)="adicionarObservacao(eqp)">
+                                <i class="material-icons">description</i>
+                                <span>Observação</span>
+                              </button>
+                              <button class="action-btn agendar-btn" (click)="agendamento(eqp)">
+                                <i class="material-icons">schedule</i>
+                                <span>Agendar</span>
+                              </button>
+                              <button class="action-btn devolver-btn" (click)="devolverEquipamento(eqp, row)">
+                                <i class="material-icons">keyboard_arrow_left</i>
+                                <span>Devolver</span>
+                              </button>
+                            </div>
+
+                            <!-- INFORMAÇÕES EXTRAS -->
+                            <div class="card-footer" *ngIf="eqp.dtprogramadaretorno || eqp.observacaoEntrega">
+                              <div class="extra-info" *ngIf="eqp.dtprogramadaretorno">
+                                <i class="material-icons">schedule</i>
+                                <span>Devolução programada para {{ eqp.dtprogramadaretorno | dateFormat : 2 }}</span>
+                              </div>
+                              <div class="extra-info" *ngIf="eqp.observacaoEntrega">
+                                <i class="material-icons">note</i>
+                                <span>{{ eqp.observacaoEntrega }}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- MENSAGEM QUANDO NÃO HÁ REQUISIÇÕES BYOD -->
+                  <div class="no-requisicoes" *ngIf="!estaCarregandoRequisicoes(row.colaboradorId) && !row.requisicoesColaborador?.length">
+                    <div class="no-requisicoes-content">
+                      <i class="material-icons">inbox</i>
+                      <h4>Nenhuma requisição BYOD encontrada</h4>
+                      <p>Este colaborador não possui requisições BYOD ativas no momento.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <ng-template #noDataBYODTemplate>
+              <div class="no-data">
+                <i class="material-icons">person</i>
+                <h3>Nenhum recurso BYOD encontrado</h3>
+                <p>Não há recursos pessoais pendentes de devolução no momento.</p>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+        
+        <!-- PAGINAÇÃO BYOD -->
+        <div class="pagination-container">
+          <mat-paginator
+            #paginatorBYOD
+            [pageSizeOptions]="[5, 10, 25, 50]"
+            [pageSize]="10"
+            showFirstLastButtons
+            (page)="listarDevolucoes($event)">
+          </mat-paginator>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</div>

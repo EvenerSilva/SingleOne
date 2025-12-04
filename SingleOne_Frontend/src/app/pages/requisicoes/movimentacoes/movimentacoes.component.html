@@ -1,0 +1,186 @@
+<!-- 🎯 HEADER MODERNO DAS SOLICITAÇÕES -->
+<div class="movimentacoes-header">
+  <div class="header-content">
+    <div class="header-left">
+      <div class="header-title">
+        <div class="title-icon">
+          <i class="cil-swap-horizontal"></i>
+        </div>
+        <div class="title-text">
+          <h1>Solicitações</h1>
+          <p>Gestão de solicitações e controle patrimonial</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 🍞 BREADCRUMB MODERNO -->
+<nav class="modern-breadcrumb">
+  <div class="breadcrumb-container">
+    <a [routerLink]="['/dashboard']" class="breadcrumb-item">
+      <i class="cil-home"></i>
+      <span>Dashboard</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <span class="breadcrumb-item active">Solicitações</span>
+  </div>
+</nav>
+
+<!-- 📋 CONTEÚDO PRINCIPAL -->
+<div class="movimentacoes-content">
+
+  <!-- 🎯 OPERAÇÕES BÁSICAS -->
+  <div class="operations-section">
+    <div class="section-header">
+      <div class="header-content">
+        <div class="header-icon">
+          <i class="material-icons">play_circle_filled</i>
+        </div>
+        <div class="header-text">
+          <h2>Operações Básicas</h2>
+          <p>Funcionalidades essenciais para gestão diária</p>
+        </div>
+      </div>
+
+    </div>
+    
+    <div class="operations-grid">
+      <div class="operation-card basic-card" [routerLink]="['/movimentacoes/requisicoes']">
+        <div class="card-icon">
+          <i class="material-icons">description</i>
+        </div>
+        <div class="card-content">
+          <h3 class="card-title">Requisições</h3>
+          <p class="card-description">Solicitar recursos e equipamentos</p>
+          <div class="card-meta">
+            <span class="meta-item">
+              <i class="material-icons">speed</i>
+              Processamento rápido
+            </span>
+          </div>
+        </div>
+        <div class="card-action">
+          <i class="material-icons">arrow_forward</i>
+        </div>
+      </div>
+
+      <div class="operation-card basic-card" [routerLink]="['/movimentacoes/entregas-devolucoes']">
+        <div class="card-icon">
+          <i class="material-icons">swap_horiz</i>
+        </div>
+        <div class="card-content">
+          <h3 class="card-title">Entrega e Devoluções</h3>
+          <p class="card-description">Controle de saída e retorno de recursos</p>
+          <div class="card-meta">
+            <span class="meta-item">
+              <i class="material-icons">sync</i>
+              Rastreamento completo
+            </span>
+          </div>
+        </div>
+        <div class="card-action">
+          <i class="material-icons">arrow_forward</i>
+        </div>
+      </div>
+
+      <div class="operation-card basic-card" [routerLink]="['/movimentacoes/contestacoes']">
+        <div class="card-icon">
+          <i class="material-icons">gavel</i>
+        </div>
+        <div class="card-content">
+          <h3 class="card-title">Contestações</h3>
+          <p class="card-description">Atendimento e gestão de contestações patrimoniais</p>
+          <div class="card-meta">
+            <span class="meta-item">
+              <i class="material-icons">priority_high</i>
+              Atendimento prioritário
+            </span>
+          </div>
+        </div>
+        <div class="card-action">
+          <i class="material-icons">arrow_forward</i>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+
+  <!-- 🔧 OPERAÇÕES TÉCNICAS -->
+  <div class="operations-section">
+    <div class="section-header">
+      <div class="header-content">
+        <div class="header-icon">
+          <i class="material-icons">build</i>
+        </div>
+        <div class="header-text">
+          <h2>Operações Técnicas</h2>
+          <p>Funcionalidades especializadas e técnicas</p>
+        </div>
+      </div>
+
+    </div>
+    
+    <div class="operations-grid">
+      <div class="operation-card technical-card" [routerLink]="['/laudos']">
+        <div class="card-icon">
+          <i class="material-icons">assignment</i>
+        </div>
+        <div class="card-content">
+          <h3 class="card-title">Perícia Técnica de Sinistros</h3>
+          <p class="card-description">Avaliação técnica especializada de sinistros</p>
+          <div class="card-meta">
+            <span class="meta-item">
+              <i class="material-icons">star</i>
+              Especializado
+            </span>
+          </div>
+        </div>
+        <div class="card-action">
+          <i class="material-icons">arrow_forward</i>
+        </div>
+      </div>
+
+      <div class="operation-card technical-card" [routerLink]="['/descarte']">
+        <div class="card-icon">
+          <i class="material-icons">delete_forever</i>
+        </div>
+        <div class="card-content">
+          <h3 class="card-title">Processo de Descartes</h3>
+          <p class="card-description">Iniciar processo de descarte de recursos</p>
+          <div class="card-meta">
+            <span class="meta-item">
+              <i class="material-icons">recycling</i>
+              Gestão de descartes
+            </span>
+          </div>
+        </div>
+        <div class="card-action">
+          <i class="material-icons">arrow_forward</i>
+        </div>
+      </div>
+
+      <div class="operation-card technical-card" [routerLink]="['/nada-consta']">
+        <div class="card-icon">
+          <i class="material-icons">verified_user</i>
+        </div>
+        <div class="card-content">
+          <h3 class="card-title">Gerar Nada Consta</h3>
+          <p class="card-description">Certificados de situação patrimonial</p>
+          <div class="card-meta">
+            <span class="meta-item">
+              <i class="material-icons">security</i>
+              Certificação oficial
+            </span>
+          </div>
+        </div>
+        <div class="card-action">
+          <i class="material-icons">arrow_forward</i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

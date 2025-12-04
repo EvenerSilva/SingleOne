@@ -1,0 +1,305 @@
+<!-- 🎯 HEADER MODERNO DO USUÁRIO -->
+<div class="usuario-header">
+  <div class="header-content">
+    <div class="header-left">
+      <button class="back-button" 
+        *ngIf="session.usuario.Adm || session.usuario.adm || session.usuario.Su || session.usuario.su" 
+        [routerLink]="['/usuarios']" 
+        matTooltip="Voltar para Usuários">
+        <i class="material-icons">arrow_back</i>
+      </button>
+      <div class="header-title">
+        <div class="title-icon">
+          <i class="cil-user"></i>
+        </div>
+        <div class="title-text">
+          <h1>{{ usuario.id ? 'Editar Usuário' : 'Novo Usuário' }}</h1>
+          <p>{{ usuario.id ? 'Modificar dados do usuário' : 'Criar novo usuário no sistema' }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 🍞 BREADCRUMB MODERNO -->
+<nav class="modern-breadcrumb">
+  <div class="breadcrumb-container">
+    <a [routerLink]="['/dashboard']" class="breadcrumb-item">
+      <i class="cil-home"></i>
+      <span>Dashboard</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a [routerLink]="['/usuarios']" class="breadcrumb-item">
+      <i class="cil-user"></i>
+      <span>Usuários</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <span class="breadcrumb-item active">{{ usuario.id ? 'Editar' : 'Novo' }}</span>
+  </div>
+</nav>
+
+<!-- 📋 CONTEÚDO PRINCIPAL -->
+<div class="usuario-content">
+  <form [formGroup]="form" (ngSubmit)="salvar()" class="usuario-form">
+    
+    <!-- 🎯 CARD DE INFORMAÇÕES BÁSICAS -->
+    <div class="form-card">
+      <div class="card-header">
+        <div class="header-icon">
+          <i class="cil-user"></i>
+        </div>
+        <div class="header-content">
+          <h3>Informações Básicas</h3>
+          <p>Dados principais do usuário</p>
+        </div>
+      </div>
+      
+      <div class="card-body">
+        <div class="form-row">
+          <div class="form-field full-width">
+            <label class="field-label">
+              <i class="cil-user"></i>
+              Nome Completo
+            </label>
+            <input 
+              type="text" 
+              class="form-input" 
+              required 
+              formControlName="nome" 
+              [(ngModel)]="usuario.Nome"
+              placeholder="Digite o nome completo">
+            <div class="field-error" *ngIf="form.get('nome')?.invalid && form.get('nome')?.touched">
+              Nome é obrigatório
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-field">
+            <label class="field-label">
+              <i class="cil-envelope-closed"></i>
+              E-mail
+            </label>
+            <input 
+              type="email" 
+              class="form-input" 
+              required 
+              formControlName="email" 
+              [(ngModel)]="usuario.Email"
+              pattern="[a-zA-Z0-9.-_]{1,}@[a-zA-Z.-]{2,}[.]{1}[a-zA-Z]{2,}"
+              placeholder="usuario@empresa.com">
+            <div class="field-error" *ngIf="form.get('email')?.invalid && form.get('email')?.touched">
+              E-mail válido é obrigatório
+            </div>
+          </div>
+          
+          <div class="form-field">
+            <label class="field-label">
+              <i class="cil-lock-locked"></i>
+              Senha
+            </label>
+            <div class="password-input-container">
+              <input 
+                [type]="showPassword ? 'text' : 'password'" 
+                class="form-input" 
+                required 
+                formControlName="senha" 
+                [(ngModel)]="usuario.Senha"
+                (input)="checkPasswordStrength($event.target.value)"
+                placeholder="Digite a senha">
+              <button 
+                type="button" 
+                class="password-toggle-btn"
+                (click)="togglePasswordVisibility()"
+                [attr.aria-label]="showPassword ? 'Ocultar senha' : 'Mostrar senha'">
+                <span class="password-icon" [class.visible]="showPassword">
+                  {{ showPassword ? '👁️' : '👁️‍🗨️' }}
+                </span>
+              </button>
+            </div>
+            <div class="field-error" *ngIf="form.get('senha')?.invalid && form.get('senha')?.touched">
+              Senha é obrigatória
+            </div>
+            
+            <!-- Indicador de força da senha -->
+            <div class="password-strength-indicator" *ngIf="passwordStrength && form.get('senha')?.value">
+              <div class="strength-bar">
+                <div class="strength-fill" 
+                     [style.width]="passwordStrength === 'weak' ? '33%' : passwordStrength === 'medium' ? '66%' : '100%'"
+                     [style.background-color]="passwordStrengthColor">
+                </div>
+              </div>
+              <div class="strength-text" [style.color]="passwordStrengthColor">
+                <i [class]="passwordStrength === 'weak' ? 'cil-warning' : passwordStrength === 'medium' ? 'cil-info' : 'cil-check-circle'"></i>
+                {{ passwordStrengthText }}
+              </div>
+            </div>
+            
+            <!-- Dicas de melhoria da senha -->
+            <div class="password-tips" *ngIf="passwordStrength === 'weak' && form.get('senha')?.value">
+              <div class="tips-header">
+                <i class="cil-lightbulb"></i>
+                <span>Dicas para uma senha mais forte:</span>
+              </div>
+              <ul class="tips-list">
+                <li *ngFor="let tip of getPasswordTips()">{{ tip }}</li>
+              </ul>
+            </div>
+            
+            <div class="field-info" *ngIf="usuario.id && !form.get('senha')?.value">
+              <i class="cil-info"></i>
+              <span>Deixe em branco para manter a senha atual</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 🔐 CARD DE PERFIS E SEGURANÇA -->
+    <div class="form-card">
+      <div class="card-header">
+        <div class="header-icon">
+          <i class="cil-shield-alt"></i>
+        </div>
+        <div class="header-content">
+          <h3>Perfis e Segurança</h3>
+          <p>Definir permissões e autenticação</p>
+        </div>
+      </div>
+      
+      <div class="card-body">
+        <div class="form-row">
+          <div class="form-field">
+            <label class="field-label">
+              <i class="cil-people"></i>
+              Tipo de Usuário
+            </label>
+            <div class="radio-group" 
+              [class.disabled]="!(session.usuario.Adm || session.usuario.adm || session.usuario.Su || session.usuario.su)">
+              <label class="radio-option" 
+                [class.disabled]="!(session.usuario.Adm || session.usuario.adm || session.usuario.Su || session.usuario.su)">
+                <input 
+                  type="radio" 
+                  name="tipo" 
+                  value="A" 
+                  formControlName="tipo" 
+                  [(ngModel)]="usuario.tipo"
+                  [disabled]="!(session.usuario.Adm || session.usuario.adm || session.usuario.Su || session.usuario.su)">
+                <span class="radio-custom"></span>
+                <div class="radio-content">
+                  <i class="cil-star"></i>
+                  <span>Administrador</span>
+                </div>
+              </label>
+              
+              <label class="radio-option" 
+                [class.disabled]="!(session.usuario.Adm || session.usuario.adm || session.usuario.Su || session.usuario.su)">
+                <input 
+                  type="radio" 
+                  name="tipo" 
+                  value="O" 
+                  formControlName="tipo" 
+                  [(ngModel)]="usuario.tipo"
+                  [disabled]="!(session.usuario.Adm || session.usuario.adm || session.usuario.Su || session.usuario.su)">
+                <span class="radio-custom"></span>
+                <div class="radio-content">
+                  <i class="cil-settings"></i>
+                  <span>Operador</span>
+                </div>
+              </label>
+              
+              <label class="radio-option" 
+                [class.disabled]="!(session.usuario.Adm || session.usuario.adm || session.usuario.Su || session.usuario.su)">
+                <input 
+                  type="radio" 
+                  name="tipo" 
+                  value="C" 
+                  formControlName="tipo" 
+                  [(ngModel)]="usuario.tipo"
+                  [disabled]="!(session.usuario.Adm || session.usuario.adm || session.usuario.Su || session.usuario.su)">
+                <span class="radio-custom"></span>
+                <div class="radio-content">
+                  <i class="cil-eye"></i>
+                  <span>Consulta</span>
+                </div>
+              </label>
+            </div>
+          </div>
+          
+          <div class="form-field" *ngIf="session.usuario.Adm || session.usuario.adm || session.usuario.Su || session.usuario.su">
+            <label class="field-label">
+              <i class="cil-lock-locked"></i>
+              Autenticação de Dois Fatores (2FA)
+            </label>
+            <div class="toggle-container">
+              <label class="toggle-switch" 
+                [class.disabled]="!usuario.Email"
+                matTooltip="{{ usuario.TwoFactorEnabled ? 'Desabilitar 2FA' : 'Habilitar 2FA' }}">
+                <input 
+                  type="checkbox" 
+                  formControlName="twoFactorEnabled" 
+                  [(ngModel)]="usuario.TwoFactorEnabled"
+                  [disabled]="!usuario.Email">
+                <span class="toggle-slider"></span>
+                <span class="toggle-text">
+                  {{ usuario.TwoFactorEnabled ? '2FA Habilitado' : '2FA Desabilitado' }}
+                </span>
+              </label>
+              
+              <div class="toggle-info" *ngIf="!usuario.Email">
+                <i class="cil-info"></i>
+                <span>É necessário ter um e-mail válido para habilitar o 2FA.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 🏢 CARD DE CLIENTE (APENAS PARA SUPER USUÁRIO) -->
+    <div class="form-card" *ngIf="session.usuario.Su || session.usuario.su">
+      <div class="card-header">
+        <div class="header-icon">
+          <i class="cil-building"></i>
+        </div>
+        <div class="header-content">
+          <h3>Cliente</h3>
+          <p>Definir cliente associado ao usuário</p>
+        </div>
+      </div>
+      
+      <div class="card-body">
+        <div class="form-row">
+          <div class="form-field">
+            <label class="field-label">
+              <i class="cil-building"></i>
+              Cliente
+            </label>
+            <select 
+              class="form-select" 
+              formControlName="cliente" 
+              [(ngModel)]="usuario.Cliente">
+              <option value="">Selecione um cliente</option>
+              <option *ngFor="let row of clientes" [value]="row.id">
+                {{row.razaosocial}} - {{row.cnpj}}
+              </option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 🎯 AÇÕES DO FORMULÁRIO -->
+    <div class="form-actions">
+      <button type="button" class="btn-secondary" [routerLink]="['/usuarios']">
+        <i class="cil-x"></i>
+        Cancelar
+      </button>
+      
+      <button type="submit" class="btn-primary" [disabled]="!form.valid">
+        <i class="cil-save"></i>
+        {{ usuario.id ? 'Atualizar' : 'Salvar' }} Usuário
+      </button>
+    </div>
+  </form>
+</div>

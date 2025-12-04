@@ -1,0 +1,113 @@
+<!-- 🎯 HEADER MODERNO DAS EMPRESAS -->
+<div class="empresas-header">
+  <div class="header-content">
+    <div class="header-left">
+      <button class="back-button" [routerLink]="['/cadastros']" matTooltip="Voltar para Cadastros">
+        <i class="cil-arrow-left"></i>
+      </button>
+      <div class="header-title">
+        <div class="title-icon">
+          <i class="cil-building"></i>
+        </div>
+        <div class="title-text">
+          <h1>Empresas</h1>
+          <p>Gerenciar empresas do sistema</p>
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="action-btn primary-btn" routerLink="/empresa" matTooltip="Adicionar nova empresa">
+        <i class="cil-plus"></i>
+        <span>Nova Empresa</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 🍞 BREADCRUMB MODERNO -->
+<nav class="modern-breadcrumb">
+  <div class="breadcrumb-container">
+    <a [routerLink]="['/dashboard']" class="breadcrumb-item">
+      <i class="cil-home"></i>
+      <span>Dashboard</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a [routerLink]="['/cadastros']" class="breadcrumb-item">
+      <i class="cil-cog"></i>
+      <span>Cadastros</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <span class="breadcrumb-item active">Empresas</span>
+  </div>
+</nav>
+
+<!-- 📋 CONTEÚDO PRINCIPAL -->
+<div class="empresas-content">
+  <!-- 🔍 SEÇÃO DE BUSCA -->
+  <div class="search-section">
+    <div class="search-box">
+      <i class="cil-magnifying-glass search-icon"></i>
+      <input type="text" placeholder="Buscar empresa pela razão social, CNPJ ou localização..." [formControl]="consulta">
+      <button 
+        *ngIf="consulta.value" 
+        class="clear-btn" 
+        (click)="limparBusca()"
+        type="button">
+        <i class="cil-x"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- 📊 TABELA MODERNA -->
+  <div class="table-section">
+    <div class="table-container">
+      <table class="modern-table">
+        <thead>
+          <tr>
+            <th>Razão Social</th>
+            <th>CNPJ</th>
+            <th>Localização</th>
+            <th class="text-center">Filiais</th>
+            <th class="text-center">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of dadosPaginados">
+            <td class="empresa-razao">
+              <div class="empresa-info">
+                <div class="empresa-avatar">
+                  <i class="cil-building"></i>
+                </div>
+                <span>{{row.nome || 'Não informado'}}</span>
+              </div>
+            </td>
+            <td class="empresa-cnpj">{{row.cnpj ? (row.cnpj | cnpjFormat) : 'Não informado'}}</td>
+            <td class="empresa-localizacao">{{ getLocalizacaoFormatada(row) }}</td>
+            <td class="empresa-filiais text-center">
+              <div class="filiais-info">
+                <span class="filiais-count">{{row.totalFiliais ? row.totalFiliais : 0}}</span>
+                <span class="filiais-label">filiais</span>
+              </div>
+            </td>
+            <td class="empresa-actions text-center">
+              <div class="action-buttons">
+                <button class="action-btn edit-btn" matTooltip="Editar Empresa" (click)="editar(row)">
+                  <i class="cil-pencil"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 📄 PAGINAÇÃO -->
+  <div class="pagination-container">
+    <mat-paginator 
+      [pageSizeOptions]="[5, 10, 25, 100]" 
+      [pageSize]="10" 
+      showFirstLastButtons>
+    </mat-paginator>
+  </div>
+</div>

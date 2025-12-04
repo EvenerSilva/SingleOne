@@ -1,0 +1,409 @@
+/* 🎯 ESTILOS PARA MINHAS CONTESTAÇÕES - SEGUINDO PADRÃO BYOD */
+
+.contestacoes-section {
+  margin-bottom: 24px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: #fff;
+  border: 1px solid #e0e0e0;
+
+  .secao-header {
+    background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+    color: white;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    &:hover {
+      background: linear-gradient(135deg, #e55a2b 0%, #e8831a 100%);
+    }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+
+      .header-icon {
+        font-size: 24px;
+        opacity: 0.9;
+      }
+
+      .header-text {
+        h3 {
+          margin: 0;
+          font-size: 18px;
+          font-weight: 600;
+        }
+
+        p {
+          margin: 4px 0 0 0;
+          font-size: 14px;
+          opacity: 0.9;
+        }
+      }
+
+      .header-badge {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        padding: 8px 16px;
+        backdrop-filter: blur(10px);
+
+        .badge-count {
+          font-weight: 600;
+          font-size: 16px;
+        }
+      }
+    }
+
+    .expand-toggle {
+      transition: transform 0.3s ease;
+
+      .material-icons.rotated {
+        transform: rotate(180deg);
+      }
+    }
+  }
+
+  .secao-content {
+    padding: 24px;
+    background: #fafafa;
+  }
+}
+
+/* 📊 CARDS DE ESTATÍSTICAS */
+.contestacoes-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+
+  .stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border-left: 4px solid;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    &.pendente {
+      border-left-color: #ff9800;
+      
+      .stat-icon {
+        color: #ff9800;
+      }
+    }
+
+    &.resolvida {
+      border-left-color: #4caf50;
+      
+      .stat-icon {
+        color: #4caf50;
+      }
+    }
+
+    &.negada {
+      border-left-color: #f44336;
+      
+      .stat-icon {
+        color: #f44336;
+      }
+    }
+
+    &.cancelada {
+      border-left-color: #9e9e9e;
+      
+      .stat-icon {
+        color: #9e9e9e;
+      }
+    }
+
+    .stat-content {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+
+      .stat-icon {
+        font-size: 32px;
+        opacity: 0.8;
+      }
+
+      .stat-info {
+        .stat-number {
+          font-size: 28px;
+          font-weight: 700;
+          line-height: 1;
+          margin-bottom: 4px;
+        }
+
+        .stat-label {
+          font-size: 14px;
+          color: #666;
+          font-weight: 500;
+        }
+      }
+    }
+  }
+}
+
+/* 📋 SUBSECÇÕES DE CONTESTAÇÕES */
+.contestacoes-subsection {
+  margin-bottom: 24px;
+
+  .subsection-header {
+    background: white;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 1px solid #e0e0e0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    &:hover {
+      background: #f5f5f5;
+      border-color: #d0d0d0;
+    }
+
+    .subsection-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 600;
+      color: #333;
+
+      .material-icons {
+        font-size: 20px;
+      }
+    }
+
+    .subsection-toggle {
+      transition: transform 0.3s ease;
+
+      .material-icons.rotated {
+        transform: rotate(180deg);
+      }
+    }
+  }
+
+  .contestacoes-grid {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  }
+}
+
+/* 🎴 CARDS DE CONTESTAÇÃO */
+.contestacao-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  border-left: 4px solid;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  }
+
+  &.pendente-card {
+    border-left-color: #ff9800;
+  }
+
+  &.resolvida-card {
+    border-left-color: #4caf50;
+  }
+
+  &.negada-card {
+    border-left-color: #f44336;
+  }
+
+  &.cancelada-card {
+    border-left-color: #9e9e9e;
+  }
+
+  .contestacao-info {
+    .contestacao-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+
+      .contestacao-id {
+        font-weight: 600;
+        color: #333;
+        font-size: 16px;
+      }
+
+      .contestacao-status {
+        .status-badge {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          padding: 6px 12px;
+          border-radius: 20px;
+          font-size: 12px;
+          font-weight: 600;
+          text-transform: uppercase;
+
+          &.status-pendente {
+            background: #fff3e0;
+            color: #e65100;
+          }
+
+          &.status-resolvida {
+            background: #e8f5e8;
+            color: #2e7d32;
+          }
+
+          &.status-negada {
+            background: #ffebee;
+            color: #c62828;
+          }
+
+          &.status-cancelada {
+            background: #f5f5f5;
+            color: #616161;
+          }
+
+          .material-icons {
+            font-size: 16px;
+          }
+        }
+      }
+    }
+
+    .contestacao-detalhes {
+      margin-bottom: 16px;
+
+      .detalhe-item {
+        display: flex;
+        margin-bottom: 8px;
+        font-size: 14px;
+
+        .detalhe-label {
+          font-weight: 600;
+          color: #666;
+          min-width: 100px;
+          margin-right: 8px;
+        }
+
+        .detalhe-value {
+          color: #333;
+          flex: 1;
+        }
+      }
+    }
+
+    .contestacao-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+
+      .action-btn {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+
+        .material-icons {
+          font-size: 16px;
+        }
+
+        &:hover {
+          transform: translateY(-1px);
+        }
+
+        &.btn-primary {
+          background: #1976d2;
+          color: white;
+
+          &:hover {
+            background: #1565c0;
+          }
+        }
+
+        &.btn-secondary {
+          background: #757575;
+          color: white;
+
+          &:hover {
+            background: #616161;
+          }
+        }
+
+        &.btn-warning {
+          background: #ff9800;
+          color: white;
+
+          &:hover {
+            background: #f57c00;
+          }
+        }
+      }
+    }
+  }
+}
+
+/* 📱 RESPONSIVIDADE */
+@media (max-width: 768px) {
+  .contestacoes-stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .contestacoes-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .contestacao-card {
+    padding: 16px;
+  }
+
+  .contestacao-header {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 8px;
+  }
+
+  .contestacao-actions {
+    flex-direction: column;
+
+    .action-btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .contestacoes-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .secao-content {
+    padding: 16px;
+  }
+
+  .stat-card {
+    padding: 16px;
+  }
+}

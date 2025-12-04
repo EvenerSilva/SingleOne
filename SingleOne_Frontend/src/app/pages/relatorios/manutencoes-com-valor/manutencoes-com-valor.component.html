@@ -1,0 +1,471 @@
+<!-- 🎯 HEADER MODERNO DOS CUSTOS DE MANUTENÇÃO -->
+<div class="custos-manutencao-header">
+  <div class="header-content">
+    <div class="header-left">
+      <button class="back-button" [routerLink]="['/relatorios']" matTooltip="Voltar para Relatórios">
+        <i class="cil-arrow-left"></i>
+      </button>
+      <div class="header-title">
+        <div class="title-icon">
+          <i class="cil-calculator"></i>
+        </div>
+        <div class="title-text">
+          <h1>Custos de Manutenção</h1>
+          <p>Relatório detalhado de custos e manutenções</p>
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="btn-exportar" (click)="exportarDados()" matTooltip="Exportar Dados">
+        <i class="cil-cloud-download"></i>
+        <span>Exportar Dados</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 🍞 BREADCRUMB MODERNO -->
+<nav class="modern-breadcrumb">
+  <div class="breadcrumb-container">
+    <a [routerLink]="['/dashboard']" class="breadcrumb-item">
+      <i class="cil-home"></i>
+      <span>Dashboard</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <a [routerLink]="['/relatorios']" class="breadcrumb-item">
+      <i class="cil-timeline"></i>
+      <span>Relatórios e Timeline</span>
+    </a>
+    <i class="cil-chevron-right"></i>
+    <span class="breadcrumb-item active">Custos de Manutenção</span>
+  </div>
+</nav>
+
+<!-- 📋 CONTEÚDO PRINCIPAL -->
+<div class="custos-manutencao-content">
+  <!-- 🔍 SEÇÃO DE FILTROS -->
+  <div class="filters-section">
+    <div class="filters-container" [class.expanded]="showFilters">
+      <div class="filters-header">
+        <button class="toggle-filters-btn" (click)="showFilters = !showFilters">
+          <i class="cil-filter"></i>
+          <span>{{ showFilters ? 'Ocultar Filtros' : 'Mostrar Filtros' }}</span>
+        </button>
+      </div>
+      
+      <div class="filters-content" *ngIf="showFilters">
+        <div class="filters-grid">
+          <div class="filter-field">
+            <label>Empresa</label>
+            <select [(ngModel)]="filtros.empresa" (change)="onEmpresaChange()" class="modern-select">
+              <option [value]="0">Todas as empresas</option>
+              <option *ngFor="let empresa of empresas" [value]="empresa.id">
+                {{ empresa.nome }}
+              </option>
+            </select>
+          </div>
+          
+          <div class="filter-field">
+            <label>Centro de Custo</label>
+            <select [(ngModel)]="filtros.centrocusto" [disabled]="!filtros.empresa" class="modern-select">
+              <option [value]="0">Todos os centros</option>
+              <option *ngFor="let centro of centros" [value]="centro.id">
+                {{ centro.nome }}
+              </option>
+            </select>
+          </div>
+          
+          <div class="filter-actions">
+            <button class="action-btn primary-btn" (click)="aplicarFiltros()" [disabled]="loading">
+              <i class="cil-magnifying-glass"></i>
+              <span>Pesquisar</span>
+            </button>
+            <button class="action-btn secondary-btn" (click)="limparFiltros()">
+              <i class="cil-x-circle"></i>
+              <span>Limpar</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 📊 CARDS DE MÉTRICAS -->
+  <div class="metrics-section" *ngIf="!loading">
+    <div class="metrics-grid">
+      <div class="metric-card primary">
+        <div class="metric-icon">
+          <i class="cil-wrench"></i>
+        </div>
+        <div class="metric-info">
+          <h3 class="metric-value">{{ totalManutencoes }}</h3>
+          <p class="metric-label">Total de Manutenções</p>
+        </div>
+      </div>
+
+      <div class="metric-card success">
+        <div class="metric-icon">
+          <i class="cil-dollar"></i>
+        </div>
+        <div class="metric-info">
+          <h3 class="metric-value">{{ custos | currencyFormat }}</h3>
+          <p class="metric-label">Custo Total</p>
+        </div>
+      </div>
+
+      <div class="metric-card info">
+        <div class="metric-icon">
+          <i class="cil-trending-up"></i>
+        </div>
+        <div class="metric-info">
+          <h3 class="metric-value">{{ custoMedio | currencyFormat }}</h3>
+          <p class="metric-label">Custo Médio</p>
+        </div>
+      </div>
+
+      <div class="metric-card warning">
+        <div class="metric-icon">
+          <i class="cil-chart-pie"></i>
+        </div>
+        <div class="metric-info">
+          <h3 class="metric-value">{{ laudos.item2.length }}</h3>
+          <p class="metric-label">Grupos de Análise</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🔄 LOADING SPINNER -->
+  <div class="loading-container" *ngIf="loading">
+    <div class="loading-spinner">
+      <i class="cil-sync"></i>
+    </div>
+    <p>Carregando dados...</p>
+  </div>
+
+  <!-- 📊 TABS DE CONTEÚDO -->
+  <div class="content-tabs" *ngIf="!loading">
+    <div class="tabs-header">
+      <button 
+        class="tab-btn" 
+        [class.active]="selectedTabIndex === 0"
+        (click)="selectedTabIndex = 0">
+        <i class="cil-chart"></i>
+        <span>Dashboard</span>
+      </button>
+      <button 
+        class="tab-btn" 
+        [class.active]="selectedTabIndex === 1"
+        (click)="selectedTabIndex = 1">
+        <i class="cil-list"></i>
+        <span>Listagem Detalhada</span>
+      </button>
+    </div>
+
+    <!-- TAB DASHBOARD -->
+    <div class="tab-content" *ngIf="selectedTabIndex === 0">
+      <!-- GRÁFICO PRINCIPAL -->
+      <div class="chart-section">
+        <div class="section-header">
+          <h3>
+            <i class="cil-bar-chart"></i>
+            Análise de Custos por Empresa
+          </h3>
+          <p>Visualização comparativa de quantidade e valores de manutenções</p>
+        </div>
+        <div class="chart-container">
+          <canvas id="chartManutencoes"></canvas>
+          <div *ngIf="!laudos.item2 || laudos.item2.length === 0" class="no-data-message">
+            <i class="cil-info"></i>
+            <p>Nenhum dado disponível para exibir no gráfico</p>
+            <small>Selecione filtros e clique em "Pesquisar" para carregar dados</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- TABELA RESUMO -->
+      <div class="table-section">
+        <div class="section-header">
+          <h3>
+            <i class="cil-table"></i>
+            Resumo por Empresa e Centro de Custo
+          </h3>
+        </div>
+        <div class="table-container">
+          <table class="modern-table">
+            <thead>
+              <tr>
+                <th>
+                  <i class="cil-building"></i>
+                  Empresa
+                </th>
+                <th>
+                  <i class="cil-account-balance"></i>
+                  Centro de Custo
+                </th>
+                <th class="text-center">
+                  <i class="cil-list-numbered"></i>
+                  Quantidade
+                </th>
+                <th class="text-end">
+                  <i class="cil-dollar"></i>
+                  Valor Total
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let row of dadosResumoPaginados">
+                <td>{{ row.empresa }}</td>
+                <td>{{ row.centroCusto || 'N/A' }}</td>
+                <td class="text-center">
+                  <span class="quantity-badge">{{ row.quantidade }}</span>
+                </td>
+                <td class="text-end">
+                  <span class="value-highlight">{{ row.valor | currencyFormat }}</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          
+          <div class="pagination-container">
+            <mat-paginator 
+              #paginatorResumo 
+              [length]="lengthResumo"
+              [pageIndex]="pageIndexResumo"
+              [pageSize]="pageSizeResumo" 
+              [pageSizeOptions]="[5, 10, 25, 50]" 
+              (page)="onPageChangeResumo($event)"
+              showFirstLastButtons>
+            </mat-paginator>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB LISTAGEM -->
+    <div class="tab-content" *ngIf="selectedTabIndex === 1">
+      <div class="table-section">
+        <div class="section-header">
+          <h3>
+            <i class="cil-list"></i>
+            Listagem Completa de Manutenções
+          </h3>
+          <p>Detalhes de todas as manutenções com valores</p>
+        </div>
+        
+        <!-- CAMPO DE PESQUISA -->
+        <div class="search-section">
+          <div class="search-box">
+            <i class="cil-magnifying-glass search-icon"></i>
+            <input 
+              type="text" 
+              placeholder="Pesquisar manutenções..." 
+              (keyup)="aplicarFiltroTabela($event)"
+              class="search-input">
+            <button 
+              *ngIf="searchValue" 
+              class="clear-btn" 
+              (click)="limparPesquisa()"
+              type="button">
+              <i class="cil-x"></i>
+            </button>
+          </div>
+          
+          <!-- Indicador de resultados -->
+          <div class="results-info" *ngIf="dataSource?.data">
+            <span class="results-count">
+              <i class="cil-list"></i>
+              {{ dataSource.filteredData?.length || 0 }} de {{ dataSource.data?.length || 0 }} manutenções
+            </span>
+            <span class="results-total" *ngIf="dataSource.filteredData?.length !== dataSource.data?.length">
+              (Filtrado de {{ dataSource.data?.length || 0 }} total)
+            </span>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <!-- Indicador de scroll horizontal -->
+          <div class="scroll-indicator" *ngIf="dataSource?.data && dataSource.data.length > 0">
+            <i class="cil-arrow-left"></i>
+            <span>Arraste horizontalmente para ver todas as colunas</span>
+            <i class="cil-arrow-right"></i>
+          </div>
+          
+          <table class="modern-table detailed-table">
+            <thead>
+              <tr>
+                <th>
+                  Equipamento
+                </th>
+                <th>
+                  Técnico
+                </th>
+                <th>
+                  Reclamação
+                </th>
+                <th>
+                  Laudo
+                </th>
+                <th>
+                  Empresa
+                </th>
+                <th>
+                  Centro de Custo
+                </th>
+                <th class="text-end">
+                  Valor
+                </th>
+                <th class="text-center">
+                  Data Entrada
+                </th>
+                <th class="text-center">
+                  Data Laudo
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let row of dadosPaginados">
+                <td class="equipamento-info">
+                  <div class="recurso-details">
+                    <div class="recurso-avatar">
+                      <i class="cil-devices"></i>
+                    </div>
+                    <div class="recurso-text">
+                      <div class="recurso-nome">{{ row.equipamento || 'N/A' }}</div>
+                      <div class="recurso-sn">
+                        S/N: 
+                        <a 
+                          class="serial-number-link"
+                          [routerLink]="['/recursos']"
+                          [queryParams]="{search: row.numeroserie}"
+                          [matTooltip]="'Clique para ver detalhes do recurso: ' + (row.equipamento || 'N/A') + ' (S/N: ' + row.numeroserie + ')'"
+                          [matTooltipClass]="'resource-tooltip'"
+                          [matTooltipPosition]="'above'"
+                          [matTooltipShowDelay]="500">
+                          {{ row.numeroserie }}
+                          <i class="cil-external-link"></i>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                <td class="tecnico-info">
+                  <span>{{ row.tecniconome || 'N/A' }}</span>
+                </td>
+                <td class="queixa-text">
+                  <div class="text-content">
+                    {{ row.descricao || 'N/A' }}
+                  </div>
+                </td>
+                <td class="laudo-text">
+                  <div class="text-content">
+                    {{ row.laudo || 'N/A' }}
+                  </div>
+                </td>
+                <td class="empresa-info">
+                  <span>{{ row.empresanome || 'N/A' }}</span>
+                </td>
+                <td class="cc-info">
+                  <span>{{ row.centrocustonome || 'N/A' }}</span>
+                </td>
+                <td class="text-end">
+                  <span class="valor-badge" *ngIf="row.valormanutencao; else noValue">
+                    {{ row.valormanutencao | currencyFormat }}
+                  </span>
+                  <ng-template #noValue>
+                    <span class="no-value">N/A</span>
+                  </ng-template>
+                </td>
+                <td class="text-center">
+                  <span class="date-info" *ngIf="row.dtentrada; else noDate">
+                    {{ row.dtentrada | date:'dd/MM/yyyy' }}
+                  </span>
+                  <ng-template #noDate>
+                    <span class="no-value">N/A</span>
+                  </ng-template>
+                </td>
+                <td class="text-center">
+                  <span class="date-info" *ngIf="row.dtlaudo; else noLaudoDate">
+                    {{ row.dtlaudo | date:'dd/MM/yyyy' }}
+                  </span>
+                  <ng-template #noLaudoDate>
+                    <span class="no-value">N/A</span>
+                  </ng-template>
+                </td>
+              </tr>
+              
+              <!-- Mensagem quando não há dados -->
+              <tr *ngIf="!dataSource?.data || dataSource.data.length === 0">
+                <td colspan="9" class="no-data-row">
+                  <div class="no-data-message">
+                    <i class="cil-inbox"></i>
+                    <p>Nenhuma manutenção encontrada</p>
+                    <small>Selecione filtros e clique em "Pesquisar" para carregar dados</small>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          
+          <div class="pagination-container">
+            <mat-paginator 
+              #paginator 
+              [length]="length"
+              [pageIndex]="pageIndex"
+              [pageSize]="pageSize" 
+              [pageSizeOptions]="[10, 25, 50, 100]" 
+              (page)="onPageChange($event)"
+              showFirstLastButtons>
+            </mat-paginator>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 🚀 MODAL DE EXPORTAÇÃO -->
+<div class="export-modal" *ngIf="showExportModal" (click)="closeExportModal($event)">
+  <div class="export-modal-content" (click)="$event.stopPropagation()">
+    <div class="export-modal-header">
+      <h3><i class="cil-download"></i> Exportar Dados</h3>
+      <button class="close-btn" (click)="closeExportModal($event)">
+        <i class="cil-x"></i>
+      </button>
+    </div>
+    
+    <div class="export-modal-body">
+      <p>Escolha o formato de exportação para os dados de custos de manutenção:</p>
+      
+      <div class="export-options">
+        <div class="export-option" (click)="exportarParaExcel()">
+          <div class="export-icon excel">
+            <i class="cil-file"></i>
+          </div>
+          <div class="export-info">
+            <h4>Excel (.xlsx)</h4>
+            <p>Formato ideal para análise e manipulação de dados</p>
+          </div>
+          <i class="cil-chevron-right"></i>
+        </div>
+        
+        <div class="export-option" (click)="exportarParaCSV()">
+          <div class="export-icon csv">
+            <i class="cil-file"></i>
+          </div>
+          <div class="export-info">
+            <h4>CSV (.csv)</h4>
+            <p>Formato universal compatível com qualquer planilha</p>
+          </div>
+          <i class="cil-chevron-right"></i>
+        </div>
+      </div>
+    </div>
+    
+    <div class="export-modal-footer">
+      <button class="btn-secondary" (click)="closeExportModal($event)">
+        Cancelar
+      </button>
+    </div>
+  </div>
+</div>
