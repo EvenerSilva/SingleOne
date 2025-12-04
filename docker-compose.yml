@@ -9,7 +9,7 @@ services:
   # PostgreSQL Database
   # ==========================================
   postgres:
-    image: postgres:14-alpine
+    image: postgres:14
     container_name: singleone-postgres
     restart: unless-stopped
     environment:
