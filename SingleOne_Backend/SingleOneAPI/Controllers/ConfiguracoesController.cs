@@ -937,21 +937,49 @@ namespace SingleOne.Controllers
             return _negocio.ObterTemplatePorId(id);
         }
         [HttpPost("[action]", Name ="VisualizarTemplate")]
-        public byte[] VisualizarTemplate(TemplateVM template)
+        public IActionResult VisualizarTemplate(TemplateVM template)
         {
             try
             {
-                // ✅ CORREÇÃO: Retornar byte[] como antes para manter compatibilidade
-                // As validações e tratamento de erro estão no método do negócio
-                return _negocio.VisualizarTemplate(template);
+                // ✅ CORREÇÃO: Validar entrada antes de processar
+                if (template == null)
+                {
+                    Console.WriteLine("[VISUALIZAR-TEMPLATE] ❌ Template é nulo");
+                    return BadRequest(new { Mensagem = "Template não pode ser nulo", Status = "400" });
+                }
+
+                if (template.UsuarioLogado <= 0)
+                {
+                    Console.WriteLine($"[VISUALIZAR-TEMPLATE] ❌ Usuário inválido: {template.UsuarioLogado}");
+                    return BadRequest(new { Mensagem = "Usuário logado inválido", Status = "400" });
+                }
+
+                if (string.IsNullOrEmpty(template.Conteudo))
+                {
+                    Console.WriteLine("[VISUALIZAR-TEMPLATE] ❌ Conteúdo vazio");
+                    return BadRequest(new { Mensagem = "Conteúdo do template não pode ser vazio", Status = "400" });
+                }
+
+                // ✅ CORREÇÃO: Processar e retornar PDF como FileResult (compatível com byte[])
+                var pdf = _negocio.VisualizarTemplate(template);
+                
+                if (pdf == null || pdf.Length == 0)
+                {
+                    Console.WriteLine("[VISUALIZAR-TEMPLATE] ❌ PDF vazio ou nulo");
+                    return StatusCode(500, new { Mensagem = "Erro ao gerar PDF: resultado vazio", Status = "500" });
+                }
+
+                Console.WriteLine($"[VISUALIZAR-TEMPLATE] ✅ PDF gerado com sucesso - Tamanho: {pdf.Length} bytes");
+                return File(pdf, "application/pdf", "template.pdf");
             }
             catch (Exception ex)
             {
-                // ✅ CORREÇÃO: Log do erro mas deixar o ASP.NET Core tratar a exceção
-                // Isso mantém compatibilidade com o comportamento anterior
                 Console.WriteLine($"[VISUALIZAR-TEMPLATE] ❌ Erro no controller: {ex.Message}");
                 Console.WriteLine($"[VISUALIZAR-TEMPLATE] StackTrace: {ex.StackTrace}");
-                throw; // Re-lançar para o ASP.NET Core retornar erro 500
+                
+                // ✅ CORREÇÃO: Retornar JSON com Content-Type explícito para erros
+                var errorResponse = new { Mensagem = "Erro ao visualizar template: " + ex.Message, Status = "500" };
+                return StatusCode(500, errorResponse);
             }
         }
         [HttpPost("[action]", Name ="SalvarTemplate")]
@@ -972,9 +1000,23 @@ namespace SingleOne.Controllers
         /***************************************************************************************************/
 
         [HttpGet("[action]/{cliente}", Name = "BuscarParametros")]
-        public Parametro BuscarParametros(int cliente)
+        public IActionResult BuscarParametros(int cliente)
         {
-            return _negocio.ObterParametros(cliente);
+            try
+            {
+                var parametro = _negocio.ObterParametros(cliente);
+                if (parametro == null)
+                {
+                    // Retornar um objeto vazio ao invés de null para evitar erro 500
+                    return Ok(new Parametro { Cliente = cliente });
+                }
+                return Ok(parametro);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[PARAMETROS] Erro ao buscar parâmetros: {ex.Message}");
+                return StatusCode(500, new { message = "Erro ao buscar parâmetros", error = ex.Message });
+            }
         }
 
         [HttpPost("[action]", Name = "SalvarParametros")]
