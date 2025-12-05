@@ -94,11 +94,11 @@ namespace SingleOne.Negocios
             Console.WriteLine($"[EQUIPAMENTOS] Listando equipamentos - Cliente: {cliente}, Contrato: {contrato}, Pesquisa: '{pesquisa}', Página: {pagina}, Tamanho: {paginaTamanho}, Modelo: {modeloId}, Localidade: {localidadeId}");
             
             // ✅ CORREÇÃO: Tratar pesquisa null ou "null"
-            if (string.IsNullOrWhiteSpace(pesquisa) || pesquisa.ToLower() == "null")
+            if (string.IsNullOrWhiteSpace(pesquisa) || (pesquisa != null && pesquisa.ToLower() == "null"))
             {
                 pesquisa = null;
             }
-            else
+            else if (pesquisa != null)
             {
                 pesquisa = pesquisa.ToLower();
             }
