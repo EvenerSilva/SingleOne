@@ -1,4 +1,4 @@
--- ========================================
+﻿-- ========================================
 -- VIEWS CORRIGIDAS - REMOÇÃO DA COLUNA localizacao
 -- Todas as views foram atualizadas para usar localidade_id em vez de localizacao
 -- Data: 2025

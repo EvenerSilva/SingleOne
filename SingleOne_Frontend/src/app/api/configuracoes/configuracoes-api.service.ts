@@ -586,13 +586,103 @@ salvarNotaFiscal(nf, token) {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ' + token
-      }
-      // ✅ CORREÇÃO: Removido responseType para deixar o Axios detectar automaticamente (como GerarLaudoEmPDF)
+      },
+      responseType: 'blob' // ✅ CORREÇÃO: Sempre receber como blob (pode ser PDF ou JSON de erro)
     }).then(res => {
-      return res;
+      // ✅ CORREÇÃO: Verificar Content-Type para distinguir PDF de erro JSON
+      const contentType = res.headers?.['content-type'] || res.headers?.['Content-Type'] || '';
+      
+      if (contentType.includes('application/json')) {
+        // É um erro JSON dentro de um Blob - converter e rejeitar
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => {
+            try {
+              const errorData = JSON.parse(reader.result as string);
+              reject({ 
+                response: { 
+                  status: res.status || 500, 
+                  statusText: res.statusText || 'Internal Server Error',
+                  data: errorData,
+                  headers: res.headers
+                } 
+              });
+            } catch (e) {
+              console.error('[API] Erro ao parsear JSON de erro:', e);
+              reject({ 
+                response: { 
+                  status: res.status || 500, 
+                  statusText: res.statusText || 'Internal Server Error',
+                  data: { Mensagem: 'Erro ao processar resposta do servidor' },
+                  headers: res.headers
+                } 
+              });
+            }
+          };
+          reader.onerror = () => {
+            reject({ 
+              response: { 
+                status: res.status || 500, 
+                statusText: res.statusText || 'Internal Server Error',
+                data: { Mensagem: 'Erro ao ler resposta do servidor' },
+                headers: res.headers
+              } 
+            });
+          };
+          reader.readAsText(res.data);
+        });
+      }
+      
+      // Se for PDF (application/pdf) ou tipo não especificado mas com dados, retornar normalmente
+      if (res.data && res.data instanceof Blob && res.data.size > 0) {
+        return res;
+      }
+      
+      // Se chegou aqui, algo está errado
+      return Promise.reject({
+        response: {
+          status: res.status || 500,
+          statusText: res.statusText || 'Unknown Error',
+          data: { Mensagem: 'Resposta inválida do servidor' },
+          headers: res.headers
+        }
+      });
     }).catch(err => {
       console.error('[API] Erro ao visualizar template:', err);
-      return err;
+      
+      // ✅ CORREÇÃO: Se a resposta for um Blob com JSON, converter
+      if (err.response && err.response.data instanceof Blob) {
+        const contentType = err.response.headers?.['content-type'] || err.response.headers?.['Content-Type'] || '';
+        if (contentType.includes('application/json') || err.response.status >= 400) {
+          return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+              try {
+                const errorData = JSON.parse(reader.result as string);
+                reject({ 
+                  response: { 
+                    ...err.response, 
+                    data: errorData 
+                  } 
+                });
+              } catch (e) {
+                // Se não conseguir parsear, manter o erro original mas com mensagem
+                reject({ 
+                  response: { 
+                    ...err.response, 
+                    data: { Mensagem: 'Erro ao processar resposta do servidor' }
+                  } 
+                });
+              }
+            };
+            reader.onerror = () => reject(err);
+            reader.readAsText(err.response.data);
+          });
+        }
+      }
+      
+      // Rejeitar o erro original
+      return Promise.reject(err);
     })
   }
   salvarTemplate(tmp, token) {

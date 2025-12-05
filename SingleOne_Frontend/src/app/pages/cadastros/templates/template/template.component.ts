@@ -175,19 +175,103 @@ constructor(private fb: FormBuilder, private util: UtilService, private api: Con
       conteudo: this.template.conteudo,
       usuarioLogado: this.session.usuario.id
     }
-    // ✅ CORREÇÃO: Manter a mesma lógica de gerarLaudoEmPDF para consistência
     this.api.visualizarTemplate(tmp, this.session.token).then(res => {
       this.util.aguardar(false);
-      if (res.status === 200) {
-        this.util.gerarDocumentoNovaGuia(res.data);
+      
+      // ✅ CORREÇÃO: Verificar se a resposta é válida e é um PDF
+      if (!res || !res.data) {
+        console.error('[TEMPLATE] Resposta inválida:', res);
+        this.util.exibirMensagemToast('Erro ao visualizar template: resposta inválida do servidor', 5000);
+        return;
+      }
+
+      // Verificar se é um Blob (PDF)
+      if (res.data instanceof Blob) {
+        // Verificar Content-Type para distinguir PDF de erro JSON
+        const contentType = res.headers?.['content-type'] || res.data.type || '';
+        
+        if (contentType.includes('application/json')) {
+          // É um erro JSON dentro de um Blob
+          this.tratarErroResposta(res.data);
+        } else if (contentType.includes('application/pdf') || res.data.size > 0) {
+          // É um PDF válido
+          this.util.gerarDocumentoNovaGuia(res.data);
+        } else {
+          // Tipo desconhecido, tentar tratar como erro
+          this.tratarErroResposta(res.data);
+        }
       } else {
-        this.util.exibirMensagemToast('Falha de comunicação com o serviço...', 5000);
+        // Não é um Blob, tratar como erro
+        this.tratarErroResposta(res.data);
       }
     }).catch(err => {
       this.util.aguardar(false);
-      console.error('Erro ao visualizar template:', err);
-      this.util.exibirMensagemToast('Erro ao visualizar template', 5000);
+      console.error('[TEMPLATE] Erro ao visualizar template:', err);
+      
+      // ✅ CORREÇÃO: Tentar extrair mensagem de erro do backend
+      if (err && err.response) {
+        if (err.response.data) {
+          this.tratarErroResposta(err.response.data);
+        } else {
+          this.util.exibirMensagemToast(`Erro ${err.response.status || 500}: Erro ao visualizar template`, 5000);
+        }
+      } else if (err && err.message) {
+        this.util.exibirMensagemToast(`Erro: ${err.message}`, 5000);
+      } else {
+        this.util.exibirMensagemToast('Erro ao visualizar template. Verifique sua conexão e tente novamente.', 5000);
+      }
     })
+  }
+
+  // ✅ NOVO: Método auxiliar para tratar erros do backend
+  private tratarErroResposta(data: any) {
+    console.log('[TEMPLATE] Tratando erro:', data);
+    
+    if (!data) {
+      this.util.exibirMensagemToast('Erro ao visualizar template: nenhuma resposta do servidor', 5000);
+      return;
+    }
+
+    if (data instanceof Blob) {
+      // Se for um Blob, tentar ler como JSON (erro do backend)
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const errorData = JSON.parse(reader.result as string);
+          const mensagem = errorData.Mensagem || errorData.mensagem || 'Erro ao visualizar template';
+          console.error('[TEMPLATE] Erro do servidor:', mensagem);
+          this.util.exibirMensagemToast(mensagem, 5000);
+        } catch (e) {
+          console.error('[TEMPLATE] Erro ao parsear JSON do erro:', e);
+          this.util.exibirMensagemToast('Erro ao visualizar template: resposta inválida do servidor', 5000);
+        }
+      };
+      reader.onerror = () => {
+        console.error('[TEMPLATE] Erro ao ler Blob de erro');
+        this.util.exibirMensagemToast('Erro ao visualizar template', 5000);
+      };
+      reader.readAsText(data);
+    } else if (data && typeof data === 'object') {
+      // Objeto JavaScript direto
+      const mensagem = data.Mensagem || data.mensagem || data.message || 'Erro ao visualizar template';
+      console.error('[TEMPLATE] Erro do servidor:', mensagem);
+      this.util.exibirMensagemToast(mensagem, 5000);
+    } else if (typeof data === 'string') {
+      // String que pode ser JSON
+      try {
+        const errorData = JSON.parse(data);
+        const mensagem = errorData.Mensagem || errorData.mensagem || 'Erro ao visualizar template';
+        console.error('[TEMPLATE] Erro do servidor:', mensagem);
+        this.util.exibirMensagemToast(mensagem, 5000);
+      } catch (e) {
+        // Se não for JSON, usar a string como mensagem
+        console.error('[TEMPLATE] Erro:', data);
+        this.util.exibirMensagemToast(data || 'Erro ao visualizar template', 5000);
+      }
+    } else {
+      console.error('[TEMPLATE] Tipo de erro desconhecido:', typeof data, data);
+      this.util.exibirMensagemToast('Erro ao visualizar template', 5000);
+    }
   }
 
   salvar() {

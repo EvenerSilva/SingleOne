@@ -2638,18 +2638,40 @@ namespace SingleOne.Negocios
         {
             try
             {
+                Console.WriteLine($"[VISUALIZAR-TEMPLATE] === INICIANDO VISUALIZAÇÃO ===");
+                Console.WriteLine($"[VISUALIZAR-TEMPLATE] UsuarioLogado: {template?.UsuarioLogado ?? 0}");
+                Console.WriteLine($"[VISUALIZAR-TEMPLATE] Conteudo length: {template?.Conteudo?.Length ?? 0}");
+                
+                // ✅ CORREÇÃO: Validar template antes de processar
+                if (template == null)
+                {
+                    Console.WriteLine("[VISUALIZAR-TEMPLATE] ❌ Template é nulo");
+                    throw new Exception("Template não pode ser nulo");
+                }
+
                 // ✅ CORREÇÃO: Validar usuário antes de usar
+                if (template.UsuarioLogado <= 0)
+                {
+                    Console.WriteLine($"[VISUALIZAR-TEMPLATE] ❌ UsuarioLogado inválido: {template.UsuarioLogado}");
+                    throw new Exception($"ID de usuário inválido: {template.UsuarioLogado}");
+                }
+
+                Console.WriteLine($"[VISUALIZAR-TEMPLATE] Buscando usuário ID: {template.UsuarioLogado}");
                 var usu = _usuarioRepository.ObterPorId(template.UsuarioLogado);
                 if (usu == null)
                 {
+                    Console.WriteLine($"[VISUALIZAR-TEMPLATE] ❌ Usuário não encontrado: {template.UsuarioLogado}");
                     throw new Exception($"Usuário com ID {template.UsuarioLogado} não encontrado");
                 }
+                Console.WriteLine($"[VISUALIZAR-TEMPLATE] ✅ Usuário encontrado: {usu.Nome}");
 
                 // ✅ CORREÇÃO: Validar conteúdo antes de processar
                 if (string.IsNullOrEmpty(template.Conteudo))
                 {
+                    Console.WriteLine("[VISUALIZAR-TEMPLATE] ❌ Conteúdo vazio");
                     throw new Exception("Conteúdo do template não pode ser vazio");
                 }
+                Console.WriteLine($"[VISUALIZAR-TEMPLATE] ✅ Conteúdo válido: {template.Conteudo.Length} caracteres");
 
                 var nomeUsuario = usu.Nome ?? "Usuário";
                 template.Conteudo = template.Conteudo
@@ -2681,20 +2703,61 @@ namespace SingleOne.Negocios
                 }
                 template.Conteudo = template.Conteudo + "<style>" + css + "table{width:100%}</style>";
 
-                //var pdf = _generatePdf.GetPDF(template.Conteudo);
-                var pdf = HtmlToPdfConverter.ConvertHtmlToPdf(template.Conteudo);
-                
-                if (pdf == null || pdf.Length == 0)
+                // ✅ CORREÇÃO: Validar HTML antes de converter
+                if (string.IsNullOrWhiteSpace(template.Conteudo))
                 {
-                    throw new Exception("Erro ao gerar PDF: resultado vazio");
+                    throw new Exception("Conteúdo HTML vazio após processamento");
                 }
 
+                Console.WriteLine($"[VISUALIZAR-TEMPLATE] Iniciando conversão HTML para PDF...");
+                Console.WriteLine($"[VISUALIZAR-TEMPLATE] HTML length: {template.Conteudo.Length} caracteres");
+                
+                byte[] pdf = null;
+                try
+                {
+                    //var pdf = _generatePdf.GetPDF(template.Conteudo);
+                    pdf = HtmlToPdfConverter.ConvertHtmlToPdf(template.Conteudo);
+                    Console.WriteLine($"[VISUALIZAR-TEMPLATE] ✅ Conversão concluída - PDF size: {pdf?.Length ?? 0} bytes");
+                }
+                catch (Exception pdfEx)
+                {
+                    Console.WriteLine($"[VISUALIZAR-TEMPLATE] ❌ Erro ao converter HTML para PDF: {pdfEx.Message}");
+                    Console.WriteLine($"[VISUALIZAR-TEMPLATE] Tipo de exceção: {pdfEx.GetType().Name}");
+                    Console.WriteLine($"[VISUALIZAR-TEMPLATE] StackTrace: {pdfEx.StackTrace}");
+                    if (pdfEx.InnerException != null)
+                    {
+                        Console.WriteLine($"[VISUALIZAR-TEMPLATE] InnerException: {pdfEx.InnerException.Message}");
+                    }
+                    throw new Exception($"Erro ao converter HTML para PDF: {pdfEx.Message}", pdfEx);
+                }
+                
+                if (pdf == null)
+                {
+                    Console.WriteLine("[VISUALIZAR-TEMPLATE] ❌ PDF é nulo após conversão");
+                    throw new Exception("Erro ao gerar PDF: resultado nulo após conversão");
+                }
+                
+                if (pdf.Length == 0)
+                {
+                    Console.WriteLine("[VISUALIZAR-TEMPLATE] ❌ PDF vazio após conversão");
+                    throw new Exception("Erro ao gerar PDF: resultado vazio após conversão");
+                }
+
+                Console.WriteLine($"[VISUALIZAR-TEMPLATE] ✅ PDF gerado com sucesso - Tamanho: {pdf.Length} bytes");
+                Console.WriteLine($"[VISUALIZAR-TEMPLATE] === VISUALIZAÇÃO CONCLUÍDA COM SUCESSO ===");
                 return pdf;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[VISUALIZAR-TEMPLATE] ❌ Erro: {ex.Message}");
+                Console.WriteLine($"[VISUALIZAR-TEMPLATE] ❌ ERRO GERAL: {ex.Message}");
+                Console.WriteLine($"[VISUALIZAR-TEMPLATE] Tipo de exceção: {ex.GetType().Name}");
                 Console.WriteLine($"[VISUALIZAR-TEMPLATE] StackTrace: {ex.StackTrace}");
+                if (ex.InnerException != null)
+                {
+                    Console.WriteLine($"[VISUALIZAR-TEMPLATE] InnerException: {ex.InnerException.Message}");
+                    Console.WriteLine($"[VISUALIZAR-TEMPLATE] InnerException StackTrace: {ex.InnerException.StackTrace}");
+                }
+                Console.WriteLine($"[VISUALIZAR-TEMPLATE] === ERRO NA VISUALIZAÇÃO ===");
                 throw; // Re-lançar para o controller tratar
             }
         }

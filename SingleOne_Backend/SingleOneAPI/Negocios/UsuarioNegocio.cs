@@ -44,6 +44,25 @@ namespace SingleOne.Negocios
 
                     if (!existe)
                     {
+                        // VALIDAÇÃO DE 2FA PARA NOVOS USUÁRIOS
+                        // SÓ VALIDAR SE ESTIVER TENTANDO HABILITAR 2FA
+                        if (usr.TwoFactorEnabled == true)
+                        {
+                            // Buscar configuração global no cliente do usuário
+                            bool configuracaoGlobal = IsTwoFactorEnabledGlobally(usr.Cliente);
+                            
+                            // BLOQUEAR se global estiver desabilitado
+                            if (!configuracaoGlobal)
+                            {
+                                return JsonConvert.SerializeObject(new { 
+                                    Mensagem = "Para habilitar 2FA para usuários, é necessário ativar primeiro a funcionalidade nas configurações globais do cliente.", 
+                                    Status = "400",
+                                    CodigoErro = "2FA_GLOBAL_DESABILITADO",
+                                    Detalhes = "2FA global está desabilitado para este cliente"
+                                });
+                            }
+                        }
+                        
                         usr.Palavracriptografada = Guid.NewGuid().ToString();
                         usr.Ativo = true;
 

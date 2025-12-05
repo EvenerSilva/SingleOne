@@ -15,7 +15,7 @@ services:
       - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./SingleOne_Backend/init_db_atualizado.sql:/docker-entrypoint-initdb.d/init_db_atualizado.sql:ro
+      - ./init_db_atualizado_v2.sql:/docker-entrypoint-initdb.d/init_db_atualizado.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -d ${DB_NAME:-singleone} -U ${DB_USER:-postgres}"]
       interval: 30s
