@@ -1259,6 +1259,48 @@ FROM TipoEquipamentos te
 	JOIN tipoequipamentosclientes tec ON te.Id = tec.tipo
 WHERE te.ativo = true;
 
+-- View: vwestoqueequipamentosalerta
+CREATE OR REPLACE VIEW vwestoqueequipamentosalerta AS
+SELECT e.cliente,
+    l.descricao AS localidade,
+    te.descricao AS tipoequipamento,
+    f.descricao AS fabricante,
+    m.descricao AS modelo,
+    count(
+        CASE
+            WHEN e.equipamentostatus = 3 AND e.ativo = true THEN 1
+            ELSE NULL::integer
+        END) AS estoqueatual,
+    eme.quantidademinima AS estoqueminimo,
+        CASE
+            WHEN count(
+            CASE
+                WHEN e.equipamentostatus = 3 AND e.ativo = true THEN 1
+                ELSE NULL::integer
+            END) < eme.quantidademinima THEN 'ALERTA'::text
+            ELSE 'OK'::text
+        END AS status,
+        CASE
+            WHEN count(
+            CASE
+                WHEN e.equipamentostatus = 3 AND e.ativo = true THEN 1
+                ELSE NULL::integer
+            END) < eme.quantidademinima THEN eme.quantidademinima - count(
+            CASE
+                WHEN e.equipamentostatus = 3 AND e.ativo = true THEN 1
+                ELSE NULL::integer
+            END)
+            ELSE 0::bigint
+        END AS quantidadefaltante
+   FROM equipamentos e
+     JOIN modelos m ON e.modelo = m.id
+     JOIN fabricantes f ON e.fabricante = f.id
+     JOIN tipoequipamentos te ON e.tipoequipamento = te.id
+     JOIN localidades l ON e.localidade_id = l.id
+     JOIN estoqueminimoequipamentos eme ON e.modelo = eme.modelo AND e.localidade_id = eme.localidade AND e.cliente = eme.cliente
+  WHERE eme.ativo = true
+  GROUP BY e.cliente, l.descricao, te.descricao, f.descricao, m.descricao, eme.quantidademinima;
+
 -- View: vwExportacaoExcel
 CREATE OR REPLACE VIEW vwExportacaoExcel AS
 SELECT DISTINCT eqp.id, c.Nome Colaborador, c.Cargo, te.Descricao TipoEquipamento, fab.Descricao Fabricante, mdl.Descricao Modelo, concat(' ', cast(nf.Numero as varchar), nf.Descricao) NotaFiscal, es.Descricao EquipamentoStatus, es.id EquipamentostatusId,
