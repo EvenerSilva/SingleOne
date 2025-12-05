@@ -2,7 +2,7 @@
 # Docker Compose - SingleOne v1.1.0
 # ==========================================
 
-version: '3.8'
+# version: '3.8' # Removido - obsoleto no Docker Compose v2+
 
 services:
   # ==========================================
