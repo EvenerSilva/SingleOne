@@ -1526,7 +1526,7 @@ SELECT
 FROM colaboradores c
 	JOIN empresas e ON c.empresa = e.id
 	JOIN centrocusto cc ON c.centrocusto = cc.id
-	LEFT JOIN localidades l ON l.id = c.localidade;
+	LEFT JOIN localidades l ON l.id = c.localidade_id;
 
 -- View: vw_equipamentos_compartilhados
 CREATE OR REPLACE VIEW vw_equipamentos_compartilhados AS
