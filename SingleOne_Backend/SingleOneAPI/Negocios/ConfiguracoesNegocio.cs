@@ -2636,29 +2636,67 @@ namespace SingleOne.Negocios
         }
         public byte[] VisualizarTemplate(TemplateVM template)
         {
-            var usu = _usuarioRepository.ObterPorId(template.UsuarioLogado);
-            template.Conteudo = template.Conteudo
-                            .Replace("@nomeEmpresa", "SingleOne Tech")
-                            .Replace("@cnpjEmpresa", "00.000.000/0001-00")
-                            .Replace("@centroCusto", "Diretoria")
-                            .Replace("@nomeColaborador", "Roberto Carlos")
-                            .Replace("@cargo", "Presidente")
-                            .Replace("@matricula", "M01")
-                            .Replace("@equipamentos", "")
-                            .Replace("@usuarioLogado", usu.Nome)
-                            .Replace("@dataAtual", TimeZoneMapper.GetDateTimeNow().ToString("dddd, dd MMMM yyyy", System.Globalization.CultureInfo.GetCultureInfo("pt-BR")))
-                            .Replace("@dataUltimaAtual", TimeZoneMapper.GetDateTimeNow().ToString("dd/MM/yyyy HH:mm"))
-                            .Replace("@versao", $"Versão: 2")
-                            .Replace("@tipoColaborador", "Funcionário");
+            try
+            {
+                // ✅ CORREÇÃO: Validar usuário antes de usar
+                var usu = _usuarioRepository.ObterPorId(template.UsuarioLogado);
+                if (usu == null)
+                {
+                    throw new Exception($"Usuário com ID {template.UsuarioLogado} não encontrado");
+                }
 
-            var file = Path.Combine(Directory.GetCurrentDirectory(), "documentos", "ckeditor.css");
-            string css = File.ReadAllText(file);
-            template.Conteudo = template.Conteudo + "<style>" + css + "table{width:100%}</style>";
+                // ✅ CORREÇÃO: Validar conteúdo antes de processar
+                if (string.IsNullOrEmpty(template.Conteudo))
+                {
+                    throw new Exception("Conteúdo do template não pode ser vazio");
+                }
 
-            //var pdf = _generatePdf.GetPDF(template.Conteudo);
-            var pdf = HtmlToPdfConverter.ConvertHtmlToPdf(template.Conteudo);
-            // fileName removido pois não estava sendo utilizado
-            return pdf;
+                var nomeUsuario = usu.Nome ?? "Usuário";
+                template.Conteudo = template.Conteudo
+                                .Replace("@nomeEmpresa", "SingleOne Tech")
+                                .Replace("@cnpjEmpresa", "00.000.000/0001-00")
+                                .Replace("@centroCusto", "Diretoria")
+                                .Replace("@nomeColaborador", "Roberto Carlos")
+                                .Replace("@cargo", "Presidente")
+                                .Replace("@matricula", "M01")
+                                .Replace("@equipamentos", "")
+                                .Replace("@usuarioLogado", nomeUsuario)
+                                .Replace("@dataAtual", TimeZoneMapper.GetDateTimeNow().ToString("dddd, dd MMMM yyyy", System.Globalization.CultureInfo.GetCultureInfo("pt-BR")))
+                                .Replace("@dataUltimaAtual", TimeZoneMapper.GetDateTimeNow().ToString("dd/MM/yyyy HH:mm"))
+                                .Replace("@versao", $"Versão: 2")
+                                .Replace("@tipoColaborador", "Funcionário");
+
+                // ✅ CORREÇÃO: Verificar se o arquivo CSS existe antes de ler
+                var file = Path.Combine(Directory.GetCurrentDirectory(), "documentos", "ckeditor.css");
+                string css = "";
+                if (File.Exists(file))
+                {
+                    css = File.ReadAllText(file);
+                }
+                else
+                {
+                    Console.WriteLine($"[VISUALIZAR-TEMPLATE] ⚠️ Arquivo CSS não encontrado: {file}");
+                    // Usar CSS padrão mínimo se o arquivo não existir
+                    css = "body { font-family: Arial, sans-serif; } table { width: 100%; border-collapse: collapse; }";
+                }
+                template.Conteudo = template.Conteudo + "<style>" + css + "table{width:100%}</style>";
+
+                //var pdf = _generatePdf.GetPDF(template.Conteudo);
+                var pdf = HtmlToPdfConverter.ConvertHtmlToPdf(template.Conteudo);
+                
+                if (pdf == null || pdf.Length == 0)
+                {
+                    throw new Exception("Erro ao gerar PDF: resultado vazio");
+                }
+
+                return pdf;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[VISUALIZAR-TEMPLATE] ❌ Erro: {ex.Message}");
+                Console.WriteLine($"[VISUALIZAR-TEMPLATE] StackTrace: {ex.StackTrace}");
+                throw; // Re-lançar para o controller tratar
+            }
         }
         #endregion
 

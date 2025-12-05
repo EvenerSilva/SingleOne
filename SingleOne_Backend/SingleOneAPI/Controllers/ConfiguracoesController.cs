@@ -939,7 +939,20 @@ namespace SingleOne.Controllers
         [HttpPost("[action]", Name ="VisualizarTemplate")]
         public byte[] VisualizarTemplate(TemplateVM template)
         {
-            return _negocio.VisualizarTemplate(template);
+            try
+            {
+                // ✅ CORREÇÃO: Retornar byte[] como antes para manter compatibilidade
+                // As validações e tratamento de erro estão no método do negócio
+                return _negocio.VisualizarTemplate(template);
+            }
+            catch (Exception ex)
+            {
+                // ✅ CORREÇÃO: Log do erro mas deixar o ASP.NET Core tratar a exceção
+                // Isso mantém compatibilidade com o comportamento anterior
+                Console.WriteLine($"[VISUALIZAR-TEMPLATE] ❌ Erro no controller: {ex.Message}");
+                Console.WriteLine($"[VISUALIZAR-TEMPLATE] StackTrace: {ex.StackTrace}");
+                throw; // Re-lançar para o ASP.NET Core retornar erro 500
+            }
         }
         [HttpPost("[action]", Name ="SalvarTemplate")]
         public void SalvarTemplate(Template tmp)

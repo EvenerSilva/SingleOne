@@ -582,12 +582,16 @@ salvarNotaFiscal(nf, token) {
     })
   }
   visualizarTemplate(tmp, token) {
-    return this.instance.post('/configuracoes/VisualizarTemplate', tmp, { headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + token
-    }}).then(res => {
+    return this.instance.post('/configuracoes/VisualizarTemplate', tmp, { 
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+      }
+      // ✅ CORREÇÃO: Removido responseType para deixar o Axios detectar automaticamente (como GerarLaudoEmPDF)
+    }).then(res => {
       return res;
     }).catch(err => {
+      console.error('[API] Erro ao visualizar template:', err);
       return err;
     })
   }

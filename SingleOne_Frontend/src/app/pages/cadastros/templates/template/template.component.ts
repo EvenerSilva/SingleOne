@@ -164,14 +164,29 @@ constructor(private fb: FormBuilder, private util: UtilService, private api: Con
   }
 
   preview() {
+    // ✅ CORREÇÃO: Validar conteúdo antes de enviar
+    if (!this.template.conteudo || this.template.conteudo.trim() === '') {
+      this.util.exibirMensagemToast('Por favor, adicione conteúdo ao template antes de visualizar', 5000);
+      return;
+    }
+
     this.util.aguardar(true);
     var tmp:any = {
       conteudo: this.template.conteudo,
       usuarioLogado: this.session.usuario.id
     }
+    // ✅ CORREÇÃO: Manter a mesma lógica de gerarLaudoEmPDF para consistência
     this.api.visualizarTemplate(tmp, this.session.token).then(res => {
       this.util.aguardar(false);
-      this.util.gerarDocumentoNovaGuia(res.data);
+      if (res.status === 200) {
+        this.util.gerarDocumentoNovaGuia(res.data);
+      } else {
+        this.util.exibirMensagemToast('Falha de comunicação com o serviço...', 5000);
+      }
+    }).catch(err => {
+      this.util.aguardar(false);
+      console.error('Erro ao visualizar template:', err);
+      this.util.exibirMensagemToast('Erro ao visualizar template', 5000);
     })
   }
 
