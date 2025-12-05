@@ -1119,9 +1119,9 @@ SELECT e.id,
     COALESCE(es.descricao, 'Nao definido'::character varying) AS equipamentostatus,
     e.usuario AS usuarioid,
     COALESCE(u.nome, 'Nao definido'::character varying) AS usuario,
-    e.localidade_id AS localizacaoid,
+    e.Localizacao AS localizacaoid,
         CASE
-            WHEN e.localidade_id = 1 THEN 'Nao definido'::character varying
+            WHEN e.Localizacao = 1 THEN 'Nao definido'::character varying
             ELSE COALESCE(l.descricao, 'Nao definido'::character varying)
         END AS localizacao,
     e.possuibo,
@@ -1158,7 +1158,7 @@ SELECT e.id,
      LEFT JOIN fornecedores forn ON e.fornecedor = forn.id
      LEFT JOIN equipamentosstatus es ON e.equipamentostatus = es.id
      LEFT JOIN usuarios u ON e.usuario = u.id
-     LEFT JOIN localidades l ON e.localidade_id = l.id
+     LEFT JOIN localidades l ON e.Localizacao = l.id
      LEFT JOIN empresas emp ON e.empresa = emp.id
      LEFT JOIN centrocusto cc ON e.centrocusto = cc.id
      LEFT JOIN empresas emp_cc ON cc.empresa = emp_cc.id
@@ -1307,8 +1307,8 @@ SELECT e.cliente,
      JOIN modelos m ON e.modelo = m.id
      JOIN fabricantes f ON e.fabricante = f.id
      JOIN tipoequipamentos te ON e.tipoequipamento = te.id
-     JOIN localidades l ON e.localidade_id = l.id
-     JOIN estoqueminimoequipamentos eme ON e.modelo = eme.modelo AND e.localidade_id = eme.localidade AND e.cliente = eme.cliente
+     JOIN localidades l ON e.Localizacao = l.id
+     JOIN estoqueminimoequipamentos eme ON e.modelo = eme.modelo AND e.Localizacao = eme.localidade AND e.cliente = eme.cliente
   WHERE eme.ativo = true
   GROUP BY e.cliente, l.descricao, te.descricao, f.descricao, m.descricao, eme.quantidademinima;
 
@@ -1386,7 +1386,7 @@ FROM equipamentos e
 	JOIN tipoequipamentos te ON e.tipoequipamento = te.id
 	JOIN fabricantes f ON e.fabricante = f.id
 	JOIN modelos m ON e.modelo = m.id
-	LEFT JOIN localidades l ON e.localizacao = l.id
+	LEFT JOIN localidades l ON e.Localizacao = l.id
 	LEFT JOIN empresas emp ON e.empresa = emp.id
 	LEFT JOIN centrocusto cc ON e.centrocusto = cc.id
 	JOIN equipamentosstatus es ON e.equipamentostatus = es.id
@@ -1553,7 +1553,7 @@ LEFT JOIN tipoequipamentos te ON e.tipoequipamento = te.id
 LEFT JOIN modelos m ON e.modelo = m.id
 LEFT JOIN fabricantes f ON e.fabricante = f.id
 LEFT JOIN equipamentosstatus es ON e.equipamentostatus = es.id
-LEFT JOIN localidades l ON e.localizacao = l.id
+LEFT JOIN localidades l ON e.Localizacao = l.id
 LEFT JOIN empresas emp ON e.empresa = emp.id
 WHERE e.ativo = TRUE AND e.compartilhado = TRUE;
 
@@ -1638,23 +1638,23 @@ COMMENT ON VIEW vwplanostelefonia IS 'View para listar planos de telefonia com i
 -- View: vw_tinone_estatisticas
 CREATE OR REPLACE VIEW vw_tinone_estatisticas AS
 SELECT count(*) AS total_interacoes,
-    count(DISTINCT usuario_id) AS usuarios_unicos,
-    count(DISTINCT sessao_id) AS sessoes_unicas,
-    avg(tempo_resposta_ms) AS tempo_medio_resposta,
+    count(DISTINCT "Usuario_Id") AS usuarios_unicos,
+    count(DISTINCT "Sessao_Id") AS sessoes_unicas,
+    avg("Tempo_Resposta_Ms") AS tempo_medio_resposta,
     count(
         CASE
-            WHEN foi_util = true THEN 1
+            WHEN "Foi_Util" = true THEN 1
             ELSE NULL::integer
         END) AS feedbacks_positivos,
     count(
         CASE
-            WHEN foi_util = false THEN 1
+            WHEN "Foi_Util" = false THEN 1
             ELSE NULL::integer
         END) AS feedbacks_negativos,
-    date(created_at) AS data
-   FROM tinone_analytics
-  GROUP BY (date(created_at))
-  ORDER BY (date(created_at)) DESC;
+    date("Created_At") AS data
+   FROM "TinOne_Analytics"
+  GROUP BY (date("Created_At"))
+  ORDER BY (date("Created_At")) DESC;
 
 COMMENT ON VIEW vw_tinone_estatisticas IS 'Estatísticas diárias de uso do TinOne';
 
@@ -1755,7 +1755,7 @@ WITH equipamentos_alocados AS (
         e.numeroserie AS equipamento_serie,
         te.id AS tipo_equipamento_id,
         te.descricao AS tipo_equipamento_descricao,
-        te.categoria_id AS categoria_equipamento,
+        NULL::integer AS categoria_equipamento,
         e.fabricante AS fabricante_id,
         f.descricao AS fabricante,
         e.modelo AS modelo_id,
@@ -1867,9 +1867,9 @@ SELECT e.id,
     COALESCE(es.descricao, 'Nao definido'::character varying) AS equipamentostatus,
     e.usuario AS usuarioid,
     COALESCE(u.nome, 'Nao definido'::character varying) AS usuario,
-    e.localidade_id AS localizacaoid,
+    e.Localizacao AS localizacaoid,
         CASE
-            WHEN e.localidade_id = 1 THEN 'Nao definido'::character varying
+            WHEN e.Localizacao = 1 THEN 'Nao definido'::character varying
             ELSE COALESCE(l.descricao, 'Nao definido'::character varying)
         END AS localizacao,
     e.possuibo,
@@ -1906,7 +1906,7 @@ SELECT e.id,
      LEFT JOIN fornecedores forn ON e.fornecedor = forn.id
      LEFT JOIN equipamentosstatus es ON e.equipamentostatus = es.id
      LEFT JOIN usuarios u ON e.usuario = u.id
-     LEFT JOIN localidades l ON e.localidade_id = l.id
+     LEFT JOIN localidades l ON e.Localizacao = l.id
      LEFT JOIN empresas emp ON e.empresa = emp.id
      LEFT JOIN centrocusto cc ON e.centrocusto = cc.id
      LEFT JOIN empresas emp_cc ON cc.empresa = emp_cc.id
@@ -1981,7 +1981,7 @@ SELECT e.id,
     cc.nome AS centro_custo_nome,
     e.filial_id,
     f.nome AS filial_nome,
-    e.localidade_id,
+    e.Localizacao AS localidade_id,
     l.descricao AS localidade_nome,
     COALESCE(e.cliente, emp.cliente) AS cliente,
     cl.razaosocial AS cliente_nome
@@ -1989,7 +1989,7 @@ SELECT e.id,
      LEFT JOIN empresas emp ON e.empresa = emp.id
      LEFT JOIN centrocusto cc ON e.centrocusto = cc.id
      LEFT JOIN filiais f ON e.filial_id = f.id
-     LEFT JOIN localidades l ON e.localidade_id = l.id
+     LEFT JOIN localidades l ON e.Localizacao = l.id
      LEFT JOIN clientes cl ON COALESCE(e.cliente, emp.cliente) = cl.id;
 
 -- View: vwestoquelinhasalerta
