@@ -271,11 +271,12 @@ export class ParametrosComponent implements OnInit {
     const smtpEnabled = this.form.get('smtpEnabled')?.value;
     
     // Controlar o estado disabled do campo 2FA baseado no SMTP
+    // Usar emitEvent: false para evitar loop infinito
     if (twoFactorEnabledControl) {
       if (!smtpEnabled) {
-        twoFactorEnabledControl.disable();
+        twoFactorEnabledControl.disable({ emitEvent: false });
       } else {
-        twoFactorEnabledControl.enable();
+        twoFactorEnabledControl.enable({ emitEvent: false });
       }
     }
     
