@@ -48,12 +48,14 @@ export class TinOneConfigService {
         }];
       })
     ).subscribe(config => {
+      console.log('[TinOne Config] Configuração carregada:', config);
       this.configSubject.next(config);
       
       // Salva no localStorage para acesso rápido
       localStorage.setItem('tinone_config', JSON.stringify(config));
 
       if (config.debugMode) {
+        console.log('[TinOne Config] Debug mode ativado');
       }
     });
   }

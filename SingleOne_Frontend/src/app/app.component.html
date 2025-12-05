@@ -89,7 +89,9 @@
             <img [src]="clienteLogo" 
                  [alt]="'Logo do Cliente'" 
                  class="cliente-logo-header-img"
-                 title="Logo do Cliente">
+                 title="Logo do Cliente"
+                 (error)="onLogoError($event)"
+                 (load)="onLogoLoad()">
           </div>
         </li>
         

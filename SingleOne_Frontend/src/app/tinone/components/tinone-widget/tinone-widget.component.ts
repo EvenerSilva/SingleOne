@@ -38,7 +38,12 @@ export class TinOneWidgetComponent implements OnInit, OnDestroy {
 
     // Listener para recarregamento de configuração
     const reloadListener = () => {
+      console.log('[Oni Widget] Evento tinone-config-reload recebido, recarregando...');
       this.configService.reload();
+      // Aguardar um pouco e atualizar estado
+      setTimeout(() => {
+        this.updateEnabledState();
+      }, 1000);
     };
     window.addEventListener('tinone-config-reload', reloadListener);
     this.subscriptions.push({

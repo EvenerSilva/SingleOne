@@ -82,6 +82,18 @@ export class AppComponent implements OnInit {
     });
   }
 
+  // Tratamento de erro ao carregar logo
+  onLogoError(event: any): void {
+    console.error('[APP] ❌ Erro ao carregar imagem da logo:', event);
+    console.error('[APP] URL da logo:', this.clienteLogo);
+    this.clienteLogo = null;
+  }
+
+  // Logo carregada com sucesso
+  onLogoLoad(): void {
+    console.log('[APP] ✅ Logo do cliente carregada com sucesso:', this.clienteLogo);
+  }
+
   // Carregar logo do cliente
   private async carregarLogoCliente() {
     try {
