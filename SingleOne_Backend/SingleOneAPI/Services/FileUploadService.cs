@@ -124,6 +124,17 @@ namespace SingleOneAPI.Services
             return $"/api/logos/{fileName}";
         }
 
+        public bool LogoExists(string fileName)
+        {
+            if (string.IsNullOrEmpty(fileName))
+                return false;
+
+            var logosPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "logos");
+            var filePath = Path.Combine(logosPath, fileName);
+            
+            return File.Exists(filePath);
+        }
+
         public async Task<string> UploadFileAsync(IFormFile file, string pasta)
         {
             if (file == null || file.Length == 0)

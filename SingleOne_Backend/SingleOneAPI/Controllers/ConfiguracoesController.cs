@@ -212,10 +212,48 @@ namespace SingleOne.Controllers
                 
                 Console.WriteLine($"[BUSCAR-LOGO] ✅ Cliente encontrado: {cliente.Razaosocial} com logo: {cliente.Logo}");
                 
+                // Verificar se o arquivo da logo existe fisicamente
+                if (!_fileUploadService.LogoExists(cliente.Logo))
+                {
+                    Console.WriteLine($"[BUSCAR-LOGO] ⚠️ Arquivo de logo não encontrado: {cliente.Logo}");
+                    Console.WriteLine($"[BUSCAR-LOGO] Tentando encontrar outro arquivo de logo do cliente {cliente.Id}...");
+                    
+                    // Tentar encontrar outro arquivo de logo do mesmo cliente
+                    var logosPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "logos");
+                    if (Directory.Exists(logosPath))
+                    {
+                        var arquivosLogo = Directory.GetFiles(logosPath, $"cliente_{cliente.Id}_*.png")
+                            .Concat(Directory.GetFiles(logosPath, $"cliente_{cliente.Id}_*.jpg"))
+                            .Concat(Directory.GetFiles(logosPath, $"cliente_{cliente.Id}_*.jpeg"))
+                            .Concat(Directory.GetFiles(logosPath, $"cliente_{cliente.Id}_*.gif"))
+                            .Select(f => Path.GetFileName(f))
+                            .FirstOrDefault();
+                        
+                        if (!string.IsNullOrEmpty(arquivosLogo))
+                        {
+                            Console.WriteLine($"[BUSCAR-LOGO] ✅ Arquivo alternativo encontrado: {arquivosLogo}");
+                            var logoPath = _fileUploadService.GetLogoPath(arquivosLogo);
+                            return Ok(new { 
+                                Logo = logoPath, 
+                                ClienteNome = cliente.Razaosocial,
+                                Mensagem = "Logo encontrada (arquivo alternativo)" 
+                            });
+                        }
+                    }
+                    
+                    Console.WriteLine($"[BUSCAR-LOGO] ❌ Nenhum arquivo de logo válido encontrado para o cliente {cliente.Id}");
+                    return Ok(new { 
+                        Logo = (string)null, 
+                        ClienteNome = cliente.Razaosocial,
+                        Mensagem = "Logo não encontrada" 
+                    });
+                }
+                
                 // Retornar o caminho da logo
-                var logoPath = _fileUploadService.GetLogoPath(cliente.Logo);
+                var logoPathFinal = _fileUploadService.GetLogoPath(cliente.Logo);
+                Console.WriteLine($"[BUSCAR-LOGO] ✅ Logo válida encontrada: {logoPathFinal}");
                 return Ok(new { 
-                    Logo = logoPath, 
+                    Logo = logoPathFinal, 
                     ClienteNome = cliente.Razaosocial,
                     Mensagem = "Logo encontrada com sucesso" 
                 });
