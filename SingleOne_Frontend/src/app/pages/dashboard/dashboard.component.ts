@@ -314,8 +314,11 @@ export class DashboardComponent implements OnInit {
     data.addColumn('number', 'Quantidade');
     data.addColumn({type: 'string', role: 'annotation'});
 
-    for(const [key, value] of Object.entries(this.vm.ultimosUsuariosQueMovimentaram)) {
-      data.addRow([{v: key}, value, value.toString()]);
+    // Verificar se ultimosUsuariosQueMovimentaram existe e não é null
+    if (this.vm.ultimosUsuariosQueMovimentaram && typeof this.vm.ultimosUsuariosQueMovimentaram === 'object') {
+      for(const [key, value] of Object.entries(this.vm.ultimosUsuariosQueMovimentaram)) {
+        data.addRow([{v: key}, value, value.toString()]);
+      }
     }
 
 var grafico:any = {};
