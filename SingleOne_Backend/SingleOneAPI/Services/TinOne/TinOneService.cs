@@ -67,13 +67,13 @@ namespace SingleOneAPI.Services.TinOne
                     stopwatch.Stop();
                     var respostaForaEscopo = new TinOneRespostaDTO
                     {
-                        Resposta = "🦉 Desculpe, mas eu sou especializado apenas em ajudar com o sistema SingleOne.\n\n" +
+                        Resposta = AdicionarFraseSabedoria("🦉 Desculpe, mas eu sou especializado apenas em ajudar com o sistema SingleOne.\n\n" +
                                   "Não posso responder sobre temas como política, religião, esportes, notícias ou outros assuntos não relacionados ao sistema.\n\n" +
                                   "Como posso ajudá-lo com o SingleOne? Posso explicar sobre:\n" +
                                   "• Requisições e movimentações\n" +
                                   "• Equipamentos e patrimônio\n" +
                                   "• Colaboradores e cadastros\n" +
-                                  "• Relatórios e exportações",
+                                  "• Relatórios e exportações"),
                         Tipo = "texto",
                         Sucesso = true
                     };
@@ -114,7 +114,7 @@ namespace SingleOneAPI.Services.TinOne
                     stopwatch.Stop();
                     var resposta = new TinOneRespostaDTO
                     {
-                        Resposta = $"Encontrei o processo: {processo.Nome}. Posso te guiar passo a passo!",
+                        Resposta = AdicionarFraseSabedoria($"Encontrei o processo: {processo.Nome}. Posso te guiar passo a passo!"),
                         Tipo = "guia",
                         Dados = processo,
                         Sucesso = true
@@ -156,7 +156,7 @@ namespace SingleOneAPI.Services.TinOne
                             stopwatch.Stop();
                             var respostaComIA = new TinOneRespostaDTO
                             {
-                                Resposta = respostaIA + "\n\n_✨ Resposta gerada por IA_",
+                                Resposta = AdicionarFraseSabedoria(respostaIA + "\n\n_✨ Resposta gerada por IA_"),
                                 Tipo = "texto",
                                 Sucesso = true
                             };
@@ -188,11 +188,11 @@ namespace SingleOneAPI.Services.TinOne
                 
                 var respostaGenerica = new TinOneRespostaDTO
                 {
-                    Resposta = "Desculpe, ainda não sei responder essa pergunta. Estou aprendendo! 🤖\n\n" +
+                    Resposta = AdicionarFraseSabedoria("Desculpe, ainda não sei responder essa pergunta. Estou aprendendo! 🤖\n\n" +
                               "Você pode tentar:\n" +
                               "• Reformular a pergunta\n" +
                               "• Perguntar sobre processos específicos (ex: 'como criar uma requisição?')\n" +
-                              "• Navegar pelo menu para encontrar o que precisa",
+                              "• Navegar pelo menu para encontrar o que precisa"),
                     Tipo = "texto",
                     Sucesso = true
                 };
@@ -208,7 +208,7 @@ namespace SingleOneAPI.Services.TinOne
                 
                 return new TinOneRespostaDTO
                 {
-                    Resposta = "Ops! Tive um problema ao processar sua pergunta. Tente novamente em alguns instantes.",
+                    Resposta = AdicionarFraseSabedoria("Ops! Tive um problema ao processar sua pergunta. Tente novamente em alguns instantes."),
                     Tipo = "erro",
                     Sucesso = false,
                     ErroMensagem = ex.Message
@@ -412,7 +412,7 @@ namespace SingleOneAPI.Services.TinOne
                     
                     return new TinOneRespostaDTO
                     {
-                        Resposta = resposta,
+                        Resposta = AdicionarFraseSabedoria(resposta),
                         Tipo = "texto",
                         Sucesso = true
                     };
@@ -435,7 +435,7 @@ namespace SingleOneAPI.Services.TinOne
                     
                     return new TinOneRespostaDTO
                     {
-                        Resposta = resposta,
+                        Resposta = AdicionarFraseSabedoria(resposta),
                         Tipo = "texto",
                         Sucesso = true
                     };
@@ -860,6 +860,67 @@ namespace SingleOneAPI.Services.TinOne
                 _logger.LogError(ex, "[TinOne RAG] Erro ao buscar contexto");
                 return string.Empty;
             }
+        }
+
+        /// <summary>
+        /// Adiciona uma frase de sabedoria do ONI ao final da resposta (se ainda não tiver)
+        /// </summary>
+        private string AdicionarFraseSabedoria(string resposta)
+        {
+            // Verifica se a resposta já contém uma frase de sabedoria
+            if (resposta.Contains("🦉") && (resposta.Contains("ONI ENSINA") || resposta.Contains("SABEDORIA DO ONI")))
+            {
+                return resposta; // Já tem, não adiciona outra
+            }
+
+            // Seleciona uma frase aleatória
+            var frase = ObterFraseSabedoria();
+            
+            // Adiciona ao final da resposta
+            return resposta + "\n\n**🦉 ONI ENSINA:**\n> \"" + frase + "\"";
+        }
+
+        /// <summary>
+        /// Retorna uma frase de sabedoria aleatória do ONI
+        /// </summary>
+        private string ObterFraseSabedoria()
+        {
+            var frases = new[]
+            {
+                "A sabedoria não está em saber tudo, mas em saber onde encontrar.",
+                "Cada ação registrada é um elo na corrente da governança.",
+                "O controle não é sobre restrição, mas sobre organização e clareza.",
+                "Um sistema bem usado é como um jardim bem cuidado: requer atenção constante.",
+                "A rastreabilidade é a memória do sistema, preserve-a com cuidado.",
+                "Compliance não é burocracia, é proteção para todos.",
+                "Cada recurso tem uma história, e cada história importa.",
+                "A organização é a base da eficiência.",
+                "Documentar é preservar, preservar é governar.",
+                "A auditoria não é punição, é garantia de integridade.",
+                "Um termo assinado é um compromisso, honre-o sempre.",
+                "O estoque vazio é sinal de planejamento ausente.",
+                "Cada movimentação conta uma história, escreva-a bem.",
+                "A conformidade não limita, ela protege e organiza.",
+                "Um recurso bem cadastrado é um recurso bem controlado.",
+                "A transparência é a luz que ilumina a governança.",
+                "Cada colaborador é responsável, cada responsabilidade importa.",
+                "O histórico não se apaga, ele se preserva para sempre.",
+                "A organização é a mãe da eficiência.",
+                "Um sistema sem controle é como um navio sem leme.",
+                "A precisão nos dados é a base da confiança.",
+                "Cada processo bem executado fortalece a governança.",
+                "A atenção aos detalhes é o que separa o bom do excelente.",
+                "Um inventário atualizado é um patrimônio protegido.",
+                "A consistência é a chave da confiabilidade.",
+                "Cada ação documentada é uma garantia de rastreabilidade.",
+                "O cuidado com os dados é cuidado com o futuro.",
+                "A disciplina no registro é disciplina na gestão.",
+                "Um sistema bem usado é um sistema que serve bem.",
+                "A governança começa com o primeiro registro e nunca termina."
+            };
+
+            var random = new Random();
+            return frases[random.Next(frases.Length)];
         }
 
         #endregion
