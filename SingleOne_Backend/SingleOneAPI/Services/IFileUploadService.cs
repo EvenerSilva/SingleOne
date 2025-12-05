@@ -12,5 +12,6 @@ namespace SingleOneAPI.Services
         bool DeleteFile(string fileName, string pasta);
         string GetLogoPath(string fileName);
         string GetFilePath(string fileName, string pasta);
+        bool LogoExists(string fileName);
     }
 }
