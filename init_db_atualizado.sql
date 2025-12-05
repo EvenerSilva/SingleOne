@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS Usuarios
 	Id serial not null primary key,
 	Cliente int not null,
 	Nome varchar(200) not null,
-	Email varchar(200) not null,
+	Email varchar(200) not null unique,
 	Senha varchar(200) not null,
 	PalavraCriptografada varchar(200) not null,
 	SU boolean not null,
@@ -293,7 +293,7 @@ CREATE TABLE IF NOT EXISTS CentroCusto
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	constraint fkCCEmpresa foreign key (Empresa) references Empresas(Id)
-	-- NOTA: FK para Filiais ser├í adicionada ap├│s cria├º├úo da tabela Filiais
+	-- NOTA: FK para Filiais será adicionada após criação da tabela Filiais
 );
 
 -- =====================================================
@@ -337,7 +337,7 @@ CREATE TABLE IF NOT EXISTS Colaboradores
 	constraint fkColaboradorCentroCusto foreign key (CentroCusto) references CentroCusto(Id),
 	constraint fkColaboradorLocalidade foreign key (Localidade) references Localidades(Id),
 	constraint fkColaboradorCliente foreign key (Cliente) references Clientes(Id)
-	-- NOTA: FK para Filiais ser├í adicionada ap├│s cria├º├úo da tabela Filiais
+	-- NOTA: FK para Filiais será adicionada após criação da tabela Filiais
 );
 
 -- =====================================================
@@ -2044,7 +2044,7 @@ INSERT INTO EquipamentosStatus(Descricao, ativo) VALUES('Descartado', true) ON C
 -- Inserir Usuário Administrador
 INSERT INTO Usuarios(Cliente, Nome, Email, Senha, PalavraCriptografada, Su, Adm, Operador, consulta, Ativo) 
 VALUES(1, 'Adminstrador', 'administrador@singleone.tech', 'MTQyNTM2QEFkbWlu', '', true, true, false, false, true)
-ON CONFLICT DO NOTHING;
+ON CONFLICT (Email) DO NOTHING;
 
 -- Inserir Localidades Padrão
 INSERT INTO Localidades(Descricao, Ativo, Cliente) VALUES('Padrão', FALSE, 1) ON CONFLICT DO NOTHING;
@@ -2055,9 +2055,9 @@ INSERT INTO Fabricantes(TipoEquipamento, Descricao, Ativo, Cliente) VALUES(1, 'L
 INSERT INTO Modelos(Fabricante, Descricao, Ativo, Cliente) VALUES(1, 'Linha Telefonica', false, 1) ON CONFLICT DO NOTHING;
 
 -- Inserir Tipos de Aquisiço
-INSERT INTO TipoAquisicao (Id, Nome) VALUES (1, 'Alugado') ON CONFLICT DO NOTHING;
-INSERT INTO TipoAquisicao (Id, Nome) VALUES (2, 'Próprio') ON CONFLICT DO NOTHING;
-INSERT INTO TipoAquisicao (Id, Nome) VALUES (3, 'Corporativo') ON CONFLICT DO NOTHING;
+INSERT INTO TipoAquisicao (Id, Nome) VALUES (1, 'Alugado') ON CONFLICT (Id) DO UPDATE SET Nome = 'Alugado';
+INSERT INTO TipoAquisicao (Id, Nome) VALUES (2, 'Próprio') ON CONFLICT (Id) DO UPDATE SET Nome = 'Próprio';
+INSERT INTO TipoAquisicao (Id, Nome) VALUES (3, 'Corporativo') ON CONFLICT (Id) DO UPDATE SET Nome = 'Corporativo';
 
 -- Inserir Equipamento Dummy (necessário para telefonia)
 INSERT INTO Equipamentos(Cliente, TipoEquipamento, Fabricante, Modelo, EquipamentoStatus, Usuario, Localizacao, PossuiBO, NumeroSerie, DtCadastro, Ativo, TipoAquisicao)
@@ -2227,7 +2227,7 @@ CREATE TABLE IF NOT EXISTS Filiais
     constraint fkFilialLocalidade foreign key (Localidade_Id) references Localidades(Id)
 );
 
--- Adicionar FKs de Filiais (ap├│s cria├º├úo de Filiais)
+-- Adicionar FKs de Filiais (após criação de Filiais)
 DO $$
 BEGIN
     -- FK para CentroCusto
