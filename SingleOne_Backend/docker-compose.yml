@@ -41,16 +41,34 @@ services:
       DB_PASSWORD: ${DB_PASSWORD:-postgres}
       DB_NAME: ${DB_NAME:-singleone}
       SITE_URL: ${SITE_URL:-http://localhost:3000}
+      OLLAMA_URL: ${OLLAMA_URL:-http://ollama:11434}
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3.2:3b}
     ports:
       - "${BACKEND_PORT:-5000}:5000"
     depends_on:
       postgres:
         condition: service_healthy
+      ollama:
+        condition: service_started
     networks:
       - singleone-network
     volumes:
       - ./SingleOne_Backend/SingleOneAPI/Documentos:/app/documentos
       - backend_wwwroot:/app/wwwroot
+
+  # Ollama (IA para TinOne - Opcional)
+  ollama:
+    image: ollama/ollama:latest
+    container_name: singleone-ollama
+    restart: unless-stopped
+    volumes:
+      - ollama_data:/root/.ollama
+    ports:
+      - "${OLLAMA_PORT:-11434}:11434"
+    networks:
+      - singleone-network
+    # Ollama é opcional - o TinOne funciona sem ele (usando apenas FAQ)
+    # Se não quiser usar Ollama, comente este serviço e configure OLLAMA_URL= no backend
 
   # Frontend
   frontend:
@@ -93,6 +111,7 @@ volumes:
   postgres_data:
   pgadmin_data:
   backend_wwwroot:
+  ollama_data:
 
 networks:
   singleone-network:
