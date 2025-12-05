@@ -1,14 +1,14 @@
--- =====================================================
--- SCRIPT DE INICIALIZA��O DO BANCO DE DADOS - SINGLEONE
--- Descri��o: Script completo para criar banco limpo com dados b�sicos
--- Vers�o: 2.3 (Atualizado em 07/11/2025)
--- v2.3: View colaboradoresvm estendida + staging de importa��o de colaboradores
+﻿-- =====================================================
+-- SCRIPT DE INICIALIZAÇÃO DO BANCO DE DADOS - SINGLEONE
+-- Descrição: Script completo para criar banco limpo com dados básicos
+-- Versão: 2.3 (Atualizado em 07/11/2025)
+-- v2.3: View colaboradoresvm estendida + staging de importação de colaboradores
 -- v2.2: Adicionadas 9 tabelas faltantes + colunas 2FA + coluna logo
--- v2.1: Adicionadas 8 novas tabelas (campanhas, estoque m�nimo, importa��o, etc)
+-- v2.1: Adicionadas 8 novas tabelas (campanhas, estoque mínimo, importação, etc)
 -- v2.0: Script base com estrutura principal
 -- =====================================================
 
--- Habilitar extens�o UUID
+-- Habilitar extensão UUID
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- =====================================================
@@ -226,7 +226,7 @@ CREATE TABLE IF NOT EXISTS NotasFiscaisItens
 );
 
 -- =====================================================
--- TABELAS DE LOCALIZA��O
+-- TABELAS DE LOCALIZAÇÃO
 -- =====================================================
 
 -- Tabela: Estados
@@ -293,7 +293,7 @@ CREATE TABLE IF NOT EXISTS CentroCusto
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	constraint fkCCEmpresa foreign key (Empresa) references Empresas(Id)
-	-- NOTA: FK para Filiais será adicionada após criação da tabela Filiais
+	-- NOTA: FK para Filiais ser├í adicionada ap├│s cria├º├úo da tabela Filiais
 );
 
 -- =====================================================
@@ -337,7 +337,7 @@ CREATE TABLE IF NOT EXISTS Colaboradores
 	constraint fkColaboradorCentroCusto foreign key (CentroCusto) references CentroCusto(Id),
 	constraint fkColaboradorLocalidade foreign key (Localidade) references Localidades(Id),
 	constraint fkColaboradorCliente foreign key (Cliente) references Clientes(Id)
-	-- NOTA: FK para Filiais será adicionada após criação da tabela Filiais
+	-- NOTA: FK para Filiais ser├í adicionada ap├│s cria├º├úo da tabela Filiais
 );
 
 -- =====================================================
@@ -393,7 +393,7 @@ CREATE TABLE IF NOT EXISTS TelefoniaLinhas
 );
 
 -- =====================================================
--- TABELAS DE EQUIPAMENTOS (CONTINUA��O)
+-- TABELAS DE EQUIPAMENTOS (CONTINUAÇÃO)
 -- =====================================================
 
 -- Tabela: Equipamentos
@@ -438,7 +438,7 @@ CREATE TABLE IF NOT EXISTS Equipamentos
 	constraint fkEquipamentoTipoAquisicao foreign key (TipoAquisicao) references TipoAquisicao(Id)
 );
 
--- Tabela: Equipamento Usu�rios Compartilhados
+-- Tabela: Equipamento Usuários Compartilhados
 CREATE TABLE IF NOT EXISTS equipamento_usuarios_compartilhados (
     id SERIAL PRIMARY KEY,
     equipamento_id INTEGER NOT NULL,
@@ -470,7 +470,7 @@ CREATE TABLE IF NOT EXISTS equipamento_usuarios_compartilhados (
         CHECK (tipo_acesso IN ('usuario_compartilhado', 'temporario', 'turno'))
     
     -- NOTA: Constraint UNIQUE NULLS NOT DISTINCT removida (requer PostgreSQL 15+)
-    -- Para PostgreSQL 14, criar �ndice parcial �nico manualmente se necess�rio:
+    -- Para PostgreSQL 14, criar índice parcial único manualmente se necessário:
     -- CREATE UNIQUE INDEX uk_equipamento_colaborador_ativo 
     --   ON equipamento_usuarios_compartilhados(equipamento_id, colaborador_id) 
     --   WHERE ativo = TRUE;
@@ -520,7 +520,7 @@ CREATE TABLE IF NOT EXISTS EquipamentoAnexos
 );
 
 -- =====================================================
--- TABELAS DE REQUISI��ES
+-- TABELAS DE REQUISIÇÕES
 -- =====================================================
 
 -- Tabela: RequisicoesStatus
@@ -713,7 +713,7 @@ CREATE TABLE IF NOT EXISTS protocolo_descarte_itens (
     CONSTRAINT fk_protocolo_itens_equipamento FOREIGN KEY (equipamento) REFERENCES equipamentos(id)
 );
 
--- Tabela: Descarte Evid�ncias
+-- Tabela: Descarte Evidências
 CREATE TABLE IF NOT EXISTS descarteevidencias (
     id SERIAL PRIMARY KEY,
     equipamento INTEGER NOT NULL,
@@ -737,10 +737,10 @@ CREATE TABLE IF NOT EXISTS descarteevidencias (
 );
 
 -- =====================================================
--- TABELAS DE POL�TICAS E ELEGIBILIDADE
+-- TABELAS DE POL´┐¢TICAS E ELEGIBILIDADE
 -- =====================================================
 
--- Tabela: Pol�ticas de Elegibilidade
+-- Tabela: Pol´┐¢ticas de Elegibilidade
 CREATE TABLE IF NOT EXISTS politicas_elegibilidade (
     id SERIAL PRIMARY KEY,
     cliente INTEGER NOT NULL,
@@ -762,10 +762,10 @@ CREATE TABLE IF NOT EXISTS politicas_elegibilidade (
 );
 
 -- =====================================================
--- TABELAS DE PASSCHECK E PATRIM�NIO
+-- TABELAS DE PASSCHECK E PATRIM´┐¢NIO
 -- =====================================================
 
--- Tabela: Patrim�nio Contesta��es
+-- Tabela: Patrim´┐¢nio Contestaçes
 CREATE TABLE IF NOT EXISTS patrimonio_contestoes (
     id SERIAL PRIMARY KEY,
     colaborador_id INTEGER NOT NULL REFERENCES colaboradores(id),
@@ -782,7 +782,7 @@ CREATE TABLE IF NOT EXISTS patrimonio_contestoes (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Tabela: Patrim�nio Logs de Acesso
+-- Tabela: Patrim´┐¢nio Logs de Acesso
 CREATE TABLE IF NOT EXISTS patrimonio_logs_acesso (
     id SERIAL PRIMARY KEY,
     tipo_acesso VARCHAR(20) NOT NULL CHECK (tipo_acesso IN ('passcheck', 'patrimonio')),
@@ -797,7 +797,7 @@ CREATE TABLE IF NOT EXISTS patrimonio_logs_acesso (
 );
 
 -- =====================================================
--- TABELAS DE SINALIZA��ES DE SUSPEITAS
+-- TABELAS DE SINALIZAÇÕES DE SUSPEITAS
 -- =====================================================
 
 -- Tabela: Motivos de Suspeita
@@ -811,7 +811,7 @@ CREATE TABLE IF NOT EXISTS motivos_suspeita (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Tabela: Sinaliza��es de Suspeitas
+-- Tabela: Sinalizaçes de Suspeitas
 CREATE TABLE IF NOT EXISTS sinalizacoes_suspeitas (
     id SERIAL PRIMARY KEY,
     colaborador_id INTEGER NOT NULL REFERENCES colaboradores(id),
@@ -837,7 +837,7 @@ CREATE TABLE IF NOT EXISTS sinalizacoes_suspeitas (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Tabela: Hist�rico de Investiga��es
+-- Tabela: Histórico de Investigações
 CREATE TABLE IF NOT EXISTS historico_investigacoes (
     id SERIAL PRIMARY KEY,
     sinalizacao_id INTEGER NOT NULL REFERENCES sinalizacoes_suspeitas(id) ON DELETE CASCADE,
@@ -850,7 +850,7 @@ CREATE TABLE IF NOT EXISTS historico_investigacoes (
 );
 
 -- =====================================================
--- TABELAS DE PAR�METROS E PROCESSAMENTOS
+-- TABELAS DE PARÂMETROS E PROCESSAMENTOS
 -- =====================================================
 
 -- Tabela: Parametros
@@ -916,7 +916,7 @@ CREATE TABLE IF NOT EXISTS campanhascolaboradores (
     CONSTRAINT fk_campanha_colab_colaborador FOREIGN KEY (ColaboradorId) REFERENCES Colaboradores(Id) ON DELETE CASCADE
 );
 
--- Tabela: Estoque M�nimo Equipamentos
+-- Tabela: Estoque Mínimo Equipamentos
 CREATE TABLE IF NOT EXISTS estoqueminimoequipamentos (
     Id SERIAL PRIMARY KEY,
     cliente INTEGER NOT NULL,
@@ -938,7 +938,7 @@ CREATE TABLE IF NOT EXISTS estoqueminimoequipamentos (
     CONSTRAINT fk_estoquemin_equip_usuario_atualizacao FOREIGN KEY (usuarioatualizacao) REFERENCES Usuarios(Id)
 );
 
--- Tabela: Estoque M�nimo Linhas
+-- Tabela: Estoque Mínimo Linhas
 CREATE TABLE IF NOT EXISTS estoqueminimolinhas (
     Id SERIAL PRIMARY KEY,
     cliente INTEGER NOT NULL,
@@ -963,7 +963,7 @@ CREATE TABLE IF NOT EXISTS estoqueminimolinhas (
     CONSTRAINT fk_estoquemin_linha_usuario_atualizacao FOREIGN KEY (usuarioatualizacao) REFERENCES Usuarios(Id)
 );
 
--- Tabela: Importa��o Linha Staging
+-- Tabela: Importaço Linha Staging
 CREATE TABLE IF NOT EXISTS importacao_linha_staging (
     id SERIAL PRIMARY KEY,
     cliente INTEGER NOT NULL,
@@ -989,7 +989,7 @@ CREATE TABLE IF NOT EXISTS importacao_linha_staging (
     CONSTRAINT fk_importacao_staging_usuario FOREIGN KEY (usuario_importacao) REFERENCES Usuarios(Id)
 );
 
--- Tabela: Importa��o Colaborador Staging
+-- Tabela: Importaço Colaborador Staging
 CREATE TABLE IF NOT EXISTS importacao_colaborador_staging (
     id SERIAL PRIMARY KEY,
     lote_id UUID NOT NULL,
@@ -1030,7 +1030,7 @@ CREATE TABLE IF NOT EXISTS importacao_colaborador_staging (
     CONSTRAINT fk_colab_staging_cliente FOREIGN KEY (cliente) REFERENCES Clientes(Id) ON DELETE CASCADE
 );
 
--- Tabela: Importa��o Log
+-- Tabela: Importaço Log
 CREATE TABLE IF NOT EXISTS importacao_log (
     id SERIAL PRIMARY KEY,
     lote_id UUID NOT NULL,
@@ -1050,7 +1050,7 @@ CREATE TABLE IF NOT EXISTS importacao_log (
     CONSTRAINT fk_importacao_log_usuario FOREIGN KEY (usuario) REFERENCES Usuarios(Id)
 );
 
--- Tabela: Geolocaliza��o Assinatura
+-- Tabela: Geolocalizaço Assinatura
 CREATE TABLE IF NOT EXISTS geolocalizacao_assinatura (
     id SERIAL PRIMARY KEY,
     colaborador_id INTEGER NOT NULL,
@@ -1070,7 +1070,7 @@ CREATE TABLE IF NOT EXISTS geolocalizacao_assinatura (
     CONSTRAINT fk_geolocalizacao_usuario FOREIGN KEY (usuario_logado_id) REFERENCES Usuarios(Id)
 );
 
--- Tabela: Requisi��o Item Compartilhado
+-- Tabela: Requisiço Item Compartilhado
 CREATE TABLE IF NOT EXISTS RequisicaoItemCompartilhado (
     Id SERIAL PRIMARY KEY,
     RequisicaoItemId INTEGER NOT NULL,
@@ -1219,7 +1219,7 @@ FROM Requisicoes req
 	JOIN Modelos mdl ON eqp.Modelo = mdl.Id 
 WHERE ri.DtDevolucao IS NULL AND req.RequisicaoStatus IN (1,3) AND eqp.EquipamentoStatus <> 8 AND eqp.Id <> 1
 UNION ALL
-SELECT te.Descricao TipoEquipamento, 'N�mero' fabricante, cast(tl.Numero as varchar) modelo, '' NumeroSerie, COALESCE(eqp.Patrimonio, '') Patrimonio, ri.DtEntrega, ri.ObservacaoEntrega, ri.DtProgramadaRetorno, req.HashRequisicao, req.colaboradorfinal, req.cliente, eqp.tipoaquisicao
+SELECT te.Descricao TipoEquipamento, 'Número' fabricante, cast(tl.Numero as varchar) modelo, '' NumeroSerie, COALESCE(eqp.Patrimonio, '') Patrimonio, ri.DtEntrega, ri.ObservacaoEntrega, ri.DtProgramadaRetorno, req.HashRequisicao, req.colaboradorfinal, req.cliente, eqp.tipoaquisicao
 FROM Requisicoes req 
 	JOIN requisicoesItens ri ON req.id = ri.Requisicao 
 	JOIN Equipamentos eqp ON ri.Equipamento = eqp.Id 
@@ -1262,8 +1262,8 @@ WHERE te.ativo = true;
 -- View: vwExportacaoExcel
 CREATE OR REPLACE VIEW vwExportacaoExcel AS
 SELECT DISTINCT eqp.id, c.Nome Colaborador, c.Cargo, te.Descricao TipoEquipamento, fab.Descricao Fabricante, mdl.Descricao Modelo, concat(' ', cast(nf.Numero as varchar), nf.Descricao) NotaFiscal, es.Descricao EquipamentoStatus, es.id EquipamentostatusId,
-	usu.Nome UsuarioCadastro, Loc.Descricao Localizacao, CASE eqp.PossuiBO WHEN false THEN 'N�o' ELSE 'Sim' END PossuiBO, eqp.DescricaoBO, eqp.NumeroSerie, eqp.Patrimonio,
-	eqp.DtCadastro, CASE eqp.TipoAquisicao WHEN 1 THEN 'Alugado' WHEN 2 THEN 'Pr�prio' WHEN 3 THEN 'Corporativo' ELSE 'N�o Definido' END TipoAquisicao, eqp.cliente, eqp.ativo, emp.nome empresa, cc.nome centrocusto
+	usu.Nome UsuarioCadastro, Loc.Descricao Localizacao, CASE eqp.PossuiBO WHEN false THEN 'Não' ELSE 'Sim' END PossuiBO, eqp.DescricaoBO, eqp.NumeroSerie, eqp.Patrimonio,
+	eqp.DtCadastro, CASE eqp.TipoAquisicao WHEN 1 THEN 'Alugado' WHEN 2 THEN 'Próprio' WHEN 3 THEN 'Corporativo' ELSE 'Não Definido' END TipoAquisicao, eqp.cliente, eqp.ativo, emp.nome empresa, cc.nome centrocusto
 FROM Equipamentos eqp
 	JOIN TipoEquipamentos te ON eqp.TipoEquipamento = te.Id
 	JOIN Fabricantes fab ON eqp.Fabricante = fab.Id
@@ -1528,7 +1528,7 @@ SELECT
 		WHEN euc.ativo = FALSE THEN 'Inativo'
 		WHEN euc.data_fim IS NULL THEN 'Ativo - Indefinido'
 		WHEN euc.data_fim < CURRENT_TIMESTAMP THEN 'Expirado'
-		ELSE 'Ativo - Tempor�rio'
+		ELSE 'Ativo - Temporário'
 	END AS status_acesso
 FROM equipamento_usuarios_compartilhados euc
 INNER JOIN equipamentos e ON euc.equipamento_id = e.id
@@ -1536,11 +1536,279 @@ INNER JOIN colaboradores c ON euc.colaborador_id = c.id
 LEFT JOIN usuarios u_criador ON euc.criado_por = u_criador.id
 WHERE e.ativo = TRUE;
 
+-- View: planosvm
+CREATE OR REPLACE VIEW planosvm AS
+SELECT 
+    p.id,
+    p.nome AS plano,
+    p.ativo,
+    p.valor,
+    c.nome AS contrato,
+    c.id AS contratoid,
+    o.nome AS operadora,
+    o.id AS operadoraid,
+    COALESCE(COUNT(l.id), 0) AS contlinhas,
+    COALESCE(COUNT(CASE WHEN l.emuso = true THEN l.id END), 0) AS contlinhasemuso,
+    COALESCE(COUNT(CASE WHEN l.emuso = false THEN l.id END), 0) AS contlinhaslivres
+FROM telefoniaplanos p
+LEFT JOIN telefoniacontratos c ON p.contrato = c.id
+LEFT JOIN telefoniaoperadoras o ON c.operadora = o.id
+LEFT JOIN telefonialinhas l ON l.plano = p.id
+WHERE p.ativo = true
+GROUP BY p.id, p.nome, p.ativo, p.valor, c.nome, c.id, o.nome, o.id;
+
+COMMENT ON VIEW planosvm IS 'View para listar planos de telefonia com informações agregadas de linhas';
+
+-- View: vwplanostelefonia
+CREATE OR REPLACE VIEW vwplanostelefonia AS
+SELECT 
+    p.id,
+    p.nome AS plano,
+    p.ativo,
+    p.valor,
+    c.nome AS contrato,
+    c.id AS contratoid,
+    o.nome AS operadora,
+    o.id AS operadoraid,
+    COALESCE(COUNT(l.id), 0) AS contlinhas,
+    COALESCE(COUNT(CASE WHEN l.emuso = true THEN l.id END), 0) AS contlinhasemuso,
+    COALESCE(COUNT(CASE WHEN l.emuso = false THEN l.id END), 0) AS contlinhaslivres
+FROM telefoniaplanos p
+LEFT JOIN telefoniacontratos c ON p.contrato = c.id
+LEFT JOIN telefoniaoperadoras o ON c.operadora = o.id
+LEFT JOIN telefonialinhas l ON l.plano = p.id
+WHERE p.ativo = true
+GROUP BY p.id, p.nome, p.ativo, p.valor, c.nome, c.id, o.nome, o.id;
+
+COMMENT ON VIEW vwplanostelefonia IS 'View para listar planos de telefonia com informações agregadas de linhas';
+
+-- View: vw_tinone_estatisticas
+CREATE OR REPLACE VIEW vw_tinone_estatisticas AS
+SELECT 
+    COUNT(*) as total_interacoes,
+    COUNT(DISTINCT usuario_id) as usuarios_unicos,
+    COUNT(DISTINCT sessao_id) as sessoes_unicas,
+    AVG(tempo_resposta_ms) as tempo_medio_resposta,
+    COUNT(CASE WHEN foi_util = true THEN 1 END) as feedbacks_positivos,
+    COUNT(CASE WHEN foi_util = false THEN 1 END) as feedbacks_negativos,
+    DATE(created_at) as data
+FROM tinone_analytics
+GROUP BY DATE(created_at)
+ORDER BY data DESC;
+
+COMMENT ON VIEW vw_tinone_estatisticas IS 'Estatísticas diárias de uso do TinOne';
+
+-- View: vw_campanhas_resumo
+CREATE OR REPLACE VIEW vw_campanhas_resumo AS
+SELECT 
+    c.id,
+    c.cliente,
+    c.nome,
+    c.descricao,
+    c.datacriacao,
+    c.datainicio,
+    c.datafim,
+    c.status,
+    c.totalcolaboradores,
+    c.totalenviados,
+    c.totalassinados,
+    c.totalpendentes,
+    c.percentualadesao,
+    c.dataultimoenvio,
+    c.dataconclusao,
+    u.nome AS usuariocriacao_nome,
+    CASE c.status
+        WHEN 'A' THEN 'Ativa'
+        WHEN 'I' THEN 'Inativa'
+        WHEN 'C' THEN 'Concluída'
+        WHEN 'G' THEN 'Agendada'
+    END AS status_descricao,
+    COUNT(cc.id) AS total_colaboradores_cadastrados,
+    COUNT(CASE WHEN cc.statusassinatura = 'A' THEN 1 END) AS total_assinados_real,
+    COUNT(CASE WHEN cc.statusassinatura IN ('P', 'E') THEN 1 END) AS total_pendentes_real
+FROM campanhasassinaturas c
+LEFT JOIN usuarios u ON c.usuariocriacao = u.id
+LEFT JOIN campanhascolaboradores cc ON c.id = cc.campanhaid
+GROUP BY c.id, c.cliente, c.nome, c.descricao, c.datacriacao, c.datainicio, c.datafim, 
+         c.status, c.totalcolaboradores, c.totalenviados, c.totalassinados, 
+         c.totalpendentes, c.percentualadesao, c.dataultimoenvio, c.dataconclusao, u.nome;
+
+COMMENT ON VIEW vw_campanhas_resumo IS 'Visão resumida das campanhas com estatísticas atualizadas';
+
+-- View: vw_campanhas_colaboradores_detalhado
+CREATE OR REPLACE VIEW vw_campanhas_colaboradores_detalhado AS
+SELECT 
+    c.id AS campanha_id,
+    c.nome AS campanha_nome,
+    c.status AS campanha_status,
+    cc.id AS associacao_id,
+    cc.colaboradorid,
+    col.nome AS colaborador_nome,
+    col.cpf AS colaborador_cpf,
+    col.email AS colaborador_email,
+    col.cargo AS colaborador_cargo,
+    e.nome AS empresa_nome,
+    l.descricao AS localidade_nome,
+    cc.statusassinatura,
+    CASE cc.statusassinatura
+        WHEN 'P' THEN 'Pendente'
+        WHEN 'E' THEN 'Enviado'
+        WHEN 'A' THEN 'Assinado'
+        WHEN 'R' THEN 'Recusado'
+    END AS status_descricao,
+    cc.datainclusao,
+    cc.dataenvio,
+    cc.dataassinatura,
+    cc.totalenvios,
+    cc.dataultimoenvio,
+    cc.ipenvio,
+    cc.localizacaoenvio
+FROM campanhasassinaturas c
+INNER JOIN campanhascolaboradores cc ON c.id = cc.campanhaid
+INNER JOIN colaboradores col ON cc.colaboradorid = col.id
+LEFT JOIN empresas e ON col.empresa = e.id
+LEFT JOIN localidades l ON col.localidade = l.id;
+
+COMMENT ON VIEW vw_campanhas_colaboradores_detalhado IS 'Visão detalhada de colaboradores por campanha';
+
+-- View: vw_nao_conformidade_elegibilidade
+CREATE OR REPLACE VIEW vw_nao_conformidade_elegibilidade AS
+WITH equipamentos_alocados AS (
+    SELECT DISTINCT ON (c.id, e.id)
+        c.id AS colaborador_id,
+        c.nome AS colaborador_nome,
+        c.cpf AS colaborador_cpf,
+        c.email AS colaborador_email,
+        c.cargo AS colaborador_cargo,
+        c.tipocolaborador AS tipo_colaborador,
+        CASE c.tipocolaborador
+            WHEN 'F' THEN 'Funcionário'
+            WHEN 'T' THEN 'Terceirizado'
+            WHEN 'C' THEN 'Consultor'
+            ELSE 'Desconhecido'
+        END AS tipo_colaborador_descricao,
+        emp.nome AS empresa_nome,
+        COALESCE(cc.codigo || ' - ' || cc.nome, '') AS centro_custo,
+        loc.descricao AS localidade,
+        e.id AS equipamento_id,
+        e.patrimonio AS equipamento_patrimonio,
+        e.numeroserie AS equipamento_serie,
+        te.id AS tipo_equipamento_id,
+        te.descricao AS tipo_equipamento_descricao,
+        te.categoria_id AS categoria_equipamento,
+        e.fabricante AS fabricante_id,
+        f.descricao AS fabricante,
+        e.modelo AS modelo_id,
+        m.descricao AS modelo,
+        e.equipamentostatus AS equipamento_status,
+        c.cliente
+    FROM colaboradores c
+    INNER JOIN requisicoes r ON r.colaboradorfinal = c.id
+    INNER JOIN requisicoesitens ri ON ri.requisicao = r.id
+    INNER JOIN equipamentos e ON e.id = ri.equipamento
+    INNER JOIN tipoequipamentos te ON te.id = e.tipoequipamento
+    LEFT JOIN fabricantes f ON f.id = e.fabricante
+    LEFT JOIN modelos m ON m.id = e.modelo
+    LEFT JOIN empresas emp ON emp.id = c.empresa
+    LEFT JOIN centrocusto cc ON cc.id = c.centrocusto
+    LEFT JOIN localidades loc ON loc.id = c.localidade
+    WHERE ri.dtdevolucao IS NULL
+      AND ri.equipamento IS NOT NULL
+      AND (c.dtdemissao IS NULL OR c.dtdemissao > NOW())
+      AND (e.tipoaquisicao IS NULL OR e.tipoaquisicao != 2)
+      AND e.equipamentostatus = 4
+),
+contagem_equipamentos AS (
+    SELECT 
+        colaborador_id,
+        tipo_equipamento_id,
+        COUNT(*) AS quantidade_atual
+    FROM equipamentos_alocados
+    GROUP BY colaborador_id, tipo_equipamento_id
+),
+politicas_aplicaveis AS (
+    SELECT DISTINCT ON (ea.colaborador_id, ea.tipo_equipamento_id)
+        ea.colaborador_id,
+        ea.tipo_colaborador,
+        ea.colaborador_cargo,
+        ea.tipo_equipamento_id,
+        pe.id AS politica_id,
+        pe.permite_acesso AS permite_acesso,
+        pe.quantidade_maxima AS quantidade_maxima,
+        pe.observacoes AS politica_observacoes,
+        pe.usarpadrao,
+        pe.cargo AS politica_cargo
+    FROM equipamentos_alocados ea
+    LEFT JOIN politicas_elegibilidade pe ON 
+        pe.tipo_colaborador = ea.tipo_colaborador
+        AND pe.tipo_equipamento_id = ea.tipo_equipamento_id
+        AND pe.cliente = ea.cliente
+        AND pe.ativo = true
+        AND (
+            pe.cargo IS NULL 
+            OR pe.cargo = ''
+            OR (
+                pe.cargo IS NOT NULL 
+                AND pe.cargo <> ''
+                AND ea.colaborador_cargo IS NOT NULL
+                AND (
+                    (pe.usarpadrao = false AND UPPER(TRIM(ea.colaborador_cargo)) = UPPER(TRIM(pe.cargo)))
+                    OR (pe.usarpadrao = true AND UPPER(ea.colaborador_cargo) LIKE '%' || UPPER(TRIM(pe.cargo)) || '%')
+                )
+            )
+        )
+)
+SELECT 
+    ea.colaborador_id,
+    ea.colaborador_nome,
+    ea.colaborador_cpf,
+    ea.colaborador_email,
+    ea.colaborador_cargo,
+    ea.tipo_colaborador,
+    ea.tipo_colaborador_descricao,
+    ea.empresa_nome,
+    ea.centro_custo,
+    ea.localidade,
+    ea.equipamento_id,
+    ea.equipamento_patrimonio,
+    ea.equipamento_serie,
+    ea.tipo_equipamento_id,
+    ea.tipo_equipamento_descricao,
+    ea.categoria_equipamento,
+    ea.fabricante_id,
+    ea.fabricante,
+    ea.modelo_id,
+    ea.modelo,
+    ea.equipamento_status,
+    ea.cliente,
+    pa.politica_id,
+    COALESCE(pa.permite_acesso, true) AS permite_acesso,
+    pa.quantidade_maxima,
+    pa.politica_observacoes,
+    ce.quantidade_atual,
+    NOW() AS dt_geracao_relatorio
+FROM equipamentos_alocados ea
+LEFT JOIN politicas_aplicaveis pa ON 
+    pa.colaborador_id = ea.colaborador_id 
+    AND pa.tipo_equipamento_id = ea.tipo_equipamento_id
+LEFT JOIN contagem_equipamentos ce ON 
+    ce.colaborador_id = ea.colaborador_id 
+    AND ce.tipo_equipamento_id = ea.tipo_equipamento_id
+WHERE 
+    (pa.politica_id IS NOT NULL AND pa.permite_acesso = false)
+    OR (pa.politica_id IS NOT NULL 
+        AND pa.permite_acesso = true 
+        AND pa.quantidade_maxima IS NOT NULL 
+        AND ce.quantidade_atual > pa.quantidade_maxima)
+ORDER BY ea.colaborador_nome, ea.tipo_equipamento_descricao;
+
+COMMENT ON VIEW vw_nao_conformidade_elegibilidade IS 'Identifica colaboradores que possuem equipamentos mas não são elegíveis conforme políticas';
+
 -- =====================================================
--- TRIGGERS E FUN��ES
+-- TRIGGERS E FUNÇÕES
 -- =====================================================
 
--- Fun��o: update_updated_at_column
+-- Funço: update_updated_at_column
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -1559,13 +1827,13 @@ CREATE TRIGGER update_sinalizacoes_updated_at
 	BEFORE UPDATE ON sinalizacoes_suspeitas 
 	FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
--- Fun��o: criar_historico_sinalizacao
+-- Funço: criar_historico_sinalizacao
 CREATE OR REPLACE FUNCTION criar_historico_sinalizacao()
 RETURNS TRIGGER AS $$
 BEGIN
 	IF TG_OP = 'INSERT' THEN
 		INSERT INTO historico_investigacoes (sinalizacao_id, usuario_id, acao, descricao)
-		VALUES (NEW.id, COALESCE(NEW.vigilante_id, 0), 'criada', 'Sinaliza��o de suspeita criada');
+		VALUES (NEW.id, COALESCE(NEW.vigilante_id, 0), 'criada', 'Sinalizaço de suspeita criada');
 	END IF;
 	
 	IF TG_OP = 'UPDATE' AND OLD.status != NEW.status THEN
@@ -1586,22 +1854,22 @@ CREATE TRIGGER trigger_historico_sinalizacao
 	AFTER INSERT OR UPDATE ON sinalizacoes_suspeitas
 	FOR EACH ROW EXECUTE FUNCTION criar_historico_sinalizacao();
 
--- Fun��o: fn_validar_equipamento_compartilhado
+-- Funço: fn_validar_equipamento_compartilhado
 CREATE OR REPLACE FUNCTION fn_validar_equipamento_compartilhado()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 AS $$
 BEGIN
 	IF NEW.tipo_acesso NOT IN ('usuario_compartilhado', 'temporario', 'turno') THEN
-		RAISE EXCEPTION 'Tipo de acesso inv�lido: %', NEW.tipo_acesso;
+		RAISE EXCEPTION 'Tipo de acesso inválido: %', NEW.tipo_acesso;
 	END IF;
 	
 	IF NEW.tipo_acesso = 'temporario' AND NEW.data_fim IS NULL THEN
-		RAISE EXCEPTION 'Para tipo de acesso tempor�rio, a data de fim deve ser informada';
+		RAISE EXCEPTION 'Para tipo de acesso temporário, a data de fim deve ser informada';
 	END IF;
 	
 	IF NEW.data_fim IS NOT NULL AND NEW.data_fim <= NEW.data_inicio THEN
-		RAISE EXCEPTION 'Data de fim deve ser maior que data de in�cio';
+		RAISE EXCEPTION 'Data de fim deve ser maior que data de início';
 	END IF;
 	
 	RETURN NEW;
@@ -1618,20 +1886,20 @@ CREATE TRIGGER trg_validar_equipamento_compartilhado
 	EXECUTE FUNCTION fn_validar_equipamento_compartilhado();
 
 -- =====================================================
--- �NDICES PARA PERFORMANCE
+-- ÍNDICES PARA PERFORMANCE
 -- =====================================================
 
--- �ndices: Estados e Cidades
+-- Índices: Estados e Cidades
 CREATE INDEX IF NOT EXISTS idx_cidades_estado_id ON cidades(estado_id);
 CREATE INDEX IF NOT EXISTS idx_cidades_nome ON cidades(nome);
 CREATE INDEX IF NOT EXISTS idx_estados_sigla ON estados(sigla);
 
--- �ndices: Equipamentos
+-- Índices: Equipamentos
 CREATE INDEX IF NOT EXISTS idx_equipamentos_compartilhado 
 ON equipamentos(compartilhado) 
 WHERE compartilhado = TRUE;
 
--- �ndices: Equipamento Usu�rios Compartilhados
+-- Índices: Equipamento Usuários Compartilhados
 CREATE INDEX IF NOT EXISTS idx_equip_usuarios_comp_equipamento 
 ON equipamento_usuarios_compartilhados(equipamento_id);
 
@@ -1652,46 +1920,46 @@ WHERE data_fim IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_equip_usuarios_comp_eq_ativo 
 ON equipamento_usuarios_compartilhados(equipamento_id, ativo);
 
--- �ndices: Protocolos de Descarte
+-- Índices: Protocolos de Descarte
 CREATE INDEX IF NOT EXISTS idx_protocolos_descarte_cliente ON protocolos_descarte(cliente);
 CREATE INDEX IF NOT EXISTS idx_protocolos_descarte_status ON protocolos_descarte(status);
 CREATE INDEX IF NOT EXISTS idx_protocolos_descarte_data_criacao ON protocolos_descarte(data_criacao DESC);
 CREATE INDEX IF NOT EXISTS idx_protocolos_descarte_tipo ON protocolos_descarte(tipo_descarte);
 
--- �ndices: Protocolo Descarte Itens
+-- Índices: Protocolo Descarte Itens
 CREATE INDEX IF NOT EXISTS idx_protocolo_itens_protocolo ON protocolo_descarte_itens(protocolo_id);
 CREATE INDEX IF NOT EXISTS idx_protocolo_itens_equipamento ON protocolo_descarte_itens(equipamento);
 CREATE INDEX IF NOT EXISTS idx_protocolo_itens_status ON protocolo_descarte_itens(status_item);
 
--- �ndices: Descarte Evid�ncias
+-- Índices: Descarte Evidências
 CREATE INDEX IF NOT EXISTS idx_descarteevidencias_equipamento ON descarteevidencias(equipamento);
 CREATE INDEX IF NOT EXISTS idx_descarteevidencias_tipoprocesso ON descarteevidencias(tipoprocesso);
 CREATE INDEX IF NOT EXISTS idx_descarteevidencias_dataupload ON descarteevidencias(dataupload DESC);
 
--- �ndices: Cargos de Confian�a
+-- Índices: Cargos de Confiança
 CREATE INDEX IF NOT EXISTS idx_cargosconfianca_cliente ON cargosconfianca(cliente);
 CREATE INDEX IF NOT EXISTS idx_cargosconfianca_cargo ON cargosconfianca(cargo);
 CREATE INDEX IF NOT EXISTS idx_cargosconfianca_ativo ON cargosconfianca(ativo);
 
--- �ndices: Pol�ticas de Elegibilidade
+-- Índices: Políticas de Elegibilidade
 CREATE INDEX IF NOT EXISTS idx_politica_cliente ON politicas_elegibilidade(cliente);
 CREATE INDEX IF NOT EXISTS idx_politica_tipo_colaborador ON politicas_elegibilidade(tipo_colaborador);
 CREATE INDEX IF NOT EXISTS idx_politica_tipo_equipamento ON politicas_elegibilidade(tipo_equipamento_id);
 CREATE INDEX IF NOT EXISTS idx_politica_ativo ON politicas_elegibilidade(ativo);
 
--- �ndices: Patrim�nio Contesta��es
+-- Índices: Patrimônio Contestações
 CREATE INDEX IF NOT EXISTS idx_patrimonio_contestoes_colaborador ON patrimonio_contestoes(colaborador_id);
 CREATE INDEX IF NOT EXISTS idx_patrimonio_contestoes_equipamento ON patrimonio_contestoes(equipamento_id);
 CREATE INDEX IF NOT EXISTS idx_patrimonio_contestoes_status ON patrimonio_contestoes(status);
 CREATE INDEX IF NOT EXISTS idx_patrimonio_contestoes_data ON patrimonio_contestoes(data_contestacao);
 
--- �ndices: Patrim�nio Logs de Acesso
+-- Índices: Patrimônio Logs de Acesso
 CREATE INDEX IF NOT EXISTS idx_logs_acesso_tipo ON patrimonio_logs_acesso(tipo_acesso);
 CREATE INDEX IF NOT EXISTS idx_logs_acesso_colaborador ON patrimonio_logs_acesso(colaborador_id);
 CREATE INDEX IF NOT EXISTS idx_logs_acesso_cpf ON patrimonio_logs_acesso(cpf_consultado);
 CREATE INDEX IF NOT EXISTS idx_logs_acesso_data ON patrimonio_logs_acesso(created_at);
 
--- �ndices: Sinaliza��es de Suspeitas
+-- Índices: Sinalizações de Suspeitas
 CREATE INDEX IF NOT EXISTS idx_sinalizacoes_colaborador ON sinalizacoes_suspeitas(colaborador_id);
 CREATE INDEX IF NOT EXISTS idx_sinalizacoes_vigilante ON sinalizacoes_suspeitas(vigilante_id);
 CREATE INDEX IF NOT EXISTS idx_sinalizacoes_status ON sinalizacoes_suspeitas(status);
@@ -1699,15 +1967,15 @@ CREATE INDEX IF NOT EXISTS idx_sinalizacoes_prioridade ON sinalizacoes_suspeitas
 CREATE INDEX IF NOT EXISTS idx_sinalizacoes_data ON sinalizacoes_suspeitas(data_sinalizacao);
 CREATE INDEX IF NOT EXISTS idx_sinalizacoes_investigador ON sinalizacoes_suspeitas(investigador_id);
 
--- �ndices: Hist�rico de Investiga��es
+-- Índices: Histórico de Investigações
 CREATE INDEX IF NOT EXISTS idx_historico_sinalizacao ON historico_investigacoes(sinalizacao_id);
 CREATE INDEX IF NOT EXISTS idx_historico_usuario ON historico_investigacoes(usuario_id);
 CREATE INDEX IF NOT EXISTS idx_historico_data ON historico_investigacoes(created_at);
 
--- �ndices: Motivos de Suspeita
+-- Índices: Motivos de Suspeita
 CREATE INDEX IF NOT EXISTS idx_motivos_ativo ON motivos_suspeita(ativo);
 
--- �ndices: Campanhas (ADICIONADOS v1.1.0)
+-- Índices: Campanhas (ADICIONADOS v1.1.0)
 CREATE INDEX IF NOT EXISTS idx_campanhas_cliente ON campanhasassinaturas(Cliente);
 CREATE INDEX IF NOT EXISTS idx_campanhas_status ON campanhasassinaturas(Status);
 CREATE INDEX IF NOT EXISTS idx_campanhas_data_criacao ON campanhasassinaturas(DataCriacao);
@@ -1715,7 +1983,7 @@ CREATE INDEX IF NOT EXISTS idx_campanhas_colab_campanha ON campanhascolaboradore
 CREATE INDEX IF NOT EXISTS idx_campanhas_colab_colaborador ON campanhascolaboradores(ColaboradorId);
 CREATE INDEX IF NOT EXISTS idx_campanhas_colab_status ON campanhascolaboradores(StatusAssinatura);
 
--- �ndices: Estoque M�nimo (ADICIONADOS v1.1.0)
+-- Índices: Estoque Mínimo (ADICIONADOS v1.1.0)
 CREATE INDEX IF NOT EXISTS idx_estoque_equip_cliente ON estoqueminimoequipamentos(cliente);
 CREATE INDEX IF NOT EXISTS idx_estoque_equip_modelo ON estoqueminimoequipamentos(modelo);
 CREATE INDEX IF NOT EXISTS idx_estoque_equip_localidade ON estoqueminimoequipamentos(localidade);
@@ -1726,7 +1994,7 @@ CREATE INDEX IF NOT EXISTS idx_estoque_linha_plano ON estoqueminimolinhas(plano)
 CREATE INDEX IF NOT EXISTS idx_estoque_linha_localidade ON estoqueminimolinhas(localidade);
 CREATE INDEX IF NOT EXISTS idx_estoque_linha_ativo ON estoqueminimolinhas(ativo);
 
--- �ndices: Importa��o (ADICIONADOS v1.1.0)
+-- Índices: Importação (ADICIONADOS v1.1.0)
 CREATE INDEX IF NOT EXISTS idx_importacao_staging_lote ON importacao_linha_staging(lote_id);
 CREATE INDEX IF NOT EXISTS idx_importacao_staging_status ON importacao_linha_staging(status);
 CREATE INDEX IF NOT EXISTS idx_importacao_staging_cliente ON importacao_linha_staging(cliente);
@@ -1737,26 +2005,26 @@ CREATE INDEX IF NOT EXISTS idx_importacao_log_lote ON importacao_log(lote_id);
 CREATE INDEX IF NOT EXISTS idx_importacao_log_status ON importacao_log(status);
 CREATE INDEX IF NOT EXISTS idx_importacao_log_cliente ON importacao_log(cliente);
 
--- �ndices: Geolocaliza��o (ADICIONADOS v1.1.0)
+-- Índices: Geolocalização (ADICIONADOS v1.1.0)
 CREATE INDEX IF NOT EXISTS idx_geolocalizacao_colaborador ON geolocalizacao_assinatura(colaborador_id);
 CREATE INDEX IF NOT EXISTS idx_geolocalizacao_usuario ON geolocalizacao_assinatura(usuario_logado_id);
 CREATE INDEX IF NOT EXISTS idx_geolocalizacao_data ON geolocalizacao_assinatura(data_criacao);
 CREATE INDEX IF NOT EXISTS idx_geolocalizacao_acao ON geolocalizacao_assinatura(acao);
 
--- �ndices: Requisi��o Item Compartilhado (ADICIONADOS v1.1.0)
+-- Índices: Requisição Item Compartilhado (ADICIONADOS v1.1.0)
 CREATE INDEX IF NOT EXISTS idx_req_comp_item ON RequisicaoItemCompartilhado(RequisicaoItemId);
 CREATE INDEX IF NOT EXISTS idx_req_comp_colaborador ON RequisicaoItemCompartilhado(ColaboradorId);
 CREATE INDEX IF NOT EXISTS idx_req_comp_ativo ON RequisicaoItemCompartilhado(Ativo);
 
 -- =====================================================
--- DADOS B�SICOS DO SISTEMA
+-- DADOS BÁSICOS DO SISTEMA
 -- =====================================================
 
 -- Inserir Cliente SingleOne
 INSERT INTO clientes(razaosocial, cnpj, ativo) VALUES('SingleOne', '51908470000199', true)
 ON CONFLICT DO NOTHING;
 
--- Inserir Status de Requisi��es
+-- Inserir Status de Requisições
 INSERT INTO RequisicoesStatus(Descricao, ativo) VALUES('Ativa', true) ON CONFLICT DO NOTHING;
 INSERT INTO RequisicoesStatus(Descricao, ativo) VALUES('Cancelada', true) ON CONFLICT DO NOTHING;
 INSERT INTO RequisicoesStatus(Descricao, ativo) VALUES('Processada', true) ON CONFLICT DO NOTHING;
@@ -1773,58 +2041,58 @@ INSERT INTO EquipamentosStatus(Descricao, ativo) VALUES('Roubado', true) ON CONF
 INSERT INTO EquipamentosStatus(Descricao, ativo) VALUES('Sinistrado', true) ON CONFLICT DO NOTHING;
 INSERT INTO EquipamentosStatus(Descricao, ativo) VALUES('Descartado', true) ON CONFLICT DO NOTHING;
 
--- Inserir Usu�rio Administrador
+-- Inserir Usuário Administrador
 INSERT INTO Usuarios(Cliente, Nome, Email, Senha, PalavraCriptografada, Su, Adm, Operador, consulta, Ativo) 
-VALUES(1, 'Adminstrador', 'administrador@singleone.tech', 'MTQyNTM2QEFkbWlu', uuid_generate_v4(), true, true, false, false, true)
+VALUES(1, 'Adminstrador', 'administrador@singleone.tech', 'MTQyNTM2QEFkbWlu', '', true, true, false, false, true)
 ON CONFLICT DO NOTHING;
 
--- Inserir Localidades Padr�o
-INSERT INTO Localidades(Descricao, Ativo, Cliente) VALUES('Padr�o', FALSE, 1) ON CONFLICT DO NOTHING;
+-- Inserir Localidades Padrão
+INSERT INTO Localidades(Descricao, Ativo, Cliente) VALUES('Padrão', FALSE, 1) ON CONFLICT DO NOTHING;
 
--- Inserir Tipo de Equipamento para Telefonia (necess�rio para recursos de telefonia)
+-- Inserir Tipo de Equipamento para Telefonia (necessário para recursos de telefonia)
 INSERT INTO TipoEquipamentos(Descricao, ativo) VALUES('Linha Telefonica', true) ON CONFLICT DO NOTHING;
 INSERT INTO Fabricantes(TipoEquipamento, Descricao, Ativo, Cliente) VALUES(1, 'Linha Telefonica', false, 1) ON CONFLICT DO NOTHING;
 INSERT INTO Modelos(Fabricante, Descricao, Ativo, Cliente) VALUES(1, 'Linha Telefonica', false, 1) ON CONFLICT DO NOTHING;
 
--- Inserir Tipos de Aquisi��o
+-- Inserir Tipos de Aquisiço
 INSERT INTO TipoAquisicao (Id, Nome) VALUES (1, 'Alugado') ON CONFLICT DO NOTHING;
-INSERT INTO TipoAquisicao (Id, Nome) VALUES (2, 'Pr�prio') ON CONFLICT DO NOTHING;
+INSERT INTO TipoAquisicao (Id, Nome) VALUES (2, 'Próprio') ON CONFLICT DO NOTHING;
 INSERT INTO TipoAquisicao (Id, Nome) VALUES (3, 'Corporativo') ON CONFLICT DO NOTHING;
 
--- Inserir Equipamento Dummy (necess�rio para telefonia)
+-- Inserir Equipamento Dummy (necessário para telefonia)
 INSERT INTO Equipamentos(Cliente, TipoEquipamento, Fabricante, Modelo, EquipamentoStatus, Usuario, Localizacao, PossuiBO, NumeroSerie, DtCadastro, Ativo, TipoAquisicao)
-VALUES(1, 1, 1, 1, 6, 1, 1, false, 'N�o cadastrado', now(), false, 3)
+VALUES(1, 1, 1, 1, 6, 1, 1, false, 'Não cadastrado', now(), false, 3)
 ON CONFLICT DO NOTHING;
 
 -- Inserir Tipos de Templates
-INSERT INTO TemplateTipos(Id, Descricao) VALUES(1, 'Nada consta') ON CONFLICT DO NOTHING;
+INSERT INTO TemplateTipos(Id, Descricao) VALUES(1, 'Termo de nada consta') ON CONFLICT DO NOTHING;
 INSERT INTO TemplateTipos(Id, Descricao) VALUES(2, 'Termo de responsabilidade') ON CONFLICT DO NOTHING;
 INSERT INTO TemplateTipos(Id, Descricao) VALUES(3, 'Termo de responsabilidade - BYOD') ON CONFLICT DO NOTHING;
-INSERT INTO TemplateTipos(Id, Descricao) VALUES(4, 'Termo de sinistro') ON CONFLICT DO NOTHING;
-INSERT INTO TemplateTipos(Id, Descricao) VALUES(5, 'Termo de descarte, doa��o, log�stica reversa') ON CONFLICT DO NOTHING;
-INSERT INTO TemplateTipos(Id, Descricao) VALUES(6, 'Levantamento de Recursos') ON CONFLICT DO NOTHING;
+INSERT INTO TemplateTipos(Id, Descricao) VALUES(4, 'Termo de sinistros') ON CONFLICT DO NOTHING;
+INSERT INTO TemplateTipos(Id, Descricao) VALUES(5, 'Termo de descarte, doação, logística reversa') ON CONFLICT DO NOTHING;
+INSERT INTO TemplateTipos(Id, Descricao) VALUES(6, 'Levantamento de Recursos - Inventário forçado') ON CONFLICT DO NOTHING;
 
 -- =====================================================
 -- TEMPLATES COMPLETOS (OPCIONAL)
 -- =====================================================
 -- 
--- IMPORTANTE: Os 6 templates do sistema est�o dispon�veis no arquivo:
+-- IMPORTANTE: Os 6 templates do sistema estão disponíveis no arquivo:
 --   templates_completos_v2.2.sql (63 KB)
 --
--- Para incluir os templates no banco, execute ap�s este script:
+-- Para incluir os templates no banco, execute após este script:
 --   psql -U postgres -d singleone -f templates_completos_v2.2.sql
 --
--- Templates inclu�dos:
+-- Templates incluídos:
 --   1. Nada Consta de Colaboradores
 --   2. Termo de Responsabilidade - Colaboradores (16 KB)
 --   3. Termo de Responsabilidade - BYOD (14 KB)
---   4. Sinistros (Laudo T�cnico) (14 KB)
---   5. Descartes, Doa��es, Log�stica Reversa (15 KB)
---   6. Levantamento de Recursos de TI (Invent�rio For�ado) (2 KB)
+--   4. Sinistros (Laudo Técnico) (14 KB)
+--   5. Descartes, Doações, Logística Reversa (15 KB)
+--   6. Levantamento de Recursos de TI (Inventário Forçado) (2 KB)
 --
--- Total: ~63 KB de conte�do HTML (incluindo imagens base64)
+-- Total: ~63 KB de conteúdo HTML (incluindo imagens base64)
 -- 
--- NOTA: O sistema funciona sem os templates - eles s�o opcionais.
+-- NOTA: O sistema funciona sem os templates - eles são opcionais.
 --       Templates podem ser cadastrados manualmente via interface.
 -- =====================================================
 
@@ -1835,96 +2103,96 @@ INSERT INTO regrasTemplate (TipoTemplate, TipoAquisicao) VALUES (3, 2) ON CONFLI
 
 -- Inserir Status de Contratos
 INSERT INTO contratostatus(id, nome) VALUES 
-	(1, 'Aguardando Inicio Vig�ncia'),
+	(1, 'Aguardando Inicio Vigência'),
 	(2, 'Vigente'),
 	(3, 'Vencido')
 ON CONFLICT DO NOTHING;
 
 -- Inserir Estados Brasileiros
 INSERT INTO estados (sigla, nome) VALUES
-('AC', 'Acre'), ('AL', 'Alagoas'), ('AP', 'Amap�'), ('AM', 'Amazonas'),
-('BA', 'Bahia'), ('CE', 'Cear�'), ('DF', 'Distrito Federal'), ('ES', 'Esp�rito Santo'),
-('GO', 'Goi�s'), ('MA', 'Maranh�o'), ('MT', 'Mato Grosso'), ('MS', 'Mato Grosso do Sul'),
-('MG', 'Minas Gerais'), ('PA', 'Par�'), ('PB', 'Para�ba'), ('PR', 'Paran�'),
-('PE', 'Pernambuco'), ('PI', 'Piau�'), ('RJ', 'Rio de Janeiro'), ('RN', 'Rio Grande do Norte'),
-('RS', 'Rio Grande do Sul'), ('RO', 'Rond�nia'), ('RR', 'Roraima'), ('SC', 'Santa Catarina'),
-('SP', 'S�o Paulo'), ('SE', 'Sergipe'), ('TO', 'Tocantins')
+('AC', 'Acre'), ('AL', 'Alagoas'), ('AP', 'Amapá'), ('AM', 'Amazonas'),
+('BA', 'Bahia'), ('CE', 'Ceará'), ('DF', 'Distrito Federal'), ('ES', 'Espírito Santo'),
+('GO', 'Goiás'), ('MA', 'Maranhão'), ('MT', 'Mato Grosso'), ('MS', 'Mato Grosso do Sul'),
+('MG', 'Minas Gerais'), ('PA', 'Pará'), ('PB', 'Paraíba'), ('PR', 'Paraná'),
+('PE', 'Pernambuco'), ('PI', 'Piauí'), ('RJ', 'Rio de Janeiro'), ('RN', 'Rio Grande do Norte'),
+('RS', 'Rio Grande do Sul'), ('RO', 'Rondônia'), ('RR', 'Roraima'), ('SC', 'Santa Catarina'),
+('SP', 'São Paulo'), ('SE', 'Sergipe'), ('TO', 'Tocantins')
 ON CONFLICT (sigla) DO NOTHING;
 
 -- Inserir Motivos de Suspeita
 INSERT INTO motivos_suspeita (codigo, descricao, descricao_detalhada, prioridade_padrao) VALUES 
-('comportamento_estranho', 'Comportamento Estranho', 'Colaborador apresentou comportamento suspeito ou at�pico', 'media'),
-('documentos_inconsistentes', 'Documentos Inconsistentes', 'Documentos apresentados n�o conferem com os dados do sistema', 'alta'),
-('equipamentos_nao_reconhecidos', 'Equipamentos N�o Reconhecidos', 'Colaborador n�o reconhece equipamentos listados no sistema', 'alta'),
-('tentativa_evasao', 'Tentativa de Evas�o', 'Colaborador tentou evitar procedimentos de verifica��o', 'critica'),
+('comportamento_estranho', 'Comportamento Estranho', 'Colaborador apresentou comportamento suspeito ou atípico', 'media'),
+('documentos_inconsistentes', 'Documentos Inconsistentes', 'Documentos apresentados não conferem com os dados do sistema', 'alta'),
+('equipamentos_nao_reconhecidos', 'Equipamentos Não Reconhecidos', 'Colaborador não reconhece equipamentos listados no sistema', 'alta'),
+('tentativa_evasao', 'Tentativa de Evasão', 'Colaborador tentou evitar procedimentos de verificação', 'critica'),
 ('acompanhante_suspeito', 'Acompanhante Suspeito', 'Pessoa acompanhando o colaborador apresentou comportamento suspeito', 'alta'),
-('horario_atipico', 'Hor�rio At�pico', 'Acesso em hor�rio n�o usual ou fora do expediente', 'baixa'),
+('horario_atipico', 'Horário Atípico', 'Acesso em horário não usual ou fora do expediente', 'baixa'),
 ('equipamentos_em_excesso', 'Equipamentos em Excesso', 'Quantidade de equipamentos superior ao esperado', 'media'),
 ('nervosismo_excessivo', 'Nervosismo Excessivo', 'Colaborador demonstrou nervosismo ou ansiedade excessiva', 'media'),
-('outros', 'Outros Motivos', 'Outros motivos n�o listados', 'media')
+('outros', 'Outros Motivos', 'Outros motivos não listados', 'media')
 ON CONFLICT (codigo) DO NOTHING;
 
 -- =====================================================
 -- TEMPLATES DE DOCUMENTOS (OPCIONAL)
 -- =====================================================
--- NOTA: Templates t�m conte�do HTML extenso (alguns com imagens base64)
---       Por quest�es de tamanho, n�o s�o inclu�dos neste script base
+-- NOTA: Templates têm conteúdo HTML extenso (alguns com imagens base64)
+--       Por questões de tamanho, não são incluídos neste script base
 --       
--- OP��ES PARA ADICIONAR TEMPLATES:
--- 1. Sistema funciona SEM templates (gera documentos b�sicos)
+-- OPÇÕES PARA ADICIONAR TEMPLATES:
+-- 1. Sistema funciona SEM templates (gera documentos básicos)
 -- 2. Importar de banco existente (ver templates_iniciais_v1.1.0.sql)
 -- 3. Criar via interface: Cadastros > Templates
 -- 4. Executar scripts individuais:
 --    - SingleOne_Backend/SingleOneAPI/Templates/Insert_Template_InventarioForcado.sql
---    - templates_iniciais_v1.1.0.sql (template b�sico de Nada Consta)
+--    - templates_iniciais_v1.1.0.sql (template básico de Nada Consta)
 --
--- Tipos de templates dispon�veis:
+-- Tipos de templates disponíveis:
 -- 1 - Nada Consta
 -- 2 - Termo de Responsabilidade - Colaboradores  
 -- 3 - Termo de Responsabilidade - BYOD
--- 4 - Sinistros (Laudo T�cnico)
--- 5 - Descartes, Doa��es, Log�stica Reversa
--- 6 - Notifica��o de Invent�rio For�ado (v1.1.0)
+-- 4 - Sinistros (Laudo Técnico)
+-- 5 - Descartes, Doações, Logística Reversa
+-- 6 - Notificação de Inventário Forçado (v1.1.0)
 
 -- =====================================================
--- COMENT�RIOS DAS TABELAS
+-- COMENTÁRIOS DAS TABELAS
 -- =====================================================
 
 COMMENT ON TABLE clientes IS 'Tabela de clientes do sistema';
-COMMENT ON TABLE usuarios IS 'Tabela de usu�rios do sistema com perfis de acesso';
+COMMENT ON TABLE usuarios IS 'Tabela de usuários do sistema com perfis de acesso';
 COMMENT ON TABLE equipamentos IS 'Tabela principal de equipamentos';
-COMMENT ON TABLE colaboradores IS 'Tabela de colaboradores (usu�rios finais dos equipamentos)';
-COMMENT ON TABLE requisicoes IS 'Tabela de requisi��es de equipamentos';
-COMMENT ON TABLE protocolos_descarte IS 'Armazena os protocolos de descarte que podem conter m�ltiplos equipamentos';
+COMMENT ON TABLE colaboradores IS 'Tabela de colaboradores (usuários finais dos equipamentos)';
+COMMENT ON TABLE requisicoes IS 'Tabela de requisições de equipamentos';
+COMMENT ON TABLE protocolos_descarte IS 'Armazena os protocolos de descarte que podem conter múltiplos equipamentos';
 COMMENT ON TABLE protocolo_descarte_itens IS 'Armazena os equipamentos individuais dentro de cada protocolo de descarte';
-COMMENT ON TABLE descarteevidencias IS 'Armazena evid�ncias fotogr�ficas e arquivos dos processos de descarte de equipamentos';
-COMMENT ON TABLE cargosconfianca IS 'Cargos que requerem processos especiais de seguran�a no descarte';
-COMMENT ON TABLE politicas_elegibilidade IS 'Armazena as pol�ticas de elegibilidade de recursos por perfil de colaborador';
-COMMENT ON TABLE patrimonio_contestoes IS 'Tabela para contesta��es de patrim�nio pelos colaboradores';
-COMMENT ON TABLE patrimonio_logs_acesso IS 'Tabela para logs de acesso ao sistema PassCheck e Meu Patrim�nio';
-COMMENT ON TABLE sinalizacoes_suspeitas IS 'Tabela para sinaliza��es de suspeitas feitas pelos vigilantes da portaria';
-COMMENT ON TABLE historico_investigacoes IS 'Hist�rico de todas as a��es realizadas nas investiga��es';
-COMMENT ON TABLE motivos_suspeita IS 'Motivos pr�-definidos para sinaliza��es de suspeitas';
-COMMENT ON TABLE equipamento_usuarios_compartilhados IS 'Gerencia m�ltiplos usu�rios para equipamentos compartilhados';
-COMMENT ON TABLE campanhasassinaturas IS 'Campanhas para coleta de assinaturas eletr�nicas de colaboradores (v1.1.0)';
+COMMENT ON TABLE descarteevidencias IS 'Armazena evidências fotográficas e arquivos dos processos de descarte de equipamentos';
+COMMENT ON TABLE cargosconfianca IS 'Cargos que requerem processos especiais de segurança no descarte';
+COMMENT ON TABLE politicas_elegibilidade IS 'Armazena as políticas de elegibilidade de recursos por perfil de colaborador';
+COMMENT ON TABLE patrimonio_contestoes IS 'Tabela para contestações de patrimônio pelos colaboradores';
+COMMENT ON TABLE patrimonio_logs_acesso IS 'Tabela para logs de acesso ao sistema PassCheck e Meu Patrimônio';
+COMMENT ON TABLE sinalizacoes_suspeitas IS 'Tabela para sinalizações de suspeitas feitas pelos vigilantes da portaria';
+COMMENT ON TABLE historico_investigacoes IS 'Histórico de todas as ações realizadas nas investigações';
+COMMENT ON TABLE motivos_suspeita IS 'Motivos pré-definidos para sinalizações de suspeitas';
+COMMENT ON TABLE equipamento_usuarios_compartilhados IS 'Gerencia múltiplos usuários para equipamentos compartilhados';
+COMMENT ON TABLE campanhasassinaturas IS 'Campanhas para coleta de assinaturas eletrônicas de colaboradores (v1.1.0)';
 COMMENT ON TABLE campanhascolaboradores IS 'Relacionamento entre campanhas e colaboradores participantes (v1.1.0)';
-COMMENT ON TABLE estoqueminimoequipamentos IS 'Controle de estoque m�nimo de equipamentos por localidade e modelo (v1.1.0)';
-COMMENT ON TABLE estoqueminimolinhas IS 'Controle de estoque m�nimo de linhas telef�nicas por localidade, operadora e plano (v1.1.0)';
-COMMENT ON TABLE importacao_linha_staging IS '�rea de staging para importa��o em lote de linhas telef�nicas via Excel (v1.1.0)';
-COMMENT ON TABLE importacao_colaborador_staging IS '�rea de staging para importa��o em lote de colaboradores via Excel (v2.3.0)';
-COMMENT ON TABLE importacao_log IS 'Log de processos de importa��o em lote de linhas e colaboradores (v1.1.0)';
-COMMENT ON TABLE geolocalizacao_assinatura IS 'Geolocaliza��o capturada durante assinatura de termos e pol�ticas (v1.1.0)';
-COMMENT ON TABLE RequisicaoItemCompartilhado IS 'Compartilhamento de recursos entre m�ltiplos colaboradores (v1.1.0)';
+COMMENT ON TABLE estoqueminimoequipamentos IS 'Controle de estoque mínimo de equipamentos por localidade e modelo (v1.1.0)';
+COMMENT ON TABLE estoqueminimolinhas IS 'Controle de estoque mínimo de linhas telefônicas por localidade, operadora e plano (v1.1.0)';
+COMMENT ON TABLE importacao_linha_staging IS 'Área de staging para importação em lote de linhas telefônicas via Excel (v1.1.0)';
+COMMENT ON TABLE importacao_colaborador_staging IS 'Área de staging para importação em lote de colaboradores via Excel (v2.3.0)';
+COMMENT ON TABLE importacao_log IS 'Log de processos de importação em lote de linhas e colaboradores (v1.1.0)';
+COMMENT ON TABLE geolocalizacao_assinatura IS 'Geolocalização capturada durante assinatura de termos e políticas (v1.1.0)';
+COMMENT ON TABLE RequisicaoItemCompartilhado IS 'Compartilhamento de recursos entre múltiplos colaboradores (v1.1.0)';
 
-COMMENT ON COLUMN equipamentos.compartilhado IS 'Indica se o equipamento permite m�ltiplos usu�rios';
+COMMENT ON COLUMN equipamentos.compartilhado IS 'Indica se o equipamento permite múltiplos usuários';
 COMMENT ON COLUMN equipamentos.enviouEmailReporte IS 'Indica se email de reporte foi enviado';
-COMMENT ON COLUMN protocolos_descarte.protocolo IS 'N�mero �nico do protocolo (ex: DESC-2025-001234)';
+COMMENT ON COLUMN protocolos_descarte.protocolo IS 'Número único do protocolo (ex: DESC-2025-001234)';
 COMMENT ON COLUMN protocolos_descarte.tipo_descarte IS 'Tipo: DOACAO, VENDA, DEVOLUCAO, LOGISTICA_REVERSA, DESCARTE_FINAL';
 COMMENT ON COLUMN protocolo_descarte_itens.status_item IS 'Status individual: PENDENTE, EM_PROCESSO, CONCLUIDO';
-COMMENT ON COLUMN protocolo_descarte_itens.processos_obrigatorios IS 'Indica se equipamento passou por cargo de confian�a e requer processos especiais';
+COMMENT ON COLUMN protocolo_descarte_itens.processos_obrigatorios IS 'Indica se equipamento passou por cargo de confiança e requer processos especiais';
 COMMENT ON COLUMN descarteevidencias.tipoprocesso IS 'Tipo do processo: SANITIZACAO, DESCARACTERIZACAO, PERFURACAO_DISCO, EVIDENCIAS_GERAIS';
 COMMENT ON COLUMN sinalizacoes_suspeitas.cpf_consultado IS 'CPF que foi consultado no PassCheck';
-COMMENT ON COLUMN sinalizacoes_suspeitas.status IS 'Status da investiga��o: pendente, em_investigacao, resolvida, arquivada';
+COMMENT ON COLUMN sinalizacoes_suspeitas.status IS 'Status da investigação: pendente, em_investigacao, resolvida, arquivada';
 
 -- =====================================================
 -- TABELAS ADICIONAIS (FALTANTES NO SCRIPT ORIGINAL)
@@ -1959,7 +2227,7 @@ CREATE TABLE IF NOT EXISTS Filiais
     constraint fkFilialLocalidade foreign key (Localidade_Id) references Localidades(Id)
 );
 
--- Adicionar FKs de Filiais (após criação de Filiais)
+-- Adicionar FKs de Filiais (ap├│s cria├º├úo de Filiais)
 DO $$
 BEGIN
     -- FK para CentroCusto
@@ -2093,31 +2361,31 @@ CREATE TABLE IF NOT EXISTS __EFMigrationsHistory
 DO $$
 BEGIN
     RAISE NOTICE '========================================';
-    RAISE NOTICE 'SCRIPT DE INICIALIZA��O EXECUTADO COM SUCESSO!';
+    RAISE NOTICE 'SCRIPT DE INICIALIZAÇÃO EXECUTADO COM SUCESSO!';
     RAISE NOTICE '========================================';
     RAISE NOTICE 'Banco de dados SingleOne inicializado';
-    RAISE NOTICE 'Vers�o: 2.2 (Atualizado em 03/11/2025)';
+    RAISE NOTICE 'Versão: 2.2 (Atualizado em 03/11/2025)';
     RAISE NOTICE '';
-    RAISE NOTICE 'Dados b�sicos inseridos:';
+    RAISE NOTICE 'Dados básicos inseridos:';
     RAISE NOTICE '- Cliente Demo criado';
-    RAISE NOTICE '- Usu�rio administrador: administrador@singleone.tech';
-    RAISE NOTICE '- Status de equipamentos e requisi��es';
+    RAISE NOTICE '- Usuário administrador: administrador@singleone.tech';
+    RAISE NOTICE '- Status de equipamentos e requisições';
     RAISE NOTICE '- Estados brasileiros';
-    RAISE NOTICE '- Tipos de aquisi��o';
+    RAISE NOTICE '- Tipos de aquisição';
     RAISE NOTICE '- Motivos de suspeita';
     RAISE NOTICE '';
     RAISE NOTICE 'Tabelas criadas:';
     RAISE NOTICE '- Estrutura principal do sistema (64 tabelas)';
     RAISE NOTICE '- Sistema de descarte e protocolos';
     RAISE NOTICE '- Sistema de elegibilidade';
-    RAISE NOTICE '- Sistema PassCheck e Meu Patrim�nio';
-    RAISE NOTICE '- Sistema de sinaliza��es de suspeitas';
+    RAISE NOTICE '- Sistema PassCheck e Meu Patrimônio';
+    RAISE NOTICE '- Sistema de sinalizações de suspeitas';
     RAISE NOTICE '- Sistema de equipamentos compartilhados';
     RAISE NOTICE '- Sistema TinOne (IA e Analytics)';
     RAISE NOTICE '- Sistema de Categorias e Filiais';
     RAISE NOTICE '';
-    RAISE NOTICE 'Pr�ximos passos:';
-    RAISE NOTICE '1. Ajustar senha do usu�rio administrador';
+    RAISE NOTICE 'Próximos passos:';
+    RAISE NOTICE '1. Ajustar senha do usuário administrador';
     RAISE NOTICE '2. Configurar dados do cliente real';
     RAISE NOTICE '3. Cadastrar empresas, localidades e colaboradores';
     RAISE NOTICE '========================================';
