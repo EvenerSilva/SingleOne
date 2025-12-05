@@ -28,7 +28,7 @@ services:
   # Backend API
   backend:
     build:
-      context: .
+      context: ./SingleOne_Backend
       dockerfile: Dockerfile
     container_name: singleone-backend
     restart: unless-stopped
@@ -49,12 +49,13 @@ services:
     networks:
       - singleone-network
     volumes:
-      - ./SingleOneAPI/Documentos:/app/documentos
+      - ./SingleOne_Backend/SingleOneAPI/Documentos:/app/documentos
+      - backend_wwwroot:/app/wwwroot
 
   # Frontend
   frontend:
     build:
-      context: ../SingleOne_Frontend
+      context: ./SingleOne_Frontend
       dockerfile: Dockerfile
     container_name: singleone-frontend
     restart: unless-stopped
@@ -91,6 +92,7 @@ services:
 volumes:
   postgres_data:
   pgadmin_data:
+  backend_wwwroot:
 
 networks:
   singleone-network:
