@@ -92,7 +92,16 @@ namespace SingleOne.Negocios
         public PagedResult<Equipamentovm> ListarEquipamentos(string pesquisa, int cliente, int? contrato, int pagina, int paginaTamanho, int? modeloId = null, int? localidadeId = null)
         {
             Console.WriteLine($"[EQUIPAMENTOS] Listando equipamentos - Cliente: {cliente}, Contrato: {contrato}, Pesquisa: '{pesquisa}', Página: {pagina}, Tamanho: {paginaTamanho}, Modelo: {modeloId}, Localidade: {localidadeId}");
-            pesquisa = pesquisa.ToLower();
+            
+            // ✅ CORREÇÃO: Tratar pesquisa null ou "null"
+            if (string.IsNullOrWhiteSpace(pesquisa) || pesquisa.ToLower() == "null")
+            {
+                pesquisa = null;
+            }
+            else
+            {
+                pesquisa = pesquisa.ToLower();
+            }
             
             // Construir filtro de forma mais simples
             if (contrato.HasValue && contrato.Value > 0)
@@ -104,12 +113,12 @@ namespace SingleOne.Negocios
                     x.Contratoid == contrato.Value &&
                     (modeloId.HasValue && modeloId.Value > 0 ? x.Modeloid == modeloId.Value : true) &&
                     (localidadeId.HasValue && localidadeId.Value > 0 ? x.Localizacaoid == localidadeId.Value : true) &&
-                    ((pesquisa != "null") ?
+                    (pesquisa != null ?
                         x.Fabricante.ToLower().Contains(pesquisa) ||
                         x.Modelo.ToLower().Contains(pesquisa) ||
                         x.Numeroserie.ToLower().Contains(pesquisa) ||
                         x.Patrimonio.ToLower().Contains(pesquisa) ||
-                        x.Colaboradornome.ToLower().Contains(pesquisa)
+                        (x.Colaboradornome != null && x.Colaboradornome.ToLower().Contains(pesquisa))
                         : 1 == 1))
                     .OrderByDescending(x => x.Id).ThenBy(x => x.Tipoequipamento).ThenBy(x => x.Fabricante).ThenBy(x => x.Modelo)
                     .GetPaged(pagina, paginaTamanho);
@@ -124,7 +133,7 @@ namespace SingleOne.Negocios
                     x.Ativo.Value &&
                     (modeloId.HasValue && modeloId.Value > 0 ? x.Modeloid == modeloId.Value : true) &&
                     (localidadeId.HasValue && localidadeId.Value > 0 ? x.Localizacaoid == localidadeId.Value : true) &&
-                    ((pesquisa != "null") ?
+                    (pesquisa != null ?
                         x.Fabricante.ToLower().Contains(pesquisa) ||
                         x.Modelo.ToLower().Contains(pesquisa) ||
                         x.Numeroserie.ToLower().Contains(pesquisa) ||

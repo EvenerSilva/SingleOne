@@ -30,9 +30,10 @@ namespace SingleOneAPI.Services
                 // Aplicar filtro se fornecido
                 if (!string.IsNullOrWhiteSpace(filtro))
                 {
+                    var filtroLower = filtro.ToLower();
                     query = query.Where(c => 
-                        c.Nome.ToLower().Contains(filtro.ToLower()) ||
-                        c.Descricao.ToLower().Contains(filtro.ToLower())
+                        c.Nome.ToLower().Contains(filtroLower) ||
+                        (c.Descricao != null && c.Descricao.ToLower().Contains(filtroLower))
                     );
                 }
 
