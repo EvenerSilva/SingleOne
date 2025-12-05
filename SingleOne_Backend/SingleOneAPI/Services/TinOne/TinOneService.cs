@@ -188,7 +188,7 @@ namespace SingleOneAPI.Services.TinOne
                 
                 var respostaGenerica = new TinOneRespostaDTO
                 {
-                    Resposta = AdicionarFraseSabedoria("Desculpe, ainda não sei responder essa pergunta. Estou aprendendo! 🤖\n\n" +
+                    Resposta = AdicionarFraseSabedoria("Desculpe, ainda não sei responder essa pergunta. Estou aprendendo! 🦉\n\n" +
                               "Você pode tentar:\n" +
                               "• Reformular a pergunta\n" +
                               "• Perguntar sobre processos específicos (ex: 'como criar uma requisição?')\n" +
