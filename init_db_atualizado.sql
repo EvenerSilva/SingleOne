@@ -1103,58 +1103,69 @@ GROUP BY r.ColaboradorFinal, c.Nome;
 
 -- View: EquipamentoVM
 CREATE OR REPLACE VIEW EquipamentoVM AS
-SELECT eq.id,
-	eq.tipoequipamento AS tipoequipamentoid,
-	te.descricao AS tipoequipamento,
-	eq.fabricante AS fabricanteid,
-	fab.descricao AS fabricante,
-	eq.modelo AS modeloid,
-	mdl.descricao AS modelo,
-	eq.notafiscal AS notafiscalid,
-	eq.equipamentostatus AS equipamentostatusid,
-	es.descricao AS equipamentostatus,
-	eq.usuario AS usuarioid,
-	usr.nome AS usuario,
-	eq.localizacao AS localizacaoid,
-	lc.descricao AS localizacao,
-	eq.possuibo,
-	eq.descricaobo,
-	eq.numeroserie,
-	COALESCE(eq.patrimonio, ''::character varying) AS patrimonio,
-	eq.dtlimitegarantia,
-	eq.dtcadastro,
-	eq.tipoaquisicao,
-	eq.fornecedor,
-	eq.cliente,
-	t.colaboradorid,
-	t.colaboradornome,
-	t.requisicaoid,
-	eq.ativo,
-	eq.empresa AS empresaid,
-	emp.nome AS empresa,
-	eq.centrocusto AS centrocustoid,
-	cc.nome AS centrocusto,
-	con.id AS contratoid,
-	con.descricao AS contrato
-FROM equipamentos eq
-JOIN tipoequipamentos te ON eq.tipoequipamento = te.id
-JOIN fabricantes fab ON eq.fabricante = fab.id
-JOIN modelos mdl ON eq.modelo = mdl.id
-JOIN equipamentosstatus es ON eq.equipamentostatus = es.id
-JOIN usuarios usr ON eq.usuario = usr.id
-JOIN localidades lc ON eq.localizacao = lc.id
-LEFT JOIN notasfiscais nf ON eq.notafiscal = nf.id
-LEFT JOIN empresas emp ON eq.empresa = emp.id
-LEFT JOIN centrocusto cc ON eq.centrocusto = cc.id
-LEFT JOIN contratos con ON eq.contrato = con.id
-LEFT JOIN ( SELECT r.id AS requisicaoid,
-		ri.equipamento AS eqpid,
-		c.id AS colaboradorid,
-		c.nome AS colaboradornome
-	FROM requisicoes r
-		JOIN requisicoesitens ri ON r.id = ri.requisicao
-		JOIN colaboradores c ON c.id = r.colaboradorfinal
-	WHERE ri.dtdevolucao IS NULL AND r.requisicaostatus = 3) t ON t.eqpid = eq.id;
+SELECT e.id,
+    e.tipoequipamento AS tipoequipamentoid,
+    COALESCE(te.descricao, 'Nao definido'::character varying) AS tipoequipamento,
+    e.fabricante AS fabricanteid,
+    COALESCE(f.descricao, 'Nao definido'::character varying) AS fabricante,
+    e.modelo AS modeloid,
+    COALESCE(m.descricao, 'Nao definido'::character varying) AS modelo,
+    e.notafiscal AS notafiscalid,
+        CASE
+            WHEN e.notafiscal IS NOT NULL THEN nf.numero::character varying
+            ELSE 'Nao definido'::character varying
+        END AS "Notafiscal",
+    e.equipamentostatus AS equipamentostatusid,
+    COALESCE(es.descricao, 'Nao definido'::character varying) AS equipamentostatus,
+    e.usuario AS usuarioid,
+    COALESCE(u.nome, 'Nao definido'::character varying) AS usuario,
+    e.localidade_id AS localizacaoid,
+        CASE
+            WHEN e.localidade_id = 1 THEN 'Nao definido'::character varying
+            ELSE COALESCE(l.descricao, 'Nao definido'::character varying)
+        END AS localizacao,
+    e.possuibo,
+    e.descricaobo,
+    e.numeroserie,
+    e.patrimonio,
+    e.dtlimitegarantia,
+    e.dtcadastro,
+    e.tipoaquisicao,
+    COALESCE(ta.nome, 'Nao definido'::character varying) AS "TipoAquisicao",
+    e.fornecedor,
+        CASE
+            WHEN e.fornecedor IS NOT NULL THEN forn.nome
+            ELSE 'Nao definido'::character varying
+        END AS "FornecedorNome",
+    e.cliente,
+    NULL::text AS colaboradorid,
+    NULL::text AS colaboradornome,
+    NULL::text AS requisicaoid,
+    e.ativo,
+    COALESCE(e.empresa, cc.empresa) AS empresaid,
+    COALESCE(emp.nome, emp_cc.nome, 'Nao definido'::character varying) AS empresa,
+    e.centrocusto AS centrocustoid,
+    COALESCE(cc.nome, 'Nao definido'::character varying) AS centrocusto,
+    e.contrato AS contratoid,
+    COALESCE(con.descricao, 'Nao definido'::character varying) AS contrato,
+    e.filial_id AS "Filialid",
+    COALESCE(fil.nome, 'Nao definido'::character varying) AS "Filial"
+   FROM equipamentos e
+     LEFT JOIN tipoequipamentos te ON e.tipoequipamento = te.id
+     LEFT JOIN fabricantes f ON e.fabricante = f.id
+     LEFT JOIN modelos m ON e.modelo = m.id
+     LEFT JOIN notasfiscais nf ON e.notafiscal = nf.id
+     LEFT JOIN fornecedores forn ON e.fornecedor = forn.id
+     LEFT JOIN equipamentosstatus es ON e.equipamentostatus = es.id
+     LEFT JOIN usuarios u ON e.usuario = u.id
+     LEFT JOIN localidades l ON e.localidade_id = l.id
+     LEFT JOIN empresas emp ON e.empresa = emp.id
+     LEFT JOIN centrocusto cc ON e.centrocusto = cc.id
+     LEFT JOIN empresas emp_cc ON cc.empresa = emp_cc.id
+     LEFT JOIN contratos con ON e.contrato = con.id
+     LEFT JOIN filiais fil ON e.filial_id = fil.id
+     LEFT JOIN tipoaquisicao ta ON e.tipoaquisicao = ta.id
+  WHERE e.ativo = true;
 
 -- View: EquipamentoHistoricoVM
 CREATE OR REPLACE VIEW EquipamentoHistoricoVM AS
@@ -1626,17 +1637,24 @@ COMMENT ON VIEW vwplanostelefonia IS 'View para listar planos de telefonia com i
 
 -- View: vw_tinone_estatisticas
 CREATE OR REPLACE VIEW vw_tinone_estatisticas AS
-SELECT 
-    COUNT(*) as total_interacoes,
-    COUNT(DISTINCT usuario_id) as usuarios_unicos,
-    COUNT(DISTINCT sessao_id) as sessoes_unicas,
-    AVG(tempo_resposta_ms) as tempo_medio_resposta,
-    COUNT(CASE WHEN foi_util = true THEN 1 END) as feedbacks_positivos,
-    COUNT(CASE WHEN foi_util = false THEN 1 END) as feedbacks_negativos,
-    DATE(created_at) as data
-FROM tinone_analytics
-GROUP BY DATE(created_at)
-ORDER BY data DESC;
+SELECT count(*) AS total_interacoes,
+    count(DISTINCT usuario_id) AS usuarios_unicos,
+    count(DISTINCT sessao_id) AS sessoes_unicas,
+    avg(tempo_resposta_ms) AS tempo_medio_resposta,
+    count(
+        CASE
+            WHEN foi_util = true THEN 1
+            ELSE NULL::integer
+        END) AS feedbacks_positivos,
+    count(
+        CASE
+            WHEN foi_util = false THEN 1
+            ELSE NULL::integer
+        END) AS feedbacks_negativos,
+    date(created_at) AS data
+   FROM tinone_analytics
+  GROUP BY (date(created_at))
+  ORDER BY (date(created_at)) DESC;
 
 COMMENT ON VIEW vw_tinone_estatisticas IS 'Estatísticas diárias de uso do TinOne';
 
@@ -1724,13 +1742,13 @@ WITH equipamentos_alocados AS (
         c.cargo AS colaborador_cargo,
         c.tipocolaborador AS tipo_colaborador,
         CASE c.tipocolaborador
-            WHEN 'F' THEN 'Funcionário'
-            WHEN 'T' THEN 'Terceirizado'
-            WHEN 'C' THEN 'Consultor'
-            ELSE 'Desconhecido'
+            WHEN 'F'::bpchar THEN 'Funcionário'::text
+            WHEN 'T'::bpchar THEN 'Terceirizado'::text
+            WHEN 'C'::bpchar THEN 'Consultor'::text
+            ELSE 'Desconhecido'::text
         END AS tipo_colaborador_descricao,
         emp.nome AS empresa_nome,
-        COALESCE(cc.codigo || ' - ' || cc.nome, '') AS centro_custo,
+        COALESCE((cc.codigo::text || ' - '::text) || cc.nome::text, ''::text) AS centro_custo,
         loc.descricao AS localidade,
         e.id AS equipamento_id,
         e.patrimonio AS equipamento_patrimonio,
@@ -1745,28 +1763,23 @@ WITH equipamentos_alocados AS (
         e.equipamentostatus AS equipamento_status,
         c.cliente
     FROM colaboradores c
-    INNER JOIN requisicoes r ON r.colaboradorfinal = c.id
-    INNER JOIN requisicoesitens ri ON ri.requisicao = r.id
-    INNER JOIN equipamentos e ON e.id = ri.equipamento
-    INNER JOIN tipoequipamentos te ON te.id = e.tipoequipamento
+    JOIN requisicoes r ON r.colaboradorfinal = c.id
+    JOIN requisicoesitens ri ON ri.requisicao = r.id
+    JOIN equipamentos e ON e.id = ri.equipamento
+    JOIN tipoequipamentos te ON te.id = e.tipoequipamento
     LEFT JOIN fabricantes f ON f.id = e.fabricante
     LEFT JOIN modelos m ON m.id = e.modelo
     LEFT JOIN empresas emp ON emp.id = c.empresa
     LEFT JOIN centrocusto cc ON cc.id = c.centrocusto
     LEFT JOIN localidades loc ON loc.id = c.localidade
-    WHERE ri.dtdevolucao IS NULL
-      AND ri.equipamento IS NOT NULL
-      AND (c.dtdemissao IS NULL OR c.dtdemissao > NOW())
-      AND (e.tipoaquisicao IS NULL OR e.tipoaquisicao != 2)
-      AND e.equipamentostatus = 4
+    WHERE ri.dtdevolucao IS NULL AND ri.equipamento IS NOT NULL AND (c.dtdemissao IS NULL OR c.dtdemissao > now()) AND (e.tipoaquisicao IS NULL OR e.tipoaquisicao <> 2) AND e.equipamentostatus = 4
 ),
 contagem_equipamentos AS (
-    SELECT 
-        colaborador_id,
-        tipo_equipamento_id,
-        COUNT(*) AS quantidade_atual
-    FROM equipamentos_alocados
-    GROUP BY colaborador_id, tipo_equipamento_id
+    SELECT equipamentos_alocados.colaborador_id,
+        equipamentos_alocados.tipo_equipamento_id,
+        count(*) AS quantidade_atual
+       FROM equipamentos_alocados
+      GROUP BY equipamentos_alocados.colaborador_id, equipamentos_alocados.tipo_equipamento_id
 ),
 politicas_aplicaveis AS (
     SELECT DISTINCT ON (ea.colaborador_id, ea.tipo_equipamento_id)
@@ -1800,8 +1813,7 @@ politicas_aplicaveis AS (
             )
         )
 )
-SELECT 
-    ea.colaborador_id,
+SELECT ea.colaborador_id,
     ea.colaborador_nome,
     ea.colaborador_cpf,
     ea.colaborador_email,
@@ -1828,21 +1840,12 @@ SELECT
     pa.quantidade_maxima,
     pa.politica_observacoes,
     ce.quantidade_atual,
-    NOW() AS dt_geracao_relatorio
-FROM equipamentos_alocados ea
-LEFT JOIN politicas_aplicaveis pa ON 
-    pa.colaborador_id = ea.colaborador_id 
-    AND pa.tipo_equipamento_id = ea.tipo_equipamento_id
-LEFT JOIN contagem_equipamentos ce ON 
-    ce.colaborador_id = ea.colaborador_id 
-    AND ce.tipo_equipamento_id = ea.tipo_equipamento_id
-WHERE 
-    (pa.politica_id IS NOT NULL AND pa.permite_acesso = false)
-    OR (pa.politica_id IS NOT NULL 
-        AND pa.permite_acesso = true 
-        AND pa.quantidade_maxima IS NOT NULL 
-        AND ce.quantidade_atual > pa.quantidade_maxima)
-ORDER BY ea.colaborador_nome, ea.tipo_equipamento_descricao;
+    now() AS dt_geracao_relatorio
+   FROM equipamentos_alocados ea
+     LEFT JOIN politicas_aplicaveis pa ON pa.colaborador_id = ea.colaborador_id AND pa.tipo_equipamento_id = ea.tipo_equipamento_id
+     LEFT JOIN contagem_equipamentos ce ON ce.colaborador_id = ea.colaborador_id AND ce.tipo_equipamento_id = ea.tipo_equipamento_id
+  WHERE pa.politica_id IS NOT NULL AND pa.permite_acesso = false OR pa.politica_id IS NOT NULL AND pa.permite_acesso = true AND pa.quantidade_maxima IS NOT NULL AND ce.quantidade_atual > pa.quantidade_maxima
+  ORDER BY ea.colaborador_nome, ea.tipo_equipamento_descricao;
 
 COMMENT ON VIEW vw_nao_conformidade_elegibilidade IS 'Identifica colaboradores que possuem equipamentos mas não são elegíveis conforme políticas';
 
