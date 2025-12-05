@@ -750,6 +750,7 @@ CREATE TABLE IF NOT EXISTS politicas_elegibilidade (
     permite_acesso BOOLEAN NOT NULL DEFAULT true,
     quantidade_maxima INTEGER,
     observacoes TEXT,
+    usarpadrao BOOLEAN NOT NULL DEFAULT true,
     ativo BOOLEAN NOT NULL DEFAULT true,
     dt_cadastro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     dt_atualizacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -1085,6 +1086,49 @@ CREATE TABLE IF NOT EXISTS RequisicaoItemCompartilhado (
     CONSTRAINT fk_req_comp_item FOREIGN KEY (RequisicaoItemId) REFERENCES RequisicoesItens(Id) ON DELETE CASCADE,
     CONSTRAINT fk_req_comp_colaborador FOREIGN KEY (ColaboradorId) REFERENCES Colaboradores(Id) ON DELETE CASCADE,
     CONSTRAINT fk_req_comp_usuario FOREIGN KEY (CriadoPor) REFERENCES Usuarios(Id)
+);
+
+-- =====================================================
+-- TABELAS NECESSÁRIAS PARA AS VIEWS
+-- =====================================================
+
+-- Tabela: Filiais (necessária para views de equipamentos e colaboradores)
+CREATE TABLE IF NOT EXISTS Filiais
+(
+    Id serial not null primary key,
+    Nome varchar(100) not null,
+    Empresa_Id int not null,
+    Localidade_Id int not null,
+    Cnpj varchar(18),
+    Endereco text,
+    Telefone varchar(20),
+    Email varchar(100),
+    Ativo boolean default true,
+    created_at timestamp default CURRENT_TIMESTAMP,
+    updated_at timestamp default CURRENT_TIMESTAMP,
+    constraint fkFilialEmpresa foreign key (Empresa_Id) references Empresas(Id),
+    constraint fkFilialLocalidade foreign key (Localidade_Id) references Localidades(Id)
+);
+
+-- Tabela: TinOne_Analytics (necessária para view vw_tinone_estatisticas)
+CREATE TABLE IF NOT EXISTS TinOne_Analytics
+(
+    Id serial not null primary key,
+    Usuario_Id int,
+    Cliente_Id int,
+    Sessao_Id varchar(100),
+    Pagina_Url varchar(500),
+    Pagina_Nome varchar(200),
+    Acao_Tipo varchar(100),
+    Pergunta text,
+    Resposta text,
+    Tempo_Resposta_Ms int,
+    Foi_Util boolean,
+    Feedback_Texto text,
+    Created_At timestamp default CURRENT_TIMESTAMP,
+    Updated_At timestamp default CURRENT_TIMESTAMP,
+    constraint fkTinOneAnalyticsUsuario foreign key (Usuario_Id) references Usuarios(Id),
+    constraint fkTinOneAnalyticsCliente foreign key (Cliente_Id) references Clientes(Id)
 );
 
 -- =====================================================
@@ -2440,24 +2484,6 @@ CREATE TABLE IF NOT EXISTS Categorias
     DataAtualizacao timestamp default CURRENT_TIMESTAMP
 );
 
--- Tabela: Filiais
-CREATE TABLE IF NOT EXISTS Filiais
-(
-    Id serial not null primary key,
-    Nome varchar(100) not null,
-    Empresa_Id int not null,
-    Localidade_Id int not null,
-    Cnpj varchar(18),
-    Endereco text,
-    Telefone varchar(20),
-    Email varchar(100),
-    Ativo boolean default true,
-    created_at timestamp default CURRENT_TIMESTAMP,
-    updated_at timestamp default CURRENT_TIMESTAMP,
-    constraint fkFilialEmpresa foreign key (Empresa_Id) references Empresas(Id),
-    constraint fkFilialLocalidade foreign key (Localidade_Id) references Localidades(Id)
-);
-
 -- Adicionar FKs de Filiais (após criação de Filiais)
 DO $$
 BEGIN
@@ -2524,26 +2550,6 @@ CREATE TABLE IF NOT EXISTS TinOne_Config
     constraint fkTinOneConfigCliente foreign key (Cliente) references Clientes(Id)
 );
 
--- Tabela: TinOne_Analytics
-CREATE TABLE IF NOT EXISTS TinOne_Analytics
-(
-    Id serial not null primary key,
-    Usuario_Id int,
-    Cliente_Id int,
-    Sessao_Id varchar(100),
-    Pagina_Url varchar(500),
-    Pagina_Nome varchar(200),
-    Acao_Tipo varchar(100),
-    Pergunta text,
-    Resposta text,
-    Tempo_Resposta_Ms int,
-    Foi_Util boolean,
-    Feedback_Texto text,
-    Created_At timestamp default CURRENT_TIMESTAMP,
-    Updated_At timestamp default CURRENT_TIMESTAMP,
-    constraint fkTinOneAnalyticsUsuario foreign key (Usuario_Id) references Usuarios(Id),
-    constraint fkTinOneAnalyticsCliente foreign key (Cliente_Id) references Clientes(Id)
-);
 
 -- Tabela: TinOne_Conversas
 CREATE TABLE IF NOT EXISTS TinOne_Conversas
