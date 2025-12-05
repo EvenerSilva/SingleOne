@@ -170,10 +170,15 @@ export class TinOneConfigComponent implements OnInit {
           this.mensagemSucesso = 'Configurações salvas com sucesso!';
           this.salvando = false;
           
-          // Aguarda 2 segundos para o usuário ver a mensagem antes de recarregar
+          // Recarregar configurações sem recarregar a página inteira
           setTimeout(() => {
-            window.location.reload();
-          }, 2000);
+            this.carregarConfiguracoes();
+            // Recarregar configuração do TinOne widget se estiver disponível
+            if (window.location) {
+              // Forçar atualização do widget TinOne
+              window.dispatchEvent(new Event('tinone-config-reload'));
+            }
+          }, 1000);
         },
         error: (err) => {
           console.error('[TinOne Config] Erro completo:', err);
