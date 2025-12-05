@@ -613,7 +613,15 @@ export class AppComponent implements OnInit {
       const response = await fetch('/assets/version.txt');
       if (response.ok) {
         const version = await response.text();
-        this.systemVersion = version.trim();
+        const trimmedVersion = version.trim();
+        
+        // Validar se a resposta não é HTML (caso o Nginx retorne index.html)
+        if (trimmedVersion.startsWith('<!doctype') || trimmedVersion.startsWith('<html') || trimmedVersion.length > 50) {
+          console.warn('[APP] Resposta parece ser HTML ao invés de version.txt, usando fallback:', this.systemVersion);
+          return; // Manter o fallback
+        }
+        
+        this.systemVersion = trimmedVersion;
       } else {
         console.warn('[APP] Não foi possível carregar a versão, usando fallback:', this.systemVersion);
       }
