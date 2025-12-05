@@ -95,16 +95,18 @@ export class AppComponent implements OnInit {
         // A logo retornada é uma URL relativa como /api/logos/{fileName}
         let logoUrl = logoData.Logo || logoData.logo;
         
-        // Se a URL já começa com /api/, verificar se precisa adicionar baseURL
+        // Se a URL já começa com /api/, manter como está (nginx faz proxy)
+        // Em produção, sempre usar URL relativa
+        // Em desenvolvimento, se environment.apiUrl tiver baseURL completo, usar ele
         if (logoUrl && logoUrl.startsWith('/api/')) {
-          // Se estiver em desenvolvimento (ng serve), usar baseURL completo
-          if (!environment.production && environment.apiUrl) {
-            // Remover /api do baseURL se existir e construir URL completa
+          // Em produção, manter URL relativa (nginx faz proxy)
+          // Em desenvolvimento, verificar se precisa construir URL completa
+          if (!environment.production && environment.apiUrl && !environment.apiUrl.startsWith('/')) {
+            // environment.apiUrl tem baseURL completo (ex: http://localhost:5000/api)
             const baseUrl = environment.apiUrl.replace('/api', '');
             logoUrl = baseUrl + logoUrl;
-          } else {
-            // Em produção, manter URL relativa (nginx faz proxy)
           }
+          // Caso contrário, manter logoUrl como está (relativa)
         }
         
         this.clienteLogo = logoUrl;

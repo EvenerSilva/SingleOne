@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subscription, interval } from 'rxjs';
 import { TinOneConfigService } from '../../services/tinone-config.service';
+import { UtilService } from 'src/app/util/util.service';
 
 /**
  * Componente principal do widget TinOne
@@ -21,7 +22,10 @@ export class TinOneWidgetComponent implements OnInit, OnDestroy {
   private wasAuthenticatedBefore = false;
   private subscriptions: Subscription[] = [];
 
-  constructor(private configService: TinOneConfigService) {}
+  constructor(
+    private configService: TinOneConfigService,
+    private util: UtilService
+  ) {}
 
   ngOnInit(): void {
     // Verifica autenticação continuamente (a cada 2 segundos)
@@ -106,11 +110,12 @@ export class TinOneWidgetComponent implements OnInit, OnDestroy {
    */
   private checkAuthentication(): void {
     try {
-      const token = localStorage.getItem('token');
-      const usuario = localStorage.getItem('usuario');
+      // O sistema SingleOne armazena a sessão em localStorage.getItem('usuario')
+      // que contém um objeto JSON com { token, usuario: {...}, cliente, ... }
+      const session = this.util.getSession('usuario');
       
-      // Considera autenticado se tiver token E usuário
-      this.isAuthenticated = !!(token && usuario);
+      // Considera autenticado se tiver sessão E token dentro da sessão
+      this.isAuthenticated = !!(session && session.token);
     } catch (error) {
       console.error('[Oni Widget] Erro ao verificar autenticação:', error);
       this.isAuthenticated = false;
