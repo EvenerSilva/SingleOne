@@ -31,6 +31,22 @@ services:
       retries: 5
 
   # ==========================================
+  # Ollama (IA para TinOne - Opcional)
+  # ==========================================
+  ollama:
+    image: ollama/ollama:latest
+    container_name: singleone-ollama
+    restart: unless-stopped
+    volumes:
+      - ollama_data:/root/.ollama
+    ports:
+      - "11434:11434"
+    networks:
+      - singleone-network
+    # Ollama é opcional - o TinOne funciona sem ele (usando apenas FAQ)
+    # Se não quiser usar Ollama, comente este serviço e configure OLLAMA_URL= no backend
+
+  # ==========================================
   # Backend API (.NET 6.0)
   # ==========================================
   backend:
@@ -49,12 +65,16 @@ services:
       DB_USER: postgres
       DB_PASSWORD: ${DB_PASSWORD:-postgres}
       SITE_URL: ${SITE_URL:-http://localhost:4200}
+      OLLAMA_URL: ${OLLAMA_URL:-http://ollama:11434}
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3.2:3b}
       # SMTP - Configurado pelo banco de dados
     ports:
       - "5000:5000"
     depends_on:
       postgres:
         condition: service_healthy
+      ollama:
+        condition: service_started
     networks:
       - singleone-network
     volumes:
@@ -97,6 +117,8 @@ services:
     image: singleone-frontend:1.1.0
     container_name: singleone-frontend
     restart: unless-stopped
+    environment:
+      API_URL: ${API_URL:-/api}
     ports:
       - "80:80"
       - "443:443"
@@ -127,4 +149,6 @@ volumes:
   backend_logs:
     driver: local
   pgadmin_data:
+    driver: local
+  ollama_data:
     driver: local

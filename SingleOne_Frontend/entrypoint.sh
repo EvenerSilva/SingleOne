@@ -8,11 +8,11 @@
 cat > /usr/share/nginx/html/assets/env.js << EOF
 (function(window) {
   window.__env = window.__env || {};
-  window.__env.apiUrl = "${API_URL:-http://localhost:5000/api/}";
+  window.__env.apiUrl = "${API_URL:-/api}";
 }(this));
 EOF
 
-echo "🚀 Frontend configurado com API_URL: ${API_URL:-http://localhost:5000/api/}"
+echo "🚀 Frontend configurado com API_URL: ${API_URL:-/api}"
 
 # Executar comando passado (nginx)
 exec "$@"

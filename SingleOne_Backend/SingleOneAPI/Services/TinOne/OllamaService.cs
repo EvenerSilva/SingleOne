@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace SingleOneAPI.Services.TinOne
@@ -23,15 +24,22 @@ namespace SingleOneAPI.Services.TinOne
         private readonly string _ollamaUrl;
         private readonly string _modelo;
 
-        public OllamaService(ILogger<OllamaService> logger)
+        public OllamaService(IConfiguration configuration, ILogger<OllamaService> logger)
         {
             _logger = logger;
-            _ollamaUrl = "http://localhost:11434"; // Porta padrão do Ollama
-            _modelo = "llama3.2:3b"; // Modelo padrão
+            // Lê a URL do Ollama da variável de ambiente ou usa padrão
+            _ollamaUrl = configuration["OLLAMA_URL"] 
+                        ?? Environment.GetEnvironmentVariable("OLLAMA_URL") 
+                        ?? "http://ollama:11434"; // Padrão: serviço Docker
+            _modelo = configuration["OLLAMA_MODEL"] 
+                     ?? Environment.GetEnvironmentVariable("OLLAMA_MODEL") 
+                     ?? "llama3.2:3b"; // Modelo padrão
+            
+            _logger.LogInformation($"[Ollama] Configurado - URL: {_ollamaUrl}, Modelo: {_modelo}");
             
             _httpClient = new HttpClient
             {
-                Timeout = TimeSpan.FromSeconds(5) // Timeout curto para verificações rápidas
+                Timeout = TimeSpan.FromSeconds(30) // Timeout aumentado para geração de respostas
             };
         }
 
