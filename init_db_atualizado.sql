@@ -1771,7 +1771,7 @@ WITH equipamentos_alocados AS (
     LEFT JOIN modelos m ON m.id = e.modelo
     LEFT JOIN empresas emp ON emp.id = c.empresa
     LEFT JOIN centrocusto cc ON cc.id = c.centrocusto
-    LEFT JOIN localidades loc ON loc.id = c.localidade
+    LEFT JOIN localidades loc ON loc.id = c.localidade_id
     WHERE ri.dtdevolucao IS NULL AND ri.equipamento IS NOT NULL AND (c.dtdemissao IS NULL OR c.dtdemissao > now()) AND (e.tipoaquisicao IS NULL OR e.tipoaquisicao <> 2) AND e.equipamentostatus = 4
 ),
 contagem_equipamentos AS (
