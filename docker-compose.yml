@@ -79,6 +79,7 @@ services:
       - singleone-network
     volumes:
       - backend_logs:/app/logs
+      - backend_wwwroot:/app/wwwroot
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
       interval: 30s
@@ -147,6 +148,8 @@ volumes:
   postgres_data:
     driver: local
   backend_logs:
+    driver: local
+  backend_wwwroot:
     driver: local
   pgadmin_data:
     driver: local
