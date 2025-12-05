@@ -1804,6 +1804,192 @@ ORDER BY ea.colaborador_nome, ea.tipo_equipamento_descricao;
 
 COMMENT ON VIEW vw_nao_conformidade_elegibilidade IS 'Identifica colaboradores que possuem equipamentos mas não são elegíveis conforme políticas';
 
+-- View: equipamentovm (minúsculo)
+CREATE OR REPLACE VIEW equipamentovm AS
+SELECT e.id,
+    e.tipoequipamento AS tipoequipamentoid,
+    COALESCE(te.descricao, 'Nao definido'::character varying) AS tipoequipamento,
+    e.fabricante AS fabricanteid,
+    COALESCE(f.descricao, 'Nao definido'::character varying) AS fabricante,
+    e.modelo AS modeloid,
+    COALESCE(m.descricao, 'Nao definido'::character varying) AS modelo,
+    e.notafiscal AS notafiscalid,
+        CASE
+            WHEN e.notafiscal IS NOT NULL THEN nf.numero::character varying
+            ELSE 'Nao definido'::character varying
+        END AS "Notafiscal",
+    e.equipamentostatus AS equipamentostatusid,
+    COALESCE(es.descricao, 'Nao definido'::character varying) AS equipamentostatus,
+    e.usuario AS usuarioid,
+    COALESCE(u.nome, 'Nao definido'::character varying) AS usuario,
+    e.localidade_id AS localizacaoid,
+        CASE
+            WHEN e.localidade_id = 1 THEN 'Nao definido'::character varying
+            ELSE COALESCE(l.descricao, 'Nao definido'::character varying)
+        END AS localizacao,
+    e.possuibo,
+    e.descricaobo,
+    e.numeroserie,
+    e.patrimonio,
+    e.dtlimitegarantia,
+    e.dtcadastro,
+    e.tipoaquisicao,
+    COALESCE(ta.nome, 'Nao definido'::character varying) AS "TipoAquisicao",
+    e.fornecedor,
+        CASE
+            WHEN e.fornecedor IS NOT NULL THEN forn.nome
+            ELSE 'Nao definido'::character varying
+        END AS "FornecedorNome",
+    e.cliente,
+    NULL::text AS colaboradorid,
+    NULL::text AS colaboradornome,
+    NULL::text AS requisicaoid,
+    e.ativo,
+    COALESCE(e.empresa, cc.empresa) AS empresaid,
+    COALESCE(emp.nome, emp_cc.nome, 'Nao definido'::character varying) AS empresa,
+    e.centrocusto AS centrocustoid,
+    COALESCE(cc.nome, 'Nao definido'::character varying) AS centrocusto,
+    e.contrato AS contratoid,
+    COALESCE(con.descricao, 'Nao definido'::character varying) AS contrato,
+    e.filial_id AS "Filialid",
+    COALESCE(fil.nome, 'Nao definido'::character varying) AS "Filial"
+   FROM equipamentos e
+     LEFT JOIN tipoequipamentos te ON e.tipoequipamento = te.id
+     LEFT JOIN fabricantes f ON e.fabricante = f.id
+     LEFT JOIN modelos m ON e.modelo = m.id
+     LEFT JOIN notasfiscais nf ON e.notafiscal = nf.id
+     LEFT JOIN fornecedores forn ON e.fornecedor = forn.id
+     LEFT JOIN equipamentosstatus es ON e.equipamentostatus = es.id
+     LEFT JOIN usuarios u ON e.usuario = u.id
+     LEFT JOIN localidades l ON e.localidade_id = l.id
+     LEFT JOIN empresas emp ON e.empresa = emp.id
+     LEFT JOIN centrocusto cc ON e.centrocusto = cc.id
+     LEFT JOIN empresas emp_cc ON cc.empresa = emp_cc.id
+     LEFT JOIN contratos con ON e.contrato = con.id
+     LEFT JOIN filiais fil ON e.filial_id = fil.id
+     LEFT JOIN tipoaquisicao ta ON e.tipoaquisicao = ta.id
+  WHERE e.ativo = true;
+
+-- View: termoentregavm (minúsculo)
+CREATE OR REPLACE VIEW termoentregavm AS
+SELECT te.descricao AS tipoequipamento,
+    f.descricao AS fabricante,
+    m.descricao AS modelo,
+    e.numeroserie,
+    e.patrimonio,
+    ri.dtentrega,
+    ri.observacaoentrega,
+    ri.dtprogramadaretorno,
+    r.hashrequisicao,
+    r.colaboradorfinal,
+    r.cliente,
+        CASE
+            WHEN e.tipoaquisicao = 2 THEN 2
+            ELSE 1
+        END AS tipoaquisicao
+   FROM equipamentos e
+     JOIN requisicoesitens ri ON e.id = ri.equipamento
+     JOIN requisicoes r ON ri.requisicao = r.id
+     JOIN tipoequipamentos te ON e.tipoequipamento = te.id
+     LEFT JOIN fabricantes f ON e.fabricante = f.id
+     LEFT JOIN modelos m ON e.modelo = m.id
+  WHERE r.requisicaostatus = 3 AND ri.dtdevolucao IS NULL;
+
+-- View: vw_colaboradores_simples
+CREATE OR REPLACE VIEW vw_colaboradores_simples AS
+SELECT c.id,
+    c.nome,
+    c.cpf,
+    c.matricula,
+    c.email,
+    c.cargo,
+    c.setor,
+    c.dtadmissao,
+    c.situacao,
+    c.empresa,
+    e.nome AS empresa_nome,
+    c.centrocusto,
+    cc.nome AS centro_custo_nome,
+    c.filial_id,
+    f.nome AS filial_nome,
+    c.localidade_id,
+    l.descricao AS localidade_nome,
+    COALESCE(c.cliente, e.cliente) AS cliente,
+    cl.razaosocial AS cliente_nome
+   FROM colaboradores c
+     JOIN empresas e ON c.empresa = e.id
+     JOIN centrocusto cc ON c.centrocusto = cc.id
+     LEFT JOIN filiais f ON c.filial_id = f.id
+     LEFT JOIN localidades l ON c.localidade_id = l.id
+     JOIN clientes cl ON COALESCE(c.cliente, e.cliente) = cl.id;
+
+-- View: vw_equipamentos_simples
+CREATE OR REPLACE VIEW vw_equipamentos_simples AS
+SELECT e.id,
+    e.numeroserie,
+    e.patrimonio,
+    e.dtcadastro,
+    e.ativo,
+    e.empresa,
+    emp.nome AS empresa_nome,
+    e.centrocusto,
+    cc.nome AS centro_custo_nome,
+    e.filial_id,
+    f.nome AS filial_nome,
+    e.localidade_id,
+    l.descricao AS localidade_nome,
+    COALESCE(e.cliente, emp.cliente) AS cliente,
+    cl.razaosocial AS cliente_nome
+   FROM equipamentos e
+     LEFT JOIN empresas emp ON e.empresa = emp.id
+     LEFT JOIN centrocusto cc ON e.centrocusto = cc.id
+     LEFT JOIN filiais f ON e.filial_id = f.id
+     LEFT JOIN localidades l ON e.localidade_id = l.id
+     LEFT JOIN clientes cl ON COALESCE(e.cliente, emp.cliente) = cl.id;
+
+-- View: vwestoquelinhasalerta
+CREATE OR REPLACE VIEW vwestoquelinhasalerta AS
+SELECT c.cliente,
+    l.descricao AS localidade,
+    o.nome AS operadora,
+    c.nome AS contrato,
+    p.nome AS plano,
+    eml.perfiluso,
+    count(
+        CASE
+            WHEN tl.emuso = false AND tl.ativo = true THEN 1
+            ELSE NULL::integer
+        END) AS estoqueatual,
+    eml.quantidademinima AS estoqueminimo,
+        CASE
+            WHEN count(
+            CASE
+                WHEN tl.emuso = false AND tl.ativo = true THEN 1
+                ELSE NULL::integer
+            END) < eml.quantidademinima THEN 'ALERTA'::text
+            ELSE 'OK'::text
+        END AS status,
+        CASE
+            WHEN count(
+            CASE
+                WHEN tl.emuso = false AND tl.ativo = true THEN 1
+                ELSE NULL::integer
+            END) < eml.quantidademinima THEN eml.quantidademinima - count(
+            CASE
+                WHEN tl.emuso = false AND tl.ativo = true THEN 1
+                ELSE NULL::integer
+            END)
+            ELSE 0::bigint
+        END AS quantidadefaltante
+   FROM telefonialinhas tl
+     JOIN telefoniaplanos p ON tl.plano = p.id
+     JOIN telefoniacontratos c ON p.contrato = c.id
+     JOIN telefoniaoperadoras o ON c.operadora = o.id
+     JOIN estoqueminimolinhas eml ON c.operadora = eml.operadora AND p.id = eml.plano AND c.cliente = eml.cliente
+     JOIN localidades l ON eml.localidade = l.id
+  WHERE eml.ativo = true
+  GROUP BY c.cliente, l.descricao, o.nome, c.nome, p.nome, eml.perfiluso, eml.quantidademinima;
+
 -- =====================================================
 -- TRIGGERS E FUNÇÕES
 -- =====================================================
