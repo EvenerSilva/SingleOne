@@ -28,6 +28,23 @@ export class TinOneWidgetComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    // Inscrever-se nas mudanças de configuração
+    const configSub = this.configService.config$.subscribe(config => {
+      if (this.isAuthenticated) {
+        this.updateEnabledState();
+      }
+    });
+    this.subscriptions.push(configSub);
+
+    // Listener para recarregamento de configuração
+    const reloadListener = () => {
+      this.configService.reload();
+    };
+    window.addEventListener('tinone-config-reload', reloadListener);
+    this.subscriptions.push({
+      unsubscribe: () => window.removeEventListener('tinone-config-reload', reloadListener)
+    } as Subscription);
+
     // Verifica autenticação continuamente (a cada 2 segundos)
     const authCheckSub = interval(2000).subscribe(() => {
       this.checkAuthentication();
@@ -72,10 +89,16 @@ export class TinOneWidgetComponent implements OnInit, OnDestroy {
     const config = this.configService.getConfig();
     
     if (config) {
-      this.posicao = config.posicao;
-      this.corPrimaria = config.corPrimaria;
-      this.isEnabled = config.habilitado && config.chatHabilitado;
+      this.posicao = config.posicao || 'bottom-right';
+      this.corPrimaria = config.corPrimaria || '#4a90e2';
+      this.isEnabled = !!(config.habilitado && config.chatHabilitado);
+      console.log('[Oni Widget] Config atualizada:', {
+        habilitado: config.habilitado,
+        chatHabilitado: config.chatHabilitado,
+        isEnabled: this.isEnabled
+      });
     } else {
+      console.log('[Oni Widget] Config não disponível ainda');
       this.isEnabled = false;
     }
   }

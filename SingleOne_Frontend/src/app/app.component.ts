@@ -109,8 +109,10 @@ export class AppComponent implements OnInit {
           // Caso contrário, manter logoUrl como está (relativa)
         }
         
+        console.log('[APP] Logo do cliente carregada:', logoUrl);
         this.clienteLogo = logoUrl;
       } else {
+        console.log('[APP] Nenhuma logo retornada pelo backend');
         this.clienteLogo = null;
       }
     } catch (error) {

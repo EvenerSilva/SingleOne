@@ -173,10 +173,16 @@ export class TinOneConfigComponent implements OnInit {
           // Recarregar configurações sem recarregar a página inteira
           setTimeout(() => {
             this.carregarConfiguracoes();
-            // Recarregar configuração do TinOne widget se estiver disponível
-            if (window.location) {
-              // Forçar atualização do widget TinOne
-              window.dispatchEvent(new Event('tinone-config-reload'));
+          }, 500);
+          
+          // Notificar widget TinOne para recarregar configuração
+          setTimeout(() => {
+            // Disparar evento customizado para o widget recarregar
+            window.dispatchEvent(new Event('tinone-config-reload'));
+            // Também forçar recarregamento do serviço
+            const tinOneConfigService = (window as any).tinOneConfigService;
+            if (tinOneConfigService && tinOneConfigService.reload) {
+              tinOneConfigService.reload();
             }
           }, 1000);
         },
