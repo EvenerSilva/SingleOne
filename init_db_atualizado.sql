@@ -2581,7 +2581,10 @@ INSERT INTO Localidades(Descricao, Ativo, Cliente) VALUES('Padrão', FALSE, 1) O
 -- Inserir Tipo de Equipamento para Telefonia (necessário para recursos de telefonia)
 INSERT INTO TipoEquipamentos(Descricao, ativo) VALUES('Linha Telefonica', true) ON CONFLICT DO NOTHING;
 -- Associar tipo de equipamento ao cliente (necessário para ListarTiposRecursos funcionar)
-INSERT INTO TipoEquipamentosClientes(Cliente, Tipo) VALUES(1, 1) ON CONFLICT DO NOTHING;
+-- NOTA: O tipo ID=1 (Linha Telefonica) é excluído na listagem, mas precisa existir na tabela de relacionamento
+INSERT INTO TipoEquipamentosClientes(Cliente, Tipo) 
+SELECT 1, 1 
+WHERE NOT EXISTS (SELECT 1 FROM TipoEquipamentosClientes WHERE Cliente = 1 AND Tipo = 1);
 INSERT INTO Fabricantes(TipoEquipamento, Descricao, Ativo, Cliente) VALUES(1, 'Linha Telefonica', false, 1) ON CONFLICT DO NOTHING;
 INSERT INTO Modelos(Fabricante, Descricao, Ativo, Cliente) VALUES(1, 'Linha Telefonica', false, 1) ON CONFLICT DO NOTHING;
 
