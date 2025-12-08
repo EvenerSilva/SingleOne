@@ -304,7 +304,7 @@ CREATE TABLE IF NOT EXISTS CentroCusto
 CREATE TABLE IF NOT EXISTS Colaboradores
 (
 	Id serial not null primary key,
-	Cliente int not null,
+	Cliente int,
 	Usuario int not null,
 	Empresa int not null,
 	CentroCusto int not null,
@@ -336,8 +336,9 @@ CREATE TABLE IF NOT EXISTS Colaboradores
 	constraint fkColaboradorEmpresa foreign key (Empresa) references Empresas(Id),
 	constraint fkColaboradorCentroCusto foreign key (CentroCusto) references CentroCusto(Id),
 	constraint fkColaboradorLocalidade foreign key (Localidade) references Localidades(Id),
+	constraint fkColaboradorLocalidadeId foreign key (Localidade_Id) references Localidades(Id),
+	constraint fkColaboradorFilial foreign key (Filial_Id) references Filiais(Id),
 	constraint fkColaboradorCliente foreign key (Cliente) references Clientes(Id)
-	-- NOTA: FK para Filiais será adicionada após criação da tabela Filiais
 );
 
 -- =====================================================
@@ -400,7 +401,7 @@ CREATE TABLE IF NOT EXISTS TelefoniaLinhas
 CREATE TABLE IF NOT EXISTS Equipamentos
 (
 	Id serial not null primary key,
-	Cliente int not null,
+	Cliente int,
 	TipoEquipamento int not null,
 	Fabricante int not null,
 	Modelo int not null,
@@ -409,6 +410,8 @@ CREATE TABLE IF NOT EXISTS Equipamentos
 	EquipamentoStatus int,
 	Usuario int,
 	Localizacao int,
+	Localidade_Id int,
+	Filial_Id int,
 	TipoAquisicao int not null,
 	Fornecedor int,
 	PossuiBO boolean not null,
@@ -432,6 +435,8 @@ CREATE TABLE IF NOT EXISTS Equipamentos
 	constraint fkEquipamentoStatus foreign key (EquipamentoStatus) references EquipamentosStatus(Id),
 	constraint fkEquipamentoUsuario foreign key (Usuario) references Usuarios(Id),
 	constraint fkEquipamentoLocalidade foreign key (Localizacao) references Localidades(Id),
+	constraint fkEquipamentoLocalidadeId foreign key (Localidade_Id) references Localidades(Id),
+	constraint fkEquipamentoFilial foreign key (Filial_Id) references Filiais(Id),
 	constraint fkEquipamentoEmpresa foreign key (Empresa) references Empresas(Id),
 	constraint fkEquipamentoCentro foreign key (CentroCusto) references centrocusto(Id),
 	constraint fkEquipamentoFornecedor foreign key (Fornecedor) references Fornecedores(Id),
@@ -540,10 +545,13 @@ CREATE TABLE IF NOT EXISTS Requisicoes
 	TecnicoResponsavel int not null,
 	RequisicaoStatus int not null,
 	ColaboradorFinal int,
-	DtSolicitacao timestamp not null,
+	DtSolicitacao timestamp,
 	DtProcessamento timestamp,
 	AssinaturaEletronica boolean not null,
 	DtAssinaturaEletronica timestamp,
+	conteudo_template_assinado TEXT,
+	tipo_termo_assinado int,
+	versao_template_assinado int,
 	DtEnvioTermo timestamp,
 	HashRequisicao varchar(200) not null,
 	MigrateID int,
@@ -860,6 +868,23 @@ CREATE TABLE IF NOT EXISTS PARAMETROS
 	Id serial primary key not null,
 	Cliente int not null,
 	EmailReporte varchar(300),
+	-- Configuração de E-mail para Descontos
+	email_descontos_enabled BOOLEAN DEFAULT false,
+	-- Configurações de SMTP
+	smtp_enabled BOOLEAN DEFAULT false,
+	smtp_host VARCHAR(200),
+	smtp_port INTEGER,
+	smtp_login VARCHAR(200),
+	smtp_password VARCHAR(200),
+	smtp_enable_ssl BOOLEAN DEFAULT false,
+	smtp_email_from VARCHAR(200),
+	-- Configurações de 2FA (Duplo Fator)
+	two_factor_enabled BOOLEAN DEFAULT false,
+	two_factor_type VARCHAR(50) DEFAULT 'email',
+	two_factor_expiration_minutes INTEGER DEFAULT 5,
+	two_factor_max_attempts INTEGER DEFAULT 3,
+	two_factor_lockout_minutes INTEGER DEFAULT 15,
+	two_factor_email_template TEXT,
 	constraint fkParametrosCliente foreign key (Cliente) references Clientes(Id)
 );
 
@@ -1071,21 +1096,21 @@ CREATE TABLE IF NOT EXISTS geolocalizacao_assinatura (
     CONSTRAINT fk_geolocalizacao_usuario FOREIGN KEY (usuario_logado_id) REFERENCES Usuarios(Id)
 );
 
--- Tabela: Requisiço Item Compartilhado
-CREATE TABLE IF NOT EXISTS RequisicaoItemCompartilhado (
-    Id SERIAL PRIMARY KEY,
-    RequisicaoItemId INTEGER NOT NULL,
-    ColaboradorId INTEGER NOT NULL,
-    TipoAcesso VARCHAR(50) NOT NULL DEFAULT 'usuario_compartilhado',
-    DataInicio TIMESTAMP NOT NULL DEFAULT NOW(),
-    DataFim TIMESTAMP,
-    Observacao TEXT,
-    Ativo BOOLEAN NOT NULL DEFAULT true,
-    CriadoPor INTEGER NOT NULL,
-    CriadoEm TIMESTAMP NOT NULL DEFAULT NOW(),
-    CONSTRAINT fk_req_comp_item FOREIGN KEY (RequisicaoItemId) REFERENCES RequisicoesItens(Id) ON DELETE CASCADE,
-    CONSTRAINT fk_req_comp_colaborador FOREIGN KEY (ColaboradorId) REFERENCES Colaboradores(Id) ON DELETE CASCADE,
-    CONSTRAINT fk_req_comp_usuario FOREIGN KEY (CriadoPor) REFERENCES Usuarios(Id)
+-- Tabela: Requisição Item Compartilhado
+CREATE TABLE IF NOT EXISTS requisicoes_itens_compartilhados (
+    id SERIAL PRIMARY KEY,
+    requisicao_item_id INTEGER NOT NULL,
+    colaborador_id INTEGER NOT NULL,
+    tipo_acesso VARCHAR(50) NOT NULL DEFAULT 'usuario_compartilhado',
+    data_inicio TIMESTAMP NOT NULL DEFAULT NOW(),
+    data_fim TIMESTAMP,
+    observacao TEXT,
+    ativo BOOLEAN NOT NULL DEFAULT true,
+    criado_por INTEGER NOT NULL,
+    criado_em TIMESTAMP NOT NULL DEFAULT NOW(),
+    CONSTRAINT fk_req_comp_item FOREIGN KEY (requisicao_item_id) REFERENCES RequisicoesItens(Id) ON DELETE RESTRICT,
+    CONSTRAINT fk_req_comp_colaborador FOREIGN KEY (colaborador_id) REFERENCES Colaboradores(Id) ON DELETE RESTRICT,
+    CONSTRAINT fk_req_comp_usuario FOREIGN KEY (criado_por) REFERENCES Usuarios(Id) ON DELETE RESTRICT
 );
 
 -- =====================================================
@@ -2518,23 +2543,7 @@ CREATE TABLE IF NOT EXISTS LaudoEvidencias
     constraint fkLaudoEvidencia foreign key (Laudo) references Laudos(Id)
 );
 
--- Tabela: Requisicoes_Itens_Compartilhados
-CREATE TABLE IF NOT EXISTS Requisicoes_Itens_Compartilhados
-(
-    Id serial not null primary key,
-    Requisicao_Item_Id int not null,
-    Colaborador_Id int not null,
-    Tipo_Acesso varchar(50) default 'usuario_compartilhado' not null,
-    Data_Inicio timestamp default CURRENT_TIMESTAMP not null,
-    Data_Fim timestamp,
-    Observacao text,
-    Ativo boolean default true not null,
-    Criado_Por int not null,
-    Criado_Em timestamp default CURRENT_TIMESTAMP not null,
-    constraint fkReqItemComp_ReqItem foreign key (Requisicao_Item_Id) references RequisicoesItens(Id),
-    constraint fkReqItemComp_Colaborador foreign key (Colaborador_Id) references Colaboradores(Id),
-    constraint fkReqItemComp_CriadoPor foreign key (Criado_Por) references Usuarios(Id)
-);
+-- Tabela duplicada removida - usar requisicoes_itens_compartilhados acima
 
 -- Tabela: TinOne_Config
 CREATE TABLE IF NOT EXISTS TinOne_Config
