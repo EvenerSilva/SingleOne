@@ -721,6 +721,7 @@ CREATE TABLE IF NOT EXISTS cargosconfianca (
     id SERIAL PRIMARY KEY,
     cliente INTEGER NOT NULL,
     cargo VARCHAR(200) NOT NULL,
+    usarpadrao BOOLEAN NOT NULL DEFAULT true,
     nivelcriticidade VARCHAR(20) NOT NULL DEFAULT 'ALTO',
     obrigarsanitizacao BOOLEAN NOT NULL DEFAULT false,
     obrigardescaracterizacao BOOLEAN NOT NULL DEFAULT false,
@@ -1011,6 +1012,22 @@ BEGIN
 
 	IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'parametros' AND column_name = 'two_factor_email_template') THEN
 		ALTER TABLE parametros ADD COLUMN two_factor_email_template TEXT;
+	END IF;
+END $$;
+
+-- Adicionar colunas faltantes em cargosconfianca se a tabela já existir (migração)
+DO $$
+BEGIN
+	IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'cargosconfianca' AND column_name = 'usarpadrao') THEN
+		ALTER TABLE cargosconfianca ADD COLUMN usarpadrao BOOLEAN NOT NULL DEFAULT true;
+	END IF;
+END $$;
+
+-- Adicionar colunas faltantes em politicas_elegibilidade se a tabela já existir (migração)
+DO $$
+BEGIN
+	IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'politicas_elegibilidade' AND column_name = 'usarpadrao') THEN
+		ALTER TABLE politicas_elegibilidade ADD COLUMN usarpadrao BOOLEAN NOT NULL DEFAULT true;
 	END IF;
 END $$;
 
