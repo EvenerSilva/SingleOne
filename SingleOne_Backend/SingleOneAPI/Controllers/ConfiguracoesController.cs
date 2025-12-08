@@ -1025,8 +1025,21 @@ namespace SingleOne.Controllers
                 var parametro = _negocio.ObterParametros(cliente);
                 if (parametro == null)
                 {
-                    // Retornar um objeto vazio ao invés de null para evitar erro 500
-                    return Ok(new Parametro { Cliente = cliente });
+                    // Retornar um objeto com valores padrão ao invés de null para evitar erro 500
+                    return Ok(new Parametro 
+                    { 
+                        Cliente = cliente,
+                        EmailDescontosEnabled = false,
+                        SmtpEnabled = false,
+                        SmtpEnableSSL = false,
+                        SmtpPort = 587,
+                        TwoFactorEnabled = false,
+                        TwoFactorType = "email",
+                        TwoFactorExpirationMinutes = 5,
+                        TwoFactorMaxAttempts = 3,
+                        TwoFactorLockoutMinutes = 15,
+                        TwoFactorEmailTemplate = "Seu código de verificação é: {CODE}. Este código expira em {EXPIRATION} minutos."
+                    });
                 }
                 return Ok(parametro);
             }
