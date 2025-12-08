@@ -2550,25 +2550,39 @@ CREATE INDEX IF NOT EXISTS idx_req_comp_ativo ON RequisicaoItemCompartilhado(Ati
 -- =====================================================
 
 -- Inserir Cliente SingleOne
-INSERT INTO clientes(razaosocial, cnpj, ativo) VALUES('SingleOne', '51908470000199', true)
-ON CONFLICT DO NOTHING;
+INSERT INTO clientes(razaosocial, cnpj, ativo) 
+SELECT 'SingleOne', '51908470000199', true
+WHERE NOT EXISTS (SELECT 1 FROM clientes WHERE cnpj = '51908470000199');
 
 -- Inserir Status de Requisições
-INSERT INTO RequisicoesStatus(Descricao, ativo) VALUES('Ativa', true) ON CONFLICT DO NOTHING;
-INSERT INTO RequisicoesStatus(Descricao, ativo) VALUES('Cancelada', true) ON CONFLICT DO NOTHING;
-INSERT INTO RequisicoesStatus(Descricao, ativo) VALUES('Processada', true) ON CONFLICT DO NOTHING;
+INSERT INTO RequisicoesStatus(Descricao, ativo) 
+SELECT 'Ativa', true WHERE NOT EXISTS (SELECT 1 FROM RequisicoesStatus WHERE Descricao = 'Ativa');
+INSERT INTO RequisicoesStatus(Descricao, ativo) 
+SELECT 'Cancelada', true WHERE NOT EXISTS (SELECT 1 FROM RequisicoesStatus WHERE Descricao = 'Cancelada');
+INSERT INTO RequisicoesStatus(Descricao, ativo) 
+SELECT 'Processada', true WHERE NOT EXISTS (SELECT 1 FROM RequisicoesStatus WHERE Descricao = 'Processada');
 
 -- Inserir Status de Equipamentos
-INSERT INTO EquipamentosStatus(Descricao, ativo) VALUES('Danificado', true) ON CONFLICT DO NOTHING;
-INSERT INTO EquipamentosStatus(Descricao, ativo) VALUES('Devolvido', true) ON CONFLICT DO NOTHING;
-INSERT INTO EquipamentosStatus(Descricao, ativo) VALUES('Em estoque', true) ON CONFLICT DO NOTHING;
-INSERT INTO EquipamentosStatus(Descricao, ativo) VALUES('Entregue', true) ON CONFLICT DO NOTHING;
-INSERT INTO EquipamentosStatus(Descricao, ativo) VALUES('Extraviado', true) ON CONFLICT DO NOTHING;
-INSERT INTO EquipamentosStatus(Descricao, ativo) VALUES('Novo', true) ON CONFLICT DO NOTHING;
-INSERT INTO EquipamentosStatus(Descricao, ativo) VALUES('Requisitado', true) ON CONFLICT DO NOTHING;
-INSERT INTO EquipamentosStatus(Descricao, ativo) VALUES('Roubado', true) ON CONFLICT DO NOTHING;
-INSERT INTO EquipamentosStatus(Descricao, ativo) VALUES('Sinistrado', true) ON CONFLICT DO NOTHING;
-INSERT INTO EquipamentosStatus(Descricao, ativo) VALUES('Descartado', true) ON CONFLICT DO NOTHING;
+INSERT INTO EquipamentosStatus(Descricao, ativo) 
+SELECT 'Danificado', true WHERE NOT EXISTS (SELECT 1 FROM EquipamentosStatus WHERE Descricao = 'Danificado');
+INSERT INTO EquipamentosStatus(Descricao, ativo) 
+SELECT 'Devolvido', true WHERE NOT EXISTS (SELECT 1 FROM EquipamentosStatus WHERE Descricao = 'Devolvido');
+INSERT INTO EquipamentosStatus(Descricao, ativo) 
+SELECT 'Em estoque', true WHERE NOT EXISTS (SELECT 1 FROM EquipamentosStatus WHERE Descricao = 'Em estoque');
+INSERT INTO EquipamentosStatus(Descricao, ativo) 
+SELECT 'Entregue', true WHERE NOT EXISTS (SELECT 1 FROM EquipamentosStatus WHERE Descricao = 'Entregue');
+INSERT INTO EquipamentosStatus(Descricao, ativo) 
+SELECT 'Extraviado', true WHERE NOT EXISTS (SELECT 1 FROM EquipamentosStatus WHERE Descricao = 'Extraviado');
+INSERT INTO EquipamentosStatus(Descricao, ativo) 
+SELECT 'Novo', true WHERE NOT EXISTS (SELECT 1 FROM EquipamentosStatus WHERE Descricao = 'Novo');
+INSERT INTO EquipamentosStatus(Descricao, ativo) 
+SELECT 'Requisitado', true WHERE NOT EXISTS (SELECT 1 FROM EquipamentosStatus WHERE Descricao = 'Requisitado');
+INSERT INTO EquipamentosStatus(Descricao, ativo) 
+SELECT 'Roubado', true WHERE NOT EXISTS (SELECT 1 FROM EquipamentosStatus WHERE Descricao = 'Roubado');
+INSERT INTO EquipamentosStatus(Descricao, ativo) 
+SELECT 'Sinistrado', true WHERE NOT EXISTS (SELECT 1 FROM EquipamentosStatus WHERE Descricao = 'Sinistrado');
+INSERT INTO EquipamentosStatus(Descricao, ativo) 
+SELECT 'Descartado', true WHERE NOT EXISTS (SELECT 1 FROM EquipamentosStatus WHERE Descricao = 'Descartado');
 
 -- Inserir Usuário Administrador
 INSERT INTO Usuarios(Cliente, Nome, Email, Senha, PalavraCriptografada, Su, Adm, Operador, consulta, Ativo) 
@@ -2576,17 +2590,25 @@ VALUES(1, 'Adminstrador', 'administrador@singleone.tech', 'MTQyNTM2QEFkbWlu', ''
 ON CONFLICT (Email) DO NOTHING;
 
 -- Inserir Localidades Padrão
-INSERT INTO Localidades(Descricao, Ativo, Cliente) VALUES('Padrão', FALSE, 1) ON CONFLICT DO NOTHING;
+INSERT INTO Localidades(Descricao, Ativo, Cliente) 
+SELECT 'Padrão', FALSE, 1 
+WHERE NOT EXISTS (SELECT 1 FROM Localidades WHERE Cliente = 1 AND Descricao = 'Padrão');
 
 -- Inserir Tipo de Equipamento para Telefonia (necessário para recursos de telefonia)
-INSERT INTO TipoEquipamentos(Descricao, ativo) VALUES('Linha Telefonica', true) ON CONFLICT DO NOTHING;
+INSERT INTO TipoEquipamentos(Descricao, ativo) 
+SELECT 'Linha Telefonica', true 
+WHERE NOT EXISTS (SELECT 1 FROM TipoEquipamentos WHERE Descricao = 'Linha Telefonica');
 -- Associar tipo de equipamento ao cliente (necessário para ListarTiposRecursos funcionar)
 -- NOTA: O tipo ID=1 (Linha Telefonica) é excluído na listagem, mas precisa existir na tabela de relacionamento
 INSERT INTO TipoEquipamentosClientes(Cliente, Tipo) 
-SELECT 1, 1 
-WHERE NOT EXISTS (SELECT 1 FROM TipoEquipamentosClientes WHERE Cliente = 1 AND Tipo = 1);
-INSERT INTO Fabricantes(TipoEquipamento, Descricao, Ativo, Cliente) VALUES(1, 'Linha Telefonica', false, 1) ON CONFLICT DO NOTHING;
-INSERT INTO Modelos(Fabricante, Descricao, Ativo, Cliente) VALUES(1, 'Linha Telefonica', false, 1) ON CONFLICT DO NOTHING;
+SELECT 1, (SELECT Id FROM TipoEquipamentos WHERE Descricao = 'Linha Telefonica' LIMIT 1)
+WHERE NOT EXISTS (SELECT 1 FROM TipoEquipamentosClientes WHERE Cliente = 1 AND Tipo = (SELECT Id FROM TipoEquipamentos WHERE Descricao = 'Linha Telefonica' LIMIT 1));
+INSERT INTO Fabricantes(TipoEquipamento, Descricao, Ativo, Cliente) 
+SELECT (SELECT Id FROM TipoEquipamentos WHERE Descricao = 'Linha Telefonica' LIMIT 1), 'Linha Telefonica', false, 1 
+WHERE NOT EXISTS (SELECT 1 FROM Fabricantes WHERE Cliente = 1 AND Descricao = 'Linha Telefonica');
+INSERT INTO Modelos(Fabricante, Descricao, Ativo, Cliente) 
+SELECT (SELECT Id FROM Fabricantes WHERE Cliente = 1 AND Descricao = 'Linha Telefonica' LIMIT 1), 'Linha Telefonica', false, 1 
+WHERE NOT EXISTS (SELECT 1 FROM Modelos WHERE Cliente = 1 AND Descricao = 'Linha Telefonica');
 
 -- Inserir Tipos de Aquisiço
 INSERT INTO TipoAquisicao (Id, Nome) VALUES (1, 'Alugado') ON CONFLICT (Id) DO UPDATE SET Nome = 'Alugado';
@@ -2595,16 +2617,26 @@ INSERT INTO TipoAquisicao (Id, Nome) VALUES (3, 'Corporativo') ON CONFLICT (Id) 
 
 -- Inserir Equipamento Dummy (necessário para telefonia)
 INSERT INTO Equipamentos(Cliente, TipoEquipamento, Fabricante, Modelo, EquipamentoStatus, Usuario, Localizacao, PossuiBO, NumeroSerie, DtCadastro, Ativo, TipoAquisicao)
-VALUES(1, 1, 1, 1, 6, 1, 1, false, 'Não cadastrado', now(), false, 3)
-ON CONFLICT DO NOTHING;
+SELECT 1, 
+       (SELECT Id FROM TipoEquipamentos WHERE Descricao = 'Linha Telefonica' LIMIT 1),
+       (SELECT Id FROM Fabricantes WHERE Cliente = 1 AND Descricao = 'Linha Telefonica' LIMIT 1),
+       (SELECT Id FROM Modelos WHERE Cliente = 1 AND Descricao = 'Linha Telefonica' LIMIT 1),
+       6, 1, 1, false, 'Não cadastrado', now(), false, 3
+WHERE NOT EXISTS (SELECT 1 FROM Equipamentos WHERE Cliente = 1 AND NumeroSerie = 'Não cadastrado');
 
 -- Inserir Tipos de Templates
-INSERT INTO TemplateTipos(Id, Descricao) VALUES(1, 'Termo de nada consta') ON CONFLICT DO NOTHING;
-INSERT INTO TemplateTipos(Id, Descricao) VALUES(2, 'Termo de responsabilidade') ON CONFLICT DO NOTHING;
-INSERT INTO TemplateTipos(Id, Descricao) VALUES(3, 'Termo de responsabilidade - BYOD') ON CONFLICT DO NOTHING;
-INSERT INTO TemplateTipos(Id, Descricao) VALUES(4, 'Termo de sinistros') ON CONFLICT DO NOTHING;
-INSERT INTO TemplateTipos(Id, Descricao) VALUES(5, 'Termo de descarte, doação, logística reversa') ON CONFLICT DO NOTHING;
-INSERT INTO TemplateTipos(Id, Descricao) VALUES(6, 'Levantamento de Recursos - Inventário forçado') ON CONFLICT DO NOTHING;
+INSERT INTO TemplateTipos(Id, Descricao) 
+SELECT 1, 'Termo de nada consta' WHERE NOT EXISTS (SELECT 1 FROM TemplateTipos WHERE Id = 1);
+INSERT INTO TemplateTipos(Id, Descricao) 
+SELECT 2, 'Termo de responsabilidade' WHERE NOT EXISTS (SELECT 1 FROM TemplateTipos WHERE Id = 2);
+INSERT INTO TemplateTipos(Id, Descricao) 
+SELECT 3, 'Termo de responsabilidade - BYOD' WHERE NOT EXISTS (SELECT 1 FROM TemplateTipos WHERE Id = 3);
+INSERT INTO TemplateTipos(Id, Descricao) 
+SELECT 4, 'Termo de sinistros' WHERE NOT EXISTS (SELECT 1 FROM TemplateTipos WHERE Id = 4);
+INSERT INTO TemplateTipos(Id, Descricao) 
+SELECT 5, 'Termo de descarte, doação, logística reversa' WHERE NOT EXISTS (SELECT 1 FROM TemplateTipos WHERE Id = 5);
+INSERT INTO TemplateTipos(Id, Descricao) 
+SELECT 6, 'Levantamento de Recursos - Inventário forçado' WHERE NOT EXISTS (SELECT 1 FROM TemplateTipos WHERE Id = 6);
 
 -- =====================================================
 -- TEMPLATES COMPLETOS (OPCIONAL)
@@ -2631,16 +2663,20 @@ INSERT INTO TemplateTipos(Id, Descricao) VALUES(6, 'Levantamento de Recursos - I
 -- =====================================================
 
 -- Inserir Regras de Templates
-INSERT INTO regrasTemplate (TipoTemplate, TipoAquisicao) VALUES (2, 1) ON CONFLICT DO NOTHING;
-INSERT INTO regrasTemplate (TipoTemplate, TipoAquisicao) VALUES (2, 3) ON CONFLICT DO NOTHING;
-INSERT INTO regrasTemplate (TipoTemplate, TipoAquisicao) VALUES (3, 2) ON CONFLICT DO NOTHING;
+INSERT INTO regrasTemplate (TipoTemplate, TipoAquisicao) 
+SELECT 2, 1 WHERE NOT EXISTS (SELECT 1 FROM regrasTemplate WHERE TipoTemplate = 2 AND TipoAquisicao = 1);
+INSERT INTO regrasTemplate (TipoTemplate, TipoAquisicao) 
+SELECT 2, 3 WHERE NOT EXISTS (SELECT 1 FROM regrasTemplate WHERE TipoTemplate = 2 AND TipoAquisicao = 3);
+INSERT INTO regrasTemplate (TipoTemplate, TipoAquisicao) 
+SELECT 3, 2 WHERE NOT EXISTS (SELECT 1 FROM regrasTemplate WHERE TipoTemplate = 3 AND TipoAquisicao = 2);
 
 -- Inserir Status de Contratos
-INSERT INTO contratostatus(id, nome) VALUES 
-	(1, 'Aguardando Inicio Vigência'),
-	(2, 'Vigente'),
-	(3, 'Vencido')
-ON CONFLICT DO NOTHING;
+INSERT INTO contratostatus(id, nome) 
+SELECT 1, 'Aguardando Inicio Vigência' WHERE NOT EXISTS (SELECT 1 FROM contratostatus WHERE id = 1);
+INSERT INTO contratostatus(id, nome) 
+SELECT 2, 'Vigente' WHERE NOT EXISTS (SELECT 1 FROM contratostatus WHERE id = 2);
+INSERT INTO contratostatus(id, nome) 
+SELECT 3, 'Vencido' WHERE NOT EXISTS (SELECT 1 FROM contratostatus WHERE id = 3);
 
 -- Inserir Estados Brasileiros
 INSERT INTO estados (sigla, nome) VALUES
