@@ -423,9 +423,20 @@ namespace SingleOne.Controllers
         /************************************************* TIPOS DE EQUIPAMENTOS ***************************/
         /***************************************************************************************************/
         [HttpGet("[action]/{pesquisa}/{cliente}", Name ="ListarTiposRecursos")]
-        public List<Tipoequipamento> ListarTiposRecursos(string pesquisa, int cliente)
+        public IActionResult ListarTiposRecursos(string pesquisa, int cliente)
         {
-            return _negocio.ListarTiposDeRecursos(pesquisa, cliente);
+            try
+            {
+                var tipos = _negocio.ListarTiposDeRecursos(pesquisa, cliente);
+                return Ok(tipos);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[TIPOS RECURSOS API] ❌ Erro: {ex.Message}");
+                Console.WriteLine($"StackTrace: {ex.StackTrace}");
+                // Retornar lista vazia em caso de erro para evitar 500
+                return Ok(new List<Tipoequipamento>());
+            }
         }
 
         [HttpGet("[action]", Name = "ListarTiposAquisicao")]

@@ -770,6 +770,18 @@ namespace SingleOne.Negocios
                 
                 pesquisa = pesquisa.ToLower();
                 
+                // Verificar se há tipos de equipamentos associados ao cliente
+                var tiposCliente = _tipoequipamentoClienteRepository.Query()
+                    .Where(tec => tec.Cliente == cliente)
+                    .Select(tec => tec.Tipo)
+                    .ToList();
+                
+                if (!tiposCliente.Any())
+                {
+                    Console.WriteLine($"[TIPOS RECURSOS] Nenhum tipo de equipamento associado ao cliente {cliente}");
+                    return new List<Tipoequipamento>();
+                }
+                
                 var tipos = (from te in _tipoequipamentoRepository.Query()
                              join tec in _tipoequipamentoClienteRepository.Query() on te.Id equals tec.Tipo
                              where te.Ativo && tec.Cliente == cliente && 
@@ -3120,8 +3132,11 @@ namespace SingleOne.Negocios
 
                 Console.WriteLine($"[ELEGIBILIDADE] {politicas.Count} políticas encontradas, ordenando...");
 
-                var politicasOrdenadas = politicas
-                    .OrderBy(x => x.TipoColaborador)
+                // Mover ToList() antes do OrderBy para evitar problemas com null
+                var politicasList = politicas.ToList();
+                
+                var politicasOrdenadas = politicasList
+                    .OrderBy(x => x.TipoColaborador ?? "")
                     .ThenBy(x => x.TipoEquipamentoNavigation?.Descricao ?? "")
                     .ToList();
 
