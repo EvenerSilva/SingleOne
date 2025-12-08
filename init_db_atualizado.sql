@@ -341,6 +341,25 @@ CREATE TABLE IF NOT EXISTS Colaboradores
 	constraint fkColaboradorCliente foreign key (Cliente) references Clientes(Id)
 );
 
+-- Adicionar colunas faltantes em Colaboradores se a tabela já existir (migração)
+DO $$
+BEGIN
+	IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'colaboradores' AND column_name = 'localidade_id') THEN
+		ALTER TABLE colaboradores ADD COLUMN localidade_id INTEGER;
+		ALTER TABLE colaboradores ADD CONSTRAINT fkColaboradorLocalidadeId FOREIGN KEY (localidade_id) REFERENCES localidades(id);
+	END IF;
+
+	IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'colaboradores' AND column_name = 'filial_id') THEN
+		ALTER TABLE colaboradores ADD COLUMN filial_id INTEGER;
+		ALTER TABLE colaboradores ADD CONSTRAINT fkColaboradorFilial FOREIGN KEY (filial_id) REFERENCES filiais(id);
+	END IF;
+
+	-- Tornar Cliente nullable se ainda não for
+	IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'colaboradores' AND column_name = 'cliente' AND is_nullable = 'NO') THEN
+		ALTER TABLE colaboradores ALTER COLUMN cliente DROP NOT NULL;
+	END IF;
+END $$;
+
 -- =====================================================
 -- TABELAS DE TELEFONIA
 -- =====================================================
@@ -584,6 +603,27 @@ CREATE TABLE IF NOT EXISTS Requisicoes
 	constraint fkRequisicaoStatus foreign key (RequisicaoStatus) references RequisicoesStatus(Id),
 	constraint fkRequisicaoColaborador foreign key (ColaboradorFinal) references Colaboradores(Id)
 );
+
+-- Adicionar colunas faltantes em Requisicoes se a tabela já existir (migração)
+DO $$
+BEGIN
+	IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'requisicoes' AND column_name = 'conteudo_template_assinado') THEN
+		ALTER TABLE requisicoes ADD COLUMN conteudo_template_assinado TEXT;
+	END IF;
+
+	IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'requisicoes' AND column_name = 'tipo_termo_assinado') THEN
+		ALTER TABLE requisicoes ADD COLUMN tipo_termo_assinado INTEGER;
+	END IF;
+
+	IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'requisicoes' AND column_name = 'versao_template_assinado') THEN
+		ALTER TABLE requisicoes ADD COLUMN versao_template_assinado INTEGER;
+	END IF;
+
+	-- Tornar DtSolicitacao nullable se ainda não for
+	IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'requisicoes' AND column_name = 'dtsolicitacao' AND is_nullable = 'NO') THEN
+		ALTER TABLE requisicoes ALTER COLUMN dtsolicitacao DROP NOT NULL;
+	END IF;
+END $$;
 
 -- Tabela: RequisicoesItens
 CREATE TABLE IF NOT EXISTS RequisicoesItens
