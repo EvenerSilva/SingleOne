@@ -3173,7 +3173,8 @@ namespace SingleOne.Negocios
                 {
                     Console.WriteLine($"[ELEGIBILIDADE] InnerException: {ex.InnerException.Message}");
                 }
-                throw;
+                // Retornar lista vazia em caso de erro para evitar 500
+                return new List<SingleOneAPI.Models.ViewModels.PoliticaElegibilidadeVM>();
             }
         }
 
