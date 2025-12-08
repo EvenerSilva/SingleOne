@@ -6,6 +6,17 @@ import { UtilService } from 'src/app/util/util.service.js';
 import * as Editor from '../../../../../ckeditor5/build/ckeditor.js';
 import { UploadAdapter } from './UploadAdapter.js';
 
+interface ApiResponse {
+  data: Blob | any;
+  headers?: {
+    [key: string]: string;
+    'content-type'?: string;
+    'Content-Type'?: string;
+  };
+  status?: number;
+  statusText?: string;
+}
+
 @Component({
   selector: 'app-template',
   templateUrl: './template.component.html',
@@ -175,34 +186,37 @@ constructor(private fb: FormBuilder, private util: UtilService, private api: Con
       conteudo: this.template.conteudo,
       usuarioLogado: this.session.usuario.id
     }
-    this.api.visualizarTemplate(tmp, this.session.token).then(res => {
+    this.api.visualizarTemplate(tmp, this.session.token).then((res: any) => {
       this.util.aguardar(false);
       
+      // Fazer type assertion para ApiResponse
+      const response = res as ApiResponse;
+      
       // ✅ CORREÇÃO: Verificar se a resposta é válida e é um PDF
-      if (!res || !res.data) {
-        console.error('[TEMPLATE] Resposta inválida:', res);
+      if (!response || !response.data) {
+        console.error('[TEMPLATE] Resposta inválida:', response);
         this.util.exibirMensagemToast('Erro ao visualizar template: resposta inválida do servidor', 5000);
         return;
       }
 
       // Verificar se é um Blob (PDF)
-      if (res.data instanceof Blob) {
+      if (response.data instanceof Blob) {
         // Verificar Content-Type para distinguir PDF de erro JSON
-        const contentType = res.headers?.['content-type'] || res.data.type || '';
+        const contentType = response.headers?.['content-type'] || response.headers?.['Content-Type'] || response.data.type || '';
         
         if (contentType.includes('application/json')) {
           // É um erro JSON dentro de um Blob
-          this.tratarErroResposta(res.data);
-        } else if (contentType.includes('application/pdf') || res.data.size > 0) {
+          this.tratarErroResposta(response.data);
+        } else if (contentType.includes('application/pdf') || (response.data instanceof Blob && response.data.size > 0)) {
           // É um PDF válido
-          this.util.gerarDocumentoNovaGuia(res.data);
+          this.util.gerarDocumentoNovaGuia(response.data);
         } else {
           // Tipo desconhecido, tentar tratar como erro
-          this.tratarErroResposta(res.data);
+          this.tratarErroResposta(response.data);
         }
       } else {
         // Não é um Blob, tratar como erro
-        this.tratarErroResposta(res.data);
+        this.tratarErroResposta(response.data);
       }
     }).catch(err => {
       this.util.aguardar(false);
