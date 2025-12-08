@@ -830,9 +830,17 @@ CREATE TABLE IF NOT EXISTS politicas_elegibilidade (
     
     CONSTRAINT fk_politica_cliente FOREIGN KEY (cliente) REFERENCES clientes(id) ON DELETE CASCADE,
     CONSTRAINT fk_politica_tipo_equipamento FOREIGN KEY (tipo_equipamento_id) REFERENCES tipoequipamentos(id) ON DELETE CASCADE,
-    CONSTRAINT fk_politica_usuario FOREIGN KEY (usuario_cadastro) REFERENCES usuarios(id) ON DELETE SET NULL,
-    CONSTRAINT uk_politica_elegibilidade UNIQUE (cliente, tipo_colaborador, cargo, tipo_equipamento_id)
+    CONSTRAINT fk_politica_usuario FOREIGN KEY (usuario_cadastro) REFERENCES usuarios(id) ON DELETE SET NULL
 );
+
+-- Índice único para evitar duplicatas (tratando NULLs corretamente)
+CREATE UNIQUE INDEX IF NOT EXISTS uk_politica_elegibilidade 
+ON politicas_elegibilidade (cliente, tipo_colaborador, COALESCE(cargo, ''), tipo_equipamento_id)
+WHERE cargo IS NOT NULL;
+
+CREATE UNIQUE INDEX IF NOT EXISTS uk_politica_elegibilidade_sem_cargo 
+ON politicas_elegibilidade (cliente, tipo_colaborador, tipo_equipamento_id)
+WHERE cargo IS NULL;
 
 -- =====================================================
 -- TABELAS DE PASSCHECK E PATRIM´┐¢NIO
@@ -1967,7 +1975,7 @@ WITH equipamentos_alocados AS (
         e.numeroserie AS equipamento_serie,
         te.id AS tipo_equipamento_id,
         te.descricao AS tipo_equipamento_descricao,
-        NULL::integer AS categoria_equipamento,
+        te.categoria_id AS categoria_equipamento,
         e.fabricante AS fabricante_id,
         f.descricao AS fabricante,
         e.modelo AS modelo_id,
