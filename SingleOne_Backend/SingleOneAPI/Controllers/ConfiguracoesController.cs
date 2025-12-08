@@ -975,10 +975,28 @@ namespace SingleOne.Controllers
             catch (Exception ex)
             {
                 Console.WriteLine($"[VISUALIZAR-TEMPLATE] ❌ Erro no controller: {ex.Message}");
+                Console.WriteLine($"[VISUALIZAR-TEMPLATE] Tipo de exceção: {ex.GetType().Name}");
                 Console.WriteLine($"[VISUALIZAR-TEMPLATE] StackTrace: {ex.StackTrace}");
+                if (ex.InnerException != null)
+                {
+                    Console.WriteLine($"[VISUALIZAR-TEMPLATE] InnerException: {ex.InnerException.Message}");
+                }
                 
                 // ✅ CORREÇÃO: Retornar JSON com Content-Type explícito para erros
-                var errorResponse = new { Mensagem = "Erro ao visualizar template: " + ex.Message, Status = "500" };
+                var errorMessage = ex.Message;
+                if (ex.InnerException != null)
+                {
+                    errorMessage += $" | Detalhes: {ex.InnerException.Message}";
+                }
+                
+                var errorResponse = new { 
+                    Mensagem = $"Erro ao visualizar template: {errorMessage}", 
+                    Status = "500",
+                    Erro = ex.GetType().Name
+                };
+                
+                // Garantir que retorna como JSON
+                Response.ContentType = "application/json";
                 return StatusCode(500, errorResponse);
             }
         }
@@ -1020,9 +1038,26 @@ namespace SingleOne.Controllers
         }
 
         [HttpPost("[action]", Name = "SalvarParametros")]
-        public void SalvarParametros(Parametro p)
+        public IActionResult SalvarParametros(Parametro p)
         {
-            _negocio.SalvarParametro(p);
+            try
+            {
+                _negocio.SalvarParametro(p);
+                
+                // Buscar o registro atualizado para retornar com o ID correto
+                var parametroAtualizado = _negocio.ObterParametros(p.Cliente);
+                if (parametroAtualizado != null)
+                {
+                    return Ok(parametroAtualizado);
+                }
+                
+                return Ok(new { message = "Parâmetros salvos com sucesso" });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[CONTROLLER] Erro ao salvar parâmetros: {ex.Message}");
+                return StatusCode(500, new { message = "Erro ao salvar parâmetros", error = ex.Message });
+            }
         }
 
         [HttpPost("[action]", Name = "TestarConexaoSMTP")]

@@ -66,15 +66,6 @@
             <mat-error *ngIf="form.get('emailReporte')?.hasError('email')">E-mail inválido</mat-error>
           </mat-form-field>
         </div>
-
-        <div class="card-actions">
-          <button type="button" 
-                  class="btn-save"
-                  (click)="salvarEmailDescontos()">
-            <i class="material-icons">save</i>
-            {{ form.get('emailDescontosEnabled')?.value ? 'Salvar Configurações' : 'Desabilitar' }}
-          </button>
-        </div>
       </div>
     </div>
 
@@ -168,14 +159,6 @@
                     (click)="testarConexaoSMTP()">
               <i class="material-icons">send</i>
               Testar Conexão
-            </button>
-            
-            <button type="button" 
-                    class="btn-save"
-                    [disabled]="!isFormSMTPValido()" 
-                    (click)="salvarSMTP()">
-              <i class="material-icons">save</i>
-              Salvar SMTP
             </button>
           </div>
 
@@ -277,16 +260,6 @@
               <strong>Segurança:</strong> Protege contra acesso não autorizado mesmo com senha comprometida
             </div>
           </div>
-        </div>
-
-        <div class="card-actions">
-          <button type="button" 
-                  class="btn-save"
-                  [disabled]="form.get('twoFactorEnabled')?.value && !form.get('smtpEnabled')?.value" 
-                  (click)="salvar2FA()">
-            <i class="material-icons">save</i>
-            {{ form.get('twoFactorEnabled')?.value ? 'Salvar Configurações 2FA' : 'Desabilitar 2FA' }}
-          </button>
         </div>
       </div>
     </div>

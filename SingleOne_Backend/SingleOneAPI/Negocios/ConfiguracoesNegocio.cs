@@ -2781,6 +2781,9 @@ namespace SingleOne.Negocios
                 Console.WriteLine($"[PARAMETROS] - EmailReporte: {param.Emailreporte}");
                 Console.WriteLine($"[PARAMETROS] - EmailDescontosEnabled: {param.EmailDescontosEnabled}");
                 Console.WriteLine($"[PARAMETROS] - SmtpEnabled: {param.SmtpEnabled}");
+                Console.WriteLine($"[PARAMETROS] - SmtpHost: {param.SmtpHost}");
+                Console.WriteLine($"[PARAMETROS] - SmtpLogin: {param.SmtpLogin}");
+                Console.WriteLine($"[PARAMETROS] - SmtpPassword: {param.SmtpPassword}"); // ⚠️ LOG DA SENHA
             }
             else
             {
@@ -2791,16 +2794,144 @@ namespace SingleOne.Negocios
         }
         public void SalvarParametro(Parametro p)
         {
-            if (p.Id == 0)
+            Console.WriteLine($"[SALVAR_PARAMETRO] === INÍCIO ===");
+            Console.WriteLine($"[SALVAR_PARAMETRO] ID recebido: {p.Id}");
+            Console.WriteLine($"[SALVAR_PARAMETRO] Cliente recebido: {p.Cliente}");
+            Console.WriteLine($"[SALVAR_PARAMETRO] EmailDescontosEnabled: {p.EmailDescontosEnabled}");
+            Console.WriteLine($"[SALVAR_PARAMETRO] SmtpEnabled: {p.SmtpEnabled}");
+            Console.WriteLine($"[SALVAR_PARAMETRO] TwoFactorEnabled: {p.TwoFactorEnabled}");
+            
+            // ✅ IMPORTANTE: Buscar o registro existente SEMPRE pelo Cliente (não pelo ID)
+            // Isso garante que funciona em novas implantações onde o ID pode ser diferente (1, 2, 100, etc)
+            // O ID é apenas um fallback caso o Cliente não seja fornecido
+            Parametro parametroExistente = null;
+            
+            if (p.Cliente > 0)
             {
-                //db.Add(p);
-                _parametroRepository.Adicionar(p);
+                var parametrosExistentes = _parametroRepository.Buscar(x => x.Cliente == p.Cliente).ToList();
+                Console.WriteLine($"[SALVAR_PARAMETRO] Buscou pelo Cliente {p.Cliente}: {parametrosExistentes.Count} registro(s) encontrado(s)");
+                
+                if (parametrosExistentes.Count > 0)
+                {
+                    // Se houver múltiplos registros, usar o primeiro e remover os outros
+                    parametroExistente = parametrosExistentes.First();
+                    Console.WriteLine($"[SALVAR_PARAMETRO] Usando registro ID: {parametroExistente.Id}");
+                    
+                    // Se houver duplicados, remover os extras (manter apenas o primeiro)
+                    if (parametrosExistentes.Count > 1)
+                    {
+                        Console.WriteLine($"[SALVAR_PARAMETRO] ⚠️ ATENÇÃO: Encontrados {parametrosExistentes.Count} registros duplicados para cliente {p.Cliente}!");
+                        Console.WriteLine($"[SALVAR_PARAMETRO] Removendo {parametrosExistentes.Count - 1} registro(s) duplicado(s)...");
+                        
+                        foreach (var duplicado in parametrosExistentes.Skip(1))
+                        {
+                            Console.WriteLine($"[SALVAR_PARAMETRO] Removendo registro duplicado ID: {duplicado.Id}");
+                            _parametroRepository.Remover(duplicado.Id);
+                        }
+                        _parametroRepository.SalvarAlteracoes();
+                        Console.WriteLine($"[SALVAR_PARAMETRO] ✅ Duplicados removidos com sucesso!");
+                    }
+                }
             }
-            else
+            else if (p.Id > 0)
             {
-                //db.Update(p);
-                _parametroRepository.Atualizar(p);
+                // Fallback: buscar pelo ID apenas se Cliente não foi fornecido
+                parametroExistente = _parametroRepository.ObterPorId(p.Id);
+                Console.WriteLine($"[SALVAR_PARAMETRO] Buscou pelo ID {p.Id}: {(parametroExistente != null ? "Encontrado" : "Não encontrado")}");
             }
+            
+            // Se não existe, criar novo (apenas se realmente não existir nenhum)
+            if (parametroExistente == null)
+            {
+                // Verificação final antes de criar (evitar condição de corrida)
+                var verificacaoFinal = _parametroRepository.Buscar(x => x.Cliente == p.Cliente).FirstOrDefault();
+                if (verificacaoFinal != null)
+                {
+                    Console.WriteLine($"[SALVAR_PARAMETRO] ⚠️ Registro encontrado na verificação final - ID: {verificacaoFinal.Id}");
+                    parametroExistente = verificacaoFinal;
+                }
+                else
+                {
+                    Console.WriteLine($"[SALVAR_PARAMETRO] Criando novo registro de parâmetros para cliente {p.Cliente}");
+                    // Garantir que o ID seja 0 para criar novo registro
+                    p.Id = 0;
+                    _parametroRepository.Adicionar(p);
+                    _parametroRepository.SalvarAlteracoes();
+                    Console.WriteLine($"[SALVAR_PARAMETRO] ✅ Novo registro criado com ID: {p.Id}");
+                    Console.WriteLine($"[SALVAR_PARAMETRO] === FIM (NOVO REGISTRO) ===");
+                    return;
+                }
+            }
+            
+            Console.WriteLine($"[SALVAR_PARAMETRO] Registro existente encontrado - ID: {parametroExistente.Id}");
+            Console.WriteLine($"[SALVAR_PARAMETRO] Valores atuais - EmailDescontosEnabled: {parametroExistente.EmailDescontosEnabled}, SmtpEnabled: {parametroExistente.SmtpEnabled}, TwoFactorEnabled: {parametroExistente.TwoFactorEnabled}");
+            
+            // Fazer merge: atualizar apenas os campos que foram enviados (não null)
+            // Campos de E-mail para Descontos
+            if (p.EmailDescontosEnabled.HasValue)
+                parametroExistente.EmailDescontosEnabled = p.EmailDescontosEnabled;
+            // Emailreporte: atualizar se não for null (permite limpar com string vazia)
+            if (p.Emailreporte != null)
+                parametroExistente.Emailreporte = p.Emailreporte;
+            
+            // Campos de SMTP
+            if (p.SmtpEnabled.HasValue)
+            {
+                parametroExistente.SmtpEnabled = p.SmtpEnabled;
+                
+                // ✅ VALIDAÇÃO: Se SMTP for desabilitado, desativar 2FA automaticamente
+                if (p.SmtpEnabled == false && parametroExistente.TwoFactorEnabled == true)
+                {
+                    Console.WriteLine($"[SALVAR_PARAMETRO] ⚠️ SMTP desabilitado - desativando 2FA automaticamente");
+                    parametroExistente.TwoFactorEnabled = false;
+                }
+            }
+            if (p.SmtpHost != null)
+                parametroExistente.SmtpHost = p.SmtpHost;
+            if (p.SmtpPort.HasValue)
+                parametroExistente.SmtpPort = p.SmtpPort;
+            if (p.SmtpLogin != null)
+                parametroExistente.SmtpLogin = p.SmtpLogin;
+            // Senha: só atualizar se não for null e não for vazia (para não limpar acidentalmente)
+            if (!string.IsNullOrEmpty(p.SmtpPassword))
+                parametroExistente.SmtpPassword = p.SmtpPassword;
+            if (p.SmtpEnableSSL.HasValue)
+                parametroExistente.SmtpEnableSSL = p.SmtpEnableSSL;
+            if (p.SmtpEmailFrom != null)
+                parametroExistente.SmtpEmailFrom = p.SmtpEmailFrom;
+            
+            // Campos de 2FA
+            if (p.TwoFactorEnabled.HasValue)
+            {
+                // ✅ VALIDAÇÃO: Não permitir ativar 2FA se SMTP não estiver habilitado
+                if (p.TwoFactorEnabled == true)
+                {
+                    bool smtpHabilitado = parametroExistente.SmtpEnabled == true;
+                    if (!smtpHabilitado)
+                    {
+                        Console.WriteLine($"[SALVAR_PARAMETRO] ❌ BLOQUEADO: Tentativa de ativar 2FA sem SMTP habilitado");
+                        throw new InvalidOperationException("Não é possível ativar 2FA sem SMTP habilitado. Ative o SMTP primeiro.");
+                    }
+                }
+                parametroExistente.TwoFactorEnabled = p.TwoFactorEnabled;
+            }
+            if (p.TwoFactorType != null)
+                parametroExistente.TwoFactorType = p.TwoFactorType;
+            if (p.TwoFactorExpirationMinutes.HasValue)
+                parametroExistente.TwoFactorExpirationMinutes = p.TwoFactorExpirationMinutes;
+            if (p.TwoFactorMaxAttempts.HasValue)
+                parametroExistente.TwoFactorMaxAttempts = p.TwoFactorMaxAttempts;
+            if (p.TwoFactorLockoutMinutes.HasValue)
+                parametroExistente.TwoFactorLockoutMinutes = p.TwoFactorLockoutMinutes;
+            if (p.TwoFactorEmailTemplate != null)
+                parametroExistente.TwoFactorEmailTemplate = p.TwoFactorEmailTemplate;
+            
+            // Atualizar o registro existente
+            _parametroRepository.Atualizar(parametroExistente);
+            _parametroRepository.SalvarAlteracoes();
+            
+            Console.WriteLine($"[SALVAR_PARAMETRO] Valores após atualização - EmailDescontosEnabled: {parametroExistente.EmailDescontosEnabled}, SmtpEnabled: {parametroExistente.SmtpEnabled}, TwoFactorEnabled: {parametroExistente.TwoFactorEnabled}");
+            Console.WriteLine($"[SALVAR_PARAMETRO] === FIM (ATUALIZAÇÃO) ===");
         }
         #endregion
 

@@ -184,16 +184,33 @@ export class ParametrosComponent implements OnInit {
 
   // Método para quando a habilitação SMTP é alterada
   onSmtpEnabledChange() {
-    // O FormControl já atualiza o valor automaticamente
-    // Apenas atualizar as validações
+    const smtpEnabled = this.form.get('smtpEnabled')?.value;
+    const twoFactorEnabled = this.form.get('twoFactorEnabled')?.value;
+    
+    // ✅ VALIDAÇÃO: Se SMTP for desabilitado, desativar 2FA automaticamente
+    if (!smtpEnabled && twoFactorEnabled) {
+      this.form.patchValue({ twoFactorEnabled: false });
+      this.util.exibirMensagemToast('2FA foi desativado automaticamente porque SMTP foi desabilitado.', 4000);
+    }
+    
+    // Atualizar as validações
     this.atualizarValidacoesSMTP();
     this.atualizarValidacoes2FA();
   }
 
   // Método para quando a habilitação 2FA é alterada
   onTwoFactorEnabledChange() {
-    // O FormControl já atualiza o valor automaticamente
-    // Apenas atualizar as validações
+    const twoFactorEnabled = this.form.get('twoFactorEnabled')?.value;
+    const smtpEnabled = this.form.get('smtpEnabled')?.value;
+    
+    // ✅ VALIDAÇÃO: Não permitir ativar 2FA se SMTP não estiver habilitado
+    if (twoFactorEnabled && !smtpEnabled) {
+      this.form.patchValue({ twoFactorEnabled: false });
+      this.util.exibirMensagemToast('SMTP deve estar habilitado para ativar 2FA.', 3000);
+      return;
+    }
+    
+    // Atualizar as validações
     this.atualizarValidacoes2FA();
   }
 
@@ -271,11 +288,18 @@ export class ParametrosComponent implements OnInit {
     const smtpEnabled = this.form.get('smtpEnabled')?.value;
     
     // Controlar o estado disabled do campo 2FA baseado no SMTP
+    // 2FA só pode estar ativo se SMTP estiver habilitado
     // Usar emitEvent: false para evitar loop infinito
     if (twoFactorEnabledControl) {
       if (!smtpEnabled) {
+        // SMTP desabilitado: desabilitar campo 2FA e desativar 2FA se estiver ativo
         twoFactorEnabledControl.disable({ emitEvent: false });
+        if (twoFactorEnabled) {
+          // Se 2FA estiver ativo e SMTP for desabilitado, desativar 2FA automaticamente
+          this.form.patchValue({ twoFactorEnabled: false }, { emitEvent: false });
+        }
       } else {
+        // SMTP habilitado: permitir ativar/desativar 2FA
         twoFactorEnabledControl.enable({ emitEvent: false });
       }
     }
@@ -388,8 +412,10 @@ export class ParametrosComponent implements OnInit {
     }
 
     // Preparar payload para e-mail de descontos
+    // ✅ Busca sempre pelo Cliente (não depende do ID, funciona em novas implantações)
     const payloadEmailDescontos = {
-      cliente: this.session?.usuario?.cliente,
+      id: this.parametro?.id || 0, // Opcional: usado apenas como fallback
+      cliente: this.session?.usuario?.cliente, // ✅ PRIORIDADE: busca sempre pelo Cliente
       emailDescontosEnabled: this.form.get('emailDescontosEnabled')?.value,
       emailreporte: this.form.get('emailReporte')?.value || '',
       emailReporte: this.form.get('emailReporte')?.value || '' // compatibilidade
@@ -403,7 +429,10 @@ export class ParametrosComponent implements OnInit {
           ? 'Configurações de e-mail para descontos salvas com sucesso!' 
           : 'E-mail para descontos desabilitado com sucesso!';
         this.util.exibirMensagemToast(mensagem, 5000);
-        // Atualizar o objeto local
+        // Atualizar o objeto local (incluindo ID se retornado)
+        if (res.data?.id) {
+          this.parametro.id = res.data.id;
+        }
         this.parametro.emailDescontosEnabled = payloadEmailDescontos.emailDescontosEnabled;
         this.parametro.emailreporte = payloadEmailDescontos.emailreporte;
         this.parametro.emailReporte = payloadEmailDescontos.emailReporte;
@@ -423,16 +452,29 @@ export class ParametrosComponent implements OnInit {
       return;
     }
 
+    const smtpEnabled = this.form.get('smtpEnabled')?.value;
+    const twoFactorEnabled = this.form.get('twoFactorEnabled')?.value;
+
+    // Se SMTP for desabilitado e 2FA estiver ativo, desativar 2FA automaticamente
+    if (!smtpEnabled && twoFactorEnabled) {
+      this.form.patchValue({ twoFactorEnabled: false });
+      this.util.exibirMensagemToast('2FA foi desativado automaticamente porque SMTP foi desabilitado.', 4000);
+    }
+
     // Preparar payload para SMTP
+    // ✅ Busca sempre pelo Cliente (não depende do ID, funciona em novas implantações)
     const payloadSMTP = {
-      cliente: this.session?.usuario?.cliente,
-      smtpEnabled: this.form.get('smtpEnabled')?.value,
+      id: this.parametro?.id || 0, // Opcional: usado apenas como fallback
+      cliente: this.session?.usuario?.cliente, // ✅ PRIORIDADE: busca sempre pelo Cliente
+      smtpEnabled: smtpEnabled,
       smtpEnableSSL: this.form.get('smtpEnableSSL')?.value || false,
       smtpHost: this.form.get('smtpHost')?.value || '',
       smtpPort: this.form.get('smtpPort')?.value || 587,
       smtpLogin: this.form.get('smtpLogin')?.value || '',
       smtpPassword: this.form.get('smtpPassword')?.value || '',
-      smtpEmailFrom: this.form.get('smtpEmailFrom')?.value || ''
+      smtpEmailFrom: this.form.get('smtpEmailFrom')?.value || '',
+      // Se SMTP for desabilitado, também desativar 2FA
+      twoFactorEnabled: smtpEnabled ? twoFactorEnabled : false
     };
 
     this.util.aguardar(true);
@@ -443,7 +485,10 @@ export class ParametrosComponent implements OnInit {
           ? 'Configurações SMTP salvas com sucesso!' 
           : 'SMTP desabilitado com sucesso!';
         this.util.exibirMensagemToast(mensagem, 5000);
-        // Atualizar o objeto local
+        // Atualizar o objeto local (incluindo ID se retornado)
+        if (res.data?.id) {
+          this.parametro.id = res.data.id;
+        }
         Object.assign(this.parametro, payloadSMTP);
       } else {
         this.util.exibirFalhaComunicacao();
@@ -480,8 +525,10 @@ export class ParametrosComponent implements OnInit {
     }
 
     // Preparar payload para 2FA
+    // ✅ Busca sempre pelo Cliente (não depende do ID, funciona em novas implantações)
     const payload2FA = {
-      cliente: this.session?.usuario?.cliente,
+      id: this.parametro?.id || 0, // Opcional: usado apenas como fallback
+      cliente: this.session?.usuario?.cliente, // ✅ PRIORIDADE: busca sempre pelo Cliente
       twoFactorEnabled: twoFactorEnabled,
       twoFactorType: this.form.get('twoFactorType')?.value || 'email',
       twoFactorExpirationMinutes: this.form.get('twoFactorExpirationMinutes')?.value || 5,
@@ -498,7 +545,10 @@ export class ParametrosComponent implements OnInit {
           ? 'Configurações de 2FA salvas com sucesso!' 
           : '2FA desabilitado com sucesso!';
         this.util.exibirMensagemToast(mensagem, 5000);
-        // Atualizar o objeto local
+        // Atualizar o objeto local (incluindo ID se retornado)
+        if (res.data?.id) {
+          this.parametro.id = res.data.id;
+        }
         Object.assign(this.parametro, payload2FA);
       } else {
         this.util.exibirFalhaComunicacao();
@@ -517,20 +567,36 @@ export class ParametrosComponent implements OnInit {
       return;
     }
 
+    const smtpEnabled = this.form.get('smtpEnabled')?.value;
+    let twoFactorEnabled = this.form.get('twoFactorEnabled')?.value;
+
+    // ✅ VALIDAÇÃO: 2FA só pode estar ativo se SMTP estiver habilitado
+    if (twoFactorEnabled && !smtpEnabled) {
+      this.util.exibirMensagemToast('SMTP deve estar habilitado para ativar 2FA.', 3000);
+      return;
+    }
+
+    // Se SMTP for desabilitado, garantir que 2FA também esteja desabilitado
+    if (!smtpEnabled) {
+      twoFactorEnabled = false;
+    }
+
     // Preparar payload completo
+    // ✅ Busca sempre pelo Cliente (não depende do ID, funciona em novas implantações)
     const payloadCompleto = {
-      cliente: this.session?.usuario?.cliente,
+      id: this.parametro?.id || 0, // Opcional: usado apenas como fallback
+      cliente: this.session?.usuario?.cliente, // ✅ PRIORIDADE: busca sempre pelo Cliente
       emailDescontosEnabled: this.form.get('emailDescontosEnabled')?.value,
       emailreporte: this.form.get('emailReporte')?.value,
       emailReporte: this.form.get('emailReporte')?.value,
-      smtpEnabled: this.form.get('smtpEnabled')?.value,
+      smtpEnabled: smtpEnabled,
       smtpEnableSSL: this.form.get('smtpEnableSSL')?.value,
       smtpHost: this.form.get('smtpHost')?.value,
       smtpPort: this.form.get('smtpPort')?.value,
       smtpLogin: this.form.get('smtpLogin')?.value,
       smtpPassword: this.form.get('smtpPassword')?.value,
       smtpEmailFrom: this.form.get('smtpEmailFrom')?.value,
-      twoFactorEnabled: this.form.get('twoFactorEnabled')?.value,
+      twoFactorEnabled: twoFactorEnabled,
       twoFactorType: this.form.get('twoFactorType')?.value,
       twoFactorExpirationMinutes: this.form.get('twoFactorExpirationMinutes')?.value,
       twoFactorMaxAttempts: this.form.get('twoFactorMaxAttempts')?.value,
@@ -543,7 +609,10 @@ export class ParametrosComponent implements OnInit {
       this.util.aguardar(false);
       if (res.status === 200) {
         this.util.exibirMensagemToast('Todas as configurações foram salvas com sucesso!', 5000);
-        // Atualizar o objeto local
+        // Atualizar o objeto local (incluindo ID se retornado)
+        if (res.data?.id) {
+          this.parametro.id = res.data.id;
+        }
         Object.assign(this.parametro, payloadCompleto);
       } else {
         this.util.exibirFalhaComunicacao();
