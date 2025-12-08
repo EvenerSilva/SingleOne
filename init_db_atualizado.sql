@@ -2642,15 +2642,50 @@ COMMENT ON COLUMN sinalizacoes_suspeitas.status IS 'Status da investigação: pe
 -- =====================================================
 
 -- Tabela: Categorias
-CREATE TABLE IF NOT EXISTS Categorias
+CREATE TABLE IF NOT EXISTS categorias
 (
-    Id serial not null primary key,
-    Nome varchar(100) not null,
-    Descricao text,
-    Ativo boolean default true,
-    DataCriacao timestamp default CURRENT_TIMESTAMP,
-    DataAtualizacao timestamp default CURRENT_TIMESTAMP
+    id serial not null primary key,
+    nome varchar(100) not null UNIQUE,
+    descricao text,
+    ativo boolean default true,
+    data_criacao timestamp default CURRENT_TIMESTAMP,
+    data_atualizacao timestamp default CURRENT_TIMESTAMP
 );
+
+-- Comentários e índices para categorias
+COMMENT ON TABLE categorias IS 'Categorias de equipamentos para organização hierárquica';
+COMMENT ON COLUMN categorias.nome IS 'Nome único da categoria';
+COMMENT ON COLUMN categorias.ativo IS 'Indica se a categoria está ativa';
+
+-- Índices para categorias
+CREATE INDEX IF NOT EXISTS idx_categorias_ativo ON categorias(ativo);
+CREATE INDEX IF NOT EXISTS idx_categorias_nome ON categorias(nome);
+
+-- Adicionar coluna categoria_id em tipoequipamentos se não existir (migração)
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'tipoequipamentos' AND column_name = 'categoria_id') THEN
+        ALTER TABLE tipoequipamentos ADD COLUMN categoria_id INTEGER;
+    END IF;
+
+    -- Adicionar foreign key categoria_id -> categorias(id) se não existir
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint 
+        WHERE conname = 'fk_tipoequipamento_categoria'
+    ) THEN
+        ALTER TABLE tipoequipamentos
+        ADD CONSTRAINT fk_tipoequipamento_categoria 
+        FOREIGN KEY (categoria_id) REFERENCES categorias(id) ON DELETE SET NULL;
+    END IF;
+
+    -- Criar índice para categoria_id se não existir
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_indexes 
+        WHERE tablename = 'tipoequipamentos' AND indexname = 'idx_tipoequipamento_categoria_id'
+    ) THEN
+        CREATE INDEX idx_tipoequipamento_categoria_id ON tipoequipamentos(categoria_id);
+    END IF;
+END $$;
 
 -- Adicionar FKs de Filiais (após criação de Filiais)
 DO $$
