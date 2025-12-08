@@ -1715,7 +1715,8 @@ FROM laudos l
 WHERE l.ativo = true;
 
 -- View: vwUltimasRequisicaoBYOD
-CREATE OR REPLACE VIEW "vwUltimasRequisicaoBYOD" AS
+DROP VIEW IF EXISTS vwultimasrequisicaobyd CASCADE;
+CREATE OR REPLACE VIEW vwultimasrequisicaobyd AS
 SELECT r.id AS requisicaoid,
 	r.cliente,
 	r.usuariorequisicao,
@@ -1752,7 +1753,8 @@ ORDER BY r.dtsolicitacao DESC
 LIMIT 1000;
 
 -- View: vwUltimasRequisicaoNaoBYOD
-CREATE OR REPLACE VIEW "vwUltimasRequisicaoNaoBYOD" AS
+DROP VIEW IF EXISTS vwultimasrequisicaonaobyd CASCADE;
+CREATE OR REPLACE VIEW vwultimasrequisicaonaobyd AS
 SELECT r.id AS requisicaoid,
 	r.cliente,
 	r.usuariorequisicao,
@@ -1935,6 +1937,7 @@ GROUP BY p.id, p.nome, p.ativo, p.valor, c.nome, c.id, o.nome, o.id;
 COMMENT ON VIEW vwplanostelefonia IS 'View para listar planos de telefonia com informações agregadas de linhas';
 
 -- View: vw_tinone_estatisticas
+DROP VIEW IF EXISTS vw_tinone_estatisticas CASCADE;
 CREATE OR REPLACE VIEW vw_tinone_estatisticas AS
 SELECT count(*) AS total_interacoes,
     count(DISTINCT "Usuario_Id") AS usuarios_unicos,
@@ -1950,10 +1953,10 @@ SELECT count(*) AS total_interacoes,
             WHEN "Foi_Util" = false THEN 1
             ELSE NULL::integer
         END) AS feedbacks_negativos,
-    date("Created_At") AS data
+    DATE("Created_At") AS data
    FROM "TinOne_Analytics"
-  GROUP BY (date("Created_At"))
-  ORDER BY (date("Created_At")) DESC;
+  GROUP BY DATE("Created_At")
+  ORDER BY DATE("Created_At") DESC;
 
 COMMENT ON VIEW vw_tinone_estatisticas IS 'Estatísticas diárias de uso do TinOne';
 
