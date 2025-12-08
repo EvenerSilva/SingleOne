@@ -760,16 +760,34 @@ namespace SingleOne.Negocios
         #region Tipo Recurso
         public List<Tipoequipamento> ListarTiposDeRecursos(string pesquisa, int cliente)
         {
-            pesquisa = pesquisa.ToLower();
-            var tipos = (from te in _tipoequipamentoRepository.Query()
-                         join tec in _tipoequipamentoClienteRepository.Query() on te.Id equals tec.Tipo
-                         where te.Ativo && tec.Cliente == cliente && 
-                               te.Id != 1 && // ✅ EXCLUIR especificamente ID = 1 (Linha Telefônica)
-                               ((pesquisa != "null") ? te.Descricao.ToLower().Contains(pesquisa) : 1 == 1)
-                         orderby te.Descricao
-                         select te
-                         ).Distinct().ToList(); // ✅ DISTINCT para remover duplicatas
-            return tipos;
+            try
+            {
+                // Tratamento seguro para pesquisa null ou vazia
+                if (string.IsNullOrWhiteSpace(pesquisa))
+                {
+                    pesquisa = "null";
+                }
+                
+                pesquisa = pesquisa.ToLower();
+                
+                var tipos = (from te in _tipoequipamentoRepository.Query()
+                             join tec in _tipoequipamentoClienteRepository.Query() on te.Id equals tec.Tipo
+                             where te.Ativo && tec.Cliente == cliente && 
+                                   te.Id != 1 && // ✅ EXCLUIR especificamente ID = 1 (Linha Telefônica)
+                                   ((pesquisa != "null") ? (te.Descricao != null && te.Descricao.ToLower().Contains(pesquisa)) : 1 == 1)
+                             orderby te.Descricao
+                             select te
+                             ).Distinct().ToList(); // ✅ DISTINCT para remover duplicatas
+                
+                return tipos ?? new List<Tipoequipamento>();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erro ao listar tipos de recursos: {ex.Message}");
+                Console.WriteLine($"StackTrace: {ex.StackTrace}");
+                // Retornar lista vazia em caso de erro para evitar 500
+                return new List<Tipoequipamento>();
+            }
         }
 
         public List<Tipoaquisicao> ListarTiposAquisicao()

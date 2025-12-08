@@ -128,7 +128,8 @@ CREATE TABLE IF NOT EXISTS TipoEquipamentosClientes
 	Cliente int not null,
 	Tipo int not null,
 	constraint fkTipoEqpCliente foreign key (Cliente) references Clientes(Id),
-	constraint fkTipoEqpClienteTIpo foreign key (Tipo) references TipoEquipamentos(Id)
+	constraint fkTipoEqpClienteTIpo foreign key (Tipo) references TipoEquipamentos(Id),
+	constraint uk_tipoequipamentocliente unique (Cliente, Tipo)
 );
 
 -- Tabela: Fabricantes
@@ -2579,6 +2580,8 @@ INSERT INTO Localidades(Descricao, Ativo, Cliente) VALUES('Padrão', FALSE, 1) O
 
 -- Inserir Tipo de Equipamento para Telefonia (necessário para recursos de telefonia)
 INSERT INTO TipoEquipamentos(Descricao, ativo) VALUES('Linha Telefonica', true) ON CONFLICT DO NOTHING;
+-- Associar tipo de equipamento ao cliente (necessário para ListarTiposRecursos funcionar)
+INSERT INTO TipoEquipamentosClientes(Cliente, Tipo) VALUES(1, 1) ON CONFLICT DO NOTHING;
 INSERT INTO Fabricantes(TipoEquipamento, Descricao, Ativo, Cliente) VALUES(1, 'Linha Telefonica', false, 1) ON CONFLICT DO NOTHING;
 INSERT INTO Modelos(Fabricante, Descricao, Ativo, Cliente) VALUES(1, 'Linha Telefonica', false, 1) ON CONFLICT DO NOTHING;
 
