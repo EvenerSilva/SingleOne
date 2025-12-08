@@ -198,19 +198,46 @@ ngOnInit(): void {
           this.route.navigate(['/usuarios']);
         } else {
           console.error('❌ Status não é 200:', statusResponse);
+          console.error('Response data completo:', res.data);
           
           // Verificar se é erro de e-mail duplicado
           if(String(statusResponse) == "200.1") {
             const mensagem = res.data?.Messagem || res.data?.mensagem || 'E-mail já cadastrado!';
             this.util.exibirMensagemToast(mensagem, 5000);
-          } else {
+          } 
+          // Verificar se é erro de 2FA global desabilitado
+          else if (res.data?.codigoErro === '2FA_GLOBAL_DESABILITADO' || res.data?.CodigoErro === '2FA_GLOBAL_DESABILITADO') {
+            const mensagem = res.data?.Mensagem || res.data?.mensagem || '⚠️ 2FA não pode ser habilitado porque a funcionalidade está desabilitada globalmente para este cliente. Entre em contato com o administrador para ativar o 2FA nas configurações globais.';
+            this.util.exibirMensagemToast(mensagem, 8000);
+          }
+          // Verificar se há mensagem de erro específica
+          else if (res.data?.Mensagem || res.data?.mensagem) {
+            const mensagem = res.data.Mensagem || res.data.mensagem;
+            this.util.exibirMensagemToast(mensagem, 5000);
+          } 
+          else {
             this.util.exibirFalhaComunicacao();
           }
         }
       }).catch(err => {
         console.error('❌ ERRO ao salvar usuário:', err);
+        console.error('Erro completo:', err);
+        console.error('Response:', err.response);
+        console.error('Response.data:', err.response?.data);
+        console.error('Response.data.codigoErro:', err.response?.data?.codigoErro);
         this.util.aguardar(false);
-        this.util.exibirFalhaComunicacao();
+        
+        // Tratamento específico para erro de 2FA global desabilitado
+        if (err?.response?.data?.codigoErro === '2FA_GLOBAL_DESABILITADO') {
+          const mensagem = '⚠️ 2FA não pode ser habilitado porque a funcionalidade está desabilitada globalmente para este cliente. Entre em contato com o administrador para ativar o 2FA nas configurações globais.';
+          this.util.exibirMensagemToast(mensagem, 8000);
+        } else if (err?.response?.data?.mensagem || err?.response?.data?.Mensagem) {
+          // Exibir mensagem específica do backend se disponível
+          const mensagem = err.response.data.mensagem || err.response.data.Mensagem;
+          this.util.exibirMensagemToast(mensagem, 5000);
+        } else {
+          this.util.exibirFalhaComunicacao();
+        }
       });
     } else {
       this.util.exibirMensagemToast('Você precisa preencher todo formulário antes de salvar.', 5000);
