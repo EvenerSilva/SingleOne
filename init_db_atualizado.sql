@@ -443,6 +443,29 @@ CREATE TABLE IF NOT EXISTS Equipamentos
 	constraint fkEquipamentoTipoAquisicao foreign key (TipoAquisicao) references TipoAquisicao(Id)
 );
 
+-- Adicionar colunas faltantes em Equipamentos se a tabela já existir (migração)
+DO $$
+BEGIN
+	IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'equipamentos' AND column_name = 'localidade_id') THEN
+		ALTER TABLE equipamentos ADD COLUMN localidade_id INTEGER;
+		ALTER TABLE equipamentos ADD CONSTRAINT fkEquipamentoLocalidadeId FOREIGN KEY (localidade_id) REFERENCES localidades(id);
+	END IF;
+
+	IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'equipamentos' AND column_name = 'filial_id') THEN
+		ALTER TABLE equipamentos ADD COLUMN filial_id INTEGER;
+		ALTER TABLE equipamentos ADD CONSTRAINT fkEquipamentoFilial FOREIGN KEY (filial_id) REFERENCES filiais(id);
+	END IF;
+
+	IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'equipamentos' AND column_name = 'compartilhado') THEN
+		ALTER TABLE equipamentos ADD COLUMN compartilhado BOOLEAN DEFAULT FALSE NOT NULL;
+	END IF;
+
+	-- Tornar Cliente nullable se ainda não for
+	IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'equipamentos' AND column_name = 'cliente' AND is_nullable = 'NO') THEN
+		ALTER TABLE equipamentos ALTER COLUMN cliente DROP NOT NULL;
+	END IF;
+END $$;
+
 -- Tabela: Equipamento Usuários Compartilhados
 CREATE TABLE IF NOT EXISTS equipamento_usuarios_compartilhados (
     id SERIAL PRIMARY KEY,
@@ -887,6 +910,69 @@ CREATE TABLE IF NOT EXISTS PARAMETROS
 	two_factor_email_template TEXT,
 	constraint fkParametrosCliente foreign key (Cliente) references Clientes(Id)
 );
+
+-- Adicionar colunas faltantes se a tabela já existir (migração)
+DO $$
+BEGIN
+	-- Configuração de E-mail para Descontos
+	IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'parametros' AND column_name = 'email_descontos_enabled') THEN
+		ALTER TABLE parametros ADD COLUMN email_descontos_enabled BOOLEAN DEFAULT false;
+	END IF;
+
+	-- Configurações de SMTP
+	IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'parametros' AND column_name = 'smtp_enabled') THEN
+		ALTER TABLE parametros ADD COLUMN smtp_enabled BOOLEAN DEFAULT false;
+	END IF;
+
+	IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'parametros' AND column_name = 'smtp_host') THEN
+		ALTER TABLE parametros ADD COLUMN smtp_host VARCHAR(200);
+	END IF;
+
+	IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'parametros' AND column_name = 'smtp_port') THEN
+		ALTER TABLE parametros ADD COLUMN smtp_port INTEGER;
+	END IF;
+
+	IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'parametros' AND column_name = 'smtp_login') THEN
+		ALTER TABLE parametros ADD COLUMN smtp_login VARCHAR(200);
+	END IF;
+
+	IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'parametros' AND column_name = 'smtp_password') THEN
+		ALTER TABLE parametros ADD COLUMN smtp_password VARCHAR(200);
+	END IF;
+
+	IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'parametros' AND column_name = 'smtp_enable_ssl') THEN
+		ALTER TABLE parametros ADD COLUMN smtp_enable_ssl BOOLEAN DEFAULT false;
+	END IF;
+
+	IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'parametros' AND column_name = 'smtp_email_from') THEN
+		ALTER TABLE parametros ADD COLUMN smtp_email_from VARCHAR(200);
+	END IF;
+
+	-- Configurações de 2FA (Duplo Fator)
+	IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'parametros' AND column_name = 'two_factor_enabled') THEN
+		ALTER TABLE parametros ADD COLUMN two_factor_enabled BOOLEAN DEFAULT false;
+	END IF;
+
+	IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'parametros' AND column_name = 'two_factor_type') THEN
+		ALTER TABLE parametros ADD COLUMN two_factor_type VARCHAR(50) DEFAULT 'email';
+	END IF;
+
+	IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'parametros' AND column_name = 'two_factor_expiration_minutes') THEN
+		ALTER TABLE parametros ADD COLUMN two_factor_expiration_minutes INTEGER DEFAULT 5;
+	END IF;
+
+	IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'parametros' AND column_name = 'two_factor_max_attempts') THEN
+		ALTER TABLE parametros ADD COLUMN two_factor_max_attempts INTEGER DEFAULT 3;
+	END IF;
+
+	IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'parametros' AND column_name = 'two_factor_lockout_minutes') THEN
+		ALTER TABLE parametros ADD COLUMN two_factor_lockout_minutes INTEGER DEFAULT 15;
+	END IF;
+
+	IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'parametros' AND column_name = 'two_factor_email_template') THEN
+		ALTER TABLE parametros ADD COLUMN two_factor_email_template TEXT;
+	END IF;
+END $$;
 
 -- Tabela: ProcessamentosServicos
 CREATE TABLE IF NOT EXISTS ProcessamentosServicos
