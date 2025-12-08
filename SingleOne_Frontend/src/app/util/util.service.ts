@@ -176,30 +176,55 @@ export class UtilService {
   }
 
   gerarDocumentoNovaGuia(data){
+    // ✅ CORREÇÃO: Validar dados antes de processar
+    if (!data) {
+      console.error('[UTIL] Erro: Dados não fornecidos (undefined ou null)');
+      this.exibirMensagemToast('Erro: Dados do documento não foram recebidos', 5000);
+      return;
+    }
+
     if (data instanceof Blob) {
       try {
+        // Validar se o Blob tem conteúdo
+        if (data.size === 0) {
+          console.error('[UTIL] Erro: Blob vazio');
+          this.exibirMensagemToast('Erro: Documento vazio recebido do servidor', 5000);
+          return;
+        }
+
         // Se já é um Blob, usar diretamente
         const url = window.URL.createObjectURL(data);
         const newWindow = window.open(url, '_blank');
         if (newWindow) {
+          // Limpar URL após um tempo para liberar memória
+          setTimeout(() => window.URL.revokeObjectURL(url), 100);
         } else {
           console.error('[UTIL] Popup bloqueado pelo navegador');
           // Fallback: download do arquivo
           const link = document.createElement('a');
           link.href = url;
-          link.download = 'laudo-tecnico.pdf';
+          link.download = 'template.pdf';
           link.click();
+          setTimeout(() => window.URL.revokeObjectURL(url), 100);
         }
       } catch (error) {
         console.error('[UTIL] Erro ao processar Blob:', error);
+        this.exibirMensagemToast('Erro ao abrir documento PDF', 5000);
       }
     } else if (typeof data === 'string') {
-      const arr = this.convertBase64ToArrayBuffer(data);
-      const blob = new Blob([arr], { type: 'application/pdf' });
-      const url = window.URL.createObjectURL(blob);
-      window.open(url, '_blank');
+      try {
+        const arr = this.convertBase64ToArrayBuffer(data);
+        const blob = new Blob([arr], { type: 'application/pdf' });
+        const url = window.URL.createObjectURL(blob);
+        window.open(url, '_blank');
+        setTimeout(() => window.URL.revokeObjectURL(url), 100);
+      } catch (error) {
+        console.error('[UTIL] Erro ao processar string Base64:', error);
+        this.exibirMensagemToast('Erro ao processar documento', 5000);
+      }
     } else {
-      console.error('[UTIL] Tipo de dados não suportado:', typeof data);
+      console.error('[UTIL] Tipo de dados não suportado:', typeof data, data);
+      this.exibirMensagemToast('Erro: Formato de dados não suportado', 5000);
     }
   }
 

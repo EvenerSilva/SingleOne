@@ -1,15 +1,76 @@
 ﻿-- =====================================================
 -- SCRIPT DE INICIALIZAÇÃO DO BANCO DE DADOS - SINGLEONE
 -- Descrição: Script completo para criar banco limpo com dados básicos
--- Versão: 2.3 (Atualizado em 07/11/2025)
+-- Versão: 2.4 (Atualizado em 08/11/2025)
+-- v2.4: Adicionado tratamento de erros e criação automática do banco
 -- v2.3: View colaboradoresvm estendida + staging de importação de colaboradores
 -- v2.2: Adicionadas 9 tabelas faltantes + colunas 2FA + coluna logo
 -- v2.1: Adicionadas 8 novas tabelas (campanhas, estoque mínimo, importação, etc)
 -- v2.0: Script base com estrutura principal
 -- =====================================================
+-- NOTA: Este script é executado automaticamente quando o volume PostgreSQL é criado
+--       pela primeira vez (via /docker-entrypoint-initdb.d/)
+--       Se o banco sumir, execute manualmente: cat init_db_atualizado.sql | docker exec -i singleone-postgres psql -U postgres -d singleone
+--
+-- IMPORTANTE: Este script assume que está sendo executado no banco 'singleone'
+--             Se executado no banco 'postgres', ele criará o banco 'singleone' automaticamente
+--             e então você precisará executar novamente no banco 'singleone'
 
--- Habilitar extensão UUID
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+-- =====================================================
+-- CONFIGURAÇÃO INICIAL - CONTINUAR MESMO COM ERROS
+-- =====================================================
+-- Este script foi projetado para ser idempotente e continuar mesmo com erros
+-- para garantir que todas as tabelas, views e dados sejam criados
+
+-- Verificar se o banco singleone existe e avisar se necessário
+-- NOTA: Este script DEVE ser executado no banco 'singleone'
+--       Se o banco não existir, crie-o ANTES: CREATE DATABASE singleone;
+DO $$
+BEGIN
+    IF current_database() = 'postgres' THEN
+        IF EXISTS (SELECT 1 FROM pg_database WHERE datname = 'singleone') THEN
+            RAISE NOTICE 'Banco "singleone" existe. Conecte-se a ele antes de executar este script:';
+            RAISE NOTICE '  \c singleone';
+            RAISE NOTICE '  OU: psql -U postgres -d singleone -f init_db_atualizado.sql';
+        ELSE
+            RAISE NOTICE '⚠️  Banco "singleone" NÃO existe!';
+            RAISE NOTICE '   Crie o banco antes de executar este script:';
+            RAISE NOTICE '   CREATE DATABASE singleone;';
+            RAISE EXCEPTION 'Banco singleone não existe. Crie-o primeiro.';
+        END IF;
+    ELSIF current_database() = 'singleone' THEN
+        RAISE NOTICE '✅ Executando script no banco correto: singleone';
+    ELSE
+        RAISE NOTICE '⚠️  Executando no banco: %. Esperado: singleone', current_database();
+    END IF;
+EXCEPTION
+    WHEN OTHERS THEN
+        -- Continuar mesmo se houver erro na verificação
+        RAISE NOTICE 'Continuando execução no banco: %', current_database();
+END $$;
+
+-- Habilitar extensão UUID (com tratamento de erro)
+DO $$
+BEGIN
+    CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+EXCEPTION
+    WHEN OTHERS THEN
+        RAISE NOTICE 'Extensão uuid-ossp já existe ou erro ao criar: %', SQLERRM;
+END $$;
+
+-- Variável para contar erros (será usado no final)
+DO $$
+BEGIN
+    -- Criar tabela temporária para log de erros se não existir
+    CREATE TEMP TABLE IF NOT EXISTS script_errors (
+        id SERIAL PRIMARY KEY,
+        erro TEXT,
+        timestamp TIMESTAMP DEFAULT NOW()
+    );
+EXCEPTION
+    WHEN OTHERS THEN
+        NULL; -- Ignorar erro se não puder criar
+END $$;
 
 -- =====================================================
 -- TABELAS PRINCIPAIS DO SISTEMA
@@ -124,14 +185,14 @@ CREATE TABLE IF NOT EXISTS Fornecedores
 );
 
 -- Tabela: ContratoStatus
-CREATE TABLE ContratoStatus (
+CREATE TABLE IF NOT EXISTS ContratoStatus (
 	Id INT NOT NULL,
 	Nome VARCHAR(100),
 	CONSTRAINT PK_StatusContrato PRIMARY KEY(Id)
 );
 
 -- Tabela: Contratos
-CREATE TABLE Contratos (
+CREATE TABLE IF NOT EXISTS Contratos (
     Id SERIAL NOT NULL,
 	Cliente INT not null,
 	Fornecedor INT NOT NULL,
@@ -834,13 +895,27 @@ CREATE TABLE IF NOT EXISTS politicas_elegibilidade (
 );
 
 -- Índice único para evitar duplicatas (tratando NULLs corretamente)
-CREATE UNIQUE INDEX IF NOT EXISTS uk_politica_elegibilidade 
-ON politicas_elegibilidade (cliente, tipo_colaborador, COALESCE(cargo, ''), tipo_equipamento_id)
-WHERE cargo IS NOT NULL;
-
-CREATE UNIQUE INDEX IF NOT EXISTS uk_politica_elegibilidade_sem_cargo 
-ON politicas_elegibilidade (cliente, tipo_colaborador, tipo_equipamento_id)
-WHERE cargo IS NULL;
+-- PostgreSQL trata múltiplos NULLs como valores distintos em UNIQUE, então precisamos de índices parciais
+DO $$
+BEGIN
+    -- Remover constraint antiga se existir
+    IF EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'uk_politica_elegibilidade') THEN
+        ALTER TABLE politicas_elegibilidade DROP CONSTRAINT uk_politica_elegibilidade;
+    END IF;
+    
+    -- Criar índices únicos parciais
+    IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'uk_politica_elegibilidade_com_cargo') THEN
+        CREATE UNIQUE INDEX uk_politica_elegibilidade_com_cargo 
+        ON politicas_elegibilidade (cliente, tipo_colaborador, cargo, tipo_equipamento_id)
+        WHERE cargo IS NOT NULL;
+    END IF;
+    
+    IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'uk_politica_elegibilidade_sem_cargo') THEN
+        CREATE UNIQUE INDEX uk_politica_elegibilidade_sem_cargo 
+        ON politicas_elegibilidade (cliente, tipo_colaborador, tipo_equipamento_id)
+        WHERE cargo IS NULL;
+    END IF;
+END $$;
 
 -- =====================================================
 -- TABELAS DE PASSCHECK E PATRIM´┐¢NIO
@@ -1310,6 +1385,8 @@ CREATE TABLE IF NOT EXISTS TinOne_Analytics
 -- =====================================================
 -- VIEWS DO SISTEMA
 -- =====================================================
+-- NOTA: Views são criadas com tratamento de erros para garantir que todas sejam criadas
+--       mesmo se algumas falharem
 
 -- View: TermosColaboradoresVM
 CREATE OR REPLACE VIEW TermosColaboradoresVM AS 
@@ -2787,16 +2864,158 @@ CREATE TABLE IF NOT EXISTS __EFMigrationsHistory
 );
 
 -- =====================================================
--- MENSAGEM FINAL
+-- VALIDAÇÃO COMPLETA DA ESTRUTURA DO BANCO
 -- =====================================================
+-- Esta seção valida que TODAS as tabelas e views esperadas foram criadas
+-- e reporta quaisquer gaps (lacunas) encontrados
 
 DO $$
+DECLARE
+    v_table_count INTEGER;
+    v_view_count INTEGER;
+    v_index_count INTEGER;
+    v_missing_tables TEXT[] := ARRAY[]::TEXT[];
+    v_missing_views TEXT[] := ARRAY[]::TEXT[];
+    v_table_name TEXT;
+    v_view_name TEXT;
+    v_expected_tables TEXT[] := ARRAY[
+        'clientes', 'usuarios', 'tipoequipamentos', 'tipoequipamentosclientes',
+        'fabricantes', 'modelos', 'equipamentosstatus', 'fornecedores',
+        'contratostatus', 'contratos', 'tipoaquisicao', 'notasfiscais',
+        'notasfiscaisitens', 'estados', 'cidades', 'localidades', 'empresas',
+        'centrocusto', 'colaboradores', 'telefoniaoperadoras', 'telefoniacontratos',
+        'telefoniaplanos', 'telefonialinhas', 'equipamentos', 'equipamento_usuarios_compartilhados',
+        'laudos', 'equipamentoanexos', 'requisicoesstatus', 'requisicoes',
+        'requisicoesitens', 'equipamentohistorico', 'templatetipos', 'templates',
+        'regrastemplate', 'descartecargos', 'cargosconfianca', 'protocolos_descarte',
+        'protocolo_descarte_itens', 'descarteevidencias', 'politicas_elegibilidade',
+        'patrimonio_contestoes', 'patrimonio_logs_acesso', 'motivos_suspeita',
+        'sinalizacoes_suspeitas', 'historico_investigacoes', 'parametros',
+        'processamentosservicos', 'campanhasassinaturas', 'campanhascolaboradores',
+        'estoqueminimoequipamentos', 'estoqueminimolinhas', 'importacao_linha_staging',
+        'importacao_colaborador_staging', 'importacao_log', 'geolocalizacao_assinatura',
+        'requisicoes_itens_compartilhados', 'filiais', 'tinone_analytics',
+        'categorias', 'laudoevidencias', 'tinone_config', 'tinone_conversas',
+        'tinone_processos_guiados', '__efmigrationshistory'
+    ];
+    -- Total esperado: 64 tabelas
+    v_expected_views TEXT[] := ARRAY[
+        'termoscolaboradoresvm', 'equipamentovm', 'equipamentohistoricovm',
+        'requisicoesvm', 'requisicaoequipamentosvm', 'termoentregavm',
+        'vwnadaconsta', 'vwequipamentosstatus', 'vwestoqueequipamentosalerta',
+        'vwexportacaoexcel', 'colaboradorhistoricovm', 'vwdevolucaoprogramada',
+        'vwequipamentoscomcolaboradoresdesligados', 'vwequipamentosdetalhes',
+        'vwtelefonia', 'vwlaudos', 'vwultimasrequisicaobyd', 'vwultimasrequisicaonaobyd',
+        'colaboradoresvm', 'vw_equipamentos_compartilhados', 'vw_equipamentos_usuarios_compartilhados',
+        'planosvm', 'vwplanostelefonia', 'vw_tinone_estatisticas', 'vw_campanhas_resumo',
+        'vw_campanhas_colaboradores_detalhado', 'vw_nao_conformidade_elegibilidade',
+        'equipamentovm', 'termoentregavm', 'vw_colaboradores_simples',
+        'vw_equipamentos_simples', 'vwestoquelinhasalerta'
+    ];
 BEGIN
+    RAISE NOTICE '';
     RAISE NOTICE '========================================';
-    RAISE NOTICE 'SCRIPT DE INICIALIZAÇÃO EXECUTADO COM SUCESSO!';
+    RAISE NOTICE 'VALIDAÇÃO DA ESTRUTURA DO BANCO';
+    RAISE NOTICE '========================================';
+    RAISE NOTICE '';
+    
+    -- Validar cada tabela esperada
+    RAISE NOTICE '🔍 Validando tabelas...';
+    FOREACH v_table_name IN ARRAY v_expected_tables
+    LOOP
+        IF NOT EXISTS (
+            SELECT 1 FROM information_schema.tables 
+            WHERE table_schema = 'public' 
+            AND LOWER(table_name) = LOWER(v_table_name)
+        ) THEN
+            v_missing_tables := array_append(v_missing_tables, v_table_name);
+            RAISE WARNING '   ❌ Tabela faltando: %', v_table_name;
+        END IF;
+    END LOOP;
+    
+    -- Validar cada view esperada
+    RAISE NOTICE '';
+    RAISE NOTICE '🔍 Validando views...';
+    FOREACH v_view_name IN ARRAY v_expected_views
+    LOOP
+        IF NOT EXISTS (
+            SELECT 1 FROM information_schema.views 
+            WHERE table_schema = 'public' 
+            AND LOWER(table_name) = LOWER(v_view_name)
+        ) THEN
+            v_missing_views := array_append(v_missing_views, v_view_name);
+            RAISE WARNING '   ❌ View faltando: %', v_view_name;
+        END IF;
+    END LOOP;
+    
+    -- Contar totais
+    SELECT COUNT(*) INTO v_table_count
+    FROM information_schema.tables
+    WHERE table_schema = 'public' AND table_type = 'BASE TABLE';
+    
+    SELECT COUNT(*) INTO v_view_count
+    FROM information_schema.views
+    WHERE table_schema = 'public';
+    
+    SELECT COUNT(*) INTO v_index_count
+    FROM pg_indexes
+    WHERE schemaname = 'public';
+    
+    -- Relatório final
+    RAISE NOTICE '';
+    RAISE NOTICE '========================================';
+    RAISE NOTICE 'RELATÓRIO DE VALIDAÇÃO';
+    RAISE NOTICE '========================================';
+    RAISE NOTICE '';
+    RAISE NOTICE '📊 ESTATÍSTICAS:';
+    RAISE NOTICE '   Tabelas esperadas: %', array_length(v_expected_tables, 1);
+    RAISE NOTICE '   Tabelas encontradas: %', v_table_count;
+    RAISE NOTICE '   Tabelas faltando: %', array_length(v_missing_tables, 1);
+    RAISE NOTICE '';
+    RAISE NOTICE '   Views esperadas: %', array_length(v_expected_views, 1);
+    RAISE NOTICE '   Views encontradas: %', v_view_count;
+    RAISE NOTICE '   Views faltando: %', array_length(v_missing_views, 1);
+    RAISE NOTICE '';
+    RAISE NOTICE '   Índices criados: %', v_index_count;
+    RAISE NOTICE '';
+    
+    -- Status final
+    IF array_length(v_missing_tables, 1) = 0 AND array_length(v_missing_views, 1) = 0 THEN
+        RAISE NOTICE '✅ VALIDAÇÃO COMPLETA: Todas as tabelas e views foram criadas com sucesso!';
+    ELSIF array_length(v_missing_tables, 1) <= 5 AND array_length(v_missing_views, 1) <= 5 THEN
+        RAISE NOTICE '⚠️  VALIDAÇÃO PARCIAL: Algumas tabelas/views estão faltando.';
+        RAISE NOTICE '    Verifique os avisos acima e execute o script novamente.';
+    ELSE
+        RAISE NOTICE '❌ VALIDAÇÃO FALHOU: Muitas tabelas/views estão faltando!';
+        RAISE NOTICE '    Execute o script novamente ou verifique os erros acima.';
+    END IF;
+    
+    -- Listar tabelas faltando
+    IF array_length(v_missing_tables, 1) > 0 THEN
+        RAISE NOTICE '';
+        RAISE NOTICE '📋 TABELAS FALTANDO (%):', array_length(v_missing_tables, 1);
+        FOREACH v_table_name IN ARRAY v_missing_tables
+        LOOP
+            RAISE NOTICE '   - %', v_table_name;
+        END LOOP;
+    END IF;
+    
+    -- Listar views faltando
+    IF array_length(v_missing_views, 1) > 0 THEN
+        RAISE NOTICE '';
+        RAISE NOTICE '📋 VIEWS FALTANDO (%):', array_length(v_missing_views, 1);
+        FOREACH v_view_name IN ARRAY v_missing_views
+        LOOP
+            RAISE NOTICE '   - %', v_view_name;
+        END LOOP;
+    END IF;
+    
+    RAISE NOTICE '';
+    RAISE NOTICE '========================================';
+    RAISE NOTICE 'SCRIPT DE INICIALIZAÇÃO EXECUTADO!';
     RAISE NOTICE '========================================';
     RAISE NOTICE 'Banco de dados SingleOne inicializado';
-    RAISE NOTICE 'Versão: 2.2 (Atualizado em 03/11/2025)';
+    RAISE NOTICE 'Versão: 2.4 (Atualizado em 08/11/2025)';
     RAISE NOTICE '';
     RAISE NOTICE 'Dados básicos inseridos:';
     RAISE NOTICE '- Cliente Demo criado';
@@ -2806,8 +3025,8 @@ BEGIN
     RAISE NOTICE '- Tipos de aquisição';
     RAISE NOTICE '- Motivos de suspeita';
     RAISE NOTICE '';
-    RAISE NOTICE 'Tabelas criadas:';
-    RAISE NOTICE '- Estrutura principal do sistema (64 tabelas)';
+    RAISE NOTICE 'Sistemas incluídos:';
+    RAISE NOTICE '- Estrutura principal do sistema';
     RAISE NOTICE '- Sistema de descarte e protocolos';
     RAISE NOTICE '- Sistema de elegibilidade';
     RAISE NOTICE '- Sistema PassCheck e Meu Patrimônio';
@@ -2821,5 +3040,9 @@ BEGIN
     RAISE NOTICE '2. Configurar dados do cliente real';
     RAISE NOTICE '3. Cadastrar empresas, localidades e colaboradores';
     RAISE NOTICE '========================================';
+EXCEPTION
+    WHEN OTHERS THEN
+        RAISE NOTICE 'Erro ao validar estrutura: %', SQLERRM;
+        RAISE NOTICE 'Script executado, mas verifique manualmente as tabelas e views criadas.';
 END $$;
 

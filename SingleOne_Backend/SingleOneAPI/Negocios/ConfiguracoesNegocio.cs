@@ -3075,6 +3075,8 @@ namespace SingleOne.Negocios
         {
             try
             {
+                Console.WriteLine($"[ELEGIBILIDADE] Iniciando listagem - Cliente: {cliente}, TipoColaborador: {tipoColaborador}, TipoEquipamentoId: {tipoEquipamentoId}");
+                
                 var query = _politicaElegibilidadeRepository.Query()
                     .Where(x => x.Cliente == cliente && x.Ativo);
 
@@ -3090,16 +3092,23 @@ namespace SingleOne.Negocios
                     query = query.Where(x => x.TipoEquipamentoId == tipoEquipamentoId.Value);
                 }
 
+                Console.WriteLine($"[ELEGIBILIDADE] Query construída, executando...");
+                
                 var politicas = query
                     .Include(x => x.ClienteNavigation)
                     .Include(x => x.TipoEquipamentoNavigation)
                     .Include(x => x.UsuarioCadastroNavigation)
+                    .ToList();
+
+                Console.WriteLine($"[ELEGIBILIDADE] {politicas.Count} políticas encontradas, ordenando...");
+
+                var politicasOrdenadas = politicas
                     .OrderBy(x => x.TipoColaborador)
-                    .ThenBy(x => x.TipoEquipamentoNavigation.Descricao)
+                    .ThenBy(x => x.TipoEquipamentoNavigation?.Descricao ?? "")
                     .ToList();
 
                 // Mapear para ViewModel
-                var resultado = politicas.Select(p => new SingleOneAPI.Models.ViewModels.PoliticaElegibilidadeVM
+                var resultado = politicasOrdenadas.Select(p => new SingleOneAPI.Models.ViewModels.PoliticaElegibilidadeVM
                 {
                     Id = p.Id,
                     Cliente = p.Cliente,
@@ -3125,7 +3134,12 @@ namespace SingleOne.Negocios
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[ELEGIBILIDADE] Erro ao listar políticas: {ex.Message}");
+                Console.WriteLine($"[ELEGIBILIDADE] ❌ Erro ao listar políticas: {ex.Message}");
+                Console.WriteLine($"[ELEGIBILIDADE] StackTrace: {ex.StackTrace}");
+                if (ex.InnerException != null)
+                {
+                    Console.WriteLine($"[ELEGIBILIDADE] InnerException: {ex.InnerException.Message}");
+                }
                 throw;
             }
         }
