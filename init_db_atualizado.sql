@@ -118,7 +118,8 @@ CREATE TABLE IF NOT EXISTS TipoEquipamentos
 (
 	Id serial not null primary key,
 	Descricao varchar(200) not null,
-	Ativo BOOLEAN not null
+	Ativo BOOLEAN not null,
+	TransitoLivre BOOLEAN not null default false
 );
 
 -- Tabela: TipoEquipamentosClientes
@@ -2792,7 +2793,8 @@ CREATE INDEX IF NOT EXISTS idx_categorias_nome ON categorias(nome);
 DO $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'tipoequipamentos' AND column_name = 'categoria_id') THEN
-        ALTER TABLE tipoequipamentos ADD COLUMN categoria_id INTEGER;
+        ALTER TABLE tipoequipamentos ADD COLUMN IF NOT EXISTS categoria_id INTEGER;
+        ALTER TABLE tipoequipamentos ADD COLUMN IF NOT EXISTS transitolivre BOOLEAN NOT NULL DEFAULT false;
     END IF;
 
     -- Adicionar foreign key categoria_id -> categorias(id) se não existir
