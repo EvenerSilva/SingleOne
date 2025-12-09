@@ -16,9 +16,28 @@ DB_PORT="${DB_PORT:-5432}"
 DB_USER="${DB_USER:-postgres}"
 DB_PASSWORD="${DB_PASSWORD:-postgres}"
 DB_NAME="${DB_NAME:-singleone}"
+DOCKER_CONTAINER="${DOCKER_CONTAINER:-singleone-postgres}"
 
-# Exportar senha para psql
-export PGPASSWORD="$DB_PASSWORD"
+# Detectar se estamos usando Docker
+USE_DOCKER=false
+if command -v docker > /dev/null 2>&1; then
+    if docker ps --format '{{.Names}}' | grep -q "^${DOCKER_CONTAINER}$"; then
+        USE_DOCKER=true
+        echo -e "${YELLOW}🐳 Detectado container Docker: ${DOCKER_CONTAINER}${NC}"
+    fi
+fi
+
+# Função para executar psql
+run_psql() {
+    local db=$1
+    shift
+    if [ "$USE_DOCKER" = true ]; then
+        docker exec -e PGPASSWORD="$DB_PASSWORD" "$DOCKER_CONTAINER" psql -U "$DB_USER" -d "$db" "$@"
+    else
+        export PGPASSWORD="$DB_PASSWORD"
+        psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$db" "$@"
+    fi
+}
 
 echo -e "${BLUE}=====================================================${NC}"
 echo -e "${BLUE}  VERIFICAÇÃO DO BANCO SINGLEONE${NC}"
@@ -34,14 +53,18 @@ echo ""
 
 # Verificar conexão com PostgreSQL
 echo -e "${YELLOW}🔍 Verificando conexão com PostgreSQL...${NC}"
-if psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d postgres -c "SELECT version();" > /dev/null 2>&1; then
+if run_psql postgres -c "SELECT version();" > /dev/null 2>&1; then
     echo -e "${GREEN}✅ Conexão com PostgreSQL OK${NC}"
 else
     echo -e "${RED}❌ Não foi possível conectar ao PostgreSQL!${NC}"
     echo "   Verifique:"
     echo "   - Se o PostgreSQL está rodando"
+    if [ "$USE_DOCKER" = true ]; then
+        echo "   - Se o container Docker '$DOCKER_CONTAINER' está rodando"
+    else
+        echo "   - Se o host/porta estão acessíveis"
+    fi
     echo "   - Se as credenciais estão corretas"
-    echo "   - Se o host/porta estão acessíveis"
     exit 1
 fi
 
@@ -49,7 +72,7 @@ echo ""
 
 # Verificar se o banco existe
 echo -e "${YELLOW}🔍 Verificando se o banco '$DB_NAME' existe...${NC}"
-DB_EXISTS=$(psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='$DB_NAME'" 2>/dev/null || echo "0")
+DB_EXISTS=$(run_psql postgres -tAc "SELECT 1 FROM pg_database WHERE datname='$DB_NAME'" 2>/dev/null || echo "0")
 
 if [ "$DB_EXISTS" = "1" ]; then
     echo -e "${GREEN}✅ Banco '$DB_NAME' existe!${NC}"
@@ -58,9 +81,9 @@ if [ "$DB_EXISTS" = "1" ]; then
     # Verificar estrutura
     echo -e "${YELLOW}📊 Estrutura do banco:${NC}"
     
-    TABLE_COUNT=$(psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -tAc "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public' AND table_type = 'BASE TABLE';" 2>/dev/null || echo "0")
-    VIEW_COUNT=$(psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -tAc "SELECT COUNT(*) FROM information_schema.views WHERE table_schema = 'public';" 2>/dev/null || echo "0")
-    SEQUENCE_COUNT=$(psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -tAc "SELECT COUNT(*) FROM information_schema.sequences WHERE sequence_schema = 'public';" 2>/dev/null || echo "0")
+    TABLE_COUNT=$(run_psql "$DB_NAME" -tAc "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public' AND table_type = 'BASE TABLE';" 2>/dev/null || echo "0")
+    VIEW_COUNT=$(run_psql "$DB_NAME" -tAc "SELECT COUNT(*) FROM information_schema.views WHERE table_schema = 'public';" 2>/dev/null || echo "0")
+    SEQUENCE_COUNT=$(run_psql "$DB_NAME" -tAc "SELECT COUNT(*) FROM information_schema.sequences WHERE sequence_schema = 'public';" 2>/dev/null || echo "0")
     
     echo "  📋 Tabelas: $TABLE_COUNT"
     echo "  👁️  Views: $VIEW_COUNT"
@@ -74,7 +97,7 @@ if [ "$DB_EXISTS" = "1" ]; then
     MISSING_TABLES=()
     
     for table in "${CRITICAL_TABLES[@]}"; do
-        EXISTS=$(psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -tAc "SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = '$table';" 2>/dev/null || echo "0")
+        EXISTS=$(run_psql "$DB_NAME" -tAc "SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = '$table';" 2>/dev/null || echo "0")
         if [ "$EXISTS" = "1" ]; then
             echo -e "  ${GREEN}✅${NC} $table"
         else
@@ -88,8 +111,8 @@ if [ "$DB_EXISTS" = "1" ]; then
     # Verificar dados básicos
     echo -e "${YELLOW}📊 Dados básicos:${NC}"
     
-    CLIENT_COUNT=$(psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -tAc "SELECT COUNT(*) FROM clientes;" 2>/dev/null || echo "0")
-    USER_COUNT=$(psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -tAc "SELECT COUNT(*) FROM usuarios;" 2>/dev/null || echo "0")
+    CLIENT_COUNT=$(run_psql "$DB_NAME" -tAc "SELECT COUNT(*) FROM clientes;" 2>/dev/null || echo "0")
+    USER_COUNT=$(run_psql "$DB_NAME" -tAc "SELECT COUNT(*) FROM usuarios;" 2>/dev/null || echo "0")
     
     echo "  👥 Clientes: $CLIENT_COUNT"
     echo "  👤 Usuários: $USER_COUNT"
@@ -121,6 +144,8 @@ fi
 echo ""
 echo -e "${BLUE}=====================================================${NC}"
 
-# Limpar senha do ambiente
-unset PGPASSWORD
+# Limpar senha do ambiente (apenas se não estiver usando Docker)
+if [ "$USE_DOCKER" != true ]; then
+    unset PGPASSWORD
+fi
 

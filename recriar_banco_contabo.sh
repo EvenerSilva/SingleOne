@@ -23,9 +23,28 @@ DB_PORT="${DB_PORT:-5432}"
 DB_USER="${DB_USER:-postgres}"
 DB_PASSWORD="${DB_PASSWORD:-postgres}"
 DB_NAME="${DB_NAME:-singleone}"
+DOCKER_CONTAINER="${DOCKER_CONTAINER:-singleone-postgres}"
 
-# Exportar senha para psql
-export PGPASSWORD="$DB_PASSWORD"
+# Detectar se estamos usando Docker
+USE_DOCKER=false
+if command -v docker > /dev/null 2>&1; then
+    if docker ps --format '{{.Names}}' | grep -q "^${DOCKER_CONTAINER}$"; then
+        USE_DOCKER=true
+        echo -e "${YELLOW}🐳 Detectado container Docker: ${DOCKER_CONTAINER}${NC}"
+    fi
+fi
+
+# Função para executar psql
+run_psql() {
+    local db=$1
+    shift
+    if [ "$USE_DOCKER" = true ]; then
+        docker exec -e PGPASSWORD="$DB_PASSWORD" "$DOCKER_CONTAINER" psql -U "$DB_USER" -d "$db" "$@"
+    else
+        export PGPASSWORD="$DB_PASSWORD"
+        psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$db" "$@"
+    fi
+}
 
 echo -e "${YELLOW}📋 Configurações:${NC}"
 echo "  Host: $DB_HOST"
@@ -36,7 +55,7 @@ echo ""
 
 # Verificar se o banco existe
 echo -e "${YELLOW}🔍 Verificando se o banco '$DB_NAME' existe...${NC}"
-DB_EXISTS=$(psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='$DB_NAME'" 2>/dev/null || echo "0")
+DB_EXISTS=$(run_psql postgres -tAc "SELECT 1 FROM pg_database WHERE datname='$DB_NAME'" 2>/dev/null || echo "0")
 
 if [ "$DB_EXISTS" = "1" ]; then
     echo -e "${GREEN}✅ Banco '$DB_NAME' já existe!${NC}"
@@ -44,10 +63,10 @@ if [ "$DB_EXISTS" = "1" ]; then
     echo -e "${YELLOW}📊 Verificando estrutura do banco...${NC}"
     
     # Contar tabelas
-    TABLE_COUNT=$(psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -tAc "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public' AND table_type = 'BASE TABLE';" 2>/dev/null || echo "0")
+    TABLE_COUNT=$(run_psql "$DB_NAME" -tAc "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public' AND table_type = 'BASE TABLE';" 2>/dev/null || echo "0")
     
     # Contar views
-    VIEW_COUNT=$(psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -tAc "SELECT COUNT(*) FROM information_schema.views WHERE table_schema = 'public';" 2>/dev/null || echo "0")
+    VIEW_COUNT=$(run_psql "$DB_NAME" -tAc "SELECT COUNT(*) FROM information_schema.views WHERE table_schema = 'public';" 2>/dev/null || echo "0")
     
     echo "  Tabelas encontradas: $TABLE_COUNT"
     echo "  Views encontradas: $VIEW_COUNT"
@@ -83,20 +102,20 @@ if [ "$RECREATE" = true ]; then
     echo -e "${YELLOW}🗑️  Removendo banco existente (se houver)...${NC}"
     
     # Terminar conexões ativas
-    psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d postgres -c "
+    run_psql postgres -c "
         SELECT pg_terminate_backend(pid)
         FROM pg_stat_activity
         WHERE datname = '$DB_NAME' AND pid <> pg_backend_pid();
     " 2>/dev/null || true
     
     # Dropar banco
-    psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d postgres -c "DROP DATABASE IF EXISTS \"$DB_NAME\";" 2>/dev/null || true
+    run_psql postgres -c "DROP DATABASE IF EXISTS \"$DB_NAME\";" 2>/dev/null || true
     
     echo -e "${GREEN}✅ Banco removido (se existia)${NC}"
     echo ""
     
     echo -e "${YELLOW}🆕 Criando novo banco '$DB_NAME'...${NC}"
-    psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d postgres -c "CREATE DATABASE \"$DB_NAME\";"
+    run_psql postgres -c "CREATE DATABASE \"$DB_NAME\";"
     
     if [ $? -eq 0 ]; then
         echo -e "${GREEN}✅ Banco criado com sucesso!${NC}"
@@ -116,7 +135,14 @@ if [ "$RECREATE" = true ]; then
     fi
     
     # Executar script de inicialização
-    psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -f init_db_atualizado.sql
+    if [ "$USE_DOCKER" = true ]; then
+        # Copiar script para o container e executar
+        docker cp init_db_atualizado.sql "$DOCKER_CONTAINER":/tmp/init_db_atualizado.sql
+        docker exec -e PGPASSWORD="$DB_PASSWORD" "$DOCKER_CONTAINER" psql -U "$DB_USER" -d "$DB_NAME" -f /tmp/init_db_atualizado.sql
+        docker exec "$DOCKER_CONTAINER" rm -f /tmp/init_db_atualizado.sql
+    else
+        run_psql "$DB_NAME" -f init_db_atualizado.sql
+    fi
     
     if [ $? -eq 0 ]; then
         echo ""
@@ -131,8 +157,8 @@ if [ "$RECREATE" = true ]; then
     echo -e "${YELLOW}📊 Verificando estrutura final...${NC}"
     
     # Contar tabelas e views novamente
-    TABLE_COUNT=$(psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -tAc "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public' AND table_type = 'BASE TABLE';" 2>/dev/null || echo "0")
-    VIEW_COUNT=$(psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -tAc "SELECT COUNT(*) FROM information_schema.views WHERE table_schema = 'public';" 2>/dev/null || echo "0")
+    TABLE_COUNT=$(run_psql "$DB_NAME" -tAc "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public' AND table_type = 'BASE TABLE';" 2>/dev/null || echo "0")
+    VIEW_COUNT=$(run_psql "$DB_NAME" -tAc "SELECT COUNT(*) FROM information_schema.views WHERE table_schema = 'public';" 2>/dev/null || echo "0")
     
     echo "  Tabelas criadas: $TABLE_COUNT"
     echo "  Views criadas: $VIEW_COUNT"
@@ -160,8 +186,10 @@ echo "  Password: $DB_PASSWORD"
 echo "  Database: $DB_NAME"
 echo ""
 
-# Limpar senha do ambiente
-unset PGPASSWORD
+# Limpar senha do ambiente (apenas se não estiver usando Docker)
+if [ "$USE_DOCKER" != true ]; then
+    unset PGPASSWORD
+fi
 
 echo -e "${GREEN}✅ Processo concluído!${NC}"
 
