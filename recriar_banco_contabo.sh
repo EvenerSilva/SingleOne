@@ -28,9 +28,34 @@ DOCKER_CONTAINER="${DOCKER_CONTAINER:-singleone-postgres}"
 # Detectar se estamos usando Docker
 USE_DOCKER=false
 if command -v docker > /dev/null 2>&1; then
-    if docker ps --format '{{.Names}}' | grep -q "^${DOCKER_CONTAINER}$"; then
-        USE_DOCKER=true
-        echo -e "${YELLOW}🐳 Detectado container Docker: ${DOCKER_CONTAINER}${NC}"
+    # Verificar se o container existe (rodando ou parado)
+    if docker ps -a --format '{{.Names}}' | grep -q "^${DOCKER_CONTAINER}$"; then
+        # Verificar se está rodando
+        if docker ps --format '{{.Names}}' | grep -q "^${DOCKER_CONTAINER}$"; then
+            USE_DOCKER=true
+            echo -e "${YELLOW}🐳 Detectado container Docker rodando: ${DOCKER_CONTAINER}${NC}"
+        else
+            echo -e "${YELLOW}⚠️  Container Docker existe mas não está rodando. Tentando iniciar...${NC}"
+            docker start "$DOCKER_CONTAINER" > /dev/null 2>&1
+            sleep 2
+            if docker ps --format '{{.Names}}' | grep -q "^${DOCKER_CONTAINER}$"; then
+                USE_DOCKER=true
+                echo -e "${GREEN}✅ Container iniciado com sucesso!${NC}"
+            fi
+        fi
+    fi
+fi
+
+# Se ainda não detectou Docker, tentar forçar se psql não estiver disponível
+if [ "$USE_DOCKER" = false ] && ! command -v psql > /dev/null 2>&1; then
+    if command -v docker > /dev/null 2>&1; then
+        # Tentar encontrar qualquer container postgres
+        POSTGRES_CONTAINER=$(docker ps --format '{{.Names}}' | grep -i postgres | head -n 1)
+        if [ -n "$POSTGRES_CONTAINER" ]; then
+            DOCKER_CONTAINER="$POSTGRES_CONTAINER"
+            USE_DOCKER=true
+            echo -e "${YELLOW}🐳 Detectado container PostgreSQL: ${DOCKER_CONTAINER}${NC}"
+        fi
     fi
 fi
 
