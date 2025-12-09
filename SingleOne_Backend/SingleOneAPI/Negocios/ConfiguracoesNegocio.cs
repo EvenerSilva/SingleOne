@@ -1336,19 +1336,28 @@ namespace SingleOne.Negocios
                 // Usar o contexto diretamente para ter controle sobre o tracking
                 if (notaFiscal.Id == 0)
                 {
-                    // Adicionar nota fiscal sem rastrear entidades relacionadas
-                    _context.Entry(notaFiscal).State = Microsoft.EntityFrameworkCore.EntityState.Added;
+                    // Adicionar nota fiscal diretamente no contexto sem rastrear entidades relacionadas
+                    _context.Notasfiscais.Add(notaFiscal);
                     
-                    // Adicionar itens sem rastrear entidades relacionadas
+                    // Adicionar itens diretamente no contexto
                     if (notaFiscal.Notasfiscaisitens != null && notaFiscal.Notasfiscaisitens.Count > 0)
                     {
                         foreach (var item in notaFiscal.Notasfiscaisitens)
                         {
-                            _context.Entry(item).State = Microsoft.EntityFrameworkCore.EntityState.Added;
+                            // Garantir que não há objetos de navegação sendo rastreados
+                            item.FabricanteNavigation = null;
+                            item.ModeloNavigation = null;
+                            item.TipoequipamentoNavigation = null;
+                            item.ContratoNavigation = null;
+                            item.NotafiscalNavigation = null;
+                            
+                            _context.Notasfiscaisitens.Add(item);
                         }
                     }
                     
-                    _context.SaveChanges();
+                    // Salvar mudanças
+                    var strategy = _context.Database.CreateExecutionStrategy();
+                    strategy.Execute(() => { _context.SaveChanges(); });
                 }
                 else
                 {
