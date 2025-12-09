@@ -1282,52 +1282,63 @@ namespace SingleOne.Negocios
         {
             try
             {
-                // Converter DateTimes UTC para Local antes de salvar no banco
-                if (nf.Dtemissao.Kind == DateTimeKind.Utc)
+                // Criar uma nova instância para evitar conflitos de tracking
+                Notasfiscai notaFiscal = new Notasfiscai
                 {
-                    nf.Dtemissao = DateTime.SpecifyKind(nf.Dtemissao, DateTimeKind.Local);
-                }
+                    Id = nf.Id,
+                    Cliente = nf.Cliente,
+                    Fornecedor = nf.Fornecedor,
+                    Numero = nf.Numero,
+                    Dtemissao = nf.Dtemissao.Kind == DateTimeKind.Utc ? DateTime.SpecifyKind(nf.Dtemissao, DateTimeKind.Local) : nf.Dtemissao,
+                    Descricao = nf.Descricao,
+                    Valor = nf.CalcularValorNota(),
+                    Contrato = nf.Contrato,
+                    Virtual = nf.Virtual,
+                    Gerouequipamento = nf.Gerouequipamento,
+                    Migrateid = nf.Migrateid,
+                    ArquivoNotaFiscal = nf.ArquivoNotaFiscal,
+                    NomeArquivoOriginal = nf.NomeArquivoOriginal,
+                    DataUploadArquivo = nf.DataUploadArquivo.HasValue && nf.DataUploadArquivo.Value.Kind == DateTimeKind.Utc 
+                        ? DateTime.SpecifyKind(nf.DataUploadArquivo.Value, DateTimeKind.Local) 
+                        : nf.DataUploadArquivo,
+                    UsuarioUploadArquivo = nf.UsuarioUploadArquivo,
+                    UsuarioRemocaoArquivo = nf.UsuarioRemocaoArquivo,
+                    DataRemocaoArquivo = nf.DataRemocaoArquivo.HasValue && nf.DataRemocaoArquivo.Value.Kind == DateTimeKind.Utc 
+                        ? DateTime.SpecifyKind(nf.DataRemocaoArquivo.Value, DateTimeKind.Local) 
+                        : nf.DataRemocaoArquivo
+                };
                 
-                if (nf.DataUploadArquivo.HasValue && nf.DataUploadArquivo.Value.Kind == DateTimeKind.Utc)
-                {
-                    nf.DataUploadArquivo = DateTime.SpecifyKind(nf.DataUploadArquivo.Value, DateTimeKind.Local);
-                }
-                
-                if (nf.DataRemocaoArquivo.HasValue && nf.DataRemocaoArquivo.Value.Kind == DateTimeKind.Utc)
-                {
-                    nf.DataRemocaoArquivo = DateTime.SpecifyKind(nf.DataRemocaoArquivo.Value, DateTimeKind.Local);
-                }
-                
-                // Converter DateTimes dos itens da nota fiscal também
+                // Adicionar itens sem objetos de navegação
                 if (nf.Notasfiscaisitens != null && nf.Notasfiscaisitens.Count > 0)
                 {
+                    notaFiscal.Notasfiscaisitens = new List<Notasfiscaisiten>();
                     foreach (var item in nf.Notasfiscaisitens)
                     {
-                        if (item.Dtlimitegarantia.HasValue && item.Dtlimitegarantia.Value.Kind == DateTimeKind.Utc)
+                        notaFiscal.Notasfiscaisitens.Add(new Notasfiscaisiten
                         {
-                            item.Dtlimitegarantia = DateTime.SpecifyKind(item.Dtlimitegarantia.Value, DateTimeKind.Local);
-                        }
-                        
-                        // Desanexar entidades relacionadas para evitar conflito de tracking
-                        item.FabricanteNavigation = null;
-                        item.ModeloNavigation = null;
-                        item.TipoequipamentoNavigation = null;
-                        item.ContratoNavigation = null;
+                            Id = item.Id,
+                            Notafiscal = item.Notafiscal,
+                            Tipoequipamento = item.Tipoequipamento,
+                            Fabricante = item.Fabricante,
+                            Modelo = item.Modelo,
+                            Quantidade = item.Quantidade,
+                            Valorunitario = item.Valorunitario,
+                            TipoAquisicao = item.TipoAquisicao,
+                            Dtlimitegarantia = item.Dtlimitegarantia.HasValue && item.Dtlimitegarantia.Value.Kind == DateTimeKind.Utc
+                                ? DateTime.SpecifyKind(item.Dtlimitegarantia.Value, DateTimeKind.Local)
+                                : item.Dtlimitegarantia,
+                            Contrato = item.Contrato
+                        });
                     }
                 }
                 
-                // Desanexar entidades relacionadas da nota fiscal
-                nf.ClienteNavigation = null;
-                nf.FornecedorNavigation = null;
-                
-                if (nf.Id == 0)
+                if (notaFiscal.Id == 0)
                 {
-                    nf.Valor = nf.CalcularValorNota();
-                    _notafiscalRepository.Adicionar(nf);
+                    _notafiscalRepository.Adicionar(notaFiscal);
                 }
                 else
                 {
-                    _notafiscalRepository.Atualizar(nf);
+                    _notafiscalRepository.Atualizar(notaFiscal);
                 }
             }
             catch (Exception ex)
