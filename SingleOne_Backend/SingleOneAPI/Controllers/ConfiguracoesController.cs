@@ -382,7 +382,17 @@ namespace SingleOne.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { Mensagem = "Erro ao salvar fornecedor: " + ex.Message, Status = "500" });
+                var innerException = ex.InnerException != null ? ex.InnerException.Message : "N/A";
+                Console.WriteLine($"[FORNECEDOR API] ❌ Erro: {ex.Message}");
+                Console.WriteLine($"[FORNECEDOR API] ❌ Inner: {innerException}");
+                Console.WriteLine($"[FORNECEDOR API] ❌ StackTrace: {ex.StackTrace}");
+                
+                return StatusCode(500, new { 
+                    Mensagem = "Erro ao salvar fornecedor: " + ex.Message, 
+                    Status = "500",
+                    InnerException = innerException,
+                    Detalhes = "Verifique os logs do servidor para mais informações"
+                });
             }
         }
         [HttpDelete("[action]/{id}", Name ="ExcluirFornecedor")]

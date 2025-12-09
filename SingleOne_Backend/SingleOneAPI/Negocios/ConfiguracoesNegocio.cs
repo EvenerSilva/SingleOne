@@ -736,7 +736,46 @@ namespace SingleOne.Negocios
             }
             catch (Exception ex)
             {
-                return JsonConvert.SerializeObject(new { Mensagem = $"Erro ao salvar fornecedor: {ex.Message}", Status = "500" });
+                // Capturar exceção interna para diagnóstico
+                var innerException = ex.InnerException != null ? ex.InnerException.Message : "N/A";
+                var stackTrace = ex.StackTrace ?? "N/A";
+                var fullException = ex.ToString();
+                
+                Console.WriteLine($"[FORNECEDOR] ❌ Erro ao salvar: {ex.Message}");
+                Console.WriteLine($"[FORNECEDOR] ❌ Inner Exception: {innerException}");
+                Console.WriteLine($"[FORNECEDOR] ❌ StackTrace: {stackTrace}");
+                Console.WriteLine($"[FORNECEDOR] ❌ Full Exception: {fullException}");
+                
+                // Verificar se é erro de foreign key (cliente não existe)
+                if (innerException.Contains("foreign key") || innerException.Contains("violates foreign key"))
+                {
+                    return JsonConvert.SerializeObject(new { 
+                        Mensagem = $"❌ Erro de integridade: O cliente ID {fornecedor.Cliente} não existe no banco de dados. Verifique se o cliente foi cadastrado corretamente.", 
+                        Status = "400",
+                        Tipo = "FOREIGN_KEY_ERROR",
+                        ClienteId = fornecedor.Cliente,
+                        Detalhes = innerException
+                    });
+                }
+                
+                // Se for erro de constraint ou foreign key, retornar mensagem mais clara
+                if (ex.Message.Contains("foreign key") || ex.Message.Contains("constraint") || 
+                    innerException.Contains("foreign key") || innerException.Contains("constraint"))
+                {
+                    return JsonConvert.SerializeObject(new { 
+                        Mensagem = $"Erro ao salvar fornecedor: Problema com relacionamento de dados. Verifique se o cliente existe e está ativo. Detalhes: {innerException}", 
+                        Status = "400",
+                        Tipo = "CONSTRAINT_ERROR",
+                        Detalhes = innerException
+                    });
+                }
+                
+                return JsonConvert.SerializeObject(new { 
+                    Mensagem = $"Erro ao salvar fornecedor: {ex.Message}. Detalhes: {innerException}", 
+                    Status = "500",
+                    Tipo = "ERRO_INTERNO",
+                    Detalhes = innerException
+                });
             }
         }
         public void ExcluirFornecedor(int id)

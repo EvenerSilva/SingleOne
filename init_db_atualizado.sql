@@ -77,14 +77,42 @@ END $$;
 -- =====================================================
 
 -- Tabela: Clientes
-CREATE TABLE IF NOT EXISTS Clientes
+CREATE TABLE IF NOT EXISTS clientes
 (
-	Id serial not null primary key,
-	RazaoSocial varchar(200) not null,
-	Cnpj varchar(20) not null,
-	Ativo boolean not null,
-	Logo TEXT
+	id serial not null primary key,
+	razaosocial varchar(200) not null,
+	cnpj varchar(20) not null,
+	ativo boolean not null,
+	logo TEXT
 );
+
+-- Migração: Renomear tabela e colunas de Clientes para snake_case se necessário
+DO $$
+BEGIN
+	-- Renomear tabela se existir com nome antigo
+	IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'Clientes') THEN
+		IF NOT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'clientes') THEN
+			ALTER TABLE "Clientes" RENAME TO clientes;
+		END IF;
+	END IF;
+	
+	-- Renomear colunas se necessário
+	IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'clientes' AND column_name = 'Id') THEN
+		ALTER TABLE clientes RENAME COLUMN "Id" TO id;
+	END IF;
+	IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'clientes' AND column_name = 'RazaoSocial') THEN
+		ALTER TABLE clientes RENAME COLUMN "RazaoSocial" TO razaosocial;
+	END IF;
+	IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'clientes' AND column_name = 'Cnpj') THEN
+		ALTER TABLE clientes RENAME COLUMN "Cnpj" TO cnpj;
+	END IF;
+	IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'clientes' AND column_name = 'Ativo') THEN
+		ALTER TABLE clientes RENAME COLUMN "Ativo" TO ativo;
+	END IF;
+	IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'clientes' AND column_name = 'Logo') THEN
+		ALTER TABLE clientes RENAME COLUMN "Logo" TO logo;
+	END IF;
+END $$;
 
 -- Tabela: Usuarios
 CREATE TABLE IF NOT EXISTS Usuarios
@@ -106,7 +134,7 @@ CREATE TABLE IF NOT EXISTS Usuarios
 	two_factor_secret TEXT,
 	two_factor_backup_codes TEXT,
 	two_factor_last_used TIMESTAMP,
-	constraint fkUsuarioCliente foreign key (Cliente) REFERENCES Clientes(Id)
+	constraint fkusuariocliente foreign key (cliente) references clientes(id)
 );
 
 -- =====================================================
@@ -119,7 +147,8 @@ CREATE TABLE IF NOT EXISTS TipoEquipamentos
 	Id serial not null primary key,
 	Descricao varchar(200) not null,
 	Ativo BOOLEAN not null,
-	TransitoLivre BOOLEAN not null default false
+	TransitoLivre BOOLEAN not null default false,
+	categoria_id INTEGER
 );
 
 -- Tabela: TipoEquipamentosClientes
@@ -128,8 +157,8 @@ CREATE TABLE IF NOT EXISTS TipoEquipamentosClientes
 	Id serial not null primary key,
 	Cliente int not null,
 	Tipo int not null,
-	constraint fkTipoEqpCliente foreign key (Cliente) references Clientes(Id),
-	constraint fkTipoEqpClienteTIpo foreign key (Tipo) references TipoEquipamentos(Id),
+	constraint fktipoeqpcliente foreign key (cliente) references clientes(id),
+	constraint fktipoeqpclientetipo foreign key (tipo) references tipoequipamentos(id),
 	constraint uk_tipoequipamentocliente unique (Cliente, Tipo)
 );
 
@@ -142,7 +171,7 @@ CREATE TABLE IF NOT EXISTS Fabricantes
 	Descricao varchar(200) not null,
 	Ativo boolean not null,
 	MigrateID int,
-	constraint fkFabricanteCliente foreign key (Cliente) references Clientes(Id),
+	constraint fkfabricantecliente foreign key (cliente) references clientes(id),
 	constraint fkFabricanteTipoEqp foreign key (TipoEquipamento) references TipoEquipamentos(Id)
 );
 
@@ -157,7 +186,7 @@ CREATE TABLE IF NOT EXISTS Modelos
 	SetEstoqueMinimo boolean,
 	Ativo boolean not null,
 	MigrateID int,
-	constraint fkModelosCliente foreign key (Cliente) references Clientes(Id),
+	constraint fkmodeloscliente foreign key (cliente) references clientes(id),
 	constraint fkModelosFabricantes foreign key (Fabricante) references Fabricantes(Id)
 );
 
@@ -174,17 +203,53 @@ CREATE TABLE IF NOT EXISTS EquipamentosStatus
 -- =====================================================
 
 -- Tabela: Fornecedores
-CREATE TABLE IF NOT EXISTS Fornecedores
+CREATE TABLE IF NOT EXISTS fornecedores
 (
-	Id serial not null primary key,
-	Cliente int not null,
-	Nome varchar(200) not null,
-	CNPJ varchar(20),
-	Ativo boolean not null,
-	DestinadorResiduos boolean not null default false,
-	MigrateID int,
-	constraint fkFornecedorCliente foreign key (Cliente) references Clientes(Id)
+	id serial not null primary key,
+	cliente int not null,
+	nome varchar(200) not null,
+	cnpj varchar(20),
+	ativo boolean not null,
+	destinador_residuos boolean not null default false,
+	migrateid int,
+	constraint fkfornecedorcliente foreign key (cliente) references clientes(id)
 );
+
+-- Migração: Renomear tabela e colunas de Fornecedores para snake_case se necessário
+DO $$
+BEGIN
+	-- Renomear tabela se existir com nome antigo
+	IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'Fornecedores') THEN
+		IF NOT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'fornecedores') THEN
+			ALTER TABLE "Fornecedores" RENAME TO fornecedores;
+		END IF;
+	END IF;
+	
+	-- Renomear colunas se necessário
+	IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'fornecedores' AND column_name = 'Id') THEN
+		ALTER TABLE fornecedores RENAME COLUMN "Id" TO id;
+	END IF;
+	IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'fornecedores' AND column_name = 'Cliente') THEN
+		ALTER TABLE fornecedores RENAME COLUMN "Cliente" TO cliente;
+	END IF;
+	IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'fornecedores' AND column_name = 'Nome') THEN
+		ALTER TABLE fornecedores RENAME COLUMN "Nome" TO nome;
+	END IF;
+	IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'fornecedores' AND column_name = 'CNPJ') THEN
+		ALTER TABLE fornecedores RENAME COLUMN "CNPJ" TO cnpj;
+	END IF;
+	IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'fornecedores' AND column_name = 'Ativo') THEN
+		ALTER TABLE fornecedores RENAME COLUMN "Ativo" TO ativo;
+	END IF;
+	IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'fornecedores' AND column_name = 'MigrateID') THEN
+		ALTER TABLE fornecedores RENAME COLUMN "MigrateID" TO migrateid;
+	END IF;
+	
+	-- Renomear constraint se necessário
+	IF EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'fkFornecedorCliente' AND table_name = 'fornecedores') THEN
+		ALTER TABLE fornecedores RENAME CONSTRAINT "fkFornecedorCliente" TO fkfornecedorcliente;
+	END IF;
+END $$;
 
 -- Tabela: ContratoStatus
 CREATE TABLE IF NOT EXISTS ContratoStatus (
@@ -220,8 +285,14 @@ CREATE TABLE IF NOT EXISTS Contratos (
 	ArquivoUsuarioUpload INT,
 	ArquivoDataRemocao TIMESTAMP,
 	ArquivoUsuarioRemocao INT,
+	arquivocontrato VARCHAR(500),
+	nomearquivooriginal VARCHAR(255),
+	datauploadarquivo TIMESTAMP,
+	usuariouploadarquivo INT,
+	usuarioremocaoarquivo INT,
+	dataremocaoarquivo TIMESTAMP,
 	CONSTRAINT PK_Contrato PRIMARY KEY(Id),
-	CONSTRAINT FK_Contrato_Clientes FOREIGN KEY (Cliente) REFERENCES Clientes(Id),
+	CONSTRAINT FK_Contrato_Clientes FOREIGN KEY (Cliente) references clientes(id),
 	CONSTRAINT FK_Contrato_Fornecedor FOREIGN KEY (Fornecedor) REFERENCES Fornecedores(Id),
 	CONSTRAINT FK_Contrato_Status FOREIGN KEY (Status) REFERENCES ContratoStatus(Id),
 	CONSTRAINT FK_Contrato_ContratoPai FOREIGN KEY (ContratoPai) REFERENCES Contratos(Id),
@@ -261,10 +332,18 @@ CREATE TABLE IF NOT EXISTS NotasFiscais
 	ArquivoTipo VARCHAR(100),
 	ArquivoDataUpload TIMESTAMP,
 	ArquivoUsuarioUpload INT,
-	constraint fkNFCliente foreign key (Cliente) references Clientes(Id),
+	arquivonotafiscal VARCHAR(500),
+	nomearquivooriginal VARCHAR(255),
+	datauploadarquivo TIMESTAMP,
+	usuariouploadarquivo INT,
+	usuarioremocaoarquivo INT,
+	dataremocaoarquivo TIMESTAMP,
+	constraint fkNFCliente foreign key (Cliente) references clientes(id),
 	constraint fkNFFornecedor foreign key (Fornecedor) references Fornecedores(Id),
 	constraint fkNFContrato foreign key (Contrato) references Contratos(Id),
-	CONSTRAINT fk_NotasFiscais_ArquivoUsuarioUpload FOREIGN KEY (ArquivoUsuarioUpload) REFERENCES Usuarios(Id)
+	CONSTRAINT fk_NotasFiscais_ArquivoUsuarioUpload FOREIGN KEY (ArquivoUsuarioUpload) REFERENCES Usuarios(Id),
+	CONSTRAINT fk_NotasFiscais_UsuarioUploadArquivo FOREIGN KEY (usuariouploadarquivo) REFERENCES Usuarios(Id),
+	CONSTRAINT fk_NotasFiscais_UsuarioRemocaoArquivo FOREIGN KEY (usuarioremocaoarquivo) REFERENCES Usuarios(Id)
 );
 
 -- Tabela: NotasFiscaisItens
@@ -316,12 +395,12 @@ CREATE TABLE IF NOT EXISTS Localidades
 (
 	Id serial not null primary key,
 	Cliente int not null,
-	Descricao varchar(300) not null,
+	Descricao varchar(300) not null default '',
 	Cidade varchar(100),
-	Estado varchar(2),
+	Estado varchar(50),
 	Ativo boolean not null,
 	MigrateID int,
-	constraint fkLocalidadeCliente foreign key (Cliente) references Clientes(Id)
+	constraint fkLocalidadeCliente foreign key (Cliente) references clientes(id)
 );
 
 -- =====================================================
@@ -339,7 +418,7 @@ CREATE TABLE IF NOT EXISTS Empresas
 	MigrateID int,
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	constraint fkEmpresaCliente foreign key (Cliente) references Clientes(Id),
+	constraint fkEmpresaCliente foreign key (Cliente) references clientes(id),
 	constraint fkEmpresaLocalidade foreign key (Localidade_Id) references Localidades(Id)
 );
 
@@ -401,7 +480,7 @@ CREATE TABLE IF NOT EXISTS Colaboradores
 	constraint fkColaboradorLocalidade foreign key (Localidade) references Localidades(Id),
 	constraint fkColaboradorLocalidadeId foreign key (Localidade_Id) references Localidades(Id),
 	constraint fkColaboradorFilial foreign key (Filial_Id) references Filiais(Id),
-	constraint fkColaboradorCliente foreign key (Cliente) references Clientes(Id)
+	constraint fkColaboradorCliente foreign key (Cliente) references clientes(id)
 );
 
 -- Adicionar colunas faltantes em Colaboradores se a tabela já existir (migração)
@@ -446,7 +525,7 @@ CREATE TABLE IF NOT EXISTS TelefoniaContratos
 	Descricao varchar(250),
 	MigrateID int,
 	Ativo boolean not null,
-	constraint fkTelContratoCliente foreign key (Cliente) references Clientes(Id),
+	constraint fkTelContratoCliente foreign key (Cliente) references clientes(id),
 	constraint fktelContratoOperadora foreign key (Operadora) references TelefoniaOperadoras(Id)
 );
 
@@ -491,7 +570,6 @@ CREATE TABLE IF NOT EXISTS Equipamentos
 	Contrato int,
 	EquipamentoStatus int,
 	Usuario int,
-	Localizacao int,
 	Localidade_Id int,
 	Filial_Id int,
 	TipoAquisicao int not null,
@@ -508,7 +586,7 @@ CREATE TABLE IF NOT EXISTS Equipamentos
 	MigrateID int,
 	enviouEmailReporte boolean default false,
 	compartilhado BOOLEAN DEFAULT FALSE NOT NULL,
-	constraint fkEquipamentoCliente foreign key (Cliente) references Clientes(Id),
+	constraint fkEquipamentoCliente foreign key (Cliente) references clientes(id),
 	constraint fkEquipamentoTipoEqp foreign key (TipoEquipamento) references TipoEquipamentos(Id),
 	constraint fkEquipamentoFabricante foreign key (Fabricante) references Fabricantes(Id),
 	constraint fkEquipamentoModelo foreign key (Modelo) references Modelos(Id),
@@ -516,7 +594,6 @@ CREATE TABLE IF NOT EXISTS Equipamentos
 	constraint fkEquipamentoContrato foreign key (Contrato) references Contratos(Id),
 	constraint fkEquipamentoStatus foreign key (EquipamentoStatus) references EquipamentosStatus(Id),
 	constraint fkEquipamentoUsuario foreign key (Usuario) references Usuarios(Id),
-	constraint fkEquipamentoLocalidade foreign key (Localizacao) references Localidades(Id),
 	constraint fkEquipamentoLocalidadeId foreign key (Localidade_Id) references Localidades(Id),
 	constraint fkEquipamentoFilial foreign key (Filial_Id) references Filiais(Id),
 	constraint fkEquipamentoEmpresa foreign key (Empresa) references Empresas(Id),
@@ -660,7 +737,7 @@ CREATE TABLE IF NOT EXISTS Requisicoes
 	DtEnvioTermo timestamp,
 	HashRequisicao varchar(200) not null,
 	MigrateID int,
-	constraint fkRequisicaoCliente foreign key (Cliente) references Clientes(Id),
+	constraint fkRequisicaoCliente foreign key (Cliente) references clientes(id),
 	constraint fkRequisicaoUsuario foreign key (UsuarioRequisicao) references Usuarios(Id),
 	constraint fkRequisicaoTecnico foreign key (TecnicoResponsavel) references Usuarios(Id),
 	constraint fkRequisicaoStatus foreign key (RequisicaoStatus) references RequisicoesStatus(Id),
@@ -752,7 +829,7 @@ CREATE TABLE IF NOT EXISTS Templates
 	DataAlteracao timestamp,
 	Ativo boolean not null,
 	constraint fkTemplatesTipo foreign key (Tipo) references TemplateTipos(Id),
-	constraint fkTemplateCliente foreign key (Cliente) references Clientes(Id)
+	constraint fkTemplateCliente foreign key (Cliente) references clientes(id)
 );
 
 -- Tabela: regrasTemplate
@@ -776,7 +853,7 @@ CREATE TABLE IF NOT EXISTS DescarteCargos
 	Id serial not null primary key,
 	Cliente int not null,
 	Cargo varchar(500) not null,
-	constraint fkCargoCliente foreign key (Cliente) references Clientes(Id)
+	constraint fkCargoCliente foreign key (Cliente) references clientes(id)
 );
 
 -- Tabela: CargosConfianca
@@ -991,9 +1068,28 @@ CREATE TABLE IF NOT EXISTS sinalizacoes_suspeitas (
     resultado_investigacao TEXT,
     acoes_tomadas TEXT,
     observacoes_finais TEXT,
+    nome_vigilante VARCHAR(100),
+    numero_protocolo VARCHAR(20),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Adicionar colunas faltantes em sinalizacoes_suspeitas se a tabela já existir (migração)
+DO $$
+BEGIN
+	IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'sinalizacoes_suspeitas' AND column_name = 'nome_vigilante') THEN
+		ALTER TABLE sinalizacoes_suspeitas ADD COLUMN nome_vigilante VARCHAR(100);
+	END IF;
+	IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'sinalizacoes_suspeitas' AND column_name = 'numero_protocolo') THEN
+		ALTER TABLE sinalizacoes_suspeitas ADD COLUMN numero_protocolo VARCHAR(20);
+	END IF;
+	IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'sinalizacoes_suspeitas' AND column_name = 'created_at') THEN
+		ALTER TABLE sinalizacoes_suspeitas ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+	END IF;
+	IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'sinalizacoes_suspeitas' AND column_name = 'updated_at') THEN
+		ALTER TABLE sinalizacoes_suspeitas ADD COLUMN updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+	END IF;
+END $$;
 
 -- Tabela: Histórico de Investigações
 CREATE TABLE IF NOT EXISTS historico_investigacoes (
@@ -1034,7 +1130,7 @@ CREATE TABLE IF NOT EXISTS PARAMETROS
 	two_factor_max_attempts INTEGER DEFAULT 3,
 	two_factor_lockout_minutes INTEGER DEFAULT 15,
 	two_factor_email_template TEXT,
-	constraint fkParametrosCliente foreign key (Cliente) references Clientes(Id)
+	constraint fkParametrosCliente foreign key (Cliente) references clientes(id)
 );
 
 -- Adicionar colunas faltantes se a tabela já existir (migração)
@@ -1149,7 +1245,7 @@ CREATE TABLE IF NOT EXISTS campanhasassinaturas (
     PercentualAdesao DECIMAL(5,2),
     DataUltimoEnvio TIMESTAMP,
     DataConclusao TIMESTAMP,
-    CONSTRAINT fk_campanha_cliente FOREIGN KEY (Cliente) REFERENCES Clientes(Id) ON DELETE CASCADE,
+    CONSTRAINT fk_campanha_cliente FOREIGN KEY (Cliente) references clientes(id) ON DELETE CASCADE,
     CONSTRAINT fk_campanha_usuario FOREIGN KEY (UsuarioCriacao) REFERENCES Usuarios(Id)
 );
 
@@ -1185,7 +1281,7 @@ CREATE TABLE IF NOT EXISTS estoqueminimoequipamentos (
     usuariocriacao INTEGER NOT NULL,
     dtatualizacao TIMESTAMP,
     usuarioatualizacao INTEGER,
-    CONSTRAINT fk_estoquemin_equip_cliente FOREIGN KEY (cliente) REFERENCES Clientes(Id) ON DELETE CASCADE,
+    CONSTRAINT fk_estoquemin_equip_cliente FOREIGN KEY (cliente) references clientes(id) ON DELETE CASCADE,
     CONSTRAINT fk_estoquemin_equip_modelo FOREIGN KEY (modelo) REFERENCES Modelos(Id) ON DELETE CASCADE,
     CONSTRAINT fk_estoquemin_equip_localidade FOREIGN KEY (localidade) REFERENCES Localidades(Id) ON DELETE CASCADE,
     CONSTRAINT fk_estoquemin_equip_usuario_criacao FOREIGN KEY (usuariocriacao) REFERENCES Usuarios(Id),
@@ -1209,7 +1305,7 @@ CREATE TABLE IF NOT EXISTS estoqueminimolinhas (
     usuariocriacao INTEGER NOT NULL,
     dtatualizacao TIMESTAMP,
     usuarioatualizacao INTEGER,
-    CONSTRAINT fk_estoquemin_linha_cliente FOREIGN KEY (cliente) REFERENCES Clientes(Id) ON DELETE CASCADE,
+    CONSTRAINT fk_estoquemin_linha_cliente FOREIGN KEY (cliente) references clientes(id) ON DELETE CASCADE,
     CONSTRAINT fk_estoquemin_linha_operadora FOREIGN KEY (operadora) REFERENCES TelefoniaOperadoras(Id) ON DELETE CASCADE,
     CONSTRAINT fk_estoquemin_linha_plano FOREIGN KEY (plano) REFERENCES TelefoniaPlanos(Id) ON DELETE CASCADE,
     CONSTRAINT fk_estoquemin_linha_localidade FOREIGN KEY (localidade) REFERENCES Localidades(Id) ON DELETE CASCADE,
@@ -1239,7 +1335,7 @@ CREATE TABLE IF NOT EXISTS importacao_linha_staging (
     criar_operadora BOOLEAN NOT NULL DEFAULT false,
     criar_contrato BOOLEAN NOT NULL DEFAULT false,
     criar_plano BOOLEAN NOT NULL DEFAULT false,
-    CONSTRAINT fk_importacao_staging_cliente FOREIGN KEY (cliente) REFERENCES Clientes(Id) ON DELETE CASCADE,
+    CONSTRAINT fk_importacao_staging_cliente FOREIGN KEY (cliente) references clientes(id) ON DELETE CASCADE,
     CONSTRAINT fk_importacao_staging_usuario FOREIGN KEY (usuario_importacao) REFERENCES Usuarios(Id)
 );
 
@@ -1281,7 +1377,7 @@ CREATE TABLE IF NOT EXISTS importacao_colaborador_staging (
     criar_centro_custo BOOLEAN NOT NULL DEFAULT FALSE,
     criar_filial BOOLEAN NOT NULL DEFAULT FALSE,
     CONSTRAINT fk_colab_staging_usuario FOREIGN KEY (usuario_importacao) REFERENCES Usuarios(Id) ON DELETE CASCADE,
-    CONSTRAINT fk_colab_staging_cliente FOREIGN KEY (cliente) REFERENCES Clientes(Id) ON DELETE CASCADE
+    CONSTRAINT fk_colab_staging_cliente FOREIGN KEY (cliente) references clientes(id) ON DELETE CASCADE
 );
 
 -- Tabela: Importaço Log
@@ -1300,7 +1396,7 @@ CREATE TABLE IF NOT EXISTS importacao_log (
     total_importados INTEGER NOT NULL DEFAULT 0,
     nome_arquivo VARCHAR(255) NOT NULL,
     observacoes TEXT,
-    CONSTRAINT fk_importacao_log_cliente FOREIGN KEY (cliente) REFERENCES Clientes(Id) ON DELETE CASCADE,
+    CONSTRAINT fk_importacao_log_cliente FOREIGN KEY (cliente) references clientes(id) ON DELETE CASCADE,
     CONSTRAINT fk_importacao_log_usuario FOREIGN KEY (usuario) REFERENCES Usuarios(Id)
 );
 
@@ -1367,21 +1463,21 @@ CREATE TABLE IF NOT EXISTS Filiais
 CREATE TABLE IF NOT EXISTS TinOne_Analytics
 (
     Id serial not null primary key,
-    Usuario_Id int,
-    Cliente_Id int,
-    Sessao_Id varchar(100),
-    Pagina_Url varchar(500),
-    Pagina_Nome varchar(200),
-    Acao_Tipo varchar(100),
-    Pergunta text,
-    Resposta text,
-    Tempo_Resposta_Ms int,
-    Foi_Util boolean,
-    Feedback_Texto text,
-    Created_At timestamp default CURRENT_TIMESTAMP,
-    Updated_At timestamp default CURRENT_TIMESTAMP,
-    constraint fkTinOneAnalyticsUsuario foreign key (Usuario_Id) references Usuarios(Id),
-    constraint fkTinOneAnalyticsCliente foreign key (Cliente_Id) references Clientes(Id)
+    usuario_id int,
+    cliente_id int,
+    sessao_id varchar(100),
+    pagina_url varchar(500),
+    pagina_nome varchar(200),
+    acao_tipo varchar(100),
+    pergunta text,
+    resposta text,
+    tempo_resposta_ms int,
+    foi_util boolean,
+    feedback_texto text,
+    created_at timestamp default CURRENT_TIMESTAMP,
+    updated_at timestamp,
+    constraint fkTinOneAnalyticsUsuario foreign key (usuario_id) references Usuarios(Id),
+    constraint fkTinOneAnalyticsCliente foreign key (cliente_id) references clientes(id)
 );
 
 -- =====================================================
@@ -1418,9 +1514,9 @@ SELECT e.id,
     COALESCE(es.descricao, 'Nao definido'::character varying) AS equipamentostatus,
     e.usuario AS usuarioid,
     COALESCE(u.nome, 'Nao definido'::character varying) AS usuario,
-    e.Localizacao AS localizacaoid,
+    e.localidade_id AS localizacaoid,
         CASE
-            WHEN e.Localizacao = 1 THEN 'Nao definido'::character varying
+            WHEN e.localidade_id = 1 THEN 'Nao definido'::character varying
             ELSE COALESCE(l.descricao, 'Nao definido'::character varying)
         END AS localizacao,
     e.possuibo,
@@ -1457,7 +1553,7 @@ SELECT e.id,
      LEFT JOIN fornecedores forn ON e.fornecedor = forn.id
      LEFT JOIN equipamentosstatus es ON e.equipamentostatus = es.id
      LEFT JOIN usuarios u ON e.usuario = u.id
-     LEFT JOIN localidades l ON e.Localizacao = l.id
+     LEFT JOIN localidades l ON e.localidade_id = l.id
      LEFT JOIN empresas emp ON e.empresa = emp.id
      LEFT JOIN centrocusto cc ON e.centrocusto = cc.id
      LEFT JOIN empresas emp_cc ON cc.empresa = emp_cc.id
@@ -1606,8 +1702,8 @@ SELECT e.cliente,
      JOIN modelos m ON e.modelo = m.id
      JOIN fabricantes f ON e.fabricante = f.id
      JOIN tipoequipamentos te ON e.tipoequipamento = te.id
-     JOIN localidades l ON e.Localizacao = l.id
-     JOIN estoqueminimoequipamentos eme ON e.modelo = eme.modelo AND e.Localizacao = eme.localidade AND e.cliente = eme.cliente
+     JOIN localidades l ON e.localidade_id = l.id
+     JOIN estoqueminimoequipamentos eme ON e.modelo = eme.modelo AND e.localidade_id = eme.localidade AND e.cliente = eme.cliente
   WHERE eme.ativo = true
   GROUP BY e.cliente, l.descricao, te.descricao, f.descricao, m.descricao, eme.quantidademinima;
 
@@ -1622,7 +1718,7 @@ FROM Equipamentos eqp
 	JOIN Modelos mdl ON eqp.Modelo = mdl.Id
 	JOIN EquipamentosStatus es ON eqp.EquipamentoStatus = es.Id
 	JOIN Usuarios usu ON eqp.Usuario = usu.Id
-	JOIN Localidades loc ON eqp.Localizacao = loc.Id
+	JOIN Localidades loc ON eqp.localidade_id = loc.Id
 	LEFT JOIN NotasFiscais nf ON eqp.NotaFiscal = nf.Id
 	LEFT JOIN RequisicoesItens ri ON eqp.id = ri.Equipamento AND ri.DtDevolucao IS NULL AND ri.DtEntrega IS NOT NULL
 	LEFT JOIN Requisicoes r ON ri.Requisicao = r.Id
@@ -2169,9 +2265,9 @@ SELECT e.id,
     COALESCE(es.descricao, 'Nao definido'::character varying) AS equipamentostatus,
     e.usuario AS usuarioid,
     COALESCE(u.nome, 'Nao definido'::character varying) AS usuario,
-    e.Localizacao AS localizacaoid,
+    e.localidade_id AS localizacaoid,
         CASE
-            WHEN e.Localizacao = 1 THEN 'Nao definido'::character varying
+            WHEN e.localidade_id = 1 THEN 'Nao definido'::character varying
             ELSE COALESCE(l.descricao, 'Nao definido'::character varying)
         END AS localizacao,
     e.possuibo,
@@ -2208,7 +2304,7 @@ SELECT e.id,
      LEFT JOIN fornecedores forn ON e.fornecedor = forn.id
      LEFT JOIN equipamentosstatus es ON e.equipamentostatus = es.id
      LEFT JOIN usuarios u ON e.usuario = u.id
-     LEFT JOIN localidades l ON e.Localizacao = l.id
+     LEFT JOIN localidades l ON e.localidade_id = l.id
      LEFT JOIN empresas emp ON e.empresa = emp.id
      LEFT JOIN centrocusto cc ON e.centrocusto = cc.id
      LEFT JOIN empresas emp_cc ON cc.empresa = emp_cc.id
@@ -2283,7 +2379,7 @@ SELECT e.id,
     cc.nome AS centro_custo_nome,
     e.filial_id,
     f.nome AS filial_nome,
-    e.Localizacao AS localidade_id,
+    e.localidade_id AS localidade_id,
     l.descricao AS localidade_nome,
     COALESCE(e.cliente, emp.cliente) AS cliente,
     cl.razaosocial AS cliente_nome
@@ -2291,7 +2387,7 @@ SELECT e.id,
      LEFT JOIN empresas emp ON e.empresa = emp.id
      LEFT JOIN centrocusto cc ON e.centrocusto = cc.id
      LEFT JOIN filiais f ON e.filial_id = f.id
-     LEFT JOIN localidades l ON e.Localizacao = l.id
+     LEFT JOIN localidades l ON e.localidade_id = l.id
      LEFT JOIN clientes cl ON COALESCE(e.cliente, emp.cliente) = cl.id;
 
 -- View: vwestoquelinhasalerta
@@ -2866,7 +2962,7 @@ CREATE TABLE IF NOT EXISTS TinOne_Config
     Ativo boolean default true,
     Created_At timestamp default CURRENT_TIMESTAMP,
     Updated_At timestamp default CURRENT_TIMESTAMP,
-    constraint fkTinOneConfigCliente foreign key (Cliente) references Clientes(Id)
+    constraint fkTinOneConfigCliente foreign key (Cliente) references clientes(id)
 );
 
 
@@ -2874,14 +2970,14 @@ CREATE TABLE IF NOT EXISTS TinOne_Config
 CREATE TABLE IF NOT EXISTS TinOne_Conversas
 (
     Id serial not null primary key,
-    Usuario_Id int,
-    Sessao_Id varchar(100),
-    Tipo_Mensagem varchar(20),
-    Mensagem text not null,
-    Pagina_Contexto varchar(200),
-    Metadata jsonb,
-    Created_At timestamp default CURRENT_TIMESTAMP,
-    constraint fkTinOneConversasUsuario foreign key (Usuario_Id) references Usuarios(Id)
+    usuario_id int,
+    sessao_id varchar(100),
+    tipo_mensagem varchar(20),
+    mensagem text not null,
+    pagina_contexto varchar(200),
+    metadata jsonb,
+    created_at timestamp default CURRENT_TIMESTAMP,
+    constraint fkTinOneConversasUsuario foreign key (usuario_id) references Usuarios(Id)
 );
 
 -- Tabela: TinOne_Processos_Guiados
