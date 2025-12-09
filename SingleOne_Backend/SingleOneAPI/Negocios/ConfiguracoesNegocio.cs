@@ -1283,79 +1283,118 @@ namespace SingleOne.Negocios
         {
             try
             {
-                // Criar uma nova instância para evitar conflitos de tracking
-                Notasfiscai notaFiscal = new Notasfiscai
+                // Converter DateTimes UTC para Local antes de salvar no banco
+                if (nf.Dtemissao.Kind == DateTimeKind.Utc)
                 {
-                    Id = nf.Id,
-                    Cliente = nf.Cliente,
-                    Fornecedor = nf.Fornecedor,
-                    Numero = nf.Numero,
-                    Dtemissao = nf.Dtemissao.Kind == DateTimeKind.Utc ? DateTime.SpecifyKind(nf.Dtemissao, DateTimeKind.Local) : nf.Dtemissao,
-                    Descricao = nf.Descricao,
-                    Valor = nf.CalcularValorNota(),
-                    Contrato = nf.Contrato,
-                    Virtual = nf.Virtual,
-                    Gerouequipamento = nf.Gerouequipamento,
-                    Migrateid = nf.Migrateid,
-                    ArquivoNotaFiscal = nf.ArquivoNotaFiscal,
-                    NomeArquivoOriginal = nf.NomeArquivoOriginal,
-                    DataUploadArquivo = nf.DataUploadArquivo.HasValue && nf.DataUploadArquivo.Value.Kind == DateTimeKind.Utc 
-                        ? DateTime.SpecifyKind(nf.DataUploadArquivo.Value, DateTimeKind.Local) 
-                        : nf.DataUploadArquivo,
-                    UsuarioUploadArquivo = nf.UsuarioUploadArquivo,
-                    UsuarioRemocaoArquivo = nf.UsuarioRemocaoArquivo,
-                    DataRemocaoArquivo = nf.DataRemocaoArquivo.HasValue && nf.DataRemocaoArquivo.Value.Kind == DateTimeKind.Utc 
-                        ? DateTime.SpecifyKind(nf.DataRemocaoArquivo.Value, DateTimeKind.Local) 
-                        : nf.DataRemocaoArquivo
-                };
+                    nf.Dtemissao = DateTime.SpecifyKind(nf.Dtemissao, DateTimeKind.Local);
+                }
                 
-                // Usar o contexto diretamente para ter controle sobre o tracking
-                if (notaFiscal.Id == 0)
+                if (nf.DataUploadArquivo.HasValue && nf.DataUploadArquivo.Value.Kind == DateTimeKind.Utc)
                 {
-                    // Adicionar nota fiscal diretamente no contexto (sem coleção de itens ainda)
-                    notaFiscal.Notasfiscaisitens = null; // Não incluir itens na coleção ainda
-                    _context.Notasfiscais.Add(notaFiscal);
-                    _context.SaveChanges(); // Salvar primeiro para obter o ID
-                    
-                    // Agora adicionar os itens separadamente, sem objetos de navegação
-                    if (nf.Notasfiscaisitens != null && nf.Notasfiscaisitens.Count > 0)
+                    nf.DataUploadArquivo = DateTime.SpecifyKind(nf.DataUploadArquivo.Value, DateTimeKind.Local);
+                }
+                
+                if (nf.DataRemocaoArquivo.HasValue && nf.DataRemocaoArquivo.Value.Kind == DateTimeKind.Utc)
+                {
+                    nf.DataRemocaoArquivo = DateTime.SpecifyKind(nf.DataRemocaoArquivo.Value, DateTimeKind.Local);
+                }
+                
+                // Converter DateTimes dos itens da nota fiscal também
+                if (nf.Notasfiscaisitens != null && nf.Notasfiscaisitens.Count > 0)
+                {
+                    foreach (var item in nf.Notasfiscaisitens)
                     {
-                        foreach (var item in nf.Notasfiscaisitens)
+                        if (item.Dtlimitegarantia.HasValue && item.Dtlimitegarantia.Value.Kind == DateTimeKind.Utc)
                         {
-                            var novoItem = new Notasfiscaisiten
-                            {
-                                Id = 0, // Novo item
-                                Notafiscal = notaFiscal.Id, // Usar o ID da nota fiscal recém-criada
-                                Tipoequipamento = item.Tipoequipamento,
-                                Fabricante = item.Fabricante,
-                                Modelo = item.Modelo,
-                                Quantidade = item.Quantidade,
-                                Valorunitario = item.Valorunitario,
-                                TipoAquisicao = item.TipoAquisicao,
-                                Dtlimitegarantia = item.Dtlimitegarantia.HasValue && item.Dtlimitegarantia.Value.Kind == DateTimeKind.Utc
-                                    ? DateTime.SpecifyKind(item.Dtlimitegarantia.Value, DateTimeKind.Local)
-                                    : item.Dtlimitegarantia,
-                                Contrato = item.Contrato
-                            };
-                            
-                            // Garantir que não há objetos de navegação
-                            novoItem.FabricanteNavigation = null;
-                            novoItem.ModeloNavigation = null;
-                            novoItem.TipoequipamentoNavigation = null;
-                            novoItem.ContratoNavigation = null;
-                            novoItem.NotafiscalNavigation = null;
-                            
-                            _context.Notasfiscaisitens.Add(novoItem);
+                            item.Dtlimitegarantia = DateTime.SpecifyKind(item.Dtlimitegarantia.Value, DateTimeKind.Local);
                         }
                         
-                        // Salvar os itens
-                        var strategy = _context.Database.CreateExecutionStrategy();
-                        strategy.Execute(() => { _context.SaveChanges(); });
+                        // CORREÇÃO CONTABO: Desanexar entidades relacionadas para evitar conflito de tracking
+                        // Isso é necessário apenas no servidor onde há tracking de entidades relacionadas
+                        var itemEntry = _context.Entry(item);
+                        if (itemEntry.State != Microsoft.EntityFrameworkCore.EntityState.Detached)
+                        {
+                            itemEntry.State = Microsoft.EntityFrameworkCore.EntityState.Detached;
+                        }
+                        
+                        // Desanexar objetos de navegação se existirem
+                        if (item.FabricanteNavigation != null)
+                        {
+                            var fabricanteEntry = _context.Entry(item.FabricanteNavigation);
+                            if (fabricanteEntry.State != Microsoft.EntityFrameworkCore.EntityState.Detached)
+                            {
+                                fabricanteEntry.State = Microsoft.EntityFrameworkCore.EntityState.Detached;
+                            }
+                            item.FabricanteNavigation = null;
+                        }
+                        
+                        if (item.ModeloNavigation != null)
+                        {
+                            var modeloEntry = _context.Entry(item.ModeloNavigation);
+                            if (modeloEntry.State != Microsoft.EntityFrameworkCore.EntityState.Detached)
+                            {
+                                modeloEntry.State = Microsoft.EntityFrameworkCore.EntityState.Detached;
+                            }
+                            item.ModeloNavigation = null;
+                        }
+                        
+                        if (item.TipoequipamentoNavigation != null)
+                        {
+                            var tipoEntry = _context.Entry(item.TipoequipamentoNavigation);
+                            if (tipoEntry.State != Microsoft.EntityFrameworkCore.EntityState.Detached)
+                            {
+                                tipoEntry.State = Microsoft.EntityFrameworkCore.EntityState.Detached;
+                            }
+                            item.TipoequipamentoNavigation = null;
+                        }
+                        
+                        if (item.ContratoNavigation != null)
+                        {
+                            var contratoEntry = _context.Entry(item.ContratoNavigation);
+                            if (contratoEntry.State != Microsoft.EntityFrameworkCore.EntityState.Detached)
+                            {
+                                contratoEntry.State = Microsoft.EntityFrameworkCore.EntityState.Detached;
+                            }
+                            item.ContratoNavigation = null;
+                        }
                     }
+                }
+                
+                // Desanexar entidades relacionadas da nota fiscal
+                var nfEntry = _context.Entry(nf);
+                if (nfEntry.State != Microsoft.EntityFrameworkCore.EntityState.Detached)
+                {
+                    nfEntry.State = Microsoft.EntityFrameworkCore.EntityState.Detached;
+                }
+                
+                if (nf.ClienteNavigation != null)
+                {
+                    var clienteEntry = _context.Entry(nf.ClienteNavigation);
+                    if (clienteEntry.State != Microsoft.EntityFrameworkCore.EntityState.Detached)
+                    {
+                        clienteEntry.State = Microsoft.EntityFrameworkCore.EntityState.Detached;
+                    }
+                    nf.ClienteNavigation = null;
+                }
+                
+                if (nf.FornecedorNavigation != null)
+                {
+                    var fornecedorEntry = _context.Entry(nf.FornecedorNavigation);
+                    if (fornecedorEntry.State != Microsoft.EntityFrameworkCore.EntityState.Detached)
+                    {
+                        fornecedorEntry.State = Microsoft.EntityFrameworkCore.EntityState.Detached;
+                    }
+                    nf.FornecedorNavigation = null;
+                }
+                
+                if (nf.Id == 0)
+                {
+                    nf.Valor = nf.CalcularValorNota();
+                    _notafiscalRepository.Adicionar(nf);
                 }
                 else
                 {
-                    _notafiscalRepository.Atualizar(notaFiscal);
+                    _notafiscalRepository.Atualizar(nf);
                 }
             }
             catch (Exception ex)
