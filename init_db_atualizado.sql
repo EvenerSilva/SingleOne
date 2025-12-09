@@ -58,6 +58,104 @@ EXCEPTION
         RAISE NOTICE 'Extensão uuid-ossp já existe ou erro ao criar: %', SQLERRM;
 END $$;
 
+-- =====================================================
+-- CRIAR SCHEMA E TABELAS DO HANGFIRE
+-- =====================================================
+-- O Hangfire precisa de suas próprias tabelas para funcionar
+CREATE SCHEMA IF NOT EXISTS hangfire;
+
+-- Tabela principal do servidor Hangfire
+CREATE TABLE IF NOT EXISTS hangfire.server (
+    id VARCHAR(100) PRIMARY KEY,
+    data TEXT NOT NULL,
+    lastheartbeat TIMESTAMP NOT NULL,
+    heartbeatinterval INTEGER NOT NULL DEFAULT 15
+);
+
+-- Tabela de jobs
+CREATE TABLE IF NOT EXISTS hangfire.job (
+    id BIGSERIAL PRIMARY KEY,
+    stateid BIGINT,
+    statename VARCHAR(20),
+    invocationdata TEXT NOT NULL,
+    arguments TEXT NOT NULL,
+    createdat TIMESTAMP NOT NULL,
+    expireat TIMESTAMP
+);
+
+-- Tabela de estados dos jobs
+CREATE TABLE IF NOT EXISTS hangfire.state (
+    id BIGSERIAL PRIMARY KEY,
+    jobid BIGINT NOT NULL,
+    name VARCHAR(20) NOT NULL,
+    reason TEXT,
+    createdat TIMESTAMP NOT NULL,
+    data TEXT,
+    FOREIGN KEY (jobid) REFERENCES hangfire.job(id) ON DELETE CASCADE
+);
+
+-- Tabela de parâmetros dos jobs
+CREATE TABLE IF NOT EXISTS hangfire.jobparameter (
+    jobid BIGINT NOT NULL,
+    name VARCHAR(40) NOT NULL,
+    value TEXT,
+    PRIMARY KEY (jobid, name),
+    FOREIGN KEY (jobid) REFERENCES hangfire.job(id) ON DELETE CASCADE
+);
+
+-- Tabela de filas
+CREATE TABLE IF NOT EXISTS hangfire.jobqueue (
+    id BIGSERIAL PRIMARY KEY,
+    jobid BIGINT NOT NULL,
+    queue VARCHAR(50) NOT NULL,
+    fetchedat TIMESTAMP,
+    FOREIGN KEY (jobid) REFERENCES hangfire.job(id) ON DELETE CASCADE
+);
+
+-- Tabela de hash (para cache)
+CREATE TABLE IF NOT EXISTS hangfire.hash (
+    key VARCHAR(100) NOT NULL,
+    field VARCHAR(100) NOT NULL,
+    value TEXT,
+    expireat TIMESTAMP,
+    PRIMARY KEY (key, field)
+);
+
+-- Tabela de listas
+CREATE TABLE IF NOT EXISTS hangfire.list (
+    key VARCHAR(100) NOT NULL,
+    value TEXT,
+    expireat TIMESTAMP,
+    PRIMARY KEY (key)
+);
+
+-- Tabela de sets
+CREATE TABLE IF NOT EXISTS hangfire.set (
+    key VARCHAR(100) NOT NULL,
+    value VARCHAR(256) NOT NULL,
+    score DOUBLE PRECISION,
+    expireat TIMESTAMP,
+    PRIMARY KEY (key, value)
+);
+
+-- Tabela de contadores
+CREATE TABLE IF NOT EXISTS hangfire.counter (
+    key VARCHAR(100) NOT NULL,
+    value INTEGER NOT NULL DEFAULT 1,
+    expireat TIMESTAMP,
+    PRIMARY KEY (key)
+);
+
+-- Índices para performance do Hangfire
+CREATE INDEX IF NOT EXISTS ix_hangfire_job_stateid ON hangfire.job(stateid);
+CREATE INDEX IF NOT EXISTS ix_hangfire_job_expireat ON hangfire.job(expireat);
+CREATE INDEX IF NOT EXISTS ix_hangfire_state_jobid ON hangfire.state(jobid);
+CREATE INDEX IF NOT EXISTS ix_hangfire_jobqueue_queue_fetchedat ON hangfire.jobqueue(queue, fetchedat);
+CREATE INDEX IF NOT EXISTS ix_hangfire_hash_expireat ON hangfire.hash(expireat);
+CREATE INDEX IF NOT EXISTS ix_hangfire_list_expireat ON hangfire.list(expireat);
+CREATE INDEX IF NOT EXISTS ix_hangfire_set_expireat ON hangfire.set(expireat);
+CREATE INDEX IF NOT EXISTS ix_hangfire_counter_expireat ON hangfire.counter(expireat);
+
 -- Variável para contar erros (será usado no final)
 DO $$
 BEGIN
@@ -312,60 +410,109 @@ CREATE TABLE IF NOT EXISTS TipoAquisicao (
     Nome VARCHAR(100) NOT NULL
 );
 
--- Tabela: NotasFiscais
-CREATE TABLE IF NOT EXISTS NotasFiscais 
+-- Tabela: NotasFiscais (notasfiscais em snake_case)
+CREATE TABLE IF NOT EXISTS notasfiscais 
 (
-	Id serial not null primary key,
-	Cliente int not null,
-	Fornecedor int not null,
-	Numero int not null,
-	DtEmissao TIMESTAMP not null,
-	Descricao varchar(500),
-	Valor money,
-	Contrato int,
-	Virtual boolean not null,
-	GerouEquipamento boolean not null,
-	MigrateID int,
-	ArquivoNome VARCHAR(255),
-	ArquivoCaminho VARCHAR(500),
-	ArquivoTamanho BIGINT,
-	ArquivoTipo VARCHAR(100),
-	ArquivoDataUpload TIMESTAMP,
-	ArquivoUsuarioUpload INT,
+	id serial not null primary key,
+	cliente int not null,
+	fornecedor int not null,
+	numero int not null,
+	dtemissao TIMESTAMP not null,
+	descricao varchar(500),
+	valor money,
+	contrato int,
+	virtual boolean not null,
+	gerouequipamento boolean not null,
+	migrateid int,
+	arquivonome VARCHAR(255),
+	arquivocaminho VARCHAR(500),
+	arquivotamanho BIGINT,
+	arquivotipo VARCHAR(100),
+	arquivodataupload TIMESTAMP,
+	arquivousuarioupload INT,
 	arquivonotafiscal VARCHAR(500),
 	nomearquivooriginal VARCHAR(255),
 	datauploadarquivo TIMESTAMP,
 	usuariouploadarquivo INT,
 	usuarioremocaoarquivo INT,
 	dataremocaoarquivo TIMESTAMP,
-	constraint fkNFCliente foreign key (Cliente) references clientes(id),
-	constraint fkNFFornecedor foreign key (Fornecedor) references Fornecedores(Id),
-	constraint fkNFContrato foreign key (Contrato) references Contratos(Id),
-	CONSTRAINT fk_NotasFiscais_ArquivoUsuarioUpload FOREIGN KEY (ArquivoUsuarioUpload) REFERENCES Usuarios(Id),
-	CONSTRAINT fk_NotasFiscais_UsuarioUploadArquivo FOREIGN KEY (usuariouploadarquivo) REFERENCES Usuarios(Id),
-	CONSTRAINT fk_NotasFiscais_UsuarioRemocaoArquivo FOREIGN KEY (usuarioremocaoarquivo) REFERENCES Usuarios(Id)
+	constraint fknfcliente foreign key (cliente) references clientes(id),
+	constraint fknffornecedor foreign key (fornecedor) references fornecedores(id),
+	constraint fknfcontrato foreign key (contrato) references contratos(id),
+	CONSTRAINT fk_notasfiscais_arquivousuarioupload FOREIGN KEY (arquivousuarioupload) REFERENCES usuarios(id),
+	CONSTRAINT fk_notasfiscais_usuariouploadarquivo FOREIGN KEY (usuariouploadarquivo) REFERENCES usuarios(id),
+	CONSTRAINT fk_notasfiscais_usuarioremocaoarquivo FOREIGN KEY (usuarioremocaoarquivo) REFERENCES usuarios(id)
 );
 
--- Tabela: NotasFiscaisItens
-CREATE TABLE IF NOT EXISTS NotasFiscaisItens
+-- Migração: Renomear tabela NotasFiscais para notasfiscais se necessário
+DO $$
+BEGIN
+	IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'NotasFiscais') THEN
+		IF NOT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'notasfiscais') THEN
+			ALTER TABLE "NotasFiscais" RENAME TO notasfiscais;
+			-- Renomear colunas
+			ALTER TABLE notasfiscais RENAME COLUMN "Id" TO id;
+			ALTER TABLE notasfiscais RENAME COLUMN "Cliente" TO cliente;
+			ALTER TABLE notasfiscais RENAME COLUMN "Fornecedor" TO fornecedor;
+			ALTER TABLE notasfiscais RENAME COLUMN "Numero" TO numero;
+			ALTER TABLE notasfiscais RENAME COLUMN "DtEmissao" TO dtemissao;
+			ALTER TABLE notasfiscais RENAME COLUMN "Descricao" TO descricao;
+			ALTER TABLE notasfiscais RENAME COLUMN "Valor" TO valor;
+			ALTER TABLE notasfiscais RENAME COLUMN "Contrato" TO contrato;
+			ALTER TABLE notasfiscais RENAME COLUMN "Virtual" TO virtual;
+			ALTER TABLE notasfiscais RENAME COLUMN "GerouEquipamento" TO gerouequipamento;
+			ALTER TABLE notasfiscais RENAME COLUMN "MigrateID" TO migrateid;
+		END IF;
+	END IF;
+EXCEPTION
+	WHEN OTHERS THEN
+		RAISE NOTICE 'Erro na migração de NotasFiscais: %', SQLERRM;
+END $$;
+
+-- Tabela: NotasFiscaisItens (notasfiscaisitens em snake_case)
+CREATE TABLE IF NOT EXISTS notasfiscaisitens
 (
-	Id serial not null primary key,
-	NotaFiscal int not null,
-	TipoEquipamento int not null,
-	Fabricante int not null,
-	Modelo int not null,
-	Quantidade int not null,
-	ValorUnitario money not null,
-	TipoAquisicao int not null,
-	DtLimiteGarantia TIMESTAMP,
-	Contrato int,
-	constraint fkNFINotaFiscal foreign key (NotaFiscal) references NotasFiscais(Id),
-	constraint fkNFITipoEqp foreign key (TipoEquipamento) references TipoEquipamentos(Id),
-	constraint fkNFIFabricante foreign key (Fabricante) references Fabricantes(Id),
-	constraint fkNFIModelo foreign key (Modelo) references Modelos(Id),
-	constraint fkNFITipoAquisicao foreign key (TipoAquisicao) references TipoAquisicao(Id),
-	constraint fkNFIContrato foreign key (Contrato) references Contratos(Id)
+	id serial not null primary key,
+	notafiscal int not null,
+	tipoequipamento int not null,
+	fabricante int not null,
+	modelo int not null,
+	quantidade int not null,
+	valorunitario money not null,
+	tipoaquisicao int not null,
+	dtlimitgarantia TIMESTAMP,
+	contrato int,
+	constraint fknfinotafiscal foreign key (notafiscal) references notasfiscais(id),
+	constraint fknfitipoeqp foreign key (tipoequipamento) references tipoequipamentos(id),
+	constraint fknfifabricante foreign key (fabricante) references fabricantes(id),
+	constraint fknfimodelo foreign key (modelo) references modelos(id),
+	constraint fknfitipoaquisicao foreign key (tipoaquisicao) references tipoaquisicao(id),
+	constraint fknficontrato foreign key (contrato) references contratos(id)
 );
+
+-- Migração: Renomear tabela NotasFiscaisItens para notasfiscaisitens se necessário
+DO $$
+BEGIN
+	IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'NotasFiscaisItens') THEN
+		IF NOT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'notasfiscaisitens') THEN
+			ALTER TABLE "NotasFiscaisItens" RENAME TO notasfiscaisitens;
+			-- Renomear colunas
+			ALTER TABLE notasfiscaisitens RENAME COLUMN "Id" TO id;
+			ALTER TABLE notasfiscaisitens RENAME COLUMN "NotaFiscal" TO notafiscal;
+			ALTER TABLE notasfiscaisitens RENAME COLUMN "TipoEquipamento" TO tipoequipamento;
+			ALTER TABLE notasfiscaisitens RENAME COLUMN "Fabricante" TO fabricante;
+			ALTER TABLE notasfiscaisitens RENAME COLUMN "Modelo" TO modelo;
+			ALTER TABLE notasfiscaisitens RENAME COLUMN "Quantidade" TO quantidade;
+			ALTER TABLE notasfiscaisitens RENAME COLUMN "ValorUnitario" TO valorunitario;
+			ALTER TABLE notasfiscaisitens RENAME COLUMN "TipoAquisicao" TO tipoaquisicao;
+			ALTER TABLE notasfiscaisitens RENAME COLUMN "DtLimiteGarantia" TO dtlimitgarantia;
+			ALTER TABLE notasfiscaisitens RENAME COLUMN "Contrato" TO contrato;
+		END IF;
+	END IF;
+EXCEPTION
+	WHEN OTHERS THEN
+		RAISE NOTICE 'Erro na migração de NotasFiscaisItens: %', SQLERRM;
+END $$;
 
 -- =====================================================
 -- TABELAS DE LOCALIZAÇÃO
