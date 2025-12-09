@@ -146,6 +146,21 @@ CREATE TABLE IF NOT EXISTS hangfire.counter (
     PRIMARY KEY (key)
 );
 
+-- Tabela de contadores agregados
+CREATE TABLE IF NOT EXISTS hangfire.aggregatedcounter (
+    id BIGSERIAL PRIMARY KEY,
+    key VARCHAR(100) NOT NULL,
+    value INTEGER NOT NULL DEFAULT 1,
+    expireat TIMESTAMP
+);
+
+-- Tabela de locks (controle de concorrência)
+CREATE TABLE IF NOT EXISTS hangfire.lock (
+    resource VARCHAR(100) NOT NULL PRIMARY KEY,
+    acquired TIMESTAMP NOT NULL,
+    expireat TIMESTAMP
+);
+
 -- Índices para performance do Hangfire
 CREATE INDEX IF NOT EXISTS ix_hangfire_job_stateid ON hangfire.job(stateid);
 CREATE INDEX IF NOT EXISTS ix_hangfire_job_expireat ON hangfire.job(expireat);
@@ -155,6 +170,8 @@ CREATE INDEX IF NOT EXISTS ix_hangfire_hash_expireat ON hangfire.hash(expireat);
 CREATE INDEX IF NOT EXISTS ix_hangfire_list_expireat ON hangfire.list(expireat);
 CREATE INDEX IF NOT EXISTS ix_hangfire_set_expireat ON hangfire.set(expireat);
 CREATE INDEX IF NOT EXISTS ix_hangfire_counter_expireat ON hangfire.counter(expireat);
+CREATE INDEX IF NOT EXISTS ix_hangfire_aggregatedcounter_expireat ON hangfire.aggregatedcounter(expireat);
+CREATE INDEX IF NOT EXISTS ix_hangfire_lock_expireat ON hangfire.lock(expireat);
 
 -- Variável para contar erros (será usado no final)
 DO $$
