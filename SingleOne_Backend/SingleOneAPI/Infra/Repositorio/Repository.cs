@@ -25,6 +25,27 @@ namespace SingleOneAPI.Infra.Repositorio
 
             try 
             {
+                // Desanexar entidades relacionadas que podem estar sendo rastreadas
+                var entry = _context.Entry(entity);
+                if (entry.State != Microsoft.EntityFrameworkCore.EntityState.Detached)
+                {
+                    entry.State = Microsoft.EntityFrameworkCore.EntityState.Detached;
+                }
+                
+                // Desanexar todas as entidades relacionadas
+                foreach (var navigation in entry.Navigations)
+                {
+                    if (navigation.CurrentValue != null)
+                    {
+                        var navEntry = _context.Entry(navigation.CurrentValue);
+                        if (navEntry.State != Microsoft.EntityFrameworkCore.EntityState.Detached)
+                        {
+                            navEntry.State = Microsoft.EntityFrameworkCore.EntityState.Detached;
+                        }
+                    }
+                }
+                
+                // Adicionar a entidade principal
                 _context.Set<T>().Add(entity);
                 Console.WriteLine($"[REPOSITORY] ✅ Entidade adicionada ao contexto");
 
