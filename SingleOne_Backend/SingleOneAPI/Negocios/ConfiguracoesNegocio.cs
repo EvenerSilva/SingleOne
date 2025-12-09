@@ -48,6 +48,7 @@ namespace SingleOne.Negocios
         private readonly IReadOnlyRepository<Vwlaudo> _vwLaudoRepository;
         private readonly IFileUploadService _fileUploadService;
         private readonly IRepository<PoliticaElegibilidade> _politicaElegibilidadeRepository;
+        private readonly SingleOneDbContext _context;
 
         private readonly IEquipamentoNegocio _equipamentoNegocio;
 
@@ -80,7 +81,7 @@ namespace SingleOne.Negocios
             IReadOnlyRepository<Vwlaudo> vwLaudoRepository,
             IFileUploadService fileUploadService,
             IRepository<PoliticaElegibilidade> politicaElegibilidadeRepository,
-
+            SingleOneDbContext context,
             IEquipamentoNegocio equipamentoNegocio)
         {
             _usuarioRepository = usuarioRepository;
@@ -111,7 +112,7 @@ namespace SingleOne.Negocios
             _vwLaudoRepository = vwLaudoRepository;
             _fileUploadService = fileUploadService;
             _politicaElegibilidadeRepository = politicaElegibilidadeRepository;
-
+            _context = context;
             _equipamentoNegocio = equipamentoNegocio;
         }
 
@@ -1332,9 +1333,22 @@ namespace SingleOne.Negocios
                     }
                 }
                 
+                // Usar o contexto diretamente para ter controle sobre o tracking
                 if (notaFiscal.Id == 0)
                 {
-                    _notafiscalRepository.Adicionar(notaFiscal);
+                    // Adicionar nota fiscal sem rastrear entidades relacionadas
+                    _context.Entry(notaFiscal).State = Microsoft.EntityFrameworkCore.EntityState.Added;
+                    
+                    // Adicionar itens sem rastrear entidades relacionadas
+                    if (notaFiscal.Notasfiscaisitens != null && notaFiscal.Notasfiscaisitens.Count > 0)
+                    {
+                        foreach (var item in notaFiscal.Notasfiscaisitens)
+                        {
+                            _context.Entry(item).State = Microsoft.EntityFrameworkCore.EntityState.Added;
+                        }
+                    }
+                    
+                    _context.SaveChanges();
                 }
                 else
                 {
