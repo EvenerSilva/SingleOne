@@ -1307,23 +1307,37 @@ namespace SingleOne.Negocios
                         {
                             item.Dtlimitegarantia = DateTime.SpecifyKind(item.Dtlimitegarantia.Value, DateTimeKind.Local);
                         }
+                        
+                        // Desanexar entidades relacionadas para evitar conflito de tracking
+                        item.FabricanteNavigation = null;
+                        item.ModeloNavigation = null;
+                        item.TipoequipamentoNavigation = null;
+                        item.ContratoNavigation = null;
                     }
                 }
                 
+                // Desanexar entidades relacionadas da nota fiscal
+                nf.ClienteNavigation = null;
+                nf.FornecedorNavigation = null;
+                
                 if (nf.Id == 0)
                 {
-                    //db.Add(nf);
                     nf.Valor = nf.CalcularValorNota();
                     _notafiscalRepository.Adicionar(nf);
                 }
                 else
                 {
-                    //db.Update(nf);
                     _notafiscalRepository.Atualizar(nf);
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine($"[SALVAR-NF] ❌ Erro ao salvar nota fiscal: {ex.Message}");
+                Console.WriteLine($"[SALVAR-NF] ❌ StackTrace: {ex.StackTrace}");
+                if (ex.InnerException != null)
+                {
+                    Console.WriteLine($"[SALVAR-NF] ❌ InnerException: {ex.InnerException.Message}");
+                }
                 throw;
             }
         }
