@@ -1309,55 +1309,49 @@ namespace SingleOne.Negocios
                         : nf.DataRemocaoArquivo
                 };
                 
-                // Adicionar itens sem objetos de navegação
-                if (nf.Notasfiscaisitens != null && nf.Notasfiscaisitens.Count > 0)
-                {
-                    notaFiscal.Notasfiscaisitens = new List<Notasfiscaisiten>();
-                    foreach (var item in nf.Notasfiscaisitens)
-                    {
-                        notaFiscal.Notasfiscaisitens.Add(new Notasfiscaisiten
-                        {
-                            Id = item.Id,
-                            Notafiscal = item.Notafiscal,
-                            Tipoequipamento = item.Tipoequipamento,
-                            Fabricante = item.Fabricante,
-                            Modelo = item.Modelo,
-                            Quantidade = item.Quantidade,
-                            Valorunitario = item.Valorunitario,
-                            TipoAquisicao = item.TipoAquisicao,
-                            Dtlimitegarantia = item.Dtlimitegarantia.HasValue && item.Dtlimitegarantia.Value.Kind == DateTimeKind.Utc
-                                ? DateTime.SpecifyKind(item.Dtlimitegarantia.Value, DateTimeKind.Local)
-                                : item.Dtlimitegarantia,
-                            Contrato = item.Contrato
-                        });
-                    }
-                }
-                
                 // Usar o contexto diretamente para ter controle sobre o tracking
                 if (notaFiscal.Id == 0)
                 {
-                    // Adicionar nota fiscal diretamente no contexto sem rastrear entidades relacionadas
+                    // Adicionar nota fiscal diretamente no contexto (sem coleção de itens ainda)
+                    notaFiscal.Notasfiscaisitens = null; // Não incluir itens na coleção ainda
                     _context.Notasfiscais.Add(notaFiscal);
+                    _context.SaveChanges(); // Salvar primeiro para obter o ID
                     
-                    // Adicionar itens diretamente no contexto
-                    if (notaFiscal.Notasfiscaisitens != null && notaFiscal.Notasfiscaisitens.Count > 0)
+                    // Agora adicionar os itens separadamente, sem objetos de navegação
+                    if (nf.Notasfiscaisitens != null && nf.Notasfiscaisitens.Count > 0)
                     {
-                        foreach (var item in notaFiscal.Notasfiscaisitens)
+                        foreach (var item in nf.Notasfiscaisitens)
                         {
-                            // Garantir que não há objetos de navegação sendo rastreados
-                            item.FabricanteNavigation = null;
-                            item.ModeloNavigation = null;
-                            item.TipoequipamentoNavigation = null;
-                            item.ContratoNavigation = null;
-                            item.NotafiscalNavigation = null;
+                            var novoItem = new Notasfiscaisiten
+                            {
+                                Id = 0, // Novo item
+                                Notafiscal = notaFiscal.Id, // Usar o ID da nota fiscal recém-criada
+                                Tipoequipamento = item.Tipoequipamento,
+                                Fabricante = item.Fabricante,
+                                Modelo = item.Modelo,
+                                Quantidade = item.Quantidade,
+                                Valorunitario = item.Valorunitario,
+                                TipoAquisicao = item.TipoAquisicao,
+                                Dtlimitegarantia = item.Dtlimitegarantia.HasValue && item.Dtlimitegarantia.Value.Kind == DateTimeKind.Utc
+                                    ? DateTime.SpecifyKind(item.Dtlimitegarantia.Value, DateTimeKind.Local)
+                                    : item.Dtlimitegarantia,
+                                Contrato = item.Contrato
+                            };
                             
-                            _context.Notasfiscaisitens.Add(item);
+                            // Garantir que não há objetos de navegação
+                            novoItem.FabricanteNavigation = null;
+                            novoItem.ModeloNavigation = null;
+                            novoItem.TipoequipamentoNavigation = null;
+                            novoItem.ContratoNavigation = null;
+                            novoItem.NotafiscalNavigation = null;
+                            
+                            _context.Notasfiscaisitens.Add(novoItem);
                         }
+                        
+                        // Salvar os itens
+                        var strategy = _context.Database.CreateExecutionStrategy();
+                        strategy.Execute(() => { _context.SaveChanges(); });
                     }
-                    
-                    // Salvar mudanças
-                    var strategy = _context.Database.CreateExecutionStrategy();
-                    strategy.Execute(() => { _context.SaveChanges(); });
                 }
                 else
                 {
