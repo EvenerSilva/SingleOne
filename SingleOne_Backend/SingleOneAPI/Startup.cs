@@ -127,7 +127,7 @@ namespace SingleOneAPI
                     QueuePollInterval = TimeSpan.FromSeconds(15), // Verificar fila a cada 15 segundos
                     JobExpirationCheckInterval = TimeSpan.FromHours(1), // Limpar jobs antigos a cada hora
                     CountersAggregateInterval = TimeSpan.FromMinutes(5), // Agregar contadores a cada 5 minutos
-                    PrepareSchemaIfNecessary = false, // Desabilitado temporariamente - tabelas criadas manualmente
+                    PrepareSchemaIfNecessary = true, // Habilitar criação automática
                     SchemaName = "hangfire" // Schema separado para tabelas do Hangfire
                 })
             );
