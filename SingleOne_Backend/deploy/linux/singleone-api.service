@@ -1,0 +1,22 @@
+[Unit]
+Description=SingleOne API (.NET 6, sem Docker)
+After=network.target postgresql.service
+
+[Service]
+WorkingDirectory=/opt/singleone-api-publish
+ExecStart=/usr/bin/dotnet /opt/singleone-api-publish/SingleOneAPI.dll
+Restart=always
+RestartSec=10
+SyslogIdentifier=singleone-api
+
+# Ambiente
+Environment=ASPNETCORE_ENVIRONMENT=Production
+
+# As configurações de banco (DB_HOST, DB_USER, DB_PASSWORD, SITE_URL, etc.)
+# são carregadas do arquivo .env em /opt/singleone-api-publish
+# via DotNetEnv (ver Startup.cs).
+
+[Install]
+WantedBy=multi-user.target
+
+
