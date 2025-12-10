@@ -1010,24 +1010,31 @@ namespace SingleOne.Negocios
             pesquisa = pesquisa.ToLower();
             // Listar todos os modelos (ativos e inativos) para permitir reativação
             // Não filtrar por ativo para que modelos desativados possam ser visualizados e reativados
+            // ❗ Regra de negócio: nunca exibir o modelo de ID 1 (estrutura inválida / reservado do sistema)
             var modelos = _modeloRepository.IncludeWithThenInclude(q => q
                                             .Include(x => x.FabricanteNavigation)
                                                 .ThenInclude(x => x.TipoequipamentoNavigation))
-                         .Where(x => x.Cliente == cliente && ((pesquisa != "null") ?
-                                x.Descricao.ToLower().Contains(pesquisa) ||
-                                x.FabricanteNavigation.Descricao.ToLower().Contains(pesquisa) ||
-                                x.FabricanteNavigation.TipoequipamentoNavigation.Descricao.ToLower().Contains(pesquisa) :
-                                1 == 1))
+                         .Where(x => x.Cliente == cliente &&
+                                     x.Id != 1 && // ocultar sempre o modelo ID 1
+                                     ((pesquisa != "null") ?
+                                        x.Descricao.ToLower().Contains(pesquisa) ||
+                                        x.FabricanteNavigation.Descricao.ToLower().Contains(pesquisa) ||
+                                        x.FabricanteNavigation.TipoequipamentoNavigation.Descricao.ToLower().Contains(pesquisa) :
+                                        1 == 1))
                          .OrderBy(x => x.Descricao).ToList();
             return modelos;
         }
 
         public List<Modelo> ListarModelosDoFabricante(int fabricante, int cliente)
         {
+            // Também não exibir o modelo ID 1 nas listagens por fabricante
             var modelos = _modeloRepository.IncludeWithThenInclude(q => q
                                                 .Include(x => x.FabricanteNavigation)
                                                     .ThenInclude(x => x.TipoequipamentoNavigation))
-                         .Where(x => x.Cliente == cliente && x.Ativo == true && x.Fabricante == fabricante)
+                         .Where(x => x.Cliente == cliente &&
+                                     x.Id != 1 && // ocultar sempre o modelo ID 1
+                                     x.Ativo == true &&
+                                     x.Fabricante == fabricante)
                          .OrderBy(x => x.Descricao).ToList();
             return modelos;
         }
