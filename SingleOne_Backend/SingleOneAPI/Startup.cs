@@ -159,16 +159,19 @@ namespace SingleOneAPI
                     Version = "v1",
                     Title = "SingleOne API",
                     Description = "An API for managing SingleOne items",
-                    TermsOfService = new Uri("https://singleone.tech/cookies"),
+                    // Termos de serviço / Política de privacidade
+                    TermsOfService = new Uri("https://singleone.com.br/contatos/politica-de-privacidade/"),
                     Contact = new OpenApiContact
                     {
                         Name = "SingleOne",
-                        Url = new Uri("https://singleone.tech/contato")
+                        // SingleOne - Website
+                        Url = new Uri("https://singleone.com.br/")
                     },
                     License = new OpenApiLicense
                     {
                         Name = "SingleOne",
-                        Url = new Uri("https://singleone.tech/")
+                        // Página de ajuda / documentação da plataforma
+                        Url = new Uri("https://singleone.com.br/ajuda/")
                     }
                 });
             });
