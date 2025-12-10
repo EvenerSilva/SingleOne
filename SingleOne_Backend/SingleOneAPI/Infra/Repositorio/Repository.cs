@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore.Storage;
 using SingleOneAPI.Infra.Contexto;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -18,7 +19,7 @@ namespace SingleOneAPI.Infra.Repositorio
             _context = context;
             _dbSet = _context.Set<T>();
         }
-                public void Adicionar(T entity)
+        public void Adicionar(T entity)
         {
             Console.WriteLine($"[REPOSITORY] 🔍 Adicionando entidade do tipo: {typeof(T).Name}");
             Console.WriteLine($"[REPOSITORY] 🔍 Entidade: {entity}");
@@ -27,24 +28,44 @@ namespace SingleOneAPI.Infra.Repositorio
             {
                 // Desanexar entidades relacionadas que podem estar sendo rastreadas
                 var entry = _context.Entry(entity);
-                if (entry.State != Microsoft.EntityFrameworkCore.EntityState.Detached)
+                if (entry.State != EntityState.Detached)
                 {
-                    entry.State = Microsoft.EntityFrameworkCore.EntityState.Detached;
+                    entry.State = EntityState.Detached;
                 }
-                
-                // Desanexar todas as entidades relacionadas
+
+                // Desanexar todas as entidades de navegação sem tentar rastrear coleções como entidades
                 foreach (var navigation in entry.Navigations)
                 {
-                    if (navigation.CurrentValue != null)
+                    if (navigation.CurrentValue == null)
+                        continue;
+
+                    // Se for uma coleção (ex: HashSet<Equipamento>), iterar nos itens
+                    if (navigation.Metadata.IsCollection &&
+                        navigation.CurrentValue is IEnumerable collection &&
+                        navigation.CurrentValue is not string)
                     {
-                        var navEntry = _context.Entry(navigation.CurrentValue);
-                        if (navEntry.State != Microsoft.EntityFrameworkCore.EntityState.Detached)
+                        foreach (var relatedEntity in collection)
                         {
-                            navEntry.State = Microsoft.EntityFrameworkCore.EntityState.Detached;
+                            if (relatedEntity == null) continue;
+
+                            var relatedEntry = _context.Entry(relatedEntity);
+                            if (relatedEntry.State != EntityState.Detached)
+                            {
+                                relatedEntry.State = EntityState.Detached;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // Navegação de referência única
+                        var relatedEntry = _context.Entry(navigation.CurrentValue);
+                        if (relatedEntry.State != EntityState.Detached)
+                        {
+                            relatedEntry.State = EntityState.Detached;
                         }
                     }
                 }
-                
+
                 // Adicionar a entidade principal
                 _context.Set<T>().Add(entity);
                 Console.WriteLine($"[REPOSITORY] ✅ Entidade adicionada ao contexto");
