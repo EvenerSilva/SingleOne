@@ -19,13 +19,22 @@ echo ""
 
 # Criar/atualizar configuração do Nginx
 echo "📝 Criando/atualizando configuração do Nginx..."
+
+# Verificar se há múltiplos blocos server e remover configurações antigas
+if [ -f "$NGINX_CONFIG" ]; then
+    SERVER_COUNT=$(grep -c "^server {" "$NGINX_CONFIG" 2>/dev/null || echo "0")
+    if [ "$SERVER_COUNT" -gt 1 ]; then
+        echo "   ⚠️  Múltiplos blocos server encontrados, limpando..."
+    fi
+fi
+
 cat > "$NGINX_CONFIG" << NGINX_EOF
 server {
     listen 80 default_server;
     listen [::]:80 default_server;
 
     # Aceitar domínio, IP e qualquer host (para garantir acesso)
-    server_name $DOMAIN $SERVER_IP _;
+    server_name demo.singleone.com.br 84.247.128.180 _;
 
     root /opt/SingleOne/SingleOne_Frontend/dist/SingleOne;
     index index.html;
