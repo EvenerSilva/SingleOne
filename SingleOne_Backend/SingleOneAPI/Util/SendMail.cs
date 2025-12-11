@@ -39,7 +39,8 @@ namespace SingleOne.Util
 
         public void Enviar(string destinatario, string assunto, string mensagemHtml, byte[] anexo = null)
         {
-            string imagePath = Path.Combine(Directory.GetCurrentDirectory(), "documentos", "logo.png");
+            // Path de logo alinhado com a pasta 'Documentos' usada no publish (.csproj)
+            string imagePath = Path.Combine(Directory.GetCurrentDirectory(), "Documentos", "logo.png");
 
             SmtpClient smtp = new SmtpClient(_environmentApiSettings.SMTPHost, _environmentApiSettings.SMTPPort);
             smtp.UseDefaultCredentials = false;
