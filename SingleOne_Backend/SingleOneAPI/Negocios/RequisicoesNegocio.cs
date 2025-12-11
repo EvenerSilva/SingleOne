@@ -979,6 +979,25 @@ namespace SingleOne.Negocios
                     // Buscar o colaborador uma única vez
                     var colaborador = _colaboradorRepository.Buscar(x => x.Id == aceiteOK.Colaboradorfinal).Single();
 
+                    // ✅ CORREÇÃO: Determinar o ID do usuário logado corretamente
+                    // Usar o técnico responsável da requisição como usuário logado
+                    int usuarioLogadoId = aceiteOK.Tecnicoresponsavel;
+                    
+                    // ✅ FALLBACK: Se técnico responsável não for válido ou for o mesmo que colaborador, usar usuário da requisição
+                    if (usuarioLogadoId <= 0 || usuarioLogadoId == colaborador.Id)
+                    {
+                        usuarioLogadoId = aceiteOK.Usuariorequisicao;
+                    }
+                    
+                    // ✅ FALLBACK FINAL: Se ainda não for válido, usar usuário 1 (Admin) como último recurso
+                    if (usuarioLogadoId <= 0)
+                    {
+                        Console.WriteLine($"[ASSINATURA_TERMO] ⚠️ Usuário logado inválido, usando usuário 1 como fallback");
+                        usuarioLogadoId = 1;
+                    }
+                    
+                    Console.WriteLine($"[ASSINATURA_TERMO] Usuário logado ID: {usuarioLogadoId} (Técnico: {aceiteOK.Tecnicoresponsavel}, Usuário Req: {aceiteOK.Usuariorequisicao})");
+
                     // Registrar geolocalização da assinatura (para ambos BYOD e não-BYOD)
                     try
                     {
@@ -986,7 +1005,7 @@ namespace SingleOne.Negocios
                         {
                             ColaboradorId = colaborador.Id,
                             ColaboradorNome = colaborador.Nome,
-                            UsuarioLogadoId = colaborador.Id,
+                            UsuarioLogadoId = usuarioLogadoId, // ✅ CORRIGIDO: Usar ID do usuário, não do colaborador
                             IpAddress = !string.IsNullOrEmpty(vm.IpAddress) ? vm.IpAddress : "Não informado",
                             Country = !string.IsNullOrEmpty(vm.Country) ? vm.Country : "Brasil",
                             City = !string.IsNullOrEmpty(vm.City) ? vm.City : "Não informado",
