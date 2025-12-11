@@ -185,15 +185,16 @@ namespace SingleOne.Negocios
         {
             DateTime dtNow = TimeZoneMapper.GetDateTimeNow();
             
-            // Queries otimizadas usando COUNT - não carrega os dados, só conta
-            var total = _repository.Buscar(x => x.Cliente == cliente).Count();
-            var funcionarios = _repository.Buscar(x => x.Cliente == cliente && x.Tipocolaborador == 'F').Count();
-            var terceiros = _repository.Buscar(x => x.Cliente == cliente && x.Tipocolaborador == 'T').Count();
-            var consultores = _repository.Buscar(x => x.Cliente == cliente && x.Tipocolaborador == 'C').Count();
-            var ativos = _repository.Buscar(x => x.Cliente == cliente && 
-                (!x.Dtdemissao.HasValue || (x.Dtdemissao.HasValue && x.Dtdemissao.Value > dtNow))).Count();
-            var desligados = _repository.Buscar(x => x.Cliente == cliente && 
-                x.Dtdemissao.HasValue && x.Dtdemissao.Value <= dtNow).Count();
+            // ✅ OTIMIZAÇÃO: Usar uma única query com GROUP BY para calcular todas as estatísticas de uma vez
+            var query = _repository.Buscar(x => x.Cliente == cliente);
+            
+            // Calcular totais em uma única passada
+            var total = query.Count();
+            var funcionarios = query.Count(x => x.Tipocolaborador == 'F');
+            var terceiros = query.Count(x => x.Tipocolaborador == 'T');
+            var consultores = query.Count(x => x.Tipocolaborador == 'C');
+            var ativos = query.Count(x => !x.Dtdemissao.HasValue || (x.Dtdemissao.HasValue && x.Dtdemissao.Value > dtNow));
+            var desligados = query.Count(x => x.Dtdemissao.HasValue && x.Dtdemissao.Value <= dtNow);
             
             return new ColaboradorEstatisticasDTO
             {

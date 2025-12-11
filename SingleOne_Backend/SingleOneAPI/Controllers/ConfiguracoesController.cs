@@ -101,15 +101,29 @@ namespace SingleOne.Controllers
 
                 Console.WriteLine($"[UPLOAD-LOGO] Validando cliente {clienteId}...");
                 
-                // Verificar se o cliente existe
-                var cliente = _negocio.ListarClientes("null").FirstOrDefault(c => c.Id == clienteId);
+                // ✅ CORREÇÃO: Buscar cliente diretamente pelo ID para evitar problemas
+                var todosClientes = _negocio.ListarClientes("null");
+                var cliente = todosClientes.FirstOrDefault(c => c.Id == clienteId);
+                
                 if (cliente == null)
                 {
                     Console.WriteLine($"[UPLOAD-LOGO] ❌ Cliente {clienteId} não encontrado");
+                    Console.WriteLine($"[UPLOAD-LOGO] Total de clientes disponíveis: {todosClientes.Count}");
+                    Console.WriteLine($"[UPLOAD-LOGO] IDs dos clientes disponíveis: {string.Join(", ", todosClientes.Select(c => c.Id))}");
                     return NotFound(new { Mensagem = "Cliente não encontrado", Status = "404" });
                 }
+                
+                // ✅ CORREÇÃO: Garantir que o ID do cliente está correto ANTES de qualquer operação
+                if (cliente.Id != clienteId)
+                {
+                    Console.WriteLine($"[UPLOAD-LOGO] ⚠️ ATENÇÃO: ID do cliente não corresponde! Cliente.Id={cliente.Id}, clienteId recebido={clienteId}");
+                    Console.WriteLine($"[UPLOAD-LOGO] Corrigindo ID do cliente...");
+                    cliente.Id = clienteId;
+                }
 
-                Console.WriteLine($"[UPLOAD-LOGO] ✅ Cliente encontrado: {cliente.Razaosocial}");
+                Console.WriteLine($"[UPLOAD-LOGO] ✅ Cliente encontrado: {cliente.Razaosocial} (ID: {cliente.Id})");
+                Console.WriteLine($"[UPLOAD-LOGO] ClienteId recebido no form: {clienteId}");
+                Console.WriteLine($"[UPLOAD-LOGO] Cliente.Id antes da atualização: {cliente.Id}");
                 Console.WriteLine($"[UPLOAD-LOGO] Iniciando upload do arquivo...");
 
                 // Fazer upload da logo
@@ -118,8 +132,20 @@ namespace SingleOne.Controllers
                 Console.WriteLine($"[UPLOAD-LOGO] ✅ Arquivo salvo: {fileName}");
                 Console.WriteLine($"[UPLOAD-LOGO] Atualizando cliente no banco...");
                 
+                // ✅ CORREÇÃO: Garantir que o ID do cliente não foi alterado
+                if (cliente.Id != clienteId)
+                {
+                    Console.WriteLine($"[UPLOAD-LOGO] ⚠️ ATENÇÃO: ID do cliente não corresponde! Cliente.Id={cliente.Id}, clienteId recebido={clienteId}");
+                    Console.WriteLine($"[UPLOAD-LOGO] Corrigindo ID do cliente...");
+                    cliente.Id = clienteId;
+                }
+                
                 // Atualizar o cliente com o nome do arquivo da logo
                 cliente.Logo = fileName;
+                Console.WriteLine($"[UPLOAD-LOGO] Cliente.Id antes de SalvarCliente: {cliente.Id}");
+                Console.WriteLine($"[UPLOAD-LOGO] Cliente.Logo antes de SalvarCliente: {cliente.Logo}");
+                Console.WriteLine($"[UPLOAD-LOGO] Cliente.RazaoSocial antes de SalvarCliente: {cliente.Razaosocial}");
+                
                 var resultado = _negocio.SalvarCliente(cliente);
                 var resultadoObj = JsonConvert.DeserializeObject<dynamic>(resultado);
                 
