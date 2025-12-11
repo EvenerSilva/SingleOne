@@ -1583,75 +1583,106 @@ namespace SingleOne.Negocios
         /// </summary>
         private string ObterUrlSite()
         {
-            // 1. Tentar usar a URL configurada
-            if (!string.IsNullOrEmpty(_environmentApiSettings.SiteUrl) && 
-                !_environmentApiSettings.SiteUrl.Contains("localhost"))
-            {
-                Console.WriteLine($"[OBTER_URL] Usando URL configurada: {_environmentApiSettings.SiteUrl}");
-                return _environmentApiSettings.SiteUrl;
-            }
-
-            // 2. Tentar obter da variável de ambiente
+            Console.WriteLine($"[OBTER_URL] ========== INÍCIO DETECÇÃO URL ==========");
+            
+            // 1. Tentar obter da variável de ambiente (prioridade máxima)
             var envUrl = Environment.GetEnvironmentVariable("SITE_URL");
-            if (!string.IsNullOrEmpty(envUrl) && !envUrl.Contains("localhost"))
+            if (!string.IsNullOrEmpty(envUrl) && !envUrl.Contains("localhost") && !envUrl.Contains("SEU_IP"))
             {
-                Console.WriteLine($"[OBTER_URL] Usando URL da variável de ambiente: {envUrl}");
+                Console.WriteLine($"[OBTER_URL] ✅ Usando URL da variável de ambiente: {envUrl}");
                 return envUrl;
             }
+            else if (!string.IsNullOrEmpty(envUrl))
+            {
+                Console.WriteLine($"[OBTER_URL] ⚠️ SITE_URL configurada mas inválida: {envUrl}");
+            }
 
-            // 3. Tentar detectar do ASPNETCORE_URLS (se configurado)
+            // 2. Tentar usar a URL configurada no EnvironmentApiSettings
+            if (!string.IsNullOrEmpty(_environmentApiSettings.SiteUrl) && 
+                !_environmentApiSettings.SiteUrl.Contains("localhost") &&
+                !_environmentApiSettings.SiteUrl.Contains("SEU_IP"))
+            {
+                Console.WriteLine($"[OBTER_URL] ✅ Usando URL configurada: {_environmentApiSettings.SiteUrl}");
+                return _environmentApiSettings.SiteUrl;
+            }
+            else if (!string.IsNullOrEmpty(_environmentApiSettings.SiteUrl))
+            {
+                Console.WriteLine($"[OBTER_URL] ⚠️ SiteUrl configurada mas inválida: {_environmentApiSettings.SiteUrl}");
+            }
+
+            // 3. Tentar detectar IP do servidor automaticamente (ANTES de usar localhost)
+            string detectedIp = null;
+            try
+            {
+                var hostName = Dns.GetHostName();
+                Console.WriteLine($"[OBTER_URL] Hostname do servidor: {hostName}");
+                var addresses = Dns.GetHostAddresses(hostName);
+                Console.WriteLine($"[OBTER_URL] Endereços encontrados: {addresses.Length}");
+                
+                foreach (var addr in addresses)
+                {
+                    Console.WriteLine($"[OBTER_URL]   - {addr} (Family: {addr.AddressFamily})");
+                    // Ignorar IPv6 e localhost
+                    if (addr.AddressFamily == AddressFamily.InterNetwork && 
+                        !addr.ToString().StartsWith("127.") && 
+                        !addr.ToString().StartsWith("169.254."))
+                    {
+                        detectedIp = addr.ToString();
+                        Console.WriteLine($"[OBTER_URL] ✅ IP válido detectado: {detectedIp}");
+                        break;
+                    }
+                }
+                
+                if (!string.IsNullOrEmpty(detectedIp))
+                {
+                    var detectedUrl = $"http://{detectedIp}";
+                    Console.WriteLine($"[OBTER_URL] ⚠️ URL não configurada, usando IP detectado: {detectedUrl}");
+                    Console.WriteLine($"[OBTER_URL] ⚠️ Configure SITE_URL no systemd para usar domínio personalizado");
+                    Console.WriteLine($"[OBTER_URL] ========== FIM DETECÇÃO URL ==========");
+                    return detectedUrl;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[OBTER_URL] ❌ Erro ao detectar IP: {ex.Message}");
+            }
+
+            // 4. Tentar detectar do ASPNETCORE_URLS (se configurado)
             var aspnetUrls = Environment.GetEnvironmentVariable("ASPNETCORE_URLS");
             if (!string.IsNullOrEmpty(aspnetUrls))
             {
+                Console.WriteLine($"[OBTER_URL] ASPNETCORE_URLS encontrado: {aspnetUrls}");
                 // Extrair a primeira URL (pode ter múltiplas separadas por ;)
                 var urls = aspnetUrls.Split(';');
                 foreach (var url in urls)
                 {
                     if (!string.IsNullOrEmpty(url) && url.StartsWith("http"))
                     {
-                        // Converter URL da API para URL do frontend (assumindo mesma base)
-                        var baseUrl = url.Replace(":5000", ":80").Replace("http://0.0.0.0", "http://SEU_IP_AQUI");
-                        if (!baseUrl.Contains("localhost") && !baseUrl.Contains("0.0.0.0"))
+                        // Tentar extrair IP da URL
+                        var uri = new Uri(url);
+                        var host = uri.Host;
+                        if (host != "0.0.0.0" && host != "localhost" && host != "127.0.0.1")
                         {
-                            Console.WriteLine($"[OBTER_URL] Detectado de ASPNETCORE_URLS: {baseUrl}");
+                            var baseUrl = $"http://{host}";
+                            Console.WriteLine($"[OBTER_URL] ✅ Detectado de ASPNETCORE_URLS: {baseUrl}");
+                            Console.WriteLine($"[OBTER_URL] ========== FIM DETECÇÃO URL ==========");
                             return baseUrl;
                         }
                     }
                 }
             }
-
-            // 4. Tentar detectar IP do servidor automaticamente
-            try
-            {
-                var hostName = Dns.GetHostName();
-                var addresses = Dns.GetHostAddresses(hostName);
-                foreach (var addr in addresses)
-                {
-                    // Ignorar IPv6 e localhost
-                    if (addr.AddressFamily == AddressFamily.InterNetwork && 
-                        !addr.ToString().StartsWith("127.") && 
-                        !addr.ToString().StartsWith("169.254."))
-                    {
-                        var detectedUrl = $"http://{addr}";
-                        Console.WriteLine($"[OBTER_URL] ⚠️ URL não configurada, usando IP detectado: {detectedUrl}");
-                        Console.WriteLine($"[OBTER_URL] ⚠️ Configure SITE_URL no systemd para usar domínio personalizado");
-                        return detectedUrl;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[OBTER_URL] Erro ao detectar IP: {ex.Message}");
-            }
             
-            // 5. Avisar e usar fallback
-            Console.WriteLine($"[OBTER_URL] ⚠️ AVISO: URL do site não configurada! Usando fallback localhost.");
+            // 5. Avisar e usar fallback (só se não detectou IP)
+            Console.WriteLine($"[OBTER_URL] ❌ ERRO: Não foi possível detectar URL do servidor!");
             Console.WriteLine($"[OBTER_URL] Configure no /etc/systemd/system/singleone-api.service:");
             Console.WriteLine($"[OBTER_URL] Environment=SITE_URL=http://SEU_IP_OU_DOMINIO");
             Console.WriteLine($"[OBTER_URL] Ou execute: sudo bash /opt/SingleOne/SingleOne_Backend/scripts/configurar_site_url.sh");
+            Console.WriteLine($"[OBTER_URL] ========== FIM DETECÇÃO URL ==========");
 
-            // Último fallback
-            return _environmentApiSettings.SiteUrl ?? "http://localhost:4200";
+            // Último fallback - mas avisar que está errado
+            var fallback = _environmentApiSettings.SiteUrl ?? "http://localhost:4200";
+            Console.WriteLine($"[OBTER_URL] ⚠️ USANDO FALLBACK (PODE ESTAR ERRADO): {fallback}");
+            return fallback;
         }
 
     }
