@@ -469,7 +469,7 @@ namespace SingleOne.Negocios
                     if (req != null)
                     {
                         Console.WriteLine($"[TERMO_COMPROMISSO] ✅ Requisição BYOD PENDENTE encontrada - Hash: {req.HashRequisicao}, Assinatura: {req.AssinaturaEletronica}");
-                        publicValidationUrl = $"{ObterUrlSite().TrimEnd('/')}/verificar-termo/{req.HashRequisicao}";
+                        publicValidationUrl = $"{ObterUrlSite(cliente).TrimEnd('/')}/verificar-termo/{req.HashRequisicao}";
                         selectedHash = req.HashRequisicao;
                         footer = GerarRodape(req.AssinaturaEletronica, req.DtAssinaturaEletronica, template, req.HashRequisicao, publicValidationUrl);
                         Console.WriteLine($"[TERMO_COMPROMISSO] Footer BYOD gerado para hash: {req.HashRequisicao}");
@@ -490,7 +490,7 @@ namespace SingleOne.Negocios
                         if (req != null)
                         {
                             Console.WriteLine($"[TERMO_COMPROMISSO] ✅ Requisição BYOD ASSINADA encontrada - Hash: {req.HashRequisicao}, Assinatura: {req.AssinaturaEletronica}");
-                            publicValidationUrl = $"{ObterUrlSite().TrimEnd('/')}/verificar-termo/{req.HashRequisicao}";
+                            publicValidationUrl = $"{ObterUrlSite(cliente).TrimEnd('/')}/verificar-termo/{req.HashRequisicao}";
                             selectedHash = req.HashRequisicao;
                             footer = GerarRodape(req.AssinaturaEletronica, req.DtAssinaturaEletronica, template, req.HashRequisicao, publicValidationUrl);
                             Console.WriteLine($"[TERMO_COMPROMISSO] Footer BYOD gerado para hash: {req.HashRequisicao}");
@@ -509,7 +509,7 @@ namespace SingleOne.Negocios
                             if (requisicaoDireta != null)
                             {
                                 Console.WriteLine($"[TERMO_COMPROMISSO] ✅ Requisição BYOD encontrada via busca direta - Hash: {requisicaoDireta.Hashrequisicao}, Assinatura: {requisicaoDireta.Assinaturaeletronica}");
-                                publicValidationUrl = $"{ObterUrlSite().TrimEnd('/')}/verificar-termo/{requisicaoDireta.Hashrequisicao}";
+                                publicValidationUrl = $"{ObterUrlSite(cliente).TrimEnd('/')}/verificar-termo/{requisicaoDireta.Hashrequisicao}";
                                 selectedHash = requisicaoDireta.Hashrequisicao;
                                 footer = GerarRodape(requisicaoDireta.Assinaturaeletronica, requisicaoDireta.Dtassinaturaeletronica, template, requisicaoDireta.Hashrequisicao, publicValidationUrl);
                                 Console.WriteLine($"[TERMO_COMPROMISSO] Footer BYOD gerado via busca direta para hash: {requisicaoDireta.Hashrequisicao}");
@@ -604,7 +604,7 @@ namespace SingleOne.Negocios
 
                         if (reqRef != null)
                         {
-                            publicValidationUrl = $"{ObterUrlSite().TrimEnd('/')}/verificar-termo/{reqRef.Hashrequisicao}";
+                            publicValidationUrl = $"{ObterUrlSite(cliente).TrimEnd('/')}/verificar-termo/{reqRef.Hashrequisicao}";
                             selectedHash = reqRef.Hashrequisicao;
                             DateTime? dtAss = null;
                             if (todasAssinadas)
