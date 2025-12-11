@@ -7,6 +7,7 @@ using SingleOne.Util;
 using SingleOneAPI.Models.ViewModels;
 using SingleOneAPI.Models.DTO;
 using SingleOneAPI.Negocios.Interfaces;
+using SingleOneAPI.Services;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -20,9 +21,12 @@ namespace SingleOne.Controllers
     public class RequisicoesController : ControllerBase
     {
         private readonly IRequisicoesNegocio _negocio;
-        public RequisicoesController(IRequisicoesNegocio negocio)
+        private readonly IIpAddressService _ipAddressService;
+        
+        public RequisicoesController(IRequisicoesNegocio negocio, IIpAddressService ipAddressService)
         {
             _negocio = negocio;
+            _ipAddressService = ipAddressService;
         }
 
 
@@ -132,13 +136,62 @@ namespace SingleOne.Controllers
         public async Task<string> AceitarTermoResponsabilidade(TermoEletronicoVM vm)
         {
             Console.WriteLine($"[CONTROLLER] Dados recebidos no controller:");
-            Console.WriteLine($"[CONTROLLER] - IP: {vm.IpAddress}");
+            Console.WriteLine($"[CONTROLLER] - IP (frontend): {vm.IpAddress}");
             Console.WriteLine($"[CONTROLLER] - País: {vm.Country}");
             Console.WriteLine($"[CONTROLLER] - Cidade: {vm.City}");
             Console.WriteLine($"[CONTROLLER] - Região: {vm.Region}");
             Console.WriteLine($"[CONTROLLER] - Latitude: {vm.Latitude}");
             Console.WriteLine($"[CONTROLLER] - Longitude: {vm.Longitude}");
             Console.WriteLine($"[CONTROLLER] - Precisão: {vm.Accuracy}");
+            Console.WriteLine($"[CONTROLLER] - Timestamp: {vm.Timestamp}");
+            
+            // ✅ CORREÇÃO: Capturar IP do servidor se o frontend não enviou ou enviou "Não informado"
+            if (string.IsNullOrEmpty(vm.IpAddress) || vm.IpAddress == "Não informado" || vm.IpAddress == "0.0.0.0")
+            {
+                try
+                {
+                    var serverIp = _ipAddressService.GetClientIpAddress(Request.HttpContext);
+                    if (!string.IsNullOrEmpty(serverIp) && serverIp != "0.0.0.0")
+                    {
+                        vm.IpAddress = serverIp;
+                        Console.WriteLine($"[CONTROLLER] ✅ IP capturado do servidor: {vm.IpAddress}");
+                    }
+                    else
+                    {
+                        // Fallback: tentar capturar diretamente
+                        var remoteIp = Request.HttpContext.Connection.RemoteIpAddress?.ToString();
+                        if (!string.IsNullOrEmpty(remoteIp))
+                        {
+                            vm.IpAddress = remoteIp;
+                            Console.WriteLine($"[CONTROLLER] ✅ IP capturado (fallback): {vm.IpAddress}");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"[CONTROLLER] ⚠️ Não foi possível capturar IP do servidor");
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[CONTROLLER] ⚠️ Erro ao capturar IP do servidor: {ex.Message}");
+                }
+            }
+            
+            // ✅ CORREÇÃO: Garantir que timestamp seja preenchido se não foi enviado
+            if (!vm.Timestamp.HasValue)
+            {
+                vm.Timestamp = DateTime.Now;
+                Console.WriteLine($"[CONTROLLER] ✅ Timestamp preenchido automaticamente: {vm.Timestamp}");
+            }
+            
+            Console.WriteLine($"[CONTROLLER] Dados finais que serão salvos:");
+            Console.WriteLine($"[CONTROLLER] - IP: {vm.IpAddress}");
+            Console.WriteLine($"[CONTROLLER] - País: {vm.Country ?? "Brasil"}");
+            Console.WriteLine($"[CONTROLLER] - Cidade: {vm.City ?? "Não informado"}");
+            Console.WriteLine($"[CONTROLLER] - Região: {vm.Region ?? "Não informado"}");
+            Console.WriteLine($"[CONTROLLER] - Latitude: {vm.Latitude?.ToString() ?? "null"}");
+            Console.WriteLine($"[CONTROLLER] - Longitude: {vm.Longitude?.ToString() ?? "null"}");
+            Console.WriteLine($"[CONTROLLER] - Precisão: {vm.Accuracy?.ToString() ?? "null"}");
             Console.WriteLine($"[CONTROLLER] - Timestamp: {vm.Timestamp}");
             
             return await _negocio.AceitarTermoEntrega(vm);
