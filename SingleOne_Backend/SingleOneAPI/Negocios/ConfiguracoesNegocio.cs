@@ -2077,7 +2077,7 @@ namespace SingleOne.Negocios
                         Console.WriteLine($"[LAUDO] Conteúdo do template: {template}");
                         
                         // Adicionar CSS como no "Nada Consta"
-                        var file = Path.Combine(Directory.GetCurrentDirectory(), "documentos", "ckeditor.css");
+                        var file = Path.Combine(Directory.GetCurrentDirectory(), "Documentos", "ckeditor.css");
                         if (File.Exists(file))
                         {
                             string css = File.ReadAllText(file);
@@ -2089,7 +2089,7 @@ namespace SingleOne.Negocios
                     {
                         Console.WriteLine("[LAUDO] Template personalizado não encontrado ou inativo, usando padrão");
                         // Fallback para template padrão
-                        var file = Path.Combine(Directory.GetCurrentDirectory(), "documentos", "template-laudo-tecnico.html");
+                        var file = Path.Combine(Directory.GetCurrentDirectory(), "Documentos", "template-laudo-tecnico.html");
                         template = File.ReadAllText(file);
                     }
                 }
@@ -2097,7 +2097,7 @@ namespace SingleOne.Negocios
                 {
                     Console.WriteLine("[LAUDO] Usando template padrão");
                     // Usar template padrão
-                    var file = Path.Combine(Directory.GetCurrentDirectory(), "documentos", "template-laudo-tecnico.html");
+                    var file = Path.Combine(Directory.GetCurrentDirectory(), "Documentos", "template-laudo-tecnico.html");
                     template = File.ReadAllText(file);
                 }
 
@@ -2854,7 +2854,7 @@ namespace SingleOne.Negocios
                                 .Replace("@tipoColaborador", "Funcionário");
 
                 // ✅ CORREÇÃO: Verificar se o arquivo CSS existe antes de ler
-                var file = Path.Combine(Directory.GetCurrentDirectory(), "documentos", "ckeditor.css");
+                var file = Path.Combine(Directory.GetCurrentDirectory(), "Documentos", "ckeditor.css");
                 string css = "";
                 if (File.Exists(file))
                 {

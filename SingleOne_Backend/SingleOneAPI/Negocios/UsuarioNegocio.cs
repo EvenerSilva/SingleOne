@@ -516,8 +516,8 @@ namespace SingleOne.Negocios
                 // Por enquanto, vamos simular salvando em memória
                 Console.WriteLine($"[2FA] Código salvo temporariamente para usuário: {usuario.Nome}");
                 
-                // Verificar se o template existe
-                var file = Path.Combine(Directory.GetCurrentDirectory(), "documentos", "two-factor-auth.html");
+                // Verificar se o template existe (pasta 'Documentos' conforme configurado no .csproj)
+                var file = Path.Combine(Directory.GetCurrentDirectory(), "Documentos", "two-factor-auth.html");
                 if (!System.IO.File.Exists(file))
                 {
                     Console.WriteLine($"[2FA] ❌ Template de 2FA não encontrado: {file}");

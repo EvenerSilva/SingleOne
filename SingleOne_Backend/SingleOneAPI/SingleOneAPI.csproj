@@ -68,6 +68,10 @@
     <None Update="Documentos\termoEntrega2.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <!-- Template de e-mail para 2FA -->
+    <None Update="Documentos\two-factor-auth.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Rotativa\Linux\wkhtmltopdf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
