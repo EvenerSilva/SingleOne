@@ -70,10 +70,97 @@ else
 fi
 echo ""
 
-# 5. Verificar e iniciar Nginx
+# 5. Garantir configuração do Nginx antes de iniciar
+echo "📋 Garantindo configuração do Nginx..."
+NGINX_CONFIG="/etc/nginx/sites-available/singleone"
+NGINX_ENABLED="/etc/nginx/sites-enabled/singleone"
+
+# Criar/atualizar configuração do Nginx
+if [ ! -f "$NGINX_CONFIG" ] || ! grep -q "demo.singleone.com.br" "$NGINX_CONFIG" 2>/dev/null; then
+    echo "📝 Criando/atualizando configuração do Nginx..."
+    cat > "$NGINX_CONFIG" << 'NGINX_EOF'
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+
+    server_name demo.singleone.com.br 84.247.128.180 _;
+
+    root /opt/SingleOne/SingleOne_Frontend/dist/SingleOne;
+    index index.html;
+
+    # Gzip compression
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 1024;
+    gzip_types text/plain text/css text/xml text/javascript application/x-javascript application/xml+rss application/json application/javascript;
+
+    # Security headers
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+
+    # Proxy para API
+    location /api/ {
+        proxy_pass http://127.0.0.1:5000/api/;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Connection "";
+        proxy_buffering off;
+    }
+
+    # Angular routing - TODAS as rotas devem retornar index.html
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    # Cache para assets estáticos
+    location ~* \.(jpg|jpeg|png|gif|ico|css|js|svg|woff|woff2|ttf|eot)$ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+
+    # Não fazer cache do index.html
+    location = /index.html {
+        add_header Cache-Control "no-cache, no-store, must-revalidate";
+        add_header Pragma "no-cache";
+        add_header Expires "0";
+    }
+}
+NGINX_EOF
+    echo "✅ Configuração do Nginx criada/atualizada"
+else
+    echo "✅ Configuração do Nginx já existe e está correta"
+fi
+
+# Garantir link simbólico
+if [ ! -L "$NGINX_ENABLED" ]; then
+    echo "🔗 Criando link simbólico..."
+    ln -sf "$NGINX_CONFIG" "$NGINX_ENABLED"
+    echo "✅ Link simbólico criado"
+else
+    echo "✅ Link simbólico já existe"
+fi
+
+# Testar configuração
+echo "🧪 Testando configuração do Nginx..."
+if nginx -t > /dev/null 2>&1; then
+    echo "✅ Configuração do Nginx válida"
+else
+    echo "❌ Erro na configuração do Nginx:"
+    nginx -t
+    exit 1
+fi
+echo ""
+
+# 6. Verificar e iniciar Nginx
 echo "📋 Verificando Nginx..."
 if systemctl is-active --quiet nginx; then
     echo "✅ Nginx já está rodando"
+    echo "🔄 Recarregando configuração..."
+    systemctl reload nginx
 else
     echo "🔄 Iniciando Nginx..."
     systemctl start nginx
@@ -86,16 +173,6 @@ else
         systemctl status nginx --no-pager -l | head -10
         exit 1
     fi
-fi
-echo ""
-
-# 6. Verificar configuração do Nginx
-echo "📋 Verificando configuração do Nginx..."
-if nginx -t > /dev/null 2>&1; then
-    echo "✅ Configuração do Nginx válida"
-else
-    echo "⚠️  Problemas na configuração do Nginx:"
-    nginx -t
 fi
 echo ""
 
@@ -182,4 +259,5 @@ echo "   1. Verifique os logs: journalctl -u NOME_DO_SERVICO -n 50"
 echo "   2. Verifique o status: systemctl status NOME_DO_SERVICO"
 echo "   3. Tente reiniciar: systemctl restart NOME_DO_SERVICO"
 echo ""
+
 

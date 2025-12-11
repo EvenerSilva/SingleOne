@@ -81,3 +81,4 @@ echo "   2. Configuração do Nginx: sudo nginx -t"
 echo "   3. Arquivos do frontend: ls -la /opt/SingleOne/SingleOne_Frontend/dist/SingleOne/"
 echo ""
 
+

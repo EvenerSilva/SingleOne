@@ -79,3 +79,4 @@ systemctl list-units | grep -i nginx
 
 Após atualizar ambos, os nomes aparecerão como "Evener Silva" em vez de "evener Silva".
 
+

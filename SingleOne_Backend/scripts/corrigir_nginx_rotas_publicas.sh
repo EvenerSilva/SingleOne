@@ -117,3 +117,4 @@ echo "🧪 Teste acessando:"
 echo "   http://84.247.128.180/verificar-termo/SEU_HASH_AQUI"
 echo ""
 
+

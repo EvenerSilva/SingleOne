@@ -120,3 +120,4 @@ echo "   3. Verifique se o .NET runtime está instalado: dotnet --version"
 echo "   4. Tente fazer um novo publish: cd /opt/SingleOne/SingleOne_Backend/SingleOneAPI && dotnet publish -c Release -o /opt/singleone-api-publish"
 echo ""
 
+
