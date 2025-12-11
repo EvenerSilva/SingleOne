@@ -338,9 +338,18 @@ namespace SingleOne.Controllers
                 // Retornar o caminho da logo
                 var logoPathFinal = _fileUploadService.GetLogoPath(cliente.Logo);
                 Console.WriteLine($"[BUSCAR-LOGO] ✅ Logo válida encontrada: {logoPathFinal}");
+                Console.WriteLine($"[BUSCAR-LOGO] Cliente: {cliente.Razaosocial} (ID: {cliente.Id})");
+                Console.WriteLine($"[BUSCAR-LOGO] Arquivo: {cliente.Logo}");
+                
+                // ✅ CORREÇÃO: Garantir que sempre retorne a logo se encontrada
+                // Adicionar timestamp para evitar cache do navegador
+                var logoUrlComCache = $"{logoPathFinal}?v={DateTime.Now:yyyyMMddHHmmss}";
+                
                 return Ok(new { 
-                    Logo = logoPathFinal, 
+                    Logo = logoPathFinal, // ✅ Retornar URL sem timestamp para consistência
+                    LogoUrl = logoUrlComCache, // URL com timestamp para forçar reload se necessário
                     ClienteNome = cliente.Razaosocial,
+                    ClienteId = cliente.Id,
                     Mensagem = "Logo encontrada com sucesso" 
                 });
             }
