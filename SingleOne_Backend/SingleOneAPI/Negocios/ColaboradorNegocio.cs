@@ -1618,17 +1618,35 @@ namespace SingleOne.Negocios
                 }
             }
 
-            // 4. Avisar e usar fallback
-            Console.WriteLine($"[OBTER_URL] ⚠️ AVISO: URL do site não configurada! Usando fallback. Configure SITE_URL no systemd service.");
+            // 4. Tentar detectar IP do servidor automaticamente
+            try
+            {
+                var hostName = System.Net.Dns.GetHostName();
+                var addresses = System.Net.Dns.GetHostAddresses(hostName);
+                foreach (var addr in addresses)
+                {
+                    // Ignorar IPv6 e localhost
+                    if (addr.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork && 
+                        !addr.ToString().StartsWith("127.") && 
+                        !addr.ToString().StartsWith("169.254."))
+                    {
+                        var detectedUrl = $"http://{addr}";
+                        Console.WriteLine($"[OBTER_URL] ⚠️ URL não configurada, usando IP detectado: {detectedUrl}");
+                        Console.WriteLine($"[OBTER_URL] ⚠️ Configure SITE_URL no systemd para usar domínio personalizado");
+                        return detectedUrl;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[OBTER_URL] Erro ao detectar IP: {ex.Message}");
+            }
+            
+            // 5. Avisar e usar fallback
+            Console.WriteLine($"[OBTER_URL] ⚠️ AVISO: URL do site não configurada! Usando fallback localhost.");
             Console.WriteLine($"[OBTER_URL] Configure no /etc/systemd/system/singleone-api.service:");
             Console.WriteLine($"[OBTER_URL] Environment=SITE_URL=http://SEU_IP_OU_DOMINIO");
-            
-            // Fallback: tentar usar o IP do servidor (se possível detectar)
-            var serverIp = Environment.GetEnvironmentVariable("SERVER_IP");
-            if (!string.IsNullOrEmpty(serverIp))
-            {
-                return $"http://{serverIp}";
-            }
+            Console.WriteLine($"[OBTER_URL] Ou execute: sudo bash /opt/SingleOne/SingleOne_Backend/scripts/configurar_site_url.sh");
 
             // Último fallback
             return _environmentApiSettings.SiteUrl ?? "http://localhost:4200";
