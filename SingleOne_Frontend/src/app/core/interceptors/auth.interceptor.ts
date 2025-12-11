@@ -61,7 +61,12 @@ export class AuthInterceptor implements HttpInterceptor {
       '/patrimonio',
       // liberar página pública e API pública de verificação de termos
       '/verificar-termo',
-      '/TermosPublicos/validacao'
+      '/TermosPublicos/validacao',
+      // APIs públicas para termos de responsabilidade (acesso anônimo)
+      '/requisicoes/ListarEquipamentosDaRequisicao',
+      '/requisicoes/AceitarTermoResponsabilidade',
+      // API pública para buscar logo do cliente
+      '/configuracoes/BuscarLogoCliente'
     ];
     return publicRoutes.some(route => url.includes(route));
   }
