@@ -267,8 +267,8 @@ namespace SingleOne.Negocios
                 {
                 }
 
-                var file = Path.Combine(Directory.GetCurrentDirectory(), "documentos", "recuperarPalavraCriptografada.html");
-                string template = System.IO.File.ReadAllText(file);
+                var file = Path.Combine(Directory.GetCurrentDirectory(), "Documentos", "recuperarPalavraCriptografada.html");
+                string template = System.IO.File.Exists(file) ? System.IO.File.ReadAllText(file) : string.Empty;
                 
                 // Gerar link seguro - correção específica para a barra
                 string baseUrl = _environmentApiSettings.SiteUrl ?? "http://localhost:4200";
@@ -310,8 +310,8 @@ namespace SingleOne.Negocios
                     _usuarioRepository.Atualizar(usr);
                     _usuarioRepository.SalvarAlteracoes(); // ✅ CORREÇÃO: Salvar alterações explicitamente
 
-                    var file = Path.Combine(Directory.GetCurrentDirectory(), "documentos", "recuperarSenha.html");
-                    string template = System.IO.File.ReadAllText(file);
+                    var file = Path.Combine(Directory.GetCurrentDirectory(), "Documentos", "recuperarSenha.html");
+                    string template = System.IO.File.Exists(file) ? System.IO.File.ReadAllText(file) : string.Empty;
                     template = template.Replace("@nome", usr.Nome).Replace("@senha", senha);
 
                     mail.Enviar(usr.Email, "Recuperação de Senha", template);

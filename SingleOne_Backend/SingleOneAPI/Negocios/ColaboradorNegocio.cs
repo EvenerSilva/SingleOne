@@ -927,9 +927,9 @@ namespace SingleOne.Negocios
                 //EquipamentoNegocio equipamentoNegocio = new EquipamentoNegocio(this._config);
                 var eqptos = _equipamentoNegocio.EquipamentosDoTermoDeEntrega(cliente, colaborador, byod);
                 string strEquipamentos = FormatarTabelaEquipamentos(eqptos);
-                var file = Path.Combine(Directory.GetCurrentDirectory(), "documentos", "termoEmail.html");
+                var file = Path.Combine(Directory.GetCurrentDirectory(), "Documentos", "termoEmail.html");
                 string siteUrl = _environmentApiSettings.SiteUrl.TrimEnd('/') + "/termos/";
-                var template = File.ReadAllText(file);
+                var template = File.Exists(file) ? File.ReadAllText(file) : string.Empty;
                 template = template.Replace("@nome", col.Nome)
                     .Replace("@equipamentos", strEquipamentos)
                     .Replace("@palavraPasse", (eqptos[0].Hashrequisicao))

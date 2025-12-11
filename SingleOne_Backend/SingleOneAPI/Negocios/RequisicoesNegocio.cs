@@ -1055,8 +1055,8 @@ namespace SingleOne.Negocios
                             throw; // Re-throw para não continuar sem PDF
                         }
                         
-                        var file = Path.Combine(Directory.GetCurrentDirectory(), "documentos", "termoEmail-Confirmacao.html");
-                        string template = File.ReadAllText(file);
+                        var file = Path.Combine(Directory.GetCurrentDirectory(), "Documentos", "termoEmail-Confirmacao.html");
+                        string template = File.Exists(file) ? File.ReadAllText(file) : string.Empty;
                         template = template.Replace("@nome", colaborador.Nome)
                             .Replace("@ano", DateTime.Today.Year.ToString());
 

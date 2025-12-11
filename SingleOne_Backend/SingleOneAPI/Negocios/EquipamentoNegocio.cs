@@ -658,8 +658,8 @@ namespace SingleOne.Negocios
                 eqpto = this.BuscarEquipamentoPorId(eqpto.Id);
                 var paramts = _parametroRepository.Buscar(x => x.Cliente == eqpto.Cliente).FirstOrDefault();
 
-                var file = Path.Combine(Directory.GetCurrentDirectory(), "documentos", "notificacaoRH.html");
-                var template = File.ReadAllText(file);
+                var file = Path.Combine(Directory.GetCurrentDirectory(), "Documentos", "notificacaoRH.html");
+                var template = File.Exists(file) ? File.ReadAllText(file) : string.Empty;
 
                 template = template.Replace("@tipo", eqpto.TipoequipamentoNavigation.Descricao)
                                 .Replace("@fabricante", eqpto.FabricanteNavigation.Descricao)
