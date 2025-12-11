@@ -53,7 +53,9 @@ services:
     networks:
       - singleone-network
     volumes:
-      - ./SingleOne_Backend/SingleOneAPI/Documentos:/app/documentos
+      # Mapeia os templates e documentos HTML (termos, laudos, 2FA, etc.)
+      - ./SingleOneAPI/Documentos:/app/documentos
+      # Mapeia a pasta wwwroot para servir arquivos estáticos e PDFs gerados
       - backend_wwwroot:/app/wwwroot
 
   # Ollama (IA para TinOne - Opcional)

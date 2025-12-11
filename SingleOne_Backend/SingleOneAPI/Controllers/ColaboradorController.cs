@@ -37,6 +37,12 @@ namespace SingleOne.Controllers
             return _negocio.ListarColaboradores(pesquisa, cliente);
         }
 
+        [HttpGet("[action]/{cliente}", Name = "ObterEstatisticas")]
+        public ColaboradorEstatisticasDTO ObterEstatisticas(int cliente)
+        {
+            return _negocio.ObterEstatisticas(cliente);
+        }
+
         [HttpGet("[action]/{pesquisa}/{cliente}", Name ="ListarColaboradoresAtivos")]
         public List<Colaboradore> ListarColaboradoresAtivos(string pesquisa, int cliente)
         {

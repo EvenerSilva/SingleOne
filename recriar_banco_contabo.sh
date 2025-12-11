@@ -78,7 +78,6 @@ echo "  User: $DB_USER"
 echo "  Database: $DB_NAME"
 echo ""
 
-# Verificar se o banco existe
 echo -e "${YELLOW}🔍 Verificando se o banco '$DB_NAME' existe...${NC}"
 DB_EXISTS=$(run_psql postgres -tAc "SELECT 1 FROM pg_database WHERE datname='$DB_NAME'" 2>/dev/null || echo "0")
 
@@ -97,109 +96,73 @@ if [ "$DB_EXISTS" = "1" ]; then
     echo "  Views encontradas: $VIEW_COUNT"
     echo ""
     
-    if [ "$TABLE_COUNT" -lt 50 ]; then
-        echo -e "${RED}⚠️  Banco existe mas parece incompleto (menos de 50 tabelas)${NC}"
-        read -p "Deseja recriar o banco? (s/N): " -n 1 -r
-        echo
-        if [[ ! $REPLY =~ ^[Ss]$ ]]; then
-            echo -e "${YELLOW}Operação cancelada.${NC}"
-            exit 0
-        fi
-        RECREATE=true
-    else
-        echo -e "${GREEN}✅ Banco parece estar completo!${NC}"
-        echo ""
-        read -p "Deseja mesmo recriar o banco? (s/N): " -n 1 -r
-        echo
-        if [[ ! $REPLY =~ ^[Ss]$ ]]; then
-            echo -e "${YELLOW}Operação cancelada.${NC}"
-            exit 0
-        fi
-        RECREATE=true
-    fi
-else
-    echo -e "${RED}❌ Banco '$DB_NAME' NÃO existe!${NC}"
-    RECREATE=true
+    echo -e "${GREEN}✅ Versão SEGURA: não será executado DROP DATABASE automaticamente.${NC}"
+    echo -e "${YELLOW}Se o banco parecer incompleto, recrie MANUALMENTE com orientação.${NC}"
+    exit 0
 fi
 
-if [ "$RECREATE" = true ]; then
+echo -e "${RED}❌ Banco '$DB_NAME' NÃO existe!${NC}"
+echo ""
+echo -e "${YELLOW}🆕 Criando novo banco '$DB_NAME'...${NC}"
+run_psql postgres -c "CREATE DATABASE \"$DB_NAME\";"
+
+if [ $? -eq 0 ]; then
+    echo -e "${GREEN}✅ Banco criado com sucesso!${NC}"
+else
+    echo -e "${RED}❌ Erro ao criar banco!${NC}"
+    exit 1
+fi
+
+echo ""
+echo -e "${YELLOW}📦 Executando script de inicialização...${NC}"
+
+# Verificar se o script existe
+if [ ! -f "init_db_atualizado.sql" ]; then
+    echo -e "${RED}❌ Arquivo 'init_db_atualizado.sql' não encontrado!${NC}"
+    echo "   Certifique-se de estar no diretório correto."
+    exit 1
+fi
+
+# Executar script de inicialização
+if [ "$USE_DOCKER" = true ]; then
+    # Copiar script para o container e executar
+    docker cp init_db_atualizado.sql "$DOCKER_CONTAINER":/tmp/init_db_atualizado.sql
+    docker exec -e PGPASSWORD="$DB_PASSWORD" "$DOCKER_CONTAINER" psql -U "$DB_USER" -d "$DB_NAME" -f /tmp/init_db_atualizado.sql
+    docker exec "$DOCKER_CONTAINER" rm -f /tmp/init_db_atualizado.sql
+else
+    run_psql "$DB_NAME" -f init_db_atualizado.sql
+fi
+
+if [ $? -eq 0 ]; then
     echo ""
-    echo -e "${YELLOW}🗑️  Removendo banco existente (se houver)...${NC}"
-    
-    # Terminar conexões ativas
-    run_psql postgres -c "
-        SELECT pg_terminate_backend(pid)
-        FROM pg_stat_activity
-        WHERE datname = '$DB_NAME' AND pid <> pg_backend_pid();
-    " 2>/dev/null || true
-    
-    # Dropar banco
-    run_psql postgres -c "DROP DATABASE IF EXISTS \"$DB_NAME\";" 2>/dev/null || true
-    
-    echo -e "${GREEN}✅ Banco removido (se existia)${NC}"
+    echo -e "${GREEN}✅ Script de inicialização executado com sucesso!${NC}"
+else
     echo ""
-    
-    echo -e "${YELLOW}🆕 Criando novo banco '$DB_NAME'...${NC}"
-    run_psql postgres -c "CREATE DATABASE \"$DB_NAME\";"
-    
-    if [ $? -eq 0 ]; then
-        echo -e "${GREEN}✅ Banco criado com sucesso!${NC}"
-    else
-        echo -e "${RED}❌ Erro ao criar banco!${NC}"
-        exit 1
-    fi
-    
+    echo -e "${RED}⚠️  Script executado com alguns erros (isso pode ser normal)${NC}"
+    echo "   Verifique os logs acima para detalhes."
+fi
+
+echo ""
+echo -e "${YELLOW}📊 Verificando estrutura final...${NC}"
+
+# Contar tabelas e views novamente
+TABLE_COUNT=$(run_psql "$DB_NAME" -tAc "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public' AND table_type = 'BASE TABLE';" 2>/dev/null || echo "0")
+VIEW_COUNT=$(run_psql "$DB_NAME" -tAc "SELECT COUNT(*) FROM information_schema.views WHERE table_schema = 'public';" 2>/dev/null || echo "0")
+
+echo "  Tabelas criadas: $TABLE_COUNT"
+echo "  Views criadas: $VIEW_COUNT"
+echo ""
+
+if [ "$TABLE_COUNT" -ge 60 ] && [ "$VIEW_COUNT" -ge 25 ]; then
+    echo -e "${GREEN}✅ Banco criado e inicializado com sucesso!${NC}"
     echo ""
-    echo -e "${YELLOW}📦 Executando script de inicialização...${NC}"
-    
-    # Verificar se o script existe
-    if [ ! -f "init_db_atualizado.sql" ]; then
-        echo -e "${RED}❌ Arquivo 'init_db_atualizado.sql' não encontrado!${NC}"
-        echo "   Certifique-se de estar no diretório correto."
-        exit 1
-    fi
-    
-    # Executar script de inicialização
-    if [ "$USE_DOCKER" = true ]; then
-        # Copiar script para o container e executar
-        docker cp init_db_atualizado.sql "$DOCKER_CONTAINER":/tmp/init_db_atualizado.sql
-        docker exec -e PGPASSWORD="$DB_PASSWORD" "$DOCKER_CONTAINER" psql -U "$DB_USER" -d "$DB_NAME" -f /tmp/init_db_atualizado.sql
-        docker exec "$DOCKER_CONTAINER" rm -f /tmp/init_db_atualizado.sql
-    else
-        run_psql "$DB_NAME" -f init_db_atualizado.sql
-    fi
-    
-    if [ $? -eq 0 ]; then
-        echo ""
-        echo -e "${GREEN}✅ Script de inicialização executado com sucesso!${NC}"
-    else
-        echo ""
-        echo -e "${RED}⚠️  Script executado com alguns erros (isso pode ser normal)${NC}"
-        echo "   Verifique os logs acima para detalhes."
-    fi
-    
-    echo ""
-    echo -e "${YELLOW}📊 Verificando estrutura final...${NC}"
-    
-    # Contar tabelas e views novamente
-    TABLE_COUNT=$(run_psql "$DB_NAME" -tAc "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public' AND table_type = 'BASE TABLE';" 2>/dev/null || echo "0")
-    VIEW_COUNT=$(run_psql "$DB_NAME" -tAc "SELECT COUNT(*) FROM information_schema.views WHERE table_schema = 'public';" 2>/dev/null || echo "0")
-    
-    echo "  Tabelas criadas: $TABLE_COUNT"
-    echo "  Views criadas: $VIEW_COUNT"
-    echo ""
-    
-    if [ "$TABLE_COUNT" -ge 60 ] && [ "$VIEW_COUNT" -ge 25 ]; then
-        echo -e "${GREEN}✅ Banco recriado com sucesso!${NC}"
-        echo ""
-        echo -e "${GREEN}=====================================================${NC}"
-        echo -e "${GREEN}  ✅ BANCO RECRIADO COM SUCESSO!${NC}"
-        echo -e "${GREEN}=====================================================${NC}"
-    else
-        echo -e "${YELLOW}⚠️  Banco criado mas pode estar incompleto${NC}"
-        echo "   Tabelas esperadas: ~64"
-        echo "   Views esperadas: ~32"
-    fi
+    echo -e "${GREEN}=====================================================${NC}"
+    echo -e "${GREEN}  ✅ BANCO CRIADO COM SUCESSO!${NC}"
+    echo -e "${GREEN}=====================================================${NC}"
+else
+    echo -e "${YELLOW}⚠️  Banco criado mas pode estar incompleto${NC}"
+    echo "   Tabelas esperadas: ~64"
+    echo "   Views esperadas: ~32"
 fi
 
 echo ""

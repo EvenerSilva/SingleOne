@@ -8,6 +8,7 @@ using SingleOneAPI.Infra.Repositorio;
 using SingleOneAPI.Models;
 using SingleOneAPI.Models.DTO;
 using SingleOneAPI.Negocios.Interfaces;
+using System.Linq;
 using SingleOneAPI.Services;
 using System;
 using System.Collections.Generic;
@@ -178,6 +179,31 @@ namespace SingleOne.Negocios
         private bool VerificarSituacaoColaboradorAtivo(Colaboradore colaborador)
         {
             return (!colaborador.Dtdemissao.HasValue || (colaborador.Dtdemissao.HasValue && colaborador.Dtdemissao.Value > TimeZoneMapper.GetDateTimeNow()));
+        }
+
+        public ColaboradorEstatisticasDTO ObterEstatisticas(int cliente)
+        {
+            DateTime dtNow = TimeZoneMapper.GetDateTimeNow();
+            
+            // Queries otimizadas usando COUNT - não carrega os dados, só conta
+            var total = _repository.Buscar(x => x.Cliente == cliente).Count();
+            var funcionarios = _repository.Buscar(x => x.Cliente == cliente && x.Tipocolaborador == 'F').Count();
+            var terceiros = _repository.Buscar(x => x.Cliente == cliente && x.Tipocolaborador == 'T').Count();
+            var consultores = _repository.Buscar(x => x.Cliente == cliente && x.Tipocolaborador == 'C').Count();
+            var ativos = _repository.Buscar(x => x.Cliente == cliente && 
+                (!x.Dtdemissao.HasValue || (x.Dtdemissao.HasValue && x.Dtdemissao.Value > dtNow))).Count();
+            var desligados = _repository.Buscar(x => x.Cliente == cliente && 
+                x.Dtdemissao.HasValue && x.Dtdemissao.Value <= dtNow).Count();
+            
+            return new ColaboradorEstatisticasDTO
+            {
+                Total = total,
+                Funcionarios = funcionarios,
+                Terceiros = terceiros,
+                Consultores = consultores,
+                Ativos = ativos,
+                Desligados = desligados
+            };
         }
 
         public ColaboradorCompletoDTO ObterColaboradorPorID(int id)

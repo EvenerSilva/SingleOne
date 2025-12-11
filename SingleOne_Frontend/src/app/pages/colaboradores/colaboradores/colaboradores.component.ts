@@ -53,6 +53,7 @@ export class ColaboradoresComponent implements OnInit, AfterViewInit {
   public mostrarAtalhoCentral = false;
   public totalRegistrosBackend = 0; // Total de registros informado pelo backend (RowCount)
   private termoPesquisaAtual: string = 'null'; // Termo de pesquisa usado na última chamada
+  public estatisticas: any = null; // Estatísticas do backend (total, funcionarios, terceiros, etc.)
   
   // 📤 VARIÁVEIS DO MODAL DE IMPORTAÇÃO
   public mostrarModalImportacao: boolean = false;
@@ -110,6 +111,7 @@ export class ColaboradoresComponent implements OnInit, AfterViewInit {
         }, 5000);
       } else {
         // Carregar lista normal (primeira página, sem filtro)
+        this.carregarEstatisticas();
         this.listar(1);
       }
 
@@ -314,9 +316,10 @@ export class ColaboradoresComponent implements OnInit, AfterViewInit {
     this.mostrarFormulario = true;
   }
 
-  onColaboradorSalvo(colaborador: any) {
+  async onColaboradorSalvo(colaborador: any) {
     this.mostrarFormulario = false;
     this.colaboradorEditando = null;
+    await this.carregarEstatisticas(); // Recarregar estatísticas
     this.listar(); // Recarregar lista
     this.util.exibirMensagemToast('Colaborador salvo com sucesso!', 5000);
   }
@@ -327,9 +330,23 @@ export class ColaboradoresComponent implements OnInit, AfterViewInit {
   }
 
   // 🎯 MÉTODOS PARA ESTATÍSTICAS DOS CARDS (OTIMIZADOS COM CACHE)
+  async carregarEstatisticas(): Promise<void> {
+    try {
+      const res = await this.api.obterEstatisticas(this.cliente, this.session.token);
+      if (res.status === 200 && res.data) {
+        this.estatisticas = res.data;
+      }
+    } catch (error) {
+      console.error('[COLABORADORES] Erro ao carregar estatísticas:', error);
+    }
+  }
+
   getTotalColaboradores(): number {
-    // Total informado pelo backend (RowCount). Se não houver, usa quantidade em memória.
-    return this.totalRegistrosBackend || this.getCachedStat('total', () => this.dadosOriginais?.length || 0);
+    // Usa estatísticas do backend se disponível, senão usa totalRegistrosBackend
+    if (this.estatisticas?.total !== undefined) {
+      return this.estatisticas.total;
+    }
+    return this.totalRegistrosBackend || 0;
   }
 
   getSelecionados(): number {
@@ -338,61 +355,43 @@ export class ColaboradoresComponent implements OnInit, AfterViewInit {
   }
 
   getFuncionarios(): number {
-    return this.getCachedStat('funcionarios', () => {
-      const dadosParaAnalisar = this.filtroAtivo === 'total' ? this.dadosOriginais : this.dataSource.data;
-      if (!dadosParaAnalisar?.length) return 0;
-      return dadosParaAnalisar.filter((colaborador: any) => 
-        this.getTipoCodigo(this.obterValorCampo(colaborador, ['tipoColaborador', 'Tipocolaborador'])) === 'F'
-      ).length;
-    });
+    // Usa estatísticas do backend se disponível
+    if (this.estatisticas?.funcionarios !== undefined) {
+      return this.estatisticas.funcionarios;
+    }
+    return 0;
   }
 
   getTerceiros(): number {
-    return this.getCachedStat('terceiros', () => {
-      const dadosParaAnalisar = this.filtroAtivo === 'total' ? this.dadosOriginais : this.dataSource.data;
-      if (!dadosParaAnalisar?.length) return 0;
-      return dadosParaAnalisar.filter((colaborador: any) => 
-        this.getTipoCodigo(this.obterValorCampo(colaborador, ['tipoColaborador', 'Tipocolaborador'])) === 'T'
-      ).length;
-    });
+    // Usa estatísticas do backend se disponível
+    if (this.estatisticas?.terceiros !== undefined) {
+      return this.estatisticas.terceiros;
+    }
+    return 0;
   }
 
   getConsultores(): number {
-    return this.getCachedStat('consultores', () => {
-      const dadosParaAnalisar = this.filtroAtivo === 'total' ? this.dadosOriginais : this.dataSource.data;
-      if (!dadosParaAnalisar?.length) return 0;
-      return dadosParaAnalisar.filter((colaborador: any) => 
-        this.getTipoCodigo(this.obterValorCampo(colaborador, ['tipoColaborador', 'Tipocolaborador'])) === 'C'
-      ).length;
-    });
+    // Usa estatísticas do backend se disponível
+    if (this.estatisticas?.consultores !== undefined) {
+      return this.estatisticas.consultores;
+    }
+    return 0;
   }
 
   getAtivos(): number {
-    return this.getCachedStat('ativos', () => {
-      const dadosParaAnalisar = this.filtroAtivo === 'total' ? this.dadosOriginais : this.dataSource.data;
-      if (!dadosParaAnalisar?.length) return 0;
-      
-      const hoje = new Date();
-      hoje.setHours(0, 0, 0, 0);
-      
-      return dadosParaAnalisar.filter((colaborador: any) => {
-        return !this.isColaboradorDesligado(colaborador, hoje);
-      }).length;
-    });
+    // Usa estatísticas do backend se disponível
+    if (this.estatisticas?.ativos !== undefined) {
+      return this.estatisticas.ativos;
+    }
+    return 0;
   }
 
   getDesligados(): number {
-    return this.getCachedStat('desligados', () => {
-      const dadosParaAnalisar = this.filtroAtivo === 'total' ? this.dadosOriginais : this.dataSource.data;
-      if (!dadosParaAnalisar?.length) return 0;
-      
-      const hoje = new Date();
-      hoje.setHours(0, 0, 0, 0);
-      
-      return dadosParaAnalisar.filter((colaborador: any) => {
-        return this.isColaboradorDesligado(colaborador, hoje);
-      }).length;
-    });
+    // Usa estatísticas do backend se disponível
+    if (this.estatisticas?.desligados !== undefined) {
+      return this.estatisticas.desligados;
+    }
+    return 0;
   }
 
   // 🚀 MÉTODO DE CACHE PARA OTIMIZAÇÃO

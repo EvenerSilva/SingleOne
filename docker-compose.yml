@@ -78,8 +78,12 @@ services:
     networks:
       - singleone-network
     volumes:
+      # Logs do backend (para troubleshooting no host)
       - backend_logs:/app/logs
+      # Arquivos estáticos gerados (PDFs, etc.)
       - backend_wwwroot:/app/wwwroot
+      # Templates e documentos HTML (termos, laudos, 2FA, etc.)
+      - ./SingleOne_Backend/SingleOneAPI/Documentos:/app/documentos
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
       interval: 30s

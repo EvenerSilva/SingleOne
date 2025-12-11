@@ -27,6 +27,7 @@ namespace SingleOneAPI.Negocios.Interfaces
         byte[] TermoNadaConsta(int colaborador, int cliente, int usuarioLogado);
         List<Termoscolaboradoresvm> ColaboradoresComTermoPorAssinar(string pesquisa, int cliente, string filtro);
         void RegistrarLocalizacaoAssinatura(LocalizacaoAssinaturaDTO dados);
+        ColaboradorEstatisticasDTO ObterEstatisticas(int cliente);
         
         // Cargos de Confiança
         List<string> ListarCargosUnicos(int cliente);

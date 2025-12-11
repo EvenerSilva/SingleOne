@@ -16,6 +16,16 @@ export class ColaboradorApiService extends ConfigApiService{
       return err;
     })
   }
+  obterEstatisticas(cliente, token){
+    return this.instance.get('/colaborador/ObterEstatisticas/' + cliente, { headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + token
+    }}).then(res => {
+      return res;
+    }).catch(err => {
+      return err;
+    })
+  }
   listarColaboradoresAtivos(pesquisa, cliente, token){
     return this.instance.get('/colaborador/ListarColaboradoresAtivos/' + pesquisa + '/' + cliente, { headers: {
       'Content-Type': 'application/json',
