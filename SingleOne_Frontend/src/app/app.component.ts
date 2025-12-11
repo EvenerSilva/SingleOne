@@ -158,9 +158,10 @@ export class AppComponent implements OnInit {
       // O backend retorna: { Logo: "/api/logos/{fileName}", ClienteNome: "...", Mensagem: "..." }
       const logoData = response?.data;
       
-      if (logoData && (logoData.Logo || logoData.logo)) {
-        // A logo retornada é uma URL relativa como /api/logos/{fileName}
-        let logoUrl = logoData.Logo || logoData.logo;
+      // Aceitar tanto maiúsculas quanto minúsculas, e priorizar logoUrl (com timestamp) se disponível
+      if (logoData && (logoData.Logo || logoData.logo || logoData.LogoUrl || logoData.logoUrl)) {
+        // Priorizar logoUrl (com timestamp) se disponível, senão usar Logo/logo
+        let logoUrl = logoData.LogoUrl || logoData.logoUrl || logoData.Logo || logoData.logo;
         
         // Se a URL já começa com /api/, manter como está (nginx faz proxy)
         // Em produção, sempre usar URL relativa
