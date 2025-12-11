@@ -928,7 +928,12 @@ namespace SingleOne.Negocios
                 var eqptos = _equipamentoNegocio.EquipamentosDoTermoDeEntrega(cliente, colaborador, byod);
                 string strEquipamentos = FormatarTabelaEquipamentos(eqptos);
                 var file = Path.Combine(Directory.GetCurrentDirectory(), "Documentos", "termoEmail.html");
-                string siteUrl = _environmentApiSettings.SiteUrl.TrimEnd('/') + "/termos/";
+                
+                // ✅ CORREÇÃO: Obter URL correta do servidor
+                string siteUrl = ObterUrlSite();
+                Console.WriteLine($"[TERMO POR EMAIL] SiteUrl usado: {siteUrl}");
+                
+                siteUrl = siteUrl.TrimEnd('/') + "/termos/";
                 var template = File.Exists(file) ? File.ReadAllText(file) : string.Empty;
                 template = template.Replace("@nome", col.Nome)
                     .Replace("@equipamentos", strEquipamentos)
@@ -1569,6 +1574,64 @@ namespace SingleOne.Negocios
                 cargoUpper.Contains(x.Cargo.ToUpper().Trim()));
             
             return matchPadrao;
+        }
+
+        /// <summary>
+        /// Obtém a URL do site, tentando detectar automaticamente se não estiver configurada
+        /// </summary>
+        private string ObterUrlSite()
+        {
+            // 1. Tentar usar a URL configurada
+            if (!string.IsNullOrEmpty(_environmentApiSettings.SiteUrl) && 
+                !_environmentApiSettings.SiteUrl.Contains("localhost"))
+            {
+                Console.WriteLine($"[OBTER_URL] Usando URL configurada: {_environmentApiSettings.SiteUrl}");
+                return _environmentApiSettings.SiteUrl;
+            }
+
+            // 2. Tentar obter da variável de ambiente
+            var envUrl = Environment.GetEnvironmentVariable("SITE_URL");
+            if (!string.IsNullOrEmpty(envUrl) && !envUrl.Contains("localhost"))
+            {
+                Console.WriteLine($"[OBTER_URL] Usando URL da variável de ambiente: {envUrl}");
+                return envUrl;
+            }
+
+            // 3. Tentar detectar do ASPNETCORE_URLS (se configurado)
+            var aspnetUrls = Environment.GetEnvironmentVariable("ASPNETCORE_URLS");
+            if (!string.IsNullOrEmpty(aspnetUrls))
+            {
+                // Extrair a primeira URL (pode ter múltiplas separadas por ;)
+                var urls = aspnetUrls.Split(';');
+                foreach (var url in urls)
+                {
+                    if (!string.IsNullOrEmpty(url) && url.StartsWith("http"))
+                    {
+                        // Converter URL da API para URL do frontend (assumindo mesma base)
+                        var baseUrl = url.Replace(":5000", ":80").Replace("http://0.0.0.0", "http://SEU_IP_AQUI");
+                        if (!baseUrl.Contains("localhost") && !baseUrl.Contains("0.0.0.0"))
+                        {
+                            Console.WriteLine($"[OBTER_URL] Detectado de ASPNETCORE_URLS: {baseUrl}");
+                            return baseUrl;
+                        }
+                    }
+                }
+            }
+
+            // 4. Avisar e usar fallback
+            Console.WriteLine($"[OBTER_URL] ⚠️ AVISO: URL do site não configurada! Usando fallback. Configure SITE_URL no systemd service.");
+            Console.WriteLine($"[OBTER_URL] Configure no /etc/systemd/system/singleone-api.service:");
+            Console.WriteLine($"[OBTER_URL] Environment=SITE_URL=http://SEU_IP_OU_DOMINIO");
+            
+            // Fallback: tentar usar o IP do servidor (se possível detectar)
+            var serverIp = Environment.GetEnvironmentVariable("SERVER_IP");
+            if (!string.IsNullOrEmpty(serverIp))
+            {
+                return $"http://{serverIp}";
+            }
+
+            // Último fallback
+            return _environmentApiSettings.SiteUrl ?? "http://localhost:4200";
         }
 
     }

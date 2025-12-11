@@ -12,7 +12,12 @@ SyslogIdentifier=singleone-api
 # Ambiente
 Environment=ASPNETCORE_ENVIRONMENT=Production
 
-# As configurações de banco (DB_HOST, DB_USER, DB_PASSWORD, SITE_URL, etc.)
+# URL do site (ajuste conforme seu domínio/IP)
+# Se usar domínio: Environment=SITE_URL=https://seudominio.com
+# Se usar IP: Environment=SITE_URL=http://SEU_IP_AQUI
+Environment=SITE_URL=http://SEU_IP_AQUI
+
+# As configurações de banco (DB_HOST, DB_USER, DB_PASSWORD, etc.)
 # são carregadas do arquivo .env em /opt/singleone-api-publish
 # via DotNetEnv (ver Startup.cs).
 
