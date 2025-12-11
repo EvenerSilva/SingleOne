@@ -75,7 +75,16 @@ export class AppComponent implements OnInit {
     // Listener para mudanças de rota
     this.route.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
-        if (event.url === '/login' || event.url === '/') {
+        // Rotas públicas não devem limpar estado ou redirecionar
+        const rotasPublicas = ['/login', '/esqueci-senha', '/termos', '/verificar-termo', '/patrimonio', '/portaria'];
+        const isRotaPublica = rotasPublicas.some(rota => event.url.startsWith(rota));
+        
+        if (isRotaPublica) {
+          // Para rotas públicas, apenas garantir que o menu está oculto
+          this.mostrarMenu = false;
+          this.sidebarVisible = false;
+          console.log(`[APP] ✅ Rota pública detectada: ${event.url} - Menu oculto`);
+        } else if (event.url === '/login' || event.url === '/') {
           this.limparEstado();
         }
       }
