@@ -231,10 +231,20 @@ export class UtilService {
   temPermissao(url) {
     if(url != undefined) {
       url = url.toLowerCase();
-      if(url != '/' && url != '/login' && url != "/esqueci-senha" && !url.includes('validar-token') && !url.includes('termos') && this.getSession('usuario') == null) {
+      
+      // Rotas completamente públicas (não exigem autenticação e não verificam menu)
+      const rotasPublicas = ['/login', '/esqueci-senha', '/termos', '/verificar-termo', '/patrimonio', '/portaria'];
+      const isRotaPublica = rotasPublicas.some(rota => url.includes(rota) || url.startsWith(rota));
+      
+      if (isRotaPublica) {
+        // Rotas públicas não precisam de verificação
+        return;
+      }
+      
+      if(url != '/' && url != '/login' && url != "/esqueci-senha" && !url.includes('validar-token') && this.getSession('usuario') == null) {
         this.semPermissao();
       }
-      else if(url != '/' && url != '/login'  && url != "/esqueci-senha" && !url.includes('validar-token') && !url.includes('termos') && this.getSession('usuario') != null) {
+      else if(url != '/' && url != '/login'  && url != "/esqueci-senha" && !url.includes('validar-token') && this.getSession('usuario') != null) {
         var page = url.split('/')[1];
         var estaNoMenu = this.paginas.filter(x => {
           // return x.url == url && x.visivel

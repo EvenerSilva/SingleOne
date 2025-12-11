@@ -254,19 +254,29 @@ namespace SingleOne.Controllers
                     {
                         Console.WriteLine($"[BUSCAR-LOGO] ✅ Cliente encontrado pelo site_url: {cliente.Razaosocial} (SiteUrl: {cliente.SiteUrl})");
                     }
+                    else
+                    {
+                        Console.WriteLine($"[BUSCAR-LOGO] ⚠️ Nenhum cliente encontrado com site_url correspondente ao domínio: {dominioNormalizado}");
+                        Console.WriteLine($"[BUSCAR-LOGO] ⚠️ SEGURANÇA: Não retornando logo de outro cliente. Retornando null.");
+                        return Ok(new { 
+                            Logo = (string)null, 
+                            Mensagem = $"Nenhum cliente configurado para o domínio {dominio}. Configure o campo site_url na tabela clientes." 
+                        });
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"[BUSCAR-LOGO] ❌ Domínio não identificado. Não é possível determinar qual cliente.");
+                    return Ok(new { 
+                        Logo = (string)null, 
+                        Mensagem = "Domínio não identificado. Não é possível determinar qual cliente." 
+                    });
                 }
                 
-                // Se não encontrou pelo site_url, buscar qualquer cliente ativo com logo (fallback)
                 if (cliente == null)
                 {
-                    Console.WriteLine($"[BUSCAR-LOGO] ⚠️ Cliente não encontrado pelo site_url, usando fallback (qualquer cliente com logo)");
-                    cliente = todosClientes.FirstOrDefault(c => c.Ativo && !string.IsNullOrEmpty(c.Logo));
-                }
-                
-                if (cliente == null)
-                {
-                    Console.WriteLine($"[BUSCAR-LOGO] ❌ Nenhum cliente com logo encontrado");
-                    return Ok(new { Logo = (string)null, Mensagem = "Nenhum cliente com logo encontrado" });
+                    Console.WriteLine($"[BUSCAR-LOGO] ❌ Nenhum cliente encontrado");
+                    return Ok(new { Logo = (string)null, Mensagem = "Nenhum cliente encontrado" });
                 }
                 
                 Console.WriteLine($"[BUSCAR-LOGO] ✅ Cliente encontrado: {cliente.Razaosocial} com logo: {cliente.Logo}");
