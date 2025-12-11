@@ -1622,8 +1622,8 @@ namespace SingleOne.Negocios
             // 4. Tentar detectar IP do servidor automaticamente
             try
             {
-                var hostName = System.Net.Dns.GetHostName();
-                var addresses = System.Net.Dns.GetHostAddresses(hostName);
+                var hostName = Dns.GetHostName();
+                var addresses = Dns.GetHostAddresses(hostName);
                 foreach (var addr in addresses)
                 {
                     // Ignorar IPv6 e localhost
