@@ -240,7 +240,11 @@ export class TermosComponent implements OnInit {
       if(this.equipamentos.requisicao.assinaturaeletronica) {
         this.util.exibirMensagemToast('Termo assinado com sucesso.', 'n')
       }
-
+    }).catch(err => {
+      this.util.aguardar(false);
+      console.error('[TERMOS] Erro ao listar equipamentos:', err);
+      // Não redirecionar - apenas logar o erro
+      // A página pode continuar funcionando mesmo com erro
     })
   }
 
