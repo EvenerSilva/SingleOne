@@ -758,14 +758,24 @@ namespace SingleOne.Negocios
                     if (mov.TemEntrega && !string.IsNullOrEmpty(mov.UsuarioEntrega))
                     {
                         // ✅ CORREÇÃO: Formatar nome com primeira letra maiúscula (função robusta)
-                        var nome = mov.UsuarioEntrega.ToLower().Trim();
-                        var palavras = nome.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                        for (int i = 0; i < palavras.Length; i++)
+                        var nomeOriginal = mov.UsuarioEntrega ?? "";
+                        var nome = nomeOriginal.Trim();
+                        if (!string.IsNullOrEmpty(nome))
                         {
-                            if (palavras[i].Length > 0)
-                                palavras[i] = char.ToUpperInvariant(palavras[i][0]) + palavras[i].Substring(1);
+                            var palavras = nome.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                            for (int i = 0; i < palavras.Length; i++)
+                            {
+                                if (palavras[i].Length > 0)
+                                {
+                                    // Garantir que a primeira letra seja maiúscula e o resto minúscula
+                                    palavras[i] = char.ToUpperInvariant(palavras[i][0]) + 
+                                                  (palavras[i].Length > 1 ? palavras[i].Substring(1).ToLowerInvariant() : "");
+                                }
+                            }
+                            nome = string.Join(" ", palavras);
                         }
-                        var nomeFormatado = string.Join(" ", palavras);
+                        var nomeFormatado = nome;
+                        Console.WriteLine($"[DASHBOARD] Nome original: '{nomeOriginal}' -> Formatado: '{nomeFormatado}'");
                         
                         if (!contagemPorUsuario.ContainsKey(nomeFormatado))
                             contagemPorUsuario[nomeFormatado] = 0;
@@ -776,14 +786,24 @@ namespace SingleOne.Negocios
                     if (mov.TemDevolucao && !string.IsNullOrEmpty(mov.UsuarioDevolucao))
                     {
                         // ✅ CORREÇÃO: Formatar nome com primeira letra maiúscula (função robusta)
-                        var nome = mov.UsuarioDevolucao.ToLower().Trim();
-                        var palavras = nome.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                        for (int i = 0; i < palavras.Length; i++)
+                        var nomeOriginal = mov.UsuarioDevolucao ?? "";
+                        var nome = nomeOriginal.Trim();
+                        if (!string.IsNullOrEmpty(nome))
                         {
-                            if (palavras[i].Length > 0)
-                                palavras[i] = char.ToUpperInvariant(palavras[i][0]) + palavras[i].Substring(1);
+                            var palavras = nome.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                            for (int i = 0; i < palavras.Length; i++)
+                            {
+                                if (palavras[i].Length > 0)
+                                {
+                                    // Garantir que a primeira letra seja maiúscula e o resto minúscula
+                                    palavras[i] = char.ToUpperInvariant(palavras[i][0]) + 
+                                                  (palavras[i].Length > 1 ? palavras[i].Substring(1).ToLowerInvariant() : "");
+                                }
+                            }
+                            nome = string.Join(" ", palavras);
                         }
-                        var nomeFormatado = string.Join(" ", palavras);
+                        var nomeFormatado = nome;
+                        Console.WriteLine($"[DASHBOARD] Nome original: '{nomeOriginal}' -> Formatado: '{nomeFormatado}'");
                         
                         if (!contagemPorUsuario.ContainsKey(nomeFormatado))
                             contagemPorUsuario[nomeFormatado] = 0;
