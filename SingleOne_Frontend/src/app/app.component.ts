@@ -19,6 +19,7 @@ export class AppComponent implements OnInit {
   public session: any;
   public dropdownUsuarioAberto = false; // Controla o dropdown do usuário
   public clienteLogo: string | null = null; // Logo do cliente para exibir no cabeçalho
+  private logoCarregada: boolean = false; // Flag para evitar recarregar logo desnecessariamente
   public systemVersion: string = 'v2.5.18'; // Versão do sistema (fallback)
   public menuMinimizadoPorPadrao = false; // Preferência do usuário
 
@@ -43,6 +44,19 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit() {
+    // ✅ CORREÇÃO: Tentar carregar logo do cache primeiro (mais rápido)
+    const logoCache = localStorage.getItem('cliente_logo_url');
+    const logoTimestamp = localStorage.getItem('cliente_logo_timestamp');
+    if (logoCache && logoTimestamp) {
+      const cacheAge = Date.now() - parseInt(logoTimestamp);
+      // Usar cache se tiver menos de 1 hora
+      if (cacheAge < 3600000) {
+        console.log('[APP] ✅ Carregando logo do cache (localStorage):', logoCache);
+        this.clienteLogo = logoCache;
+        this.logoCarregada = true;
+      }
+    }
+    
     // Verificar se é rota pública antes de limpar estado
     const currentUrl = window.location.pathname;
     const rotasPublicas = ['/login', '/esqueci-senha', '/termos', '/verificar-termo', '/patrimonio', '/portaria'];
@@ -62,8 +76,10 @@ export class AppComponent implements OnInit {
       }
     }
     
-    // Carregar logo do cliente
-    this.carregarLogoCliente();
+    // ✅ CORREÇÃO: Carregar logo apenas se não estiver em cache
+    if (!this.logoCarregada) {
+      this.carregarLogoCliente();
+    }
     
     // Carregar versão do sistema
     this.carregarVersaoSistema();
@@ -117,7 +133,9 @@ export class AppComponent implements OnInit {
   onLogoError(event: any): void {
     console.error('[APP] ❌ Erro ao carregar imagem da logo:', event);
     console.error('[APP] URL da logo:', this.clienteLogo);
-    this.clienteLogo = null;
+    // ✅ CORREÇÃO: Não limpar logo se já estiver carregada (pode ser erro temporário de rede)
+    // Apenas logar o erro, mas manter a URL da logo
+    // this.clienteLogo = null; // REMOVIDO - não limpar logo em caso de erro
   }
 
   // Logo carregada com sucesso
@@ -125,8 +143,14 @@ export class AppComponent implements OnInit {
     console.log('[APP] ✅ Logo do cliente carregada com sucesso:', this.clienteLogo);
   }
 
-  // Carregar logo do cliente
+  // Carregar logo do cliente (apenas uma vez, com cache)
   private async carregarLogoCliente() {
+    // ✅ CORREÇÃO: Evitar recarregar logo se já foi carregada com sucesso
+    if (this.logoCarregada && this.clienteLogo) {
+      console.log('[APP] Logo já carregada, usando cache:', this.clienteLogo);
+      return;
+    }
+    
     try {
       const response = await this.configuracoesApi.buscarLogoCliente();
       
@@ -152,14 +176,51 @@ export class AppComponent implements OnInit {
           // Caso contrário, manter logoUrl como está (relativa)
         }
         
-        console.log('[APP] Logo do cliente carregada:', logoUrl);
+        console.log('[APP] ✅ Logo do cliente carregada:', logoUrl);
         this.clienteLogo = logoUrl;
+        this.logoCarregada = true; // Marcar como carregada
+        
+        // ✅ CORREÇÃO: Salvar logo no localStorage para persistência
+        if (logoUrl) {
+          try {
+            localStorage.setItem('cliente_logo_url', logoUrl);
+            localStorage.setItem('cliente_logo_timestamp', Date.now().toString());
+          } catch (e) {
+            console.warn('[APP] ⚠️ Não foi possível salvar logo no localStorage:', e);
+          }
+        }
       } else {
         console.log('[APP] Nenhuma logo retornada pelo backend');
+        // ✅ CORREÇÃO: Tentar recuperar logo do localStorage se houver
+        const logoCache = localStorage.getItem('cliente_logo_url');
+        const logoTimestamp = localStorage.getItem('cliente_logo_timestamp');
+        if (logoCache && logoTimestamp) {
+          const cacheAge = Date.now() - parseInt(logoTimestamp);
+          // Usar cache se tiver menos de 1 hora
+          if (cacheAge < 3600000) {
+            console.log('[APP] ✅ Usando logo do cache (localStorage):', logoCache);
+            this.clienteLogo = logoCache;
+            this.logoCarregada = true;
+            return;
+          }
+        }
         this.clienteLogo = null;
       }
     } catch (error) {
       console.error('[APP] ❌ Erro ao carregar logo do cliente:', error);
+      // ✅ CORREÇÃO: Tentar recuperar logo do localStorage em caso de erro
+      const logoCache = localStorage.getItem('cliente_logo_url');
+      const logoTimestamp = localStorage.getItem('cliente_logo_timestamp');
+      if (logoCache && logoTimestamp) {
+        const cacheAge = Date.now() - parseInt(logoTimestamp);
+        // Usar cache se tiver menos de 24 horas
+        if (cacheAge < 86400000) {
+          console.log('[APP] ✅ Usando logo do cache após erro:', logoCache);
+          this.clienteLogo = logoCache;
+          this.logoCarregada = true;
+          return;
+        }
+      }
       this.clienteLogo = null;
     }
   }
@@ -185,7 +246,10 @@ export class AppComponent implements OnInit {
     // Montar menu de acesso
     try {
       this.paginas = this.util.montarMenuDeAcesso(session.usuario);
-      this.carregarLogoCliente();
+      // ✅ CORREÇÃO: Não recarregar logo se já estiver carregada (evita mudanças desnecessárias)
+      if (!this.logoCarregada) {
+        this.carregarLogoCliente();
+      }
       
       // Carregar preferência do usuário
       this.carregarPreferenciaSidebar();
@@ -392,6 +456,8 @@ export class AppComponent implements OnInit {
     this.dropdownUsuarioAberto = false;
     this.session = null;
     this.paginas = [];
+    // ✅ CORREÇÃO: NÃO limpar logo ao limpar estado (logo deve persistir)
+    // this.clienteLogo = null; // REMOVIDO - logo deve persistir
   }
 
   /**

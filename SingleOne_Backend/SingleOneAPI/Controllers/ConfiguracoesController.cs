@@ -243,12 +243,29 @@ namespace SingleOne.Controllers
                     
                     Console.WriteLine($"[BUSCAR-LOGO] Domínio normalizado: {dominioNormalizado}");
                     
+                    // ✅ CORREÇÃO: Buscar cliente de forma mais precisa e consistente
+                    // Primeiro, tentar match exato do domínio
                     cliente = todosClientes.FirstOrDefault(c => 
                         c.Ativo && 
                         !string.IsNullOrEmpty(c.SiteUrl) &&
                         !string.IsNullOrEmpty(c.Logo) &&
-                        (c.SiteUrl.ToLower().Contains(dominioNormalizado) || 
-                         dominioNormalizado.Contains(c.SiteUrl.ToLower().Replace("http://", "").Replace("https://", "").Split(':')[0].Split('/')[0])));
+                        c.SiteUrl.ToLower().Contains(dominioNormalizado));
+                    
+                    // Se não encontrou, tentar match reverso (domínio contém site_url)
+                    if (cliente == null)
+                    {
+                        var siteUrlNormalizado = dominioNormalizado;
+                        cliente = todosClientes.FirstOrDefault(c => 
+                            c.Ativo && 
+                            !string.IsNullOrEmpty(c.SiteUrl) &&
+                            !string.IsNullOrEmpty(c.Logo) &&
+                            dominioNormalizado.Contains(c.SiteUrl.ToLower()
+                                .Replace("http://", "")
+                                .Replace("https://", "")
+                                .Split(':')[0]
+                                .Split('/')[0]
+                                .Trim()));
+                    }
                     
                     if (cliente != null)
                     {
