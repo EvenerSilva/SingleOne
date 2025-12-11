@@ -43,15 +43,17 @@ export class AuthInterceptor implements HttpInterceptor {
       // (ex.: /portaria, /patrimonio, /verificar-termo, /termos), mesmo que a URL da API
       // não esteja na lista de rotas públicas.
       const isPublicRoute = this.isPublicRoute(request.url);
-      const isPublicPath = this.isPublicPath(this.router.url);
+      const routerUrl = this.router.url || window.location.pathname;
+      const isPublicPath = this.isPublicPath(routerUrl);
       
       if (!isPublicRoute && !isPublicPath) {
         console.log(`[AUTH-INTERCEPTOR] ⚠️ Bloqueando requisição sem token: ${request.url}`);
         console.log(`[AUTH-INTERCEPTOR] Rota pública? ${isPublicRoute}, Path público? ${isPublicPath}`);
-        console.log(`[AUTH-INTERCEPTOR] Router URL atual: ${this.router.url}`);
-        this.router.navigate(['/login']);
+        console.log(`[AUTH-INTERCEPTOR] Router URL atual: ${routerUrl}`);
+        // NÃO redirecionar - apenas logar o bloqueio
+        // this.router.navigate(['/login']);
       } else {
-        console.log(`[AUTH-INTERCEPTOR] ✅ Permitindo requisição pública: ${request.url}`);
+        console.log(`[AUTH-INTERCEPTOR] ✅ Permitindo requisição pública: ${request.url} (Path: ${routerUrl})`);
       }
     }
     
