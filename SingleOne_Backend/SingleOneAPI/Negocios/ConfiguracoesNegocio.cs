@@ -189,6 +189,13 @@ namespace SingleOne.Negocios
                         
                         if (!existe)
                         {
+                            // Preservar SiteUrl se não foi enviado pelo frontend
+                            var clienteExistente = _clienteRepository.Buscar(x => x.Id == cli.Id).FirstOrDefault();
+                            if (clienteExistente != null && string.IsNullOrEmpty(cli.SiteUrl))
+                            {
+                                cli.SiteUrl = clienteExistente.SiteUrl;
+                            }
+                            
                             _clienteRepository.Atualizar(cli);
                             return JsonConvert.SerializeObject(new { 
                                 Mensagem = "✅ Cliente atualizado com sucesso! As informações foram modificadas e salvas no sistema.", 
