@@ -226,9 +226,42 @@ namespace SingleOne.Controllers
                 
                 Console.WriteLine($"[BUSCAR-LOGO] Buscando cliente por domínio: {dominio}");
                 
-                // Buscar cliente que tenha logo configurada
+                // Buscar cliente pelo site_url que corresponda ao domínio
                 var todosClientes = _negocio.ListarClientes("null");
-                var cliente = todosClientes.FirstOrDefault(c => c.Ativo && !string.IsNullOrEmpty(c.Logo));
+                Cliente cliente = null;
+                
+                // Primeiro, tentar encontrar cliente pelo site_url que corresponda ao domínio
+                if (!string.IsNullOrEmpty(dominio))
+                {
+                    // Normalizar domínio (remover http/https, porta, etc)
+                    var dominioNormalizado = dominio.ToLower()
+                        .Replace("http://", "")
+                        .Replace("https://", "")
+                        .Split(':')[0]
+                        .Split('/')[0]
+                        .Trim();
+                    
+                    Console.WriteLine($"[BUSCAR-LOGO] Domínio normalizado: {dominioNormalizado}");
+                    
+                    cliente = todosClientes.FirstOrDefault(c => 
+                        c.Ativo && 
+                        !string.IsNullOrEmpty(c.SiteUrl) &&
+                        !string.IsNullOrEmpty(c.Logo) &&
+                        (c.SiteUrl.ToLower().Contains(dominioNormalizado) || 
+                         dominioNormalizado.Contains(c.SiteUrl.ToLower().Replace("http://", "").Replace("https://", "").Split(':')[0].Split('/')[0])));
+                    
+                    if (cliente != null)
+                    {
+                        Console.WriteLine($"[BUSCAR-LOGO] ✅ Cliente encontrado pelo site_url: {cliente.Razaosocial} (SiteUrl: {cliente.SiteUrl})");
+                    }
+                }
+                
+                // Se não encontrou pelo site_url, buscar qualquer cliente ativo com logo (fallback)
+                if (cliente == null)
+                {
+                    Console.WriteLine($"[BUSCAR-LOGO] ⚠️ Cliente não encontrado pelo site_url, usando fallback (qualquer cliente com logo)");
+                    cliente = todosClientes.FirstOrDefault(c => c.Ativo && !string.IsNullOrEmpty(c.Logo));
+                }
                 
                 if (cliente == null)
                 {

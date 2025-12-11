@@ -3,6 +3,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UtilService } from 'src/app/util/util.service';
 import { RequisicaoApiService } from 'src/app/api/requisicoes/requisicao-api.service';
+import { ConfiguracoesApiService } from 'src/app/api/configuracoes/configuracoes-api.service';
+import { environment } from '../../../../environments/environment';
 
 // Declaração do tipo GeolocationPosition para TypeScript
 interface GeolocationPosition {
@@ -46,8 +48,17 @@ export class TermosComponent implements OnInit {
   public ipAddress: string = '';
   public geolocationStatus: string = 'capturando'; // 'capturando', 'sucesso', 'negado', 'erro', 'fallback'
   public showLocationInfo: boolean = false;
+  public clienteLogo: string | null = null;
 
-  constructor(private fb: FormBuilder, private util: UtilService, private api: RequisicaoApiService, private ar: ActivatedRoute, private cdr: ChangeDetectorRef, private router: Router) {
+  constructor(
+    private fb: FormBuilder, 
+    private util: UtilService, 
+    private api: RequisicaoApiService, 
+    private ar: ActivatedRoute, 
+    private cdr: ChangeDetectorRef, 
+    private router: Router,
+    private configuracoesApi: ConfiguracoesApiService
+  ) {
     this.form = this.fb.group({
       cpf: ['', Validators.required],
       palavrachave: ['', Validators.required]
@@ -65,8 +76,36 @@ export class TermosComponent implements OnInit {
       }
     })
     
+    // Carregar logo do cliente
+    this.carregarLogoCliente();
+    
     // Capturar geolocalização e IP
     this.captureLocationAndIP();
+  }
+
+  private async carregarLogoCliente() {
+    try {
+      const response = await this.configuracoesApi.buscarLogoCliente();
+      
+      const logoData = response?.data;
+      
+      if (logoData && (logoData.Logo || logoData.logo)) {
+        let logoUrl = logoData.Logo || logoData.logo;
+        
+        if (logoUrl && logoUrl.startsWith('/api/')) {
+          if (!environment.production && environment.apiUrl) {
+            const baseUrl = environment.apiUrl.replace('/api', '');
+            logoUrl = baseUrl + logoUrl;
+          }
+        }
+        
+        this.clienteLogo = logoUrl;
+        this.cdr.detectChanges();
+      }
+    } catch (error) {
+      console.warn('⚠️ Erro ao carregar logo do cliente:', error);
+      // Não é crítico, apenas loga o erro
+    }
   }
 
   async captureLocationAndIP(): Promise<void> {

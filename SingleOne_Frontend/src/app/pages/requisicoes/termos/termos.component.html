@@ -2,7 +2,9 @@
     <div class="container">
         <div class="row">
             <div class="col-md-12 text-center">
-                <img src="../../../../assets/Branding/logo.png">
+                <img [src]="clienteLogo || '../../../../assets/Branding/logo.png'" 
+                     [alt]="clienteLogo ? 'Logo do Cliente' : 'SingleOne'"
+                     style="max-height: 80px; max-width: 200px;">
             </div>
         </div>
         <br clear="all">
