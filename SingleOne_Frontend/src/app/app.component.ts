@@ -43,11 +43,23 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit() {
+    // Verificar se é rota pública antes de limpar estado
+    const currentUrl = this.route.url || window.location.pathname;
+    const rotasPublicas = ['/login', '/esqueci-senha', '/termos', '/verificar-termo', '/patrimonio', '/portaria'];
+    const isRotaPublica = rotasPublicas.some(rota => currentUrl.startsWith(rota));
+    
     const session = this.util.getSession('usuario');
     if (session) {
       this.configurarSessao(session);
     } else {
-      this.limparEstado();
+      // Se for rota pública, apenas ocultar menu, não limpar tudo
+      if (isRotaPublica) {
+        this.mostrarMenu = false;
+        this.sidebarVisible = false;
+        console.log(`[APP] ✅ Rota pública no ngOnInit: ${currentUrl} - Menu oculto`);
+      } else {
+        this.limparEstado();
+      }
     }
     
     // Carregar logo do cliente
@@ -61,7 +73,17 @@ export class AppComponent implements OnInit {
       if (novaSessao) {
         this.configurarSessao(novaSessao);
       } else {
-        this.limparEstado();
+        // Verificar se é rota pública antes de limpar estado
+        const currentUrl = this.route.url || window.location.pathname;
+        const rotasPublicas = ['/login', '/esqueci-senha', '/termos', '/verificar-termo', '/patrimonio', '/portaria'];
+        const isRotaPublica = rotasPublicas.some(rota => currentUrl.startsWith(rota));
+        
+        if (isRotaPublica) {
+          this.mostrarMenu = false;
+          this.sidebarVisible = false;
+        } else {
+          this.limparEstado();
+        }
       }
     });
 
