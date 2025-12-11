@@ -40,10 +40,18 @@ export class AuthInterceptor implements HttpInterceptor {
       );
     } else {
       // Sem token: permitir livremente chamadas feitas a partir de rotas públicas
-      // (ex.: /portaria, /patrimonio, /verificar-termo), mesmo que a URL da API
+      // (ex.: /portaria, /patrimonio, /verificar-termo, /termos), mesmo que a URL da API
       // não esteja na lista de rotas públicas.
-      if (!this.isPublicRoute(request.url) && !this.isPublicPath(this.router.url)) {
+      const isPublicRoute = this.isPublicRoute(request.url);
+      const isPublicPath = this.isPublicPath(this.router.url);
+      
+      if (!isPublicRoute && !isPublicPath) {
+        console.log(`[AUTH-INTERCEPTOR] ⚠️ Bloqueando requisição sem token: ${request.url}`);
+        console.log(`[AUTH-INTERCEPTOR] Rota pública? ${isPublicRoute}, Path público? ${isPublicPath}`);
+        console.log(`[AUTH-INTERCEPTOR] Router URL atual: ${this.router.url}`);
         this.router.navigate(['/login']);
+      } else {
+        console.log(`[AUTH-INTERCEPTOR] ✅ Permitindo requisição pública: ${request.url}`);
       }
     }
     
@@ -51,6 +59,33 @@ export class AuthInterceptor implements HttpInterceptor {
   }
 
   private isPublicRoute(url: string): boolean {
+    // Extrair apenas o path da URL (remover protocolo, domínio, porta, etc)
+    let path = url;
+    try {
+      // Se for uma URL completa, extrair o path
+      if (url.includes('://')) {
+        const urlObj = new URL(url);
+        path = urlObj.pathname;
+      } else if (url.startsWith('http')) {
+        // Tentar parsear mesmo sem protocolo explícito
+        const match = url.match(/\/[^?]*/);
+        if (match) {
+          path = match[0];
+        }
+      }
+    } catch (e) {
+      // Se falhar, usar a URL original
+      path = url;
+    }
+    
+    // Normalizar path (remover /api/ se existir no início)
+    if (path.startsWith('/api/')) {
+      path = path.substring(4); // Remove '/api'
+    }
+    if (!path.startsWith('/')) {
+      path = '/' + path;
+    }
+    
     const publicRoutes = [
       '/login',
       '/esqueci-senha',
@@ -68,7 +103,18 @@ export class AuthInterceptor implements HttpInterceptor {
       // API pública para buscar logo do cliente
       '/configuracoes/BuscarLogoCliente'
     ];
-    return publicRoutes.some(route => url.includes(route));
+    
+    // Verificar se o path corresponde a alguma rota pública
+    const isPublic = publicRoutes.some(route => {
+      // Verificar match exato ou se o path começa com a rota
+      return path === route || path.startsWith(route + '/') || path.includes(route);
+    });
+    
+    if (isPublic) {
+      console.log(`[AUTH-INTERCEPTOR] ✅ Rota pública detectada: ${path}`);
+    }
+    
+    return isPublic;
   }
 
   /**
