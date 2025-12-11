@@ -147,7 +147,10 @@ export class DashboardComponent implements OnInit {
 
       // Converter objeto para array para MatTableDataSource
       const movimentacoesArray = this.vm.ultimosUsuariosQueMovimentaram 
-        ? Object.entries(this.vm.ultimosUsuariosQueMovimentaram).map(([usuario, quantidade]) => ({ usuario, quantidade }))
+        ? Object.entries(this.vm.ultimosUsuariosQueMovimentaram).map(([usuario, quantidade]) => ({ 
+            usuario: this.formatarNomeUsuario(usuario), 
+            quantidade 
+          }))
         : [];
       this.dataSourceMovimentacoesUsuario = new MatTableDataSource<any>(movimentacoesArray);
       this.dataSourceMovimentacoesUsuario.paginator = this.paginatorMovimentacoesUsuario;
@@ -317,7 +320,9 @@ export class DashboardComponent implements OnInit {
     // Verificar se ultimosUsuariosQueMovimentaram existe e não é null
     if (this.vm.ultimosUsuariosQueMovimentaram && typeof this.vm.ultimosUsuariosQueMovimentaram === 'object') {
       for(const [key, value] of Object.entries(this.vm.ultimosUsuariosQueMovimentaram)) {
-        data.addRow([{v: key}, value, value.toString()]);
+        // ✅ CORREÇÃO: Formatar nome com primeira letra maiúscula
+        const nomeFormatado = this.formatarNomeUsuario(key);
+        data.addRow([{v: nomeFormatado}, value, value.toString()]);
       }
     }
 
@@ -475,11 +480,24 @@ var grafico:any = {};
         }
       }
       
-      return usuarioMaisAtivo[0] as string;
+      // ✅ CORREÇÃO: Formatar nome com primeira letra maiúscula
+      const nomeFormatado = this.formatarNomeUsuario(usuarioMaisAtivo[0] as string);
+      return nomeFormatado;
     } catch (error) {
       console.error('[DASHBOARD] Erro ao calcular usuário mais ativo:', error);
       return 'Erro';
     }
+  }
+
+  // ✅ CORREÇÃO: Função para formatar nome com primeira letra maiúscula
+  private formatarNomeUsuario(nome: string): string {
+    if (!nome || nome.trim() === '') return nome;
+    
+    return nome
+      .toLowerCase()
+      .split(' ')
+      .map(palavra => palavra.charAt(0).toUpperCase() + palavra.slice(1))
+      .join(' ');
   }
 
   // 📊 MÉTODOS PARA RESUMO GERAL

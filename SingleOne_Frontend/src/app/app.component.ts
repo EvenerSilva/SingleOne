@@ -44,7 +44,7 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     // Verificar se é rota pública antes de limpar estado
-    const currentUrl = this.route.url || window.location.pathname;
+    const currentUrl = window.location.pathname;
     const rotasPublicas = ['/login', '/esqueci-senha', '/termos', '/verificar-termo', '/patrimonio', '/portaria'];
     const isRotaPublica = rotasPublicas.some(rota => currentUrl.startsWith(rota));
     
@@ -74,7 +74,7 @@ export class AppComponent implements OnInit {
         this.configurarSessao(novaSessao);
       } else {
         // Verificar se é rota pública antes de limpar estado
-        const currentUrl = this.route.url || window.location.pathname;
+        const currentUrl = window.location.pathname;
         const rotasPublicas = ['/login', '/esqueci-senha', '/termos', '/verificar-termo', '/patrimonio', '/portaria'];
         const isRotaPublica = rotasPublicas.some(rota => currentUrl.startsWith(rota));
         
