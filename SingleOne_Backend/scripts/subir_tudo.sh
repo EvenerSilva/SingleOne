@@ -179,6 +179,32 @@ else
 fi
 echo ""
 
+# 5. Verificar SSL/HTTPS
+echo "📋 [5/5] Verificando SSL/HTTPS..."
+DOMAIN="demo.singleone.com.br"
+CERT_PATH="/etc/letsencrypt/live/$DOMAIN"
+
+if [ -f "$CERT_PATH/fullchain.pem" ] && grep -q "listen 443" "$NGINX_CONFIG" 2>/dev/null; then
+    echo "   ✅ SSL/HTTPS configurado"
+    
+    # Verificar se precisa renovar
+    if command -v openssl > /dev/null 2>&1; then
+        EXPIRY_DATE=$(openssl x509 -enddate -noout -in "$CERT_PATH/fullchain.pem" 2>/dev/null | cut -d= -f2)
+        EXPIRY_EPOCH=$(date -d "$EXPIRY_DATE" +%s 2>/dev/null)
+        CURRENT_EPOCH=$(date +%s)
+        DAYS_LEFT=$(( ($EXPIRY_EPOCH - $CURRENT_EPOCH) / 86400 ))
+        
+        if [ "$DAYS_LEFT" -lt 30 ]; then
+            echo "   ⚠️  Certificado expira em $DAYS_LEFT dias"
+            echo "   Execute: sudo certbot renew"
+        fi
+    fi
+else
+    echo "   ⚠️  SSL/HTTPS não configurado"
+    echo "   Execute: sudo bash /opt/SingleOne/SingleOne_Backend/scripts/configurar_ssl.sh"
+fi
+echo ""
+
 # Resumo final
 echo "=========================================="
 echo "✅ SISTEMA SUBIDO COM SUCESSO"
@@ -193,11 +219,15 @@ echo "🌐 Acesse:"
 SERVER_IP=$(hostname -I | awk '{print $1}')
 echo "   - Por IP: http://$SERVER_IP"
 echo "   - Por domínio: http://demo.singleone.com.br"
+if [ -f "$CERT_PATH/fullchain.pem" ] && grep -q "listen 443" "$NGINX_CONFIG" 2>/dev/null; then
+    echo "   - HTTPS: https://demo.singleone.com.br"
+fi
 echo ""
 echo "📋 Comandos úteis:"
 echo "   - Ver logs da API: journalctl -u singleone-api -f"
 echo "   - Ver logs do Nginx: tail -f /var/log/nginx/error.log"
 echo "   - Parar tudo: sudo systemctl stop postgresql singleone-api nginx"
 echo "   - Ver mudanças locais salvas: git stash list"
+echo "   - Verificar SSL: sudo bash /opt/SingleOne/SingleOne_Backend/scripts/verificar_certificado_ssl.sh"
 echo ""
 
