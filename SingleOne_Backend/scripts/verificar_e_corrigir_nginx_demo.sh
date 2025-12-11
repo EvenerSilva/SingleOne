@@ -68,7 +68,7 @@ server {
     listen 80 default_server;
     listen [::]:80 default_server;
 
-    server_name demo.singleone.com.br _;
+    server_name demo.singleone.com.br 84.247.128.180 _;
 
     root /opt/SingleOne/SingleOne_Frontend/dist/SingleOne;
     index index.html;
