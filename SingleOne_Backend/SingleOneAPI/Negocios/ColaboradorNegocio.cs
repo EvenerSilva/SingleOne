@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 using QRCoder;
 using System.Drawing;
@@ -1627,7 +1628,7 @@ namespace SingleOne.Negocios
                 foreach (var addr in addresses)
                 {
                     // Ignorar IPv6 e localhost
-                    if (addr.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork && 
+                    if (addr.AddressFamily == AddressFamily.InterNetwork && 
                         !addr.ToString().StartsWith("127.") && 
                         !addr.ToString().StartsWith("169.254."))
                     {
