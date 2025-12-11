@@ -143,7 +143,8 @@ namespace SingleOneAPI.DependencyInjection
                     provider.GetRequiredService<ISmtpConfigService>(),
                     provider.GetRequiredService<IRepository<Requisicoesiten>>(),
                     provider.GetRequiredService<IRepository<Equipamento>>(),
-                    provider.GetRequiredService<IRepository<RequisicaoItemCompartilhado>>()
+                    provider.GetRequiredService<IRepository<RequisicaoItemCompartilhado>>(),
+                    provider.GetRequiredService<IRepository<Cliente>>()
                 ));
             services.AddScoped<IRelatorioNegocio, RelatorioNegocio>();
             services.AddScoped<IRequisicoesNegocio, RequisicoesNegocio>();
