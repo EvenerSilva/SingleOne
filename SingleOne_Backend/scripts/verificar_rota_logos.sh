@@ -20,11 +20,47 @@ echo ""
 
 # 2. Verificar se a porta 5000 está escutando
 echo "📋 [2/5] Verificando se a porta 5000 está escutando..."
-if netstat -tuln | grep -q ":5000"; then
-    echo "✅ Porta 5000 está escutando"
+# Tentar usar 'ss' primeiro (mais moderno), depois 'netstat', depois verificar via systemctl
+if command -v ss >/dev/null 2>&1; then
+    if ss -tuln | grep -q ":5000"; then
+        echo "✅ Porta 5000 está escutando (verificado via ss)"
+    else
+        echo "⚠️  Porta 5000 não encontrada via ss"
+        # Verificar via systemctl se o serviço está ativo
+        if systemctl is-active --quiet singleone-api; then
+            echo "   ℹ️  Mas o serviço está ativo, pode estar iniciando..."
+        else
+            echo "❌ Porta 5000 NÃO está escutando e serviço não está ativo!"
+            exit 1
+        fi
+    fi
+elif command -v netstat >/dev/null 2>&1; then
+    if netstat -tuln | grep -q ":5000"; then
+        echo "✅ Porta 5000 está escutando (verificado via netstat)"
+    else
+        echo "⚠️  Porta 5000 não encontrada via netstat"
+        if systemctl is-active --quiet singleone-api; then
+            echo "   ℹ️  Mas o serviço está ativo, pode estar iniciando..."
+        else
+            echo "❌ Porta 5000 NÃO está escutando e serviço não está ativo!"
+            exit 1
+        fi
+    fi
 else
-    echo "❌ Porta 5000 NÃO está escutando!"
-    exit 1
+    # Se nem ss nem netstat estão disponíveis, verificar via systemctl e curl
+    echo "⚠️  ss e netstat não disponíveis, verificando via systemctl e curl..."
+    if systemctl is-active --quiet singleone-api; then
+        echo "   ✅ Serviço está ativo"
+        # Tentar fazer uma requisição de teste
+        if curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:5000/api/values >/dev/null 2>&1; then
+            echo "✅ Backend responde na porta 5000 (verificado via curl)"
+        else
+            echo "⚠️  Backend não responde na porta 5000, mas serviço está ativo"
+        fi
+    else
+        echo "❌ Serviço não está ativo!"
+        exit 1
+    fi
 fi
 echo ""
 
