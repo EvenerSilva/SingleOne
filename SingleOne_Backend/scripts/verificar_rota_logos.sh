@@ -66,22 +66,38 @@ echo ""
 
 # 3. Testar acesso direto ao backend (sem Nginx)
 echo "📋 [3/5] Testando acesso direto ao backend..."
-RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:5000/api/logos/cliente_1_20251211221041.png 2>/dev/null)
+
+# Primeiro, descobrir qual arquivo está no banco de dados
+CURRENT_LOGO=$(sudo -u postgres psql -d singleone -t -c "SELECT logo FROM clientes WHERE id = 1;" 2>/dev/null | xargs)
+
+if [ -z "$CURRENT_LOGO" ]; then
+    echo "⚠️  Nenhuma logo registrada no banco para cliente 1"
+    echo "   Usando arquivo de teste: cliente_1_20251211221041.png"
+    TEST_FILE="cliente_1_20251211221041.png"
+else
+    echo "📋 Logo registrada no banco: $CURRENT_LOGO"
+    TEST_FILE="$CURRENT_LOGO"
+fi
+
+RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" "http://127.0.0.1:5000/api/logos/$TEST_FILE" 2>/dev/null)
 if [ "$RESPONSE" = "200" ]; then
     echo "✅ Backend respondeu com 200 OK"
 elif [ "$RESPONSE" = "404" ]; then
     echo "⚠️  Backend respondeu com 404 - arquivo não encontrado"
     echo "   Verificando se o arquivo existe..."
-    if [ -f "/opt/singleone-api-publish/wwwroot/logos/cliente_1_20251211221041.png" ]; then
-        echo "   ✅ Arquivo existe em: /opt/singleone-api-publish/wwwroot/logos/cliente_1_20251211221041.png"
+    if [ -f "/opt/singleone-api-publish/wwwroot/logos/$TEST_FILE" ]; then
+        echo "   ✅ Arquivo existe em: /opt/singleone-api-publish/wwwroot/logos/$TEST_FILE"
         echo "   ⚠️  Problema pode ser na rota do controller"
     else
-        echo "   ❌ Arquivo NÃO existe!"
+        echo "   ❌ Arquivo NÃO existe: $TEST_FILE"
         echo "   📁 Verificando diretório de logos..."
         if [ -d "/opt/singleone-api-publish/wwwroot/logos" ]; then
             echo "   ✅ Diretório existe"
             echo "   📋 Arquivos no diretório:"
             ls -la /opt/singleone-api-publish/wwwroot/logos/ | head -10
+            echo ""
+            echo "   💡 SUGESTÃO: Execute o script para corrigir a logo:"
+            echo "      sudo bash /opt/SingleOne/SingleOne_Backend/scripts/corrigir_logo_cliente.sh"
         else
             echo "   ❌ Diretório NÃO existe!"
         fi
@@ -93,7 +109,8 @@ echo ""
 
 # 4. Testar acesso via Nginx
 echo "📋 [4/5] Testando acesso via Nginx..."
-NGINX_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1/api/logos/cliente_1_20251211221041.png 2>/dev/null)
+# Seguir redirecionamentos (301/302) para HTTPS se necessário
+NGINX_RESPONSE=$(curl -s -L -o /dev/null -w "%{http_code}" "http://127.0.0.1/api/logos/$TEST_FILE" 2>/dev/null)
 if [ "$NGINX_RESPONSE" = "200" ]; then
     echo "✅ Nginx respondeu com 200 OK"
 elif [ "$NGINX_RESPONSE" = "404" ]; then
@@ -120,7 +137,8 @@ echo "=========================================="
 echo ""
 echo "📋 Comandos úteis:"
 echo "   - Ver logs do backend: journalctl -u singleone-api -f"
-echo "   - Testar URL diretamente: curl -I http://127.0.0.1:5000/api/logos/cliente_1_20251211221041.png"
+echo "   - Testar URL diretamente: curl -I http://127.0.0.1:5000/api/logos/$TEST_FILE"
 echo "   - Verificar arquivo: ls -la /opt/singleone-api-publish/wwwroot/logos/"
+echo "   - Corrigir logo do cliente: sudo bash /opt/SingleOne/SingleOne_Backend/scripts/corrigir_logo_cliente.sh"
 echo ""
 
