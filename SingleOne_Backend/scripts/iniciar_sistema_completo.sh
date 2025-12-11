@@ -75,10 +75,92 @@ echo "📋 Garantindo configuração do Nginx..."
 NGINX_CONFIG="/etc/nginx/sites-available/singleone"
 NGINX_ENABLED="/etc/nginx/sites-enabled/singleone"
 
+# Verificar se há certificado SSL
+DOMAIN="demo.singleone.com.br"
+CERT_PATH="/etc/letsencrypt/live/$DOMAIN"
+HAS_SSL=false
+
+if [ -f "$CERT_PATH/fullchain.pem" ] && [ -f "$CERT_PATH/privkey.pem" ]; then
+    HAS_SSL=true
+    echo "✅ Certificado SSL encontrado, configurando HTTPS..."
+fi
+
 # Criar/atualizar configuração do Nginx
 if [ ! -f "$NGINX_CONFIG" ] || ! grep -q "demo.singleone.com.br" "$NGINX_CONFIG" 2>/dev/null; then
     echo "📝 Criando/atualizando configuração do Nginx..."
-    cat > "$NGINX_CONFIG" << 'NGINX_EOF'
+    if [ "$HAS_SSL" = true ]; then
+        # Configuração com HTTPS
+        cat > "$NGINX_CONFIG" << NGINX_HTTPS_EOF
+# Redirect HTTP to HTTPS
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    server_name demo.singleone.com.br 84.247.128.180 _;
+    return 301 https://\$server_name\$request_uri;
+}
+
+# HTTPS Server
+server {
+    listen 443 ssl http2 default_server;
+    listen [::]:443 ssl http2 default_server;
+    server_name demo.singleone.com.br 84.247.128.180 _;
+
+    # SSL Configuration
+    ssl_certificate /etc/letsencrypt/live/demo.singleone.com.br/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/demo.singleone.com.br/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+    ssl_prefer_server_ciphers on;
+
+    root /opt/SingleOne/SingleOne_Frontend/dist/SingleOne;
+    index index.html;
+
+    # Gzip compression
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 1024;
+    gzip_types text/plain text/css text/xml text/javascript application/x-javascript application/xml+rss application/json application/javascript;
+
+    # Security headers
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+
+    # Proxy para API
+    location /api/ {
+        proxy_pass http://127.0.0.1:5000/api/;
+        proxy_http_version 1.1;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+        proxy_set_header Connection "";
+        proxy_buffering off;
+    }
+
+    # Angular routing - TODAS as rotas devem retornar index.html
+    location / {
+        try_files \$uri \$uri/ /index.html;
+    }
+
+    # Cache para assets estáticos
+    location ~* \.(jpg|jpeg|png|gif|ico|css|js|svg|woff|woff2|ttf|eot)$ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+
+    # Não fazer cache do index.html
+    location = /index.html {
+        add_header Cache-Control "no-cache, no-store, must-revalidate";
+        add_header Pragma "no-cache";
+        add_header Expires "0";
+    }
+}
+NGINX_HTTPS_EOF
+    else
+        # Configuração apenas HTTP
+        cat > "$NGINX_CONFIG" << 'NGINX_EOF'
 server {
     listen 80 default_server;
     listen [::]:80 default_server;
