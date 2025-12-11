@@ -1647,6 +1647,14 @@ namespace SingleOne.Negocios
                                 Descricaobo = $"Gerado automaticamente da nota fiscal {nf.Nota.Numero}",
                                 Enviouemailreporte = false
                             };
+
+                            // ✅ Garantir que Dtlimitegarantia não fique com Kind=Utc (PostgreSQL usa timestamp sem fuso)
+                            if (equipamento.Dtlimitegarantia.HasValue &&
+                                equipamento.Dtlimitegarantia.Value.Kind == DateTimeKind.Utc)
+                            {
+                                equipamento.Dtlimitegarantia =
+                                    DateTime.SpecifyKind(equipamento.Dtlimitegarantia.Value, DateTimeKind.Unspecified);
+                            }
                             
                             Console.WriteLine($"[LIBERAR-ESTOQUE] 🔍 DEBUG PERSISTÊNCIA: Equipamento criado - Contrato={equipamento.Contrato}, Serial={equipamento.Numeroserie}");
                             
