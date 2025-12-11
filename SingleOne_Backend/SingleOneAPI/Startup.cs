@@ -264,13 +264,9 @@ namespace SingleOneAPI
             // Configurar arquivos estáticos padrão
             app.UseStaticFiles();
             
-            // Configurar rota específica para logos via /api/logos/
-            app.UseStaticFiles(new Microsoft.AspNetCore.Builder.StaticFileOptions
-            {
-                FileProvider = new PhysicalFileProvider(
-                    Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "logos")),
-                RequestPath = "/api/logos"
-            });
+            // ✅ REMOVIDO: UseStaticFiles para /api/logos
+            // O LogosController já serve os arquivos com mais controle e logs
+            // Isso evita conflitos entre o middleware de arquivos estáticos e o controller
             
             // Middleware para garantir UTF-8 em todas as respostas JSON
             app.Use(async (context, next) =>
