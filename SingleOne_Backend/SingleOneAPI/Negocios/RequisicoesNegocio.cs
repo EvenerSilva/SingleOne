@@ -979,7 +979,7 @@ namespace SingleOne.Negocios
                     // Buscar o colaborador uma única vez
                     var colaborador = _colaboradorRepository.Buscar(x => x.Id == aceiteOK.Colaboradorfinal).Single();
 
-                    // ✅ CORREÇÃO: Determinar o ID do usuário logado corretamente
+                    // ✅ CORREÇÃO: Determinar o ID do usuário logado corretamente (uma única vez para todo o bloco)
                     // Usar o técnico responsável da requisição como usuário logado
                     int usuarioLogadoId = aceiteOK.Tecnicoresponsavel;
                     
@@ -1042,20 +1042,11 @@ namespace SingleOne.Negocios
                             Console.WriteLine($"[TERMO_DINAMICO] Requisições incluídas: {string.Join(", ", requisicoesParaAssinar.Select(r => r.Id))}");
                             Console.WriteLine($"[TERMO_DINAMICO] Novo hash: {novoHash}");
                             
-                            // ✅ CORREÇÃO: Usar o técnico responsável da requisição como usuário logado
-                            int usuarioLogadoId = aceiteOK.Tecnicoresponsavel;
+                            // ✅ REUTILIZAR: usuarioLogadoId já foi determinado acima para geolocalização
                             Console.WriteLine($"[TERMO_DINAMICO] DEBUG - Requisição ID: {aceiteOK.Id}");
                             Console.WriteLine($"[TERMO_DINAMICO] DEBUG - Colaborador ID: {colaborador.Id}");
                             Console.WriteLine($"[TERMO_DINAMICO] DEBUG - Técnico Responsável: {aceiteOK.Tecnicoresponsavel}");
                             Console.WriteLine($"[TERMO_DINAMICO] DEBUG - Usuário Requisição: {aceiteOK.Usuariorequisicao}");
-                            
-                            // ✅ FALLBACK: Se técnico responsável for o mesmo que colaborador, usar usuário 1 (Admin)
-                            if (usuarioLogadoId == colaborador.Id)
-                            {
-                                Console.WriteLine($"[TERMO_DINAMICO] AVISO: Técnico responsável é o mesmo que colaborador, usando usuário 1 como fallback");
-                                usuarioLogadoId = 1;
-                            }
-                            
                             Console.WriteLine($"[TERMO_DINAMICO] Usando usuário logado ID: {usuarioLogadoId}");
                             
                             pdfTermo = _colaboradorNegocio.TermoCompromisso(aceiteOK.Cliente, colaborador.Id, usuarioLogadoId, isByod);
