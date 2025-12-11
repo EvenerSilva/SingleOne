@@ -30,6 +30,7 @@ namespace SingleOneAPI.Models
         public string Cnpj { get; set; }
         public bool Ativo { get; set; }
         public string Logo { get; set; }
+        public string SiteUrl { get; set; }
 
         public virtual ICollection<Colaboradore> Colaboradores { get; set; }
         public virtual ICollection<Descartecargo> Descartecargos { get; set; }

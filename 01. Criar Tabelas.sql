@@ -97,7 +97,8 @@ CREATE TABLE IF NOT EXISTS clientes
 	razaosocial varchar(200) not null,
 	cnpj varchar(20) not null,
 	ativo boolean not null,
-	logo TEXT
+	logo TEXT,
+	site_url VARCHAR(500)
 );
 
 -- Migração: Renomear tabela e colunas de Clientes para snake_case se necessário

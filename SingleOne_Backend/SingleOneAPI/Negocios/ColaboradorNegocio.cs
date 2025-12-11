@@ -44,6 +44,7 @@ namespace SingleOne.Negocios
         private readonly IRepository<Requisicoesiten> _requisicaoItensRepository;
         private readonly IRepository<Equipamento> _equipamentoRepository;
         private readonly IRepository<RequisicaoItemCompartilhado> _reqItemCompartilhadoRepository;
+        private readonly IRepository<Cliente> _clienteRepository;
 
         public ColaboradorNegocio(EnvironmentApiSettings environmentApiSettings,
             IRepository<Colaboradore> repository,
@@ -63,7 +64,8 @@ namespace SingleOne.Negocios
             ISmtpConfigService smtpConfigService,
             IRepository<Requisicoesiten> requisicaoItensRepository,
             IRepository<Equipamento> equipamentoRepository,
-            IRepository<RequisicaoItemCompartilhado> reqItemCompartilhadoRepository
+            IRepository<RequisicaoItemCompartilhado> reqItemCompartilhadoRepository,
+            IRepository<Cliente> clienteRepository
             )
         {
             mail = new SendMail(environmentApiSettings, smtpConfigService);
@@ -85,6 +87,7 @@ namespace SingleOne.Negocios
             _requisicaoItensRepository = requisicaoItensRepository;
             _equipamentoRepository = equipamentoRepository;
             _reqItemCompartilhadoRepository = reqItemCompartilhadoRepository;
+            _clienteRepository = clienteRepository;
         }
 
         public PagedResult<ColaboradoresVM> ListarColaboradores(string pesquisa, int cliente, int pagina)
@@ -931,8 +934,8 @@ namespace SingleOne.Negocios
                 string strEquipamentos = FormatarTabelaEquipamentos(eqptos);
                 var file = Path.Combine(Directory.GetCurrentDirectory(), "Documentos", "termoEmail.html");
                 
-                // ✅ CORREÇÃO: Obter URL correta do servidor
-                string siteUrl = ObterUrlSite();
+                // ✅ CORREÇÃO: Obter URL correta do servidor (prioriza URL do cliente)
+                string siteUrl = ObterUrlSite(cliente);
                 Console.WriteLine($"[TERMO POR EMAIL] SiteUrl usado: {siteUrl}");
                 
                 siteUrl = siteUrl.TrimEnd('/') + "/termos/";
@@ -1579,13 +1582,41 @@ namespace SingleOne.Negocios
         }
 
         /// <summary>
-        /// Obtém a URL do site, tentando detectar automaticamente se não estiver configurada
+        /// Obtém a URL do site, priorizando a URL configurada para o cliente específico
         /// </summary>
-        private string ObterUrlSite()
+        /// <param name="clienteId">ID do cliente (opcional). Se fornecido, busca URL específica do cliente.</param>
+        private string ObterUrlSite(int? clienteId = null)
         {
             Console.WriteLine($"[OBTER_URL] ========== INÍCIO DETECÇÃO URL ==========");
+            if (clienteId.HasValue)
+            {
+                Console.WriteLine($"[OBTER_URL] Cliente ID: {clienteId.Value}");
+            }
             
-            // 1. Tentar obter da variável de ambiente (prioridade máxima)
+            // 1. Tentar obter URL específica do cliente (prioridade MÁXIMA)
+            if (clienteId.HasValue)
+            {
+                try
+                {
+                    var cliente = _clienteRepository.Buscar(x => x.Id == clienteId.Value).FirstOrDefault();
+                    if (cliente != null && !string.IsNullOrEmpty(cliente.SiteUrl) && 
+                        !cliente.SiteUrl.Contains("localhost") && !cliente.SiteUrl.Contains("SEU_IP"))
+                    {
+                        Console.WriteLine($"[OBTER_URL] ✅ Usando URL do cliente ({cliente.Razaosocial}): {cliente.SiteUrl}");
+                        return cliente.SiteUrl;
+                    }
+                    else if (cliente != null && !string.IsNullOrEmpty(cliente.SiteUrl))
+                    {
+                        Console.WriteLine($"[OBTER_URL] ⚠️ URL do cliente configurada mas inválida: {cliente.SiteUrl}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[OBTER_URL] ⚠️ Erro ao buscar URL do cliente: {ex.Message}");
+                }
+            }
+            
+            // 2. Tentar obter da variável de ambiente
             var envUrl = Environment.GetEnvironmentVariable("SITE_URL");
             if (!string.IsNullOrEmpty(envUrl) && !envUrl.Contains("localhost") && !envUrl.Contains("SEU_IP"))
             {
@@ -1597,7 +1628,7 @@ namespace SingleOne.Negocios
                 Console.WriteLine($"[OBTER_URL] ⚠️ SITE_URL configurada mas inválida: {envUrl}");
             }
 
-            // 2. Tentar usar a URL configurada no EnvironmentApiSettings
+            // 3. Tentar usar a URL configurada no EnvironmentApiSettings
             if (!string.IsNullOrEmpty(_environmentApiSettings.SiteUrl) && 
                 !_environmentApiSettings.SiteUrl.Contains("localhost") &&
                 !_environmentApiSettings.SiteUrl.Contains("SEU_IP"))
@@ -1610,7 +1641,7 @@ namespace SingleOne.Negocios
                 Console.WriteLine($"[OBTER_URL] ⚠️ SiteUrl configurada mas inválida: {_environmentApiSettings.SiteUrl}");
             }
 
-            // 3. Tentar detectar IP do servidor automaticamente (ANTES de usar localhost)
+            // 4. Tentar detectar IP do servidor automaticamente (ANTES de usar localhost)
             string detectedIp = null;
             try
             {
@@ -1647,7 +1678,7 @@ namespace SingleOne.Negocios
                 Console.WriteLine($"[OBTER_URL] ❌ Erro ao detectar IP: {ex.Message}");
             }
 
-            // 4. Tentar detectar do ASPNETCORE_URLS (se configurado)
+            // 5. Tentar detectar do ASPNETCORE_URLS (se configurado)
             var aspnetUrls = Environment.GetEnvironmentVariable("ASPNETCORE_URLS");
             if (!string.IsNullOrEmpty(aspnetUrls))
             {
@@ -1672,7 +1703,7 @@ namespace SingleOne.Negocios
                 }
             }
             
-            // 5. Avisar e usar fallback (só se não detectou IP)
+            // 6. Avisar e usar fallback (só se não detectou IP)
             Console.WriteLine($"[OBTER_URL] ❌ ERRO: Não foi possível detectar URL do servidor!");
             Console.WriteLine($"[OBTER_URL] Configure no /etc/systemd/system/singleone-api.service:");
             Console.WriteLine($"[OBTER_URL] Environment=SITE_URL=http://SEU_IP_OU_DOMINIO");
