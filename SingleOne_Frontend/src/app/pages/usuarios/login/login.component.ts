@@ -128,8 +128,17 @@ export class LoginComponent implements OnInit {
             console.log('[LOGIN] 🔗 URL da logo (desenvolvimento):', logoUrl);
           } else {
             // Em produção, manter URL relativa (nginx faz proxy)
+            // Garantir que começa com /api/
+            if (!logoUrl.startsWith('/')) {
+              logoUrl = '/' + logoUrl;
+            }
             console.log('[LOGIN] 🔗 URL da logo (produção, relativa):', logoUrl);
+            console.log('[LOGIN] 🔗 URL completa será:', window.location.origin + logoUrl);
           }
+        } else if (logoUrl && !logoUrl.startsWith('http') && !logoUrl.startsWith('/')) {
+          // Se não começa com /api/ nem com http, adicionar /api/logos/
+          logoUrl = '/api/logos/' + logoUrl;
+          console.log('[LOGIN] 🔗 URL corrigida para:', logoUrl);
         }
         
         console.log('[LOGIN] ✅ Logo definida:', logoUrl);
