@@ -7,8 +7,27 @@ echo "🚀 SUBINDO SISTEMA COMPLETO"
 echo "=========================================="
 echo ""
 
+# 0. Resolver conflitos Git se houver
+echo "📋 [0/5] Verificando Git..."
+cd /opt/SingleOne
+
+if [ -n "$(git status --porcelain)" ]; then
+    echo "   ⚠️  Mudanças locais detectadas, fazendo stash..."
+    git stash push -m "Stash automático antes de subir sistema - $(date +%Y%m%d_%H%M%S)"
+    echo "   ✅ Mudanças locais salvas em stash"
+fi
+
+echo "   🔄 Atualizando repositório..."
+git pull
+if [ $? -eq 0 ]; then
+    echo "   ✅ Repositório atualizado"
+else
+    echo "   ⚠️  Erro ao atualizar repositório, continuando mesmo assim..."
+fi
+echo ""
+
 # 1. Iniciar PostgreSQL
-echo "📋 [1/4] Iniciando PostgreSQL..."
+echo "📋 [1/5] Iniciando PostgreSQL..."
 if systemctl is-active --quiet postgresql; then
     echo "   ✅ PostgreSQL já está rodando"
 else
@@ -24,7 +43,7 @@ fi
 echo ""
 
 # 2. Verificar conexão com banco
-echo "📋 [2/4] Verificando banco de dados..."
+echo "📋 [2/5] Verificando banco de dados..."
 if sudo -u postgres psql -d singleone -c "SELECT 1;" > /dev/null 2>&1; then
     echo "   ✅ Banco de dados OK"
 else
@@ -34,7 +53,7 @@ fi
 echo ""
 
 # 3. Iniciar API (Backend)
-echo "📋 [3/4] Iniciando API (Backend)..."
+echo "📋 [3/5] Iniciando API (Backend)..."
 if systemctl is-active --quiet singleone-api; then
     echo "   ✅ API já está rodando"
 else
@@ -60,7 +79,7 @@ fi
 echo ""
 
 # 4. Compilar e configurar Frontend
-echo "📋 [4/4] Verificando Frontend..."
+echo "📋 [4/5] Verificando Frontend..."
 
 # Verificar se precisa compilar
 if [ ! -f "/opt/SingleOne/SingleOne_Frontend/dist/SingleOne/index.html" ]; then
@@ -179,5 +198,6 @@ echo "📋 Comandos úteis:"
 echo "   - Ver logs da API: journalctl -u singleone-api -f"
 echo "   - Ver logs do Nginx: tail -f /var/log/nginx/error.log"
 echo "   - Parar tudo: sudo systemctl stop postgresql singleone-api nginx"
+echo "   - Ver mudanças locais salvas: git stash list"
 echo ""
 
