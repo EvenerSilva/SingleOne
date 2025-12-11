@@ -27,6 +27,10 @@ namespace SingleOneAPI.Infra.Mapeamento
             entity.Property(e => e.Logo)
                 .HasMaxLength(500)
                 .HasColumnName("logo");
+
+            entity.Property(e => e.SiteUrl)
+                .HasMaxLength(500)
+                .HasColumnName("site_url");
         }
     }
 }
