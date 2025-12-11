@@ -1764,6 +1764,11 @@ namespace SingleOne.Negocios
                         _equipamentohistoricoRepository.AdicionarSemSalvar(item);
                     }
                     Console.WriteLine($"[LIBERAR-ESTOQUE] Históricos adicionados ao contexto com sucesso");
+                    
+                    // ✅ CORREÇÃO CRÍTICA: Salvar históricos explicitamente
+                    Console.WriteLine($"[LIBERAR-ESTOQUE] Salvando históricos no banco de dados...");
+                    _equipamentohistoricoRepository.SalvarAlteracoes();
+                    Console.WriteLine($"[LIBERAR-ESTOQUE] Históricos salvos com sucesso!");
 
                     Console.WriteLine($"[LIBERAR-ESTOQUE] ✅ Processo concluído com sucesso! {totalEquipamentosCriados} equipamentos criados");
                     Console.WriteLine($"[LIBERAR-ESTOQUE] 🔍 RESUMO: {notaCompleta.Notasfiscaisitens.Count} itens processados, {totalEquipamentosCriados} equipamentos criados");

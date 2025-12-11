@@ -9,6 +9,7 @@
 --       mesmo se algumas falharem
 
 -- View: TermosColaboradoresVM
+DROP VIEW IF EXISTS TermosColaboradoresVM CASCADE;
 CREATE OR REPLACE VIEW TermosColaboradoresVM AS 
 SELECT r.ColaboradorFinal as ColaboradorFinalId, c.Nome as ColaboradorFinal, 
 	(SELECT max(DtEnvioTermo) FROM requisicoes rq WHERE rq.ColaboradorFinal = r.ColaboradorFinal) as DtEnvioTermo, 
@@ -19,15 +20,15 @@ FROM Requisicoes r
 GROUP BY r.ColaboradorFinal, c.Nome;
 
 -- View: EquipamentoVM
-DROP VIEW IF EXISTS EquipamentoVM CASCADE;
-CREATE OR REPLACE VIEW EquipamentoVM AS
+DROP VIEW IF EXISTS "EquipamentoVM" CASCADE;
+CREATE OR REPLACE VIEW "EquipamentoVM" AS
 SELECT e.id,
     e.tipoequipamento AS tipoequipamentoid,
-    COALESCE(te.descricao, 'Nao definido'::character varying(200)) AS tipoequipamento,
+    COALESCE(te.descricao, 'Nao definido'::character varying) AS tipoequipamento,
     e.fabricante AS fabricanteid,
-    COALESCE(f.descricao, 'Nao definido'::character varying(200)) AS fabricante,
+    COALESCE(f.descricao, 'Nao definido'::character varying) AS fabricante,
     e.modelo AS modeloid,
-    COALESCE(m.descricao, 'Nao definido'::character varying(200)) AS modelo,
+    COALESCE(m.descricao, 'Nao definido'::character varying) AS modelo,
     e.notafiscal AS notafiscalid,
         CASE
             WHEN e.notafiscal IS NOT NULL THEN nf.numero::character varying
@@ -48,7 +49,6 @@ SELECT e.id,
     e.patrimonio,
     e.dtlimitegarantia,
     e.dtcadastro,
-    e.tipoaquisicao,
     COALESCE(ta.nome, 'Nao definido'::character varying) AS "TipoAquisicao",
     e.fornecedor,
         CASE
@@ -86,6 +86,7 @@ SELECT e.id,
   WHERE e.ativo = true;
 
 -- View: EquipamentoHistoricoVM
+DROP VIEW IF EXISTS EquipamentoHistoricoVM CASCADE;
 CREATE OR REPLACE VIEW EquipamentoHistoricoVM AS
 SELECT e.id, te.id TipoequipamentoID, te.descricao TipoEquipamento, f.Id FabricanteId, f.Descricao Fabricante, m.Id ModeloId, m.Descricao Modelo, e.NumeroSerie, e.Patrimonio, es.Id EquipamentoStatusId, es.Descricao EquipamentoStatus, c.Id ColaboradorId, c.Nome Colaborador, eh.DtRegistro,
 	u.Id UsuarioId, u.Nome Usuario
@@ -99,6 +100,7 @@ FROM EquipamentoHistorico eh
 	LEFT JOIN Colaboradores c ON eh.Colaborador = c.Id;
 
 -- View: RequisicoesVM
+DROP VIEW IF EXISTS RequisicoesVM CASCADE;
 CREATE OR REPLACE VIEW RequisicoesVM AS
 SELECT r.id, u.Id UsuarioRequisicaoId, u.Nome UsuarioRequisicao, t.Id TecnicoResponsavelId, t.Nome TecnicoResponsavel, c.Id ColaboradorFinalId, c.Nome ColaboradorFinal,
 	r.DtSolicitacao, r.DtProcessamento, r.RequisicaoStatus RequisicaoStatusId, rs.Descricao RequisicaoStatus, r.AssinaturaEletronica, r.DtAssinaturaEletronica, r.DtEnvioTermo, r.HashRequisicao,
@@ -110,6 +112,7 @@ FROM requisicoes r
 	LEFT JOIN Colaboradores c ON r.ColaboradorFinal = c.Id;
 
 -- View: RequisicaoEquipamentosVM
+DROP VIEW IF EXISTS RequisicaoEquipamentosVM CASCADE;
 CREATE OR REPLACE VIEW RequisicaoEquipamentosVM AS  
 SELECT ri.Id, r.Id Requisicao, ri.Equipamento EquipamentoId, concat(te.Descricao, ' ', f.Descricao, ' ', m.Descricao) Equipamento, e.NumeroSerie, e.Patrimonio, ue.Id UsuarioEntregaId, ue.Nome UsuarioEntrega,   
  ud.Id UsuarioDevolucaoId, ud.Nome UsuarioDevolucao, ri.DtEntrega, ri.DtDevolucao, ri.ObservacaoEntrega, ri.DtProgramadaRetorno, e.EquipamentoStatus, tl.Numero, ri.linhatelefonica linhaid, e.TipoAquisicao
@@ -160,6 +163,7 @@ FROM Requisicoes req
 WHERE ri.DtDevolucao IS NULL AND req.RequisicaoStatus IN (1,3) AND eqp.EquipamentoStatus <> 8 AND eqp.Id = 1;
 
 -- View: vwNadaConsta
+DROP VIEW IF EXISTS vwNadaConsta CASCADE;
 CREATE OR REPLACE VIEW vwNadaConsta AS
 SELECT 
 	c.id, c.Nome, c.Cpf, cc.Nome CentroCusto, e.Nome Empresa, c.Matricula, c.Cargo,
@@ -172,6 +176,7 @@ FROM colaboradores c
 	JOIN Empresas e ON c.Empresa = e.Id;
 
 -- View: vwEquipamentosStatus
+DROP VIEW IF EXISTS vwEquipamentosStatus CASCADE;
 CREATE OR REPLACE VIEW vwEquipamentosStatus AS
 SELECT tec.cliente, descricao TipoEquipamento, 
 	(SELECT count(*) FROM equipamentos WHERE equipamentoStatus = 1 AND TipoEquipamento = te.id AND cliente = tec.cliente AND equipamentos.ativo = true) Danificado,
@@ -254,6 +259,7 @@ FROM Equipamentos eqp
 WHERE eqp.Id > 1 AND eqp.Ativo = true;
 
 -- View: ColaboradorHistoricoVM
+DROP VIEW IF EXISTS ColaboradorHistoricoVM CASCADE;
 CREATE OR REPLACE VIEW ColaboradorHistoricoVM AS
 SELECT c.Id, c.Nome, Cpf, Matricula, Email, Cargo, 
 	CASE
@@ -278,6 +284,7 @@ FROM colaboradores c
 WHERE c.DtAtualizacao IS NOT NULL OR c.DtAtualizacaoCentroCusto IS NOT NULL OR c.DtAtualizacaoEmpresa IS NOT NULL OR c.DtAtualizacaoLocalidade IS NOT NULL;
 
 -- View: vwDevolucaoProgramada
+DROP VIEW IF EXISTS vwDevolucaoProgramada CASCADE;
 CREATE OR REPLACE VIEW vwDevolucaoProgramada AS
 SELECT req.cliente, col.Nome nomeColaborador, ri.dtProgramadaRetorno
 FROM requisicoes req
@@ -287,6 +294,7 @@ WHERE ri.DtProgramadaRetorno IS NOT NULL AND ri.DtDevolucao IS NULL AND req.Requ
 	AND req.id NOT IN(SELECT requisicao FROM requisicoesItens WHERE equipamento IN(SELECT id FROM equipamentos WHERE equipamentoStatus = 8));
 
 -- View: vwequipamentoscomcolaboradoresdesligados
+DROP VIEW IF EXISTS vwequipamentoscomcolaboradoresdesligados CASCADE;
 CREATE OR REPLACE VIEW vwequipamentoscomcolaboradoresdesligados AS
 SELECT r.cliente,
 	c.nome, c.dtdemissao,
@@ -300,6 +308,7 @@ WHERE ((ri.dtdevolucao IS NULL) AND (c.dtdemissao IS NOT NULL AND c.dtdemissao <
 GROUP BY r.cliente, c.nome, c.dtdemissao;
 
 -- View: vwEquipamentosDetalhes
+DROP VIEW IF EXISTS vwEquipamentosDetalhes CASCADE;
 CREATE OR REPLACE VIEW vwEquipamentosDetalhes AS
 SELECT e.id, e.cliente, te.id tipoEquipamentoID, te.descricao tipoequipamento, e.fabricante fabricanteId, f.descricao fabricante, m.id modeloid, m.descricao modelo,
 	es.id equipamentoStatusID, es.descricao equipamentostatus, l.id localidadeid, l.descricao localidade, e.numeroserie, e.patrimonio, e.empresa empresaid, emp.nome empresa, e.centrocusto centrocustoid, cc.nome centrocusto
@@ -314,6 +323,7 @@ FROM equipamentos e
 WHERE te.ativo = TRUE AND e.ativo = true;
 
 -- View: vwTelefonia
+DROP VIEW IF EXISTS vwTelefonia CASCADE;
 CREATE OR REPLACE VIEW vwTelefonia AS 
 SELECT o.nome operadora, c.nome contrato, p.nome plano, p.valor, l.numero, l.iccid, l.emuso, l.ativo, c.cliente
 FROM telefoniaoperadoras o 
@@ -323,6 +333,7 @@ FROM telefoniaoperadoras o
 WHERE o.ativo = true AND c.ativo = true AND p.ativo = true AND l.ativo = true;
 
 -- View: vwLaudos
+DROP VIEW IF EXISTS vwLaudos CASCADE;
 CREATE OR REPLACE VIEW vwLaudos AS
 SELECT l.id, l.cliente, concat(te.descricao, ' ', f.descricao, ' ', m.descricao) equipamento, e.numeroserie, e.patrimonio, l.descricao, l.laudo, l.dtentrada, l.dtlaudo, l.mauuso, l.temconserto, l.usuario, u.nome usuarionome, l.tecnico, u.nome tecniconome, l.valormanutencao, e.empresa, emp.nome empresanome, e.centrocusto, cc.nome centrocustonome
 FROM laudos l
@@ -337,8 +348,8 @@ FROM laudos l
 WHERE l.ativo = true;
 
 -- View: vwUltimasRequisicaoBYOD
-DROP VIEW IF EXISTS vwultimasrequisicaobyd CASCADE;
-CREATE OR REPLACE VIEW vwultimasrequisicaobyd AS
+DROP VIEW IF EXISTS "vwUltimasRequisicaoBYOD" CASCADE;
+CREATE OR REPLACE VIEW "vwUltimasRequisicaoBYOD" AS
 SELECT r.id AS requisicaoid,
 	r.cliente,
 	r.usuariorequisicao,
@@ -375,8 +386,8 @@ ORDER BY r.dtsolicitacao DESC
 LIMIT 1000;
 
 -- View: vwUltimasRequisicaoNaoBYOD
-DROP VIEW IF EXISTS vwultimasrequisicaonaobyd CASCADE;
-CREATE OR REPLACE VIEW vwultimasrequisicaonaobyd AS
+DROP VIEW IF EXISTS "vwUltimasRequisicaoNaoBYOD" CASCADE;
+CREATE OR REPLACE VIEW "vwUltimasRequisicaoNaoBYOD" AS
 SELECT r.id AS requisicaoid,
 	r.cliente,
 	r.usuariorequisicao,
@@ -482,6 +493,7 @@ LEFT JOIN empresas emp ON e.empresa = emp.id
 WHERE e.ativo = TRUE AND e.compartilhado = TRUE;
 
 -- View: vw_equipamentos_usuarios_compartilhados
+DROP VIEW IF EXISTS vw_equipamentos_usuarios_compartilhados CASCADE;
 CREATE OR REPLACE VIEW vw_equipamentos_usuarios_compartilhados AS
 SELECT 
 	euc.id,
@@ -514,6 +526,7 @@ LEFT JOIN usuarios u_criador ON euc.criado_por = u_criador.id
 WHERE e.ativo = TRUE;
 
 -- View: planosvm
+DROP VIEW IF EXISTS planosvm CASCADE;
 CREATE OR REPLACE VIEW planosvm AS
 SELECT 
     p.id,
@@ -537,6 +550,7 @@ GROUP BY p.id, p.nome, p.ativo, p.valor, c.nome, c.id, o.nome, o.id;
 COMMENT ON VIEW planosvm IS 'View para listar planos de telefonia com informações agregadas de linhas';
 
 -- View: vwplanostelefonia
+DROP VIEW IF EXISTS vwplanostelefonia CASCADE;
 CREATE OR REPLACE VIEW vwplanostelefonia AS
 SELECT 
     p.id,
@@ -584,6 +598,7 @@ SELECT count(*) AS total_interacoes,
 COMMENT ON VIEW vw_tinone_estatisticas IS 'Estatísticas diárias de uso do TinOne';
 
 -- View: vw_campanhas_resumo
+DROP VIEW IF EXISTS vw_campanhas_resumo CASCADE;
 CREATE OR REPLACE VIEW vw_campanhas_resumo AS
 SELECT 
     c.id,
@@ -621,6 +636,7 @@ GROUP BY c.id, c.cliente, c.nome, c.descricao, c.datacriacao, c.datainicio, c.da
 COMMENT ON VIEW vw_campanhas_resumo IS 'Visão resumida das campanhas com estatísticas atualizadas';
 
 -- View: vw_campanhas_colaboradores_detalhado
+DROP VIEW IF EXISTS vw_campanhas_colaboradores_detalhado CASCADE;
 CREATE OR REPLACE VIEW vw_campanhas_colaboradores_detalhado AS
 SELECT 
     c.id AS campanha_id,
@@ -780,11 +796,11 @@ DROP VIEW IF EXISTS equipamentovm CASCADE;
 CREATE OR REPLACE VIEW equipamentovm AS
 SELECT e.id,
     e.tipoequipamento AS tipoequipamentoid,
-    COALESCE(te.descricao, 'Nao definido'::character varying(200)) AS tipoequipamento,
+    COALESCE(te.descricao, 'Nao definido'::character varying) AS tipoequipamento,
     e.fabricante AS fabricanteid,
-    COALESCE(f.descricao, 'Nao definido'::character varying(200)) AS fabricante,
+    COALESCE(f.descricao, 'Nao definido'::character varying) AS fabricante,
     e.modelo AS modeloid,
-    COALESCE(m.descricao, 'Nao definido'::character varying(200)) AS modelo,
+    COALESCE(m.descricao, 'Nao definido'::character varying) AS modelo,
     e.notafiscal AS notafiscalid,
         CASE
             WHEN e.notafiscal IS NOT NULL THEN nf.numero::character varying
@@ -869,6 +885,7 @@ SELECT te.descricao AS tipoequipamento,
   WHERE r.requisicaostatus = 3 AND ri.dtdevolucao IS NULL;
 
 -- View: vw_colaboradores_simples
+DROP VIEW IF EXISTS vw_colaboradores_simples CASCADE;
 CREATE OR REPLACE VIEW vw_colaboradores_simples AS
 SELECT c.id,
     c.nome,
@@ -897,6 +914,7 @@ SELECT c.id,
      JOIN clientes cl ON COALESCE(c.cliente, e.cliente) = cl.id;
 
 -- View: vw_equipamentos_simples
+DROP VIEW IF EXISTS vw_equipamentos_simples CASCADE;
 CREATE OR REPLACE VIEW vw_equipamentos_simples AS
 SELECT e.id,
     e.numeroserie,
@@ -921,6 +939,7 @@ SELECT e.id,
      LEFT JOIN clientes cl ON COALESCE(e.cliente, emp.cliente) = cl.id;
 
 -- View: vwestoquelinhasalerta
+DROP VIEW IF EXISTS vwestoquelinhasalerta CASCADE;
 CREATE OR REPLACE VIEW vwestoquelinhasalerta AS
 SELECT c.cliente,
     l.descricao AS localidade,
