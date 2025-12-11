@@ -8,7 +8,14 @@
     <img [src]="clienteLogo" 
          alt="Logo do Cliente" 
          class="logo-image cliente"
-         title="Logo do Cliente">
+         title="Logo do Cliente"
+         (error)="onLogoError($event)"
+         (load)="onLogoLoad()">
+  </div>
+  
+  <!-- Debug: mostrar placeholder se logo não carregar -->
+  <div class="cliente-logo-placeholder" *ngIf="!clienteLogo && !loading">
+    <span>Logo do Cliente</span>
   </div>
 
   <!-- By SingleOne -->

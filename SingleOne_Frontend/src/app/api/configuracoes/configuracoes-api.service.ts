@@ -760,16 +760,21 @@ salvarNotaFiscal(nf, token) {
   }
 
   buscarLogoCliente() {
+    console.log('[API] 🔍 Buscando logo do cliente...');
     return this.instance.get('/configuracoes/BuscarLogoCliente', { 
       headers: {
         'Content-Type': 'application/json'
       },
       timeout: 10000 // 10 segundos de timeout
     }).then(res => {
+      console.log('[API] ✅ Resposta recebida:', res);
+      console.log('[API] ✅ res.data:', res?.data);
       return res;
     }).catch(err => {
-      console.error('[API] Erro ao buscar logo:', err);
-      return err;
+      console.error('[API] ❌ Erro ao buscar logo:', err);
+      console.error('[API] ❌ Detalhes do erro:', err?.response?.data || err?.message || err);
+      // Retornar objeto vazio em vez de erro para não quebrar o componente
+      return { data: { Logo: null, Mensagem: 'Erro ao buscar logo' } };
     })
   }
 

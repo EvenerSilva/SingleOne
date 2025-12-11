@@ -97,15 +97,23 @@ export class LoginComponent implements OnInit {
 
   private async carregarLogoCliente() {
     try {
+      console.log('[LOGIN] 🔍 Iniciando busca da logo...');
       const response = await this.configuracoesApi.buscarLogoCliente();
+      
+      console.log('[LOGIN] 📦 Resposta recebida:', response);
+      console.log('[LOGIN] 📦 response.data:', response?.data);
       
       // A resposta do axios vem em response.data
       // O backend retorna: { Logo: "/api/logos/{fileName}", ClienteNome: "...", Mensagem: "..." }
-      const logoData = response?.data;
+      const logoData = response?.data?.data || response?.data;
+      
+      console.log('[LOGIN] 📦 logoData:', logoData);
       
       if (logoData && (logoData.Logo || logoData.logo)) {
         // A logo retornada é uma URL relativa como /api/logos/{fileName}
         let logoUrl = logoData.Logo || logoData.logo;
+        
+        console.log('[LOGIN] 🔗 URL da logo (antes):', logoUrl);
         
         // Se a URL já começa com /api/, verificar se precisa adicionar baseURL
         if (logoUrl && logoUrl.startsWith('/api/')) {
@@ -115,18 +123,24 @@ export class LoginComponent implements OnInit {
             // Remover /api do baseURL se existir e construir URL completa
             const baseUrl = environment.apiUrl.replace('/api', '');
             logoUrl = baseUrl + logoUrl;
+            console.log('[LOGIN] 🔗 URL da logo (desenvolvimento):', logoUrl);
           } else {
             // Em produção, manter URL relativa (nginx faz proxy)
+            console.log('[LOGIN] 🔗 URL da logo (produção, relativa):', logoUrl);
           }
         }
         
+        console.log('[LOGIN] ✅ Logo definida:', logoUrl);
         this.clienteLogo = logoUrl;
         this.cdr.detectChanges();
       } else {
+        console.warn('[LOGIN] ⚠️ Nenhuma logo encontrada na resposta');
+        console.warn('[LOGIN] ⚠️ logoData:', logoData);
         this.clienteLogo = null;
       }
     } catch (error) {
       console.error('[LOGIN] ❌ Erro ao carregar logo do cliente:', error);
+      console.error('[LOGIN] ❌ Detalhes do erro:', error);
       this.clienteLogo = null;
     }
   }

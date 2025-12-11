@@ -18,18 +18,36 @@ export class LogoDisplayComponent implements OnInit {
   ngOnInit(): void {
     this.carregarLogoCliente();
   }
+  
+  onLogoError(event: any): void {
+    console.error('[LOGO-DISPLAY] ❌ Erro ao carregar imagem da logo:', event);
+    console.error('[LOGO-DISPLAY] ❌ URL da logo que falhou:', this.clienteLogo);
+    // Não limpar logo em caso de erro (pode ser erro temporário)
+  }
+  
+  onLogoLoad(): void {
+    console.log('[LOGO-DISPLAY] ✅ Logo do cliente carregada com sucesso:', this.clienteLogo);
+  }
 
   private async carregarLogoCliente() {
     try {
+      console.log('[LOGO-DISPLAY] 🔍 Iniciando busca da logo...');
       const response = await this.configuracoesApi.buscarLogoCliente();
+      
+      console.log('[LOGO-DISPLAY] 📦 Resposta recebida:', response);
+      console.log('[LOGO-DISPLAY] 📦 response.data:', response?.data);
       
       // A resposta do axios vem em response.data
       // O backend retorna: { Logo: "/api/logos/{fileName}", ClienteNome: "...", Mensagem: "..." }
-      const logoData = response?.data;
+      const logoData = response?.data?.data || response?.data;
+      
+      console.log('[LOGO-DISPLAY] 📦 logoData:', logoData);
       
       if (logoData && (logoData.Logo || logoData.logo)) {
         // A logo retornada é uma URL relativa como /api/logos/{fileName}
         let logoUrl = logoData.Logo || logoData.logo;
+        
+        console.log('[LOGO-DISPLAY] 🔗 URL da logo (antes):', logoUrl);
         
         // Se a URL já começa com /api/, verificar se precisa adicionar baseURL
         if (logoUrl && logoUrl.startsWith('/api/')) {
@@ -38,20 +56,27 @@ export class LogoDisplayComponent implements OnInit {
             // Remover /api do baseURL se existir e construir URL completa
             const baseUrl = environment.apiUrl.replace('/api', '');
             logoUrl = baseUrl + logoUrl;
+            console.log('[LOGO-DISPLAY] 🔗 URL da logo (desenvolvimento):', logoUrl);
           } else {
             // Em produção, manter URL relativa (nginx faz proxy)
+            console.log('[LOGO-DISPLAY] 🔗 URL da logo (produção, relativa):', logoUrl);
           }
         }
         
+        console.log('[LOGO-DISPLAY] ✅ Logo definida:', logoUrl);
         this.clienteLogo = logoUrl;
       } else {
+        console.warn('[LOGO-DISPLAY] ⚠️ Nenhuma logo encontrada na resposta');
+        console.warn('[LOGO-DISPLAY] ⚠️ logoData:', logoData);
         this.clienteLogo = null;
       }
     } catch (error) {
       console.error('[LOGO-DISPLAY] ❌ Erro ao carregar logo do cliente:', error);
+      console.error('[LOGO-DISPLAY] ❌ Detalhes do erro:', error);
       this.clienteLogo = null;
     } finally {
       this.loading = false;
+      console.log('[LOGO-DISPLAY] ✅ Carregamento finalizado. Logo:', this.clienteLogo);
     }
   }
 }
