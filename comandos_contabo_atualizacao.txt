@@ -1,0 +1,81 @@
+📋 COMANDOS PARA ATUALIZAR O CONTABO
+=====================================
+
+⚠️ IMPORTANTE: O Backend é .NET (C#) e NÃO usa npm!
+O npm é usado apenas no Frontend (Angular).
+
+✅ BACKEND (.NET) - Comandos corretos:
+---------------------------------------
+cd /opt/SingleOne/SingleOne_Backend
+git pull origin main
+dotnet build
+sudo systemctl restart singleone-api
+
+# Verificar se está funcionando:
+systemctl status singleone-api
+journalctl -u singleone-api -f
+
+
+✅ FRONTEND (Angular) - Se estiver em servidor separado:
+--------------------------------------------------------
+# 1. Encontrar o diretório do frontend:
+find /opt -name "package.json" -path "*/SingleOne*" 2>/dev/null
+# ou
+find /home -name "package.json" -path "*/SingleOne*" 2>/dev/null
+
+# 2. Navegar até o diretório encontrado:
+cd /caminho/encontrado/SingleOne_Frontend
+
+# 3. Atualizar e compilar:
+git pull origin main
+npm install
+npm run build
+# ou
+ng build --configuration production
+
+# 4. Se usar nginx, reiniciar:
+sudo systemctl restart nginx
+# ou
+sudo service nginx restart
+
+
+✅ SE O FRONTEND ESTIVER NO MESMO SERVIDOR:
+-------------------------------------------
+# Verificar onde está o frontend compilado:
+ls -la /opt/SingleOne/
+# ou
+ls -la /var/www/
+# ou
+ls -la /usr/share/nginx/html/
+
+# Se o frontend já estiver compilado e servido pelo nginx,
+# você só precisa:
+# 1. Fazer pull do código
+# 2. Recompilar (npm run build)
+# 3. Copiar os arquivos para o diretório do nginx
+# 4. Reiniciar nginx
+
+
+🔍 VERIFICAR ONDE ESTÁ O FRONTEND:
+----------------------------------
+# Verificar configuração do nginx:
+cat /etc/nginx/sites-available/* | grep -i singleone
+# ou
+cat /etc/nginx/nginx.conf | grep -i singleone
+
+# Verificar processos Node/npm:
+ps aux | grep node
+ps aux | grep npm
+
+# Verificar serviços:
+systemctl list-units | grep -i singleone
+systemctl list-units | grep -i nginx
+
+
+📝 RESUMO DAS CORREÇÕES APLICADAS:
+----------------------------------
+✅ Backend: Formatação de nomes no RelatorioNegocio.cs
+✅ Frontend: Função formatarNomeUsuario() no dashboard.component.ts
+
+Após atualizar ambos, os nomes aparecerão como "Evener Silva" em vez de "evener Silva".
+
