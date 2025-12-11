@@ -246,7 +246,13 @@ if systemctl is-enabled nginx > /dev/null 2>&1; then
     echo "✅ Nginx habilitado para iniciar automaticamente"
 else
     echo "⚠️  Nginx NÃO está habilitado para iniciar automaticamente"
-    echo "   Execute: sudo systemctl enable nginx"
+    echo "🔄 Habilitando Nginx para iniciar automaticamente..."
+    systemctl enable nginx
+    if systemctl is-enabled nginx > /dev/null 2>&1; then
+        echo "✅ Nginx habilitado com sucesso"
+    else
+        echo "❌ Erro ao habilitar Nginx!"
+    fi
 fi
 echo ""
 
