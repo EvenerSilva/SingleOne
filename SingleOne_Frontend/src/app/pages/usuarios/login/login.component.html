@@ -233,7 +233,9 @@
           [src]="clienteLogo || '../../../../assets/Branding/logo.png'" 
           [alt]="clienteLogo ? 'Logo do Cliente' : 'SingleOne'" 
           class="logo"
-          [class.cliente-logo]="clienteLogo">
+          [class.cliente-logo]="clienteLogo"
+          (error)="onLogoError($event)"
+          (load)="onLogoLoad()">
       </div>
       
       <!-- Logo da SingleOne (By SingleOne) - sempre visível -->

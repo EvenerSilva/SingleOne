@@ -146,6 +146,21 @@ export class LoginComponent implements OnInit {
       this.clienteLogo = null;
     }
   }
+  
+  onLogoError(event: any): void {
+    console.error('[LOGIN] ❌ Erro ao carregar imagem da logo:', event);
+    console.error('[LOGIN] ❌ URL da logo que falhou:', this.clienteLogo);
+    // Tentar usar logoUrl com timestamp se disponível
+    if (this.clienteLogo && !this.clienteLogo.includes('?v=')) {
+      console.log('[LOGIN] 🔄 Tentando adicionar timestamp à URL...');
+      this.clienteLogo = `${this.clienteLogo}?v=${Date.now()}`;
+      this.cdr.detectChanges();
+    }
+  }
+  
+  onLogoLoad(): void {
+    console.log('[LOGIN] ✅ Logo do cliente carregada com sucesso:', this.clienteLogo);
+  }
 
   async entrar() {
     if(this.frmLogin.valid) {
