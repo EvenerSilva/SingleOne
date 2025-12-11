@@ -105,7 +105,8 @@ export class LoginComponent implements OnInit {
       
       // A resposta do axios vem em response.data
       // O backend retorna: { Logo: "/api/logos/{fileName}", ClienteNome: "...", Mensagem: "..." }
-      const logoData = response?.data?.data || response?.data;
+      // O axios já extrai o body da resposta HTTP, então response.data já é o objeto JSON
+      const logoData = response?.data;
       
       console.log('[LOGIN] 📦 logoData:', logoData);
       
