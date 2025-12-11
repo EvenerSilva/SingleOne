@@ -1337,7 +1337,7 @@ namespace SingleOneAPI.Negocios
             // ✅ Incluir CSS do CKEditor (mesmo comportamento dos templates de colaboradores)
             try
             {
-                var cssPath = Path.Combine(Directory.GetCurrentDirectory(), "documentos", "ckeditor.css");
+                var cssPath = Path.Combine(Directory.GetCurrentDirectory(), "Documentos", "ckeditor.css");
                 if (File.Exists(cssPath))
                 {
                     var css = File.ReadAllText(cssPath);

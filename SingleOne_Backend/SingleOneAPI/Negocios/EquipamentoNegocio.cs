@@ -684,8 +684,8 @@ namespace SingleOne.Negocios
                                         
                 }
 
-                var filecss = Path.Combine(Directory.GetCurrentDirectory(), "documentos", "ckeditor.css");
-                string css = File.ReadAllText(filecss);
+                var filecss = Path.Combine(Directory.GetCurrentDirectory(), "Documentos", "ckeditor.css");
+                string css = File.Exists(filecss) ? File.ReadAllText(filecss) : string.Empty;
 
                 mail.Enviar(paramts.Emailreporte, "[SingleOne] - Reporte de dano ou perda de recurso", template);
 

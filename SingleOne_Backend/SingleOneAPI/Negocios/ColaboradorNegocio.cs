@@ -440,8 +440,8 @@ namespace SingleOne.Negocios
                 
                 // Adiar substituição do @usuarioLogado para depois de determinar quem entregou
 
-                var file = Path.Combine(Directory.GetCurrentDirectory(), "documentos", "ckeditor.css");
-                string css = File.ReadAllText(file);
+                var file = Path.Combine(Directory.GetCurrentDirectory(), "Documentos", "ckeditor.css");
+                string css = File.Exists(file) ? File.ReadAllText(file) : string.Empty;
                 string footer = string.Empty;
                 string publicValidationUrl = string.Empty;
 
@@ -936,8 +936,8 @@ namespace SingleOne.Negocios
                     //.Replace("@link", siteUrl + (eqptos[0].Hashrequisicao));
                     .Replace("@link", string.Concat(siteUrl, eqptos[0].Hashrequisicao, "/", byod.ToString().ToLower()));
 
-                var filecss = Path.Combine(Directory.GetCurrentDirectory(), "documentos", "ckeditor.css");
-                string css = File.ReadAllText(filecss);
+                var filecss = Path.Combine(Directory.GetCurrentDirectory(), "Documentos", "ckeditor.css");
+                string css = File.Exists(filecss) ? File.ReadAllText(filecss) : string.Empty;
                 template = template + "<style>" + css + "table{width:100%}</style>";
 
                 Console.WriteLine($"[TERMO POR EMAIL] Preparando envio para: {col.Email}");
@@ -1221,8 +1221,8 @@ namespace SingleOne.Negocios
                 .Replace("@versao", $"Versão: {template.Versao.ToString()}")
                 .Replace("@tipoColaborador", $"{ObterTipoColaborador(col.Tipocolaborador)}");
 
-            var file = Path.Combine(Directory.GetCurrentDirectory(), "documentos", "ckeditor.css");
-            string css = File.ReadAllText(file);
+            var file = Path.Combine(Directory.GetCurrentDirectory(), "Documentos", "ckeditor.css");
+            string css = File.Exists(file) ? File.ReadAllText(file) : string.Empty;
             template.Conteudo = template.Conteudo + "<style>" + css + "table{width:100%}</style>";
 
             var pdf = HtmlToPdfConverter.ConvertHtmlToPdf(template.Conteudo);
@@ -1399,8 +1399,8 @@ namespace SingleOne.Negocios
                     .Replace("@versao", $"Versão: {template.Versao.ToString()}")
                     .Replace("@tipoColaborador", $"{ObterTipoColaborador(col.Tipocolaborador)}");
 
-                var file = Path.Combine(Directory.GetCurrentDirectory(), "documentos", "ckeditor.css");
-                string css = System.IO.File.ReadAllText(file);
+                var file = Path.Combine(Directory.GetCurrentDirectory(), "Documentos", "ckeditor.css");
+                string css = File.Exists(file) ? File.ReadAllText(file) : string.Empty;
                 template.Conteudo = template.Conteudo + "<style>" + css + "table{width:100%}</style>";
 
 
