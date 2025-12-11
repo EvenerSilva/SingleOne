@@ -28,7 +28,15 @@ export class ConfigApiService {
         return response;
       }, error => {
         if (error.response?.status == 401) {
-          if (this.isPatrimonioRoute(error.config?.url)) {
+          // Verificar se é uma rota pública (termos, patrimônio, etc)
+          const currentPath = this.route.url || '';
+          const isPublicRoute = this.isPublicRoute(error.config?.url) || 
+                                this.isPublicPath(currentPath) ||
+                                this.isPatrimonioRoute(error.config?.url);
+          
+          if (isPublicRoute) {
+            // Rotas públicas podem retornar 401 sem redirecionar
+            console.log('[CONFIG-API] ✅ 401 em rota pública, não redirecionando');
             return Promise.reject(error);
           }
           
@@ -79,5 +87,42 @@ protected instanceCep = axios.create({
    */
   private isPatrimonioRoute(url: string): boolean {
     return url && (url.includes('/MeuPatrimonio') || url.includes('/patrimonio'));
+  }
+
+  /**
+   * Verifica se a URL da API é uma rota pública
+   */
+  private isPublicRoute(url: string | undefined): boolean {
+    if (!url) return false;
+    
+    const publicRoutes = [
+      '/requisicoes/ListarEquipamentosDaRequisicao',
+      '/requisicoes/AceitarTermoResponsabilidade',
+      '/configuracoes/BuscarLogoCliente',
+      '/TermosPublicos/validacao',
+      '/MeuPatrimonio',
+      '/patrimonio'
+    ];
+    
+    return publicRoutes.some(route => url.includes(route));
+  }
+
+  /**
+   * Verifica se o path atual do Angular é público
+   */
+  private isPublicPath(path: string): boolean {
+    if (!path) return false;
+    
+    const publicPaths = [
+      '/login',
+      '/esqueci-senha',
+      '/two-factor-verification',
+      '/patrimonio',
+      '/portaria',
+      '/verificar-termo',
+      '/termos'
+    ];
+    
+    return publicPaths.some(p => path.startsWith(p));
   }
 }
