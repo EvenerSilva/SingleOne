@@ -757,10 +757,15 @@ namespace SingleOne.Negocios
                     // Contar entrega
                     if (mov.TemEntrega && !string.IsNullOrEmpty(mov.UsuarioEntrega))
                     {
-                        // ✅ CORREÇÃO: Formatar nome com primeira letra maiúscula
-                        var nomeFormatado = string.IsNullOrWhiteSpace(mov.UsuarioEntrega) 
-                            ? mov.UsuarioEntrega 
-                            : System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(mov.UsuarioEntrega.ToLower());
+                        // ✅ CORREÇÃO: Formatar nome com primeira letra maiúscula (função robusta)
+                        var nome = mov.UsuarioEntrega.ToLower().Trim();
+                        var palavras = nome.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                        for (int i = 0; i < palavras.Length; i++)
+                        {
+                            if (palavras[i].Length > 0)
+                                palavras[i] = char.ToUpperInvariant(palavras[i][0]) + palavras[i].Substring(1);
+                        }
+                        var nomeFormatado = string.Join(" ", palavras);
                         
                         if (!contagemPorUsuario.ContainsKey(nomeFormatado))
                             contagemPorUsuario[nomeFormatado] = 0;
@@ -770,10 +775,15 @@ namespace SingleOne.Negocios
                     // Contar devolu��o
                     if (mov.TemDevolucao && !string.IsNullOrEmpty(mov.UsuarioDevolucao))
                     {
-                        // ✅ CORREÇÃO: Formatar nome com primeira letra maiúscula
-                        var nomeFormatado = string.IsNullOrWhiteSpace(mov.UsuarioDevolucao) 
-                            ? mov.UsuarioDevolucao 
-                            : System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(mov.UsuarioDevolucao.ToLower());
+                        // ✅ CORREÇÃO: Formatar nome com primeira letra maiúscula (função robusta)
+                        var nome = mov.UsuarioDevolucao.ToLower().Trim();
+                        var palavras = nome.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                        for (int i = 0; i < palavras.Length; i++)
+                        {
+                            if (palavras[i].Length > 0)
+                                palavras[i] = char.ToUpperInvariant(palavras[i][0]) + palavras[i].Substring(1);
+                        }
+                        var nomeFormatado = string.Join(" ", palavras);
                         
                         if (!contagemPorUsuario.ContainsKey(nomeFormatado))
                             contagemPorUsuario[nomeFormatado] = 0;
