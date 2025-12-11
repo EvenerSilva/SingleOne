@@ -1,0 +1,85 @@
+📋 COMANDOS PARA ATUALIZAR O CONTABO
+=====================================
+
+✅ O git pull já foi executado com sucesso!
+As alterações foram baixadas (incluindo a correção da Timeline de Recursos).
+
+🔍 PASSO 1: Encontrar o caminho do projeto
+-------------------------------------------
+# Opção A - Buscar arquivo .sln ou .csproj:
+find /home -name "SingleOne*.sln" -o -name "SingleOneAPI.csproj" 2>/dev/null | head -1
+
+# Opção B - Buscar diretório SingleOne:
+find /home -type d -name "SingleOne*" 2>/dev/null | head -1
+
+# Opção C - Verificar processos em execução:
+ps aux | grep -i singleone | grep -v grep
+
+# Opção D - Verificar serviços systemd:
+systemctl list-units | grep -i singleone
+
+# Opção E - Verificar variáveis de ambiente:
+env | grep -i singleone
+
+
+🔨 PASSO 2: Navegar até o diretório e recompilar
+------------------------------------------------
+# Substitua /caminho/encontrado pelo caminho real encontrado acima
+cd /caminho/encontrado/SingleOne_Backend
+
+# Ou se o projeto estiver em outro local:
+cd /caminho/encontrado
+
+# Recompilar o projeto:
+dotnet build
+
+# Ou se precisar publicar:
+dotnet publish -c Release
+
+
+🔄 PASSO 3: Reiniciar o serviço
+--------------------------------
+# Opção A - Se usar systemd:
+sudo systemctl restart singleone-api
+# ou
+sudo systemctl restart singleone
+# ou
+sudo systemctl restart singleone.service
+
+# Opção B - Se usar supervisor:
+sudo supervisorctl restart singleone-api
+
+# Opção C - Se rodar manualmente (encontrar PID e reiniciar):
+ps aux | grep dotnet | grep SingleOneAPI
+# Depois matar o processo e iniciar novamente:
+kill <PID>
+# E iniciar novamente (ajuste o comando conforme sua configuração):
+dotnet SingleOneAPI.dll
+
+# Opção D - Se usar Docker:
+docker-compose restart
+# ou
+docker restart singleone-container
+
+
+📝 PASSO 4: Verificar se está funcionando
+------------------------------------------
+# Verificar logs:
+journalctl -u singleone-api -f
+# ou
+tail -f /var/log/singleone/api.log
+# ou
+pm2 logs singleone-api  # se usar PM2
+
+# Verificar se o serviço está rodando:
+systemctl status singleone-api
+# ou
+ps aux | grep dotnet | grep SingleOneAPI
+
+
+✅ ALTERAÇÕES APLICADAS
+-----------------------
+- Correção da Timeline de Recursos (salvar históricos ao liberar estoque)
+- Arquivo: SingleOne_Backend/SingleOneAPI/Negocios/ConfiguracoesNegocio.cs
+- Linha 1770: Adicionado _equipamentohistoricoRepository.SalvarAlteracoes()
+

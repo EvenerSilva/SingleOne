@@ -993,17 +993,17 @@ CREATE OR REPLACE VIEW vwequipamentosstatus AS
 SELECT 
     e.cliente,
     te.descricao AS tipoequipamento,
-    COUNT(CASE WHEN es.id = 1 THEN 1 END) AS novo,
-    COUNT(CASE WHEN es.id = 2 THEN 1 END) AS requisitado,
-    COUNT(CASE WHEN es.id = 3 THEN 1 END) AS emestoque,
-    COUNT(CASE WHEN es.id = 4 THEN 1 END) AS entregue,
-    COUNT(CASE WHEN es.id = 5 THEN 1 END) AS roubado,
-    COUNT(CASE WHEN es.id = 6 THEN 1 END) AS devolvido,
-    COUNT(CASE WHEN es.id = 7 THEN 1 END) AS danificado,
-    COUNT(CASE WHEN es.id = 8 THEN 1 END) AS extraviado,
-    COUNT(CASE WHEN es.id = 9 THEN 1 END) AS semconserto,
-    COUNT(CASE WHEN es.id = 10 THEN 1 END) AS descartado,
-    COUNT(CASE WHEN es.id = 11 THEN 1 END) AS migrado
+    COUNT(CASE WHEN LOWER(es.descricao) = 'novo' THEN 1 END) AS novo,
+    COUNT(CASE WHEN LOWER(es.descricao) = 'requisitado' THEN 1 END) AS requisitado,
+    COUNT(CASE WHEN LOWER(es.descricao) = 'em estoque' THEN 1 END) AS emestoque,
+    COUNT(CASE WHEN LOWER(es.descricao) = 'entregue' THEN 1 END) AS entregue,
+    COUNT(CASE WHEN LOWER(es.descricao) = 'roubado' THEN 1 END) AS roubado,
+    COUNT(CASE WHEN LOWER(es.descricao) = 'devolvido' THEN 1 END) AS devolvido,
+    COUNT(CASE WHEN LOWER(es.descricao) = 'danificado' THEN 1 END) AS danificado,
+    COUNT(CASE WHEN LOWER(es.descricao) = 'extraviado' THEN 1 END) AS extraviado,
+    COUNT(CASE WHEN LOWER(es.descricao) IN ('sem conserto', 'semconserto') THEN 1 END) AS semconserto,
+    COUNT(CASE WHEN LOWER(es.descricao) = 'descartado' THEN 1 END) AS descartado,
+    COUNT(CASE WHEN LOWER(es.descricao) = 'migrado' THEN 1 END) AS migrado
 FROM equipamentos e
 INNER JOIN tipoequipamentos te ON e.tipoequipamento = te.id
 INNER JOIN equipamentosstatus es ON e.equipamentostatus = es.id
