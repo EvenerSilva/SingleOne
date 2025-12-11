@@ -50,13 +50,22 @@ SERVICE_FILE="/etc/systemd/system/singleone-api.service"
 # Fazer backup
 cp "$SERVICE_FILE" "${SERVICE_FILE}.backup.$(date +%Y%m%d_%H%M%S)"
 
-# Remover linha antiga se existir
+# Remover TODAS as linhas antigas de SITE_URL (incluindo placeholders)
 sed -i '/Environment=SITE_URL=/d' "$SERVICE_FILE"
 
 # Adicionar nova linha após ASPNETCORE_ENVIRONMENT
 sed -i "/Environment=ASPNETCORE_ENVIRONMENT=Production/a Environment=SITE_URL=$SITE_URL" "$SERVICE_FILE"
 
 echo "✅ SITE_URL configurado: $SITE_URL"
+
+# Verificar se foi aplicado corretamente
+if grep -q "Environment=SITE_URL=$SITE_URL" "$SERVICE_FILE"; then
+    echo "✅ Verificação: SITE_URL encontrado no arquivo de serviço"
+else
+    echo "⚠️  AVISO: SITE_URL não foi encontrado no arquivo após configuração!"
+    echo "📋 Conteúdo do arquivo:"
+    grep "SITE_URL" "$SERVICE_FILE" || echo "   (nenhuma linha SITE_URL encontrada)"
+fi
 
 # 7. Recarregar systemd
 echo "🔄 Recarregando systemd..."

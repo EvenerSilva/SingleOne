@@ -54,7 +54,44 @@ namespace SingleOneAPI
             string dbHost = Environment.GetEnvironmentVariable("DB_HOST") ?? "127.0.0.1";
             string dbUser = Environment.GetEnvironmentVariable("DB_USER") ?? "postgres";
             string dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD") ?? "Admin@2025";
-            string siteUrl = Environment.GetEnvironmentVariable("SITE_URL") ?? "http://localhost:4200";
+            
+            // Detectar SITE_URL com fallback inteligente
+            string siteUrl = Environment.GetEnvironmentVariable("SITE_URL");
+            if (string.IsNullOrEmpty(siteUrl) || siteUrl.Contains("localhost") || siteUrl.Contains("SEU_IP"))
+            {
+                // Tentar detectar IP automaticamente
+                try
+                {
+                    var hostName = System.Net.Dns.GetHostName();
+                    var addresses = System.Net.Dns.GetHostAddresses(hostName);
+                    foreach (var addr in addresses)
+                    {
+                        if (addr.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork && 
+                            !addr.ToString().StartsWith("127.") && 
+                            !addr.ToString().StartsWith("169.254."))
+                        {
+                            siteUrl = $"http://{addr}";
+                            Console.WriteLine($"[STARTUP] ⚠️ SITE_URL não configurada, usando IP detectado: {siteUrl}");
+                            break;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[STARTUP] ⚠️ Erro ao detectar IP: {ex.Message}");
+                }
+                
+                // Último fallback
+                if (string.IsNullOrEmpty(siteUrl) || siteUrl.Contains("localhost") || siteUrl.Contains("SEU_IP"))
+                {
+                    siteUrl = "http://localhost:4200";
+                    Console.WriteLine($"[STARTUP] ⚠️ Usando fallback localhost. Configure SITE_URL no systemd!");
+                }
+            }
+            else
+            {
+                Console.WriteLine($"[STARTUP] ✅ SITE_URL configurada: {siteUrl}");
+            }
 
             // Criar EnvironmentApiSettings com configurações básicas
             // As configurações SMTP serão carregadas do banco de dados pelo SmtpConfigService
