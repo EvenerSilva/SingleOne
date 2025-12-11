@@ -51,6 +51,8 @@ export class ColaboradoresComponent implements OnInit, AfterViewInit {
   public pageSize = 10;
   public currentPageIndex = 0;
   public mostrarAtalhoCentral = false;
+  public totalRegistrosBackend = 0; // Total de registros informado pelo backend (RowCount)
+  private termoPesquisaAtual: string = 'null'; // Termo de pesquisa usado na última chamada
   
   // 📤 VARIÁVEIS DO MODAL DE IMPORTAÇÃO
   public mostrarModalImportacao: boolean = false;
@@ -107,8 +109,8 @@ export class ColaboradoresComponent implements OnInit, AfterViewInit {
           this.indicadorFiltro = '';
         }, 5000);
       } else {
-        // Carregar lista normal
-        this.listar();
+        // Carregar lista normal (primeira página, sem filtro)
+        this.listar(1);
       }
 
       if (acao === 'importar') {
@@ -136,190 +138,99 @@ export class ColaboradoresComponent implements OnInit, AfterViewInit {
       return;
     }
     
-    // CONFIGURAÇÃO SIMPLES E DIRETA
-    this.dataSource.paginator = this.paginator;
-    
-    // CONFIGURAR TAMANHO INICIAL
-    this.paginator.pageSize = 10;
-    this.paginator.pageIndex = 0;
-    
-    // ADICIONAR LISTENER PARA MUDANÇAS
-    this.paginator.page.subscribe(() => {
-      // FORÇAR ATUALIZAÇÃO DA VIEW
-      this.cdr.detectChanges();
-      this.cdr.markForCheck();
-    });
+    // CONFIGURAÇÃO INICIAL DO PAGINADOR
+    this.paginator.pageSize = this.pageSize;
+    this.paginator.pageIndex = this.currentPageIndex;
+    this.paginator.length = this.totalLength;
   }
 
-  async listar(pagina: number = 1, pageSize: number = 10) {
-    this.util.aguardar(true);
-    
-    try {
-      // 🔧 BUSCAR TODAS AS PÁGINAS DO ENDPOINT PAGINADO
-      // O endpoint paginado retorna ColaboradoresVM com joins (empresa, centro custo, tipo)
-      const todosColaboradores = await this.buscarTodasPaginas();
-      
-      this.util.aguardar(false);
-      
-      // Armazenar dados originais e filtrados
-      this.dadosOriginais = [...todosColaboradores];
-      this.dadosFiltrados = [...todosColaboradores];
-      this.dataSource = new MatTableDataSource<any>(this.dadosFiltrados);
-      
-      // Configurar paginador para paginação local
-      if (this.paginator) {
-        this.paginator.pageIndex = 0;
-        this.paginator.pageSize = this.pageSize;
-        this.paginator.length = this.dadosFiltrados.length;
-        this.dataSource.paginator = this.paginator;
-      }
-      
-      // Atualizar página
-      this.totalLength = this.dadosFiltrados.length;
-      this.currentPageIndex = 0;
-      this.atualizarPagina();
-      
-      // Limpar cache de estatísticas
-      this.clearStatsCache();
-      
-      // Forçar atualização
-      this.cdr.detectChanges();
-    } catch (error) {
-      this.util.aguardar(false);
-      this.util.exibirFalhaComunicacao();
-      console.error('[COLABORADORES] Erro ao carregar:', error);
-    }
-  }
-  
-  // 🔧 MÉTODO PARA BUSCAR TODAS AS PÁGINAS (endpoint paginado retorna ColaboradoresVM com joins)
-  private async buscarTodasPaginas(): Promise<any[]> {
-    let paginaAtual = 1;
-    let todosColaboradores: any[] = [];
-    let continuarBuscando = true;
-    
-    while (continuarBuscando) {
-      try {
-        const res = await this.api.listarColaboradores("null", this.cliente, paginaAtual, this.session.token);
-        
-        if (res.status === 200 || res.status === 204) {
-          const resultados = res.data.results || [];
-          
-          if (resultados.length > 0) {
-            todosColaboradores = todosColaboradores.concat(resultados);
-            paginaAtual++;
-            
-            // Se retornou menos de 10, é a última página
-            if (resultados.length < 10) {
-              continuarBuscando = false;
-            }
-          } else {
-            // Sem mais resultados
-            continuarBuscando = false;
-          }
-        } else {
-          continuarBuscando = false;
-        }
-      } catch (error) {
-        console.error('[COLABORADORES] Erro ao buscar página', paginaAtual, error);
-        continuarBuscando = false;
-      }
-    }
-    return todosColaboradores;
+  /**
+   * Lista colaboradores usando paginação REAL no backend.
+   * Cada chamada traz apenas uma página do endpoint paginado.
+   */
+  async listar(pagina: number = 1) {
+    await this.carregarPagina(pagina, this.termoPesquisaAtual);
   }
 
   // 🎯 MÉTODO PARA ATUALIZAR DADOS DA PÁGINA CORRENTE (paginação local)
   private atualizarPagina() {
-    const inicio = this.currentPageIndex * this.pageSize;
-    const fim = inicio + this.pageSize;
-    this.dadosPagina = this.dadosFiltrados.slice(inicio, fim);
+    // Com paginação no backend, a página atual já vem pronta do servidor
+    this.dadosPagina = this.dadosFiltrados;
   }
 
   // 🎯 MÉTODO PARA TRATAR MUDANÇAS DE PÁGINA (paginação local)
   onPageChange(event: PageEvent) {
     this.currentPageIndex = event.pageIndex;
     this.pageSize = event.pageSize;
-    this.atualizarPagina();
-    this.cdr.detectChanges();
+
+    const paginaBackend = event.pageIndex + 1;
+    this.listar(paginaBackend);
   }
 
   async buscar(valor) {
     if (valor != '') {
-      this.util.aguardar(true);
-      
-      try {
-        // 🔧 BUSCAR TODAS AS PÁGINAS COM O FILTRO
-        const todosColaboradores = await this.buscarTodasPaginasComFiltro(valor);
-        
-        this.util.aguardar(false);
-        
-        // Armazenar dados originais e filtrados
-        this.dadosOriginais = [...todosColaboradores];
-        this.dadosFiltrados = [...todosColaboradores];
-        this.dataSource = new MatTableDataSource<any>(this.dadosFiltrados);
-        
-        // Configurar paginador
-        if (this.paginator) {
-          this.paginator.pageIndex = 0;
-          this.paginator.pageSize = this.pageSize;
-          this.paginator.length = this.dadosFiltrados.length;
-          this.dataSource.paginator = this.paginator;
-        }
-        
-        // Atualizar página
-        this.totalLength = this.dadosFiltrados.length;
-        this.currentPageIndex = 0;
-        this.atualizarPagina();
-        
-        // Limpar cache de estatísticas
-        this.clearStatsCache();
-        
-        // Forçar atualização
-        this.cdr.detectChanges();
-      } catch (error) {
-        this.util.aguardar(false);
-        this.util.exibirFalhaComunicacao();
-        console.error('[COLABORADORES] Erro na busca:', error);
-      }
-    }
-    else {
-      this.listar();
+      this.termoPesquisaAtual = valor;
+      await this.carregarPagina(1, valor);
+    } else {
+      this.termoPesquisaAtual = 'null';
+      await this.carregarPagina(1, 'null');
     }
   }
-  
-  // 🔧 MÉTODO PARA BUSCAR TODAS AS PÁGINAS COM FILTRO
-  private async buscarTodasPaginasComFiltro(pesquisa: string): Promise<any[]> {
-    let paginaAtual = 1;
-    let todosColaboradores: any[] = [];
-    let continuarBuscando = true;
-    
-    while (continuarBuscando) {
-      try {
-        const res = await this.api.listarColaboradores(pesquisa, this.cliente, paginaAtual, this.session.token);
-        
-        if (res.status === 200 || res.status === 204) {
-          const resultados = res.data.results || [];
-          
-          if (resultados.length > 0) {
-            todosColaboradores = todosColaboradores.concat(resultados);
-            paginaAtual++;
-            
-            // Se retornou menos de 10, é a última página
-            if (resultados.length < 10) {
-              continuarBuscando = false;
-            }
-          } else {
-            continuarBuscando = false;
-          }
-        } else {
-          continuarBuscando = false;
-        }
-      } catch (error) {
-        console.error('[COLABORADORES] Erro ao buscar página', paginaAtual, error);
-        continuarBuscando = false;
+
+  /**
+   * Carrega uma página específica de colaboradores a partir do backend.
+   * Usa o endpoint paginado `ListarColaboradores`.
+   */
+  private async carregarPagina(pagina: number = 1, pesquisa?: string): Promise<void> {
+    const termo = (pesquisa !== undefined && pesquisa !== null && pesquisa !== '')
+      ? pesquisa
+      : this.termoPesquisaAtual || 'null';
+
+    this.termoPesquisaAtual = termo;
+    this.util.aguardar(true);
+
+    try {
+      const res = await this.api.listarColaboradores(termo, this.cliente, pagina, this.session.token);
+
+      this.util.aguardar(false);
+
+      if (res.status !== 200 && res.status !== 204) {
+        this.util.exibirFalhaComunicacao();
+        return;
       }
+
+      const body = res.data || {};
+      const resultados = body.results || body.Results || [];
+      const rowCount = body.rowCount || body.RowCount || resultados.length;
+      const pageSizeFromApi = body.pageSize || body.PageSize || this.pageSize;
+      const currentPageFromApi = body.currentPage || body.CurrentPage || pagina;
+
+      // Armazenar dados da página atual
+      this.dadosOriginais = [...resultados];
+      this.dadosFiltrados = [...resultados];
+      this.atualizarPagina();
+
+      // Atualizar totais e paginação
+      this.totalLength = rowCount;
+      this.totalRegistrosBackend = rowCount;
+      this.pageSize = pageSizeFromApi;
+      this.currentPageIndex = Math.max(0, currentPageFromApi - 1);
+
+      // Atualizar paginator, se existir
+      if (this.paginator) {
+        this.paginator.pageIndex = this.currentPageIndex;
+        this.paginator.pageSize = this.pageSize;
+        this.paginator.length = this.totalLength;
+      }
+
+      // Limpar cache de estatísticas e forçar atualização
+      this.clearStatsCache();
+      this.cdr.detectChanges();
+    } catch (error) {
+      this.util.aguardar(false);
+      this.util.exibirFalhaComunicacao();
+      console.error('[COLABORADORES] Erro ao carregar página:', error);
     }
-    
-    return todosColaboradores;
   }
 
   editar(obj) {
@@ -417,8 +328,8 @@ export class ColaboradoresComponent implements OnInit, AfterViewInit {
 
   // 🎯 MÉTODOS PARA ESTATÍSTICAS DOS CARDS (OTIMIZADOS COM CACHE)
   getTotalColaboradores(): number {
-    // Sempre retorna o total da base, independente do filtro ativo
-    return this.getCachedStat('total', () => this.dadosOriginais?.length || 0);
+    // Total informado pelo backend (RowCount). Se não houver, usa quantidade em memória.
+    return this.totalRegistrosBackend || this.getCachedStat('total', () => this.dadosOriginais?.length || 0);
   }
 
   getSelecionados(): number {
