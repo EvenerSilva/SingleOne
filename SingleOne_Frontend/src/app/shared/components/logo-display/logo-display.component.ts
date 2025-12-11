@@ -22,7 +22,17 @@ export class LogoDisplayComponent implements OnInit {
   onLogoError(event: any): void {
     console.error('[LOGO-DISPLAY] ❌ Erro ao carregar imagem da logo:', event);
     console.error('[LOGO-DISPLAY] ❌ URL da logo que falhou:', this.clienteLogo);
-    // Não limpar logo em caso de erro (pode ser erro temporário)
+    console.error('[LOGO-DISPLAY] ❌ Target do erro:', event?.target);
+    
+    // Tentar adicionar timestamp se não tiver
+    if (this.clienteLogo && !this.clienteLogo.includes('?v=')) {
+      console.log('[LOGO-DISPLAY] 🔄 Tentando adicionar timestamp à URL...');
+      this.clienteLogo = `${this.clienteLogo}?v=${Date.now()}`;
+    } else {
+      // Se já tentou e falhou, limpar para mostrar placeholder
+      console.warn('[LOGO-DISPLAY] ⚠️ Logo falhou mesmo com timestamp, limpando');
+      this.clienteLogo = null;
+    }
   }
   
   onLogoLoad(): void {

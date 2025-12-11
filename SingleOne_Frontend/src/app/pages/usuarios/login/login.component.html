@@ -230,12 +230,18 @@
       <div class="logo-container">
         <!-- Logo do cliente (se disponível) ou logo padrão da SingleOne -->
         <img 
-          [src]="clienteLogo || '../../../../assets/Branding/logo.png'" 
-          [alt]="clienteLogo ? 'Logo do Cliente' : 'SingleOne'" 
-          class="logo"
-          [class.cliente-logo]="clienteLogo"
+          *ngIf="clienteLogo"
+          [src]="clienteLogo" 
+          alt="Logo do Cliente" 
+          class="logo cliente-logo"
           (error)="onLogoError($event)"
           (load)="onLogoLoad()">
+        <!-- Fallback: logo padrão da SingleOne se não houver logo do cliente -->
+        <img 
+          *ngIf="!clienteLogo"
+          src="../../../../assets/Branding/logo.png" 
+          alt="SingleOne" 
+          class="logo">
       </div>
       
       <!-- Logo da SingleOne (By SingleOne) - sempre visível -->

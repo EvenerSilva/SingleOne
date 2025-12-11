@@ -150,10 +150,19 @@ export class LoginComponent implements OnInit {
   onLogoError(event: any): void {
     console.error('[LOGIN] ❌ Erro ao carregar imagem da logo:', event);
     console.error('[LOGIN] ❌ URL da logo que falhou:', this.clienteLogo);
+    console.error('[LOGIN] ❌ Target do erro:', event?.target);
+    
     // Tentar usar logoUrl com timestamp se disponível
     if (this.clienteLogo && !this.clienteLogo.includes('?v=')) {
       console.log('[LOGIN] 🔄 Tentando adicionar timestamp à URL...');
-      this.clienteLogo = `${this.clienteLogo}?v=${Date.now()}`;
+      const newUrl = `${this.clienteLogo}?v=${Date.now()}`;
+      console.log('[LOGIN] 🔄 Nova URL:', newUrl);
+      this.clienteLogo = newUrl;
+      this.cdr.detectChanges();
+    } else {
+      // Se já tentou com timestamp e ainda falhou, limpar para mostrar fallback
+      console.warn('[LOGIN] ⚠️ Logo falhou mesmo com timestamp, usando fallback');
+      this.clienteLogo = null;
       this.cdr.detectChanges();
     }
   }
