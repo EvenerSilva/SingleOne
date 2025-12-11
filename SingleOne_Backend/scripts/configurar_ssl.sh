@@ -53,9 +53,9 @@ else
 fi
 echo ""
 
-# 3. Garantir que Nginx está configurado para HTTP primeiro
+# 3. Garantir que Nginx está configurado para HTTP primeiro (se não tiver HTTPS)
 echo "📋 [3/6] Garantindo configuração HTTP básica..."
-if [ ! -f "$NGINX_CONFIG" ] || ! grep -q "listen 80" "$NGINX_CONFIG"; then
+if [ ! -f "$NGINX_CONFIG" ] || (! grep -q "listen 80" "$NGINX_CONFIG" && ! grep -q "listen 443" "$NGINX_CONFIG"); then
     echo "   📝 Criando configuração HTTP básica..."
     cat > "$NGINX_CONFIG" << 'NGINX_HTTP_EOF'
 server {
@@ -67,6 +67,17 @@ server {
     root /opt/SingleOne/SingleOne_Frontend/dist/SingleOne;
     index index.html;
 
+    # Gzip compression
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 1024;
+    gzip_types text/plain text/css text/xml text/javascript application/x-javascript application/xml+rss application/json application/javascript;
+
+    # Security headers
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+
     location /api/ {
         proxy_pass http://127.0.0.1:5000/api/;
         proxy_http_version 1.1;
@@ -74,10 +85,25 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Connection "";
+        proxy_buffering off;
     }
 
     location / {
         try_files $uri $uri/ /index.html;
+    }
+
+    # Cache para assets estáticos
+    location ~* \.(jpg|jpeg|png|gif|ico|css|js|svg|woff|woff2|ttf|eot)$ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+
+    # Não fazer cache do index.html
+    location = /index.html {
+        add_header Cache-Control "no-cache, no-store, must-revalidate";
+        add_header Pragma "no-cache";
+        add_header Expires "0";
     }
 }
 NGINX_HTTP_EOF
@@ -96,7 +122,7 @@ NGINX_HTTP_EOF
         exit 1
     fi
 else
-    echo "   ✅ Configuração HTTP já existe"
+    echo "   ✅ Configuração já existe"
 fi
 echo ""
 
