@@ -757,17 +757,27 @@ namespace SingleOne.Negocios
                     // Contar entrega
                     if (mov.TemEntrega && !string.IsNullOrEmpty(mov.UsuarioEntrega))
                     {
-                        if (!contagemPorUsuario.ContainsKey(mov.UsuarioEntrega))
-                            contagemPorUsuario[mov.UsuarioEntrega] = 0;
-                        contagemPorUsuario[mov.UsuarioEntrega]++;
+                        // ✅ CORREÇÃO: Formatar nome com primeira letra maiúscula
+                        var nomeFormatado = string.IsNullOrWhiteSpace(mov.UsuarioEntrega) 
+                            ? mov.UsuarioEntrega 
+                            : System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(mov.UsuarioEntrega.ToLower());
+                        
+                        if (!contagemPorUsuario.ContainsKey(nomeFormatado))
+                            contagemPorUsuario[nomeFormatado] = 0;
+                        contagemPorUsuario[nomeFormatado]++;
                     }
                     
                     // Contar devolu��o
                     if (mov.TemDevolucao && !string.IsNullOrEmpty(mov.UsuarioDevolucao))
                     {
-                        if (!contagemPorUsuario.ContainsKey(mov.UsuarioDevolucao))
-                            contagemPorUsuario[mov.UsuarioDevolucao] = 0;
-                        contagemPorUsuario[mov.UsuarioDevolucao]++;
+                        // ✅ CORREÇÃO: Formatar nome com primeira letra maiúscula
+                        var nomeFormatado = string.IsNullOrWhiteSpace(mov.UsuarioDevolucao) 
+                            ? mov.UsuarioDevolucao 
+                            : System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(mov.UsuarioDevolucao.ToLower());
+                        
+                        if (!contagemPorUsuario.ContainsKey(nomeFormatado))
+                            contagemPorUsuario[nomeFormatado] = 0;
+                        contagemPorUsuario[nomeFormatado]++;
                     }
                 }
                 

@@ -11,6 +11,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 
 namespace SingleOne.Negocios
@@ -271,7 +273,7 @@ namespace SingleOne.Negocios
                 string template = System.IO.File.Exists(file) ? System.IO.File.ReadAllText(file) : string.Empty;
                 
                 // Gerar link seguro - correção específica para a barra
-                string baseUrl = _environmentApiSettings.SiteUrl ?? "http://localhost:4200";
+                string baseUrl = ObterUrlSite();
                 baseUrl = baseUrl.TrimEnd('/');
                 
                 // Garantir que a URL tenha a barra correta após a porta
@@ -465,7 +467,114 @@ namespace SingleOne.Negocios
 
         public string GetFrontendUrl()
         {
-            return _environmentApiSettings.SiteUrl ?? "http://localhost:4200";
+            return ObterUrlSite();
+        }
+
+        /// <summary>
+        /// Obtém a URL do site, tentando detectar automaticamente se não estiver configurada
+        /// </summary>
+        private string ObterUrlSite()
+        {
+            Console.WriteLine($"[OBTER_URL] ========== INÍCIO DETECÇÃO URL ==========");
+            
+            // 1. Tentar obter da variável de ambiente (prioridade máxima)
+            var envUrl = Environment.GetEnvironmentVariable("SITE_URL");
+            if (!string.IsNullOrEmpty(envUrl) && !envUrl.Contains("localhost") && !envUrl.Contains("SEU_IP"))
+            {
+                Console.WriteLine($"[OBTER_URL] ✅ Usando URL da variável de ambiente: {envUrl}");
+                return envUrl;
+            }
+            else if (!string.IsNullOrEmpty(envUrl))
+            {
+                Console.WriteLine($"[OBTER_URL] ⚠️ SITE_URL configurada mas inválida: {envUrl}");
+            }
+
+            // 2. Tentar usar a URL configurada no EnvironmentApiSettings
+            if (!string.IsNullOrEmpty(_environmentApiSettings.SiteUrl) && 
+                !_environmentApiSettings.SiteUrl.Contains("localhost") &&
+                !_environmentApiSettings.SiteUrl.Contains("SEU_IP"))
+            {
+                Console.WriteLine($"[OBTER_URL] ✅ Usando URL configurada: {_environmentApiSettings.SiteUrl}");
+                return _environmentApiSettings.SiteUrl;
+            }
+            else if (!string.IsNullOrEmpty(_environmentApiSettings.SiteUrl))
+            {
+                Console.WriteLine($"[OBTER_URL] ⚠️ SiteUrl configurada mas inválida: {_environmentApiSettings.SiteUrl}");
+            }
+
+            // 3. Tentar detectar IP do servidor automaticamente (ANTES de usar localhost)
+            string detectedIp = null;
+            try
+            {
+                var hostName = Dns.GetHostName();
+                Console.WriteLine($"[OBTER_URL] Hostname do servidor: {hostName}");
+                var addresses = Dns.GetHostAddresses(hostName);
+                Console.WriteLine($"[OBTER_URL] Endereços encontrados: {addresses.Length}");
+                
+                foreach (var addr in addresses)
+                {
+                    Console.WriteLine($"[OBTER_URL]   - {addr} (Family: {addr.AddressFamily})");
+                    // Ignorar IPv6 e localhost
+                    if (addr.AddressFamily == AddressFamily.InterNetwork && 
+                        !addr.ToString().StartsWith("127.") && 
+                        !addr.ToString().StartsWith("169.254."))
+                    {
+                        detectedIp = addr.ToString();
+                        Console.WriteLine($"[OBTER_URL] ✅ IP válido detectado: {detectedIp}");
+                        break;
+                    }
+                }
+                
+                if (!string.IsNullOrEmpty(detectedIp))
+                {
+                    var detectedUrl = $"http://{detectedIp}";
+                    Console.WriteLine($"[OBTER_URL] ⚠️ URL não configurada, usando IP detectado: {detectedUrl}");
+                    Console.WriteLine($"[OBTER_URL] ⚠️ Configure SITE_URL no systemd para usar domínio personalizado");
+                    Console.WriteLine($"[OBTER_URL] ========== FIM DETECÇÃO URL ==========");
+                    return detectedUrl;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[OBTER_URL] ❌ Erro ao detectar IP: {ex.Message}");
+            }
+
+            // 4. Tentar detectar do ASPNETCORE_URLS (se configurado)
+            var aspnetUrls = Environment.GetEnvironmentVariable("ASPNETCORE_URLS");
+            if (!string.IsNullOrEmpty(aspnetUrls))
+            {
+                Console.WriteLine($"[OBTER_URL] ASPNETCORE_URLS encontrado: {aspnetUrls}");
+                // Extrair a primeira URL (pode ter múltiplas separadas por ;)
+                var urls = aspnetUrls.Split(';');
+                foreach (var url in urls)
+                {
+                    if (!string.IsNullOrEmpty(url) && url.StartsWith("http"))
+                    {
+                        // Tentar extrair IP da URL
+                        var uri = new Uri(url);
+                        var host = uri.Host;
+                        if (host != "0.0.0.0" && host != "localhost" && host != "127.0.0.1")
+                        {
+                            var baseUrl = $"http://{host}";
+                            Console.WriteLine($"[OBTER_URL] ✅ Detectado de ASPNETCORE_URLS: {baseUrl}");
+                            Console.WriteLine($"[OBTER_URL] ========== FIM DETECÇÃO URL ==========");
+                            return baseUrl;
+                        }
+                    }
+                }
+            }
+            
+            // 5. Avisar e usar fallback (só se não detectou IP)
+            Console.WriteLine($"[OBTER_URL] ❌ ERRO: Não foi possível detectar URL do servidor!");
+            Console.WriteLine($"[OBTER_URL] Configure no /etc/systemd/system/singleone-api.service:");
+            Console.WriteLine($"[OBTER_URL] Environment=SITE_URL=http://SEU_IP_OU_DOMINIO");
+            Console.WriteLine($"[OBTER_URL] Ou execute: sudo bash /opt/SingleOne/SingleOne_Backend/scripts/configurar_site_url.sh");
+            Console.WriteLine($"[OBTER_URL] ========== FIM DETECÇÃO URL ==========");
+
+            // Último fallback - mas avisar que está errado
+            var fallback = _environmentApiSettings.SiteUrl ?? "http://localhost:4200";
+            Console.WriteLine($"[OBTER_URL] ⚠️ USANDO FALLBACK (PODE ESTAR ERRADO): {fallback}");
+            return fallback;
         }
 
         public async Task<bool> EnviarCodigoTwoFactor(string email, string codigo)
