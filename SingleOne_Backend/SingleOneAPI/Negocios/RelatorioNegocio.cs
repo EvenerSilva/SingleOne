@@ -687,20 +687,33 @@ namespace SingleOne.Negocios
 
                 // ? Lista resumida de contesta��es pendentes (inclui auto invent�rio)
                 // Mostra as 5 mais recentes para o card de A��es Pendentes
-                vm.ContestacoesPendentesLista = _contestacaoRepository
-                    .Buscar(x => x.Status == "pendente")
-                    .OrderByDescending(x => x.DataContestacao)
-                    .Take(5)
-                    .Select(x => new ContestacaoPendenteResumo
-                    {
-                        Id = x.Id,
-                        TipoContestacao = (x.TipoContestacao ?? "contestacao").Trim().ToLower().Replace("-", "_").Replace(" ", "_") == "auto_inventario" ? "auto_inventario" : "contestacao",
-                        Status = x.Status,
-                        Motivo = x.Motivo,
-                        Descricao = x.Descricao,
-                        DataContestacao = x.DataContestacao
-                    })
-                    .ToList();
+                // ✅ CORREÇÃO: Carregar dados em memória antes de fazer Select para evitar problemas com tradução SQL
+                try
+                {
+                    var contestacoesPendentes = _contestacaoRepository
+                        .Buscar(x => x.Status == "pendente")
+                        .OrderByDescending(x => x.DataContestacao)
+                        .Take(5)
+                        .ToList();
+                    
+                    vm.ContestacoesPendentesLista = contestacoesPendentes
+                        .Select(x => new ContestacaoPendenteResumo
+                        {
+                            Id = x.Id,
+                            TipoContestacao = (!string.IsNullOrEmpty(x.TipoContestacao) ? x.TipoContestacao.Trim().ToLower().Replace("-", "_").Replace(" ", "_") : "contestacao") == "auto_inventario" ? "auto_inventario" : "contestacao",
+                            Status = x.Status ?? "pendente",
+                            Motivo = x.Motivo ?? string.Empty,
+                            Descricao = x.Descricao ?? string.Empty,
+                            DataContestacao = x.DataContestacao
+                        })
+                        .ToList();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[DASHBOARD] Erro ao buscar contestações pendentes: {ex.Message}");
+                    Console.WriteLine($"[DASHBOARD] StackTrace: {ex.StackTrace}");
+                    vm.ContestacoesPendentesLista = new List<ContestacaoPendenteResumo>();
+                }
                     
                 // Recursos movimentados HOJE: entregas + devolu��es (contar opera��es separadamente)
                 var entregasHoje = (from evm in _requisicaoequipamentosvmsRepository.Query() 
