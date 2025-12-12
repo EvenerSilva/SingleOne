@@ -190,7 +190,6 @@ export class ColaboradoresComponent implements OnInit, AfterViewInit {
       ? pesquisa
       : this.termoPesquisaAtual || 'null';
 
-    // ✅ CORREÇÃO: Garantir que tipoFiltro seja passado corretamente
     let filtro: string | null = null;
     if (tipoFiltro !== undefined && tipoFiltro !== null && tipoFiltro !== 'total') {
       filtro = tipoFiltro;
@@ -200,8 +199,6 @@ export class ColaboradoresComponent implements OnInit, AfterViewInit {
 
     this.termoPesquisaAtual = termo;
     this.tipoFiltroAtual = filtro;
-    
-    console.log('[COLABORADORES] Carregando página:', { pagina, termo, filtro, tipoFiltro });
     this.util.aguardar(true);
 
     try {
@@ -476,10 +473,8 @@ export class ColaboradoresComponent implements OnInit, AfterViewInit {
 
   // 🎯 MÉTODO PARA FILTRAR POR TIPO (CARDS CLICÁVEIS)
   async filtrarPorTipo(tipo: string): Promise<void> {
-    console.log('[COLABORADORES] Filtrar por tipo:', tipo);
     this.filtroAtivo = tipo;
     
-    // ✅ CORREÇÃO: Buscar no backend com o filtro aplicado (não apenas filtrar localmente)
     if (tipo === 'total') {
       this.tipoFiltroAtual = null;
       await this.carregarPagina(1, this.termoPesquisaAtual, null);

@@ -92,9 +92,6 @@ namespace SingleOne.Negocios
 
         public PagedResult<ColaboradoresVM> ListarColaboradores(string pesquisa, int cliente, int pagina, string tipoFiltro = null)
         {
-            // ✅ LOG: Debug do filtro recebido
-            Console.WriteLine($"[COLABORADOR-NEGOCIO] ListarColaboradores - Pesquisa: '{pesquisa}', Cliente: {cliente}, Página: {pagina}, TipoFiltro: '{tipoFiltro}'");
-            
             // ✅ OTIMIZAÇÃO: Normalizar pesquisa uma vez só
             pesquisa = pesquisa?.Trim().ToLower();
             bool temPesquisa = !string.IsNullOrWhiteSpace(pesquisa) && pesquisa != "null";
@@ -103,80 +100,39 @@ namespace SingleOne.Negocios
             IQueryable<ColaboradoresVM> query = _viewRepositoryColaboradoresVM
                                 .Buscar(x => x.Cliente == cliente);
             
-            int totalAntesFiltro = query.Count();
-            Console.WriteLine($"[COLABORADOR-NEGOCIO] Total de registros antes do filtro: {totalAntesFiltro}");
-            
             // ✅ FILTRO POR TIPO: Aplicar filtros de tipo de colaborador
             if (!string.IsNullOrWhiteSpace(tipoFiltro))
             {
                 tipoFiltro = tipoFiltro.ToLower().Trim();
-                Console.WriteLine($"[COLABORADOR-NEGOCIO] Aplicando filtro: '{tipoFiltro}'");
                 
                 if (tipoFiltro == "funcionarios")
                 {
                     query = query.Where(x => x.TipoColaborador != null && x.TipoColaborador.ToUpper() == "F");
-                    Console.WriteLine($"[COLABORADOR-NEGOCIO] Filtro aplicado: Funcionários (TipoColaborador == 'F')");
                 }
                 else if (tipoFiltro == "terceiros")
                 {
                     query = query.Where(x => x.TipoColaborador != null && x.TipoColaborador.ToUpper() == "T");
-                    Console.WriteLine($"[COLABORADOR-NEGOCIO] Filtro aplicado: Terceiros (TipoColaborador == 'T')");
                 }
                 else if (tipoFiltro == "consultores")
                 {
                     query = query.Where(x => x.TipoColaborador != null && x.TipoColaborador.ToUpper() == "C");
-                    Console.WriteLine($"[COLABORADOR-NEGOCIO] Filtro aplicado: Consultores (TipoColaborador == 'C')");
                 }
                 else if (tipoFiltro == "ativos")
                 {
-                    // Ativos: situação 'A' ou sem data de demissão ou data de demissão futura
                     var hoje = DateTime.Now.Date;
                     query = query.Where(x => 
                         (x.Situacao != null && x.Situacao.ToUpper() == "A") ||
                         (x.Dtdemissao == null || x.Dtdemissao.Value.Date > hoje)
                     );
-                    Console.WriteLine($"[COLABORADOR-NEGOCIO] Filtro aplicado: Ativos (Situacao == 'A' ou Dtdemissao == null ou Dtdemissao > hoje)");
                 }
                 else if (tipoFiltro == "desligados")
                 {
-                    // ✅ CORREÇÃO: A view já calcula situacao='D' quando dtdemissao < CURRENT_DATE
-                    // A view retorna 'D' quando: dtdemissao < CURRENT_DATE ou situacao = 'D'
-                    // Então basta filtrar por Situacao == 'D', mas vamos manter fallback para segurança
                     var hoje = DateTime.Now.Date;
-                    Console.WriteLine($"[COLABORADOR-NEGOCIO] Aplicando filtro desligados - Data de hoje: {hoje:yyyy-MM-dd}");
-                    
-                    // Contar antes do filtro para debug
-                    var totalAntes = query.Count();
-                    Console.WriteLine($"[COLABORADOR-NEGOCIO] Total antes do filtro desligados: {totalAntes}");
-                    
-                    // ✅ CORREÇÃO: A view já calcula situacao='D' quando dtdemissao < CURRENT_DATE
-                    // Vamos usar apenas Situacao == 'D' já que a view faz esse cálculo
-                    query = query.Where(x => x.Situacao != null && x.Situacao.ToUpper() == "D");
-                    
-                    // Executar query para contar (materializar)
-                    var totalApos = query.Count();
-                    Console.WriteLine($"[COLABORADOR-NEGOCIO] Filtro aplicado: Desligados (Situacao == 'D')");
-                    Console.WriteLine($"[COLABORADOR-NEGOCIO] Total após filtro desligados: {totalApos}");
-                    
-                    // Debug: listar TODOS os registros desligados para verificar
-                    var todosDesligados = query.ToList();
-                    Console.WriteLine($"[COLABORADOR-NEGOCIO] Total de registros desligados encontrados: {todosDesligados.Count}");
-                    foreach (var item in todosDesligados)
-                    {
-                        Console.WriteLine($"[COLABORADOR-NEGOCIO]   - ID: {item.Id}, Nome: {item.Nome}, Situacao: '{item.Situacao}', Dtdemissao: {item.Dtdemissao?.ToString("yyyy-MM-dd") ?? "NULL"}, TipoColaborador: {item.TipoColaborador}");
-                    }
+                    query = query.Where(x => 
+                        (x.Situacao != null && x.Situacao.ToUpper() == "D") ||
+                        (x.Dtdemissao != null && x.Dtdemissao.Value.Date <= hoje)
+                    );
                 }
-                else
-                {
-                    Console.WriteLine($"[COLABORADOR-NEGOCIO] AVISO: Tipo de filtro desconhecido: '{tipoFiltro}'");
-                }
-                
-                int totalAposFiltro = query.Count();
-                Console.WriteLine($"[COLABORADOR-NEGOCIO] Total de registros após filtro: {totalAposFiltro}");
-            }
-            else
-            {
-                Console.WriteLine($"[COLABORADOR-NEGOCIO] Nenhum filtro de tipo aplicado (tipoFiltro é null ou vazio)");
             }
             
             // ✅ OTIMIZAÇÃO: Aplicar filtros de pesquisa de forma otimizada
@@ -303,8 +259,6 @@ namespace SingleOne.Negocios
             // ✅ CORREÇÃO CRÍTICA: Usar a MESMA view (ColaboradoresVM) que o filtro usa para garantir consistência
             var query = _viewRepositoryColaboradoresVM.Buscar(x => x.Cliente == cliente);
             
-            Console.WriteLine($"[ESTATISTICAS] Calculando estatísticas para cliente {cliente} usando view ColaboradoresVM");
-            
             // Calcular totais em uma única passada usando a mesma lógica do filtro
             var total = query.Count();
             
@@ -319,10 +273,12 @@ namespace SingleOne.Negocios
                 (x.Dtdemissao == null || x.Dtdemissao.Value.Date > hoje)
             );
             
-            // Desligados: mesma lógica do filtro (apenas Situacao == 'D', pois a view já calcula isso)
-            var desligados = query.Count(x => x.Situacao != null && x.Situacao.ToUpper() == "D");
-            
-            Console.WriteLine($"[ESTATISTICAS] Total: {total}, Funcionários: {funcionarios}, Terceiros: {terceiros}, Consultores: {consultores}, Ativos: {ativos}, Desligados: {desligados}");
+            // Desligados: mesma lógica do filtro
+            var hoje = dtNow.Date;
+            var desligados = query.Count(x => 
+                (x.Situacao != null && x.Situacao.ToUpper() == "D") ||
+                (x.Dtdemissao != null && x.Dtdemissao.Value.Date <= hoje)
+            );
             
             return new ColaboradorEstatisticasDTO
             {
