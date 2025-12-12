@@ -170,7 +170,7 @@ namespace SingleOne.Negocios
                     {
                         Id = lt.Id,
                         Equipamentoid = lt.Linhatelefonica,
-                        Tipoequipamento = "Linha Telef�nica",
+                        Tipoequipamento = "Linha Telefônica",
                         Fabricante = lt.LinhatelefonicaNavigation?.PlanoNavigation?.ContratoNavigation?.OperadoraNavigation?.Nome ?? "N/A",
                         Modelo = lt.LinhatelefonicaNavigation?.Numero.ToString() ?? "N/A",
                         Numeroserie = lt.LinhatelefonicaNavigation?.Numero.ToString(),
@@ -345,7 +345,7 @@ namespace SingleOne.Negocios
                     {
                         Id = lt.Id,
                         Requisicao = lt.Requisicao,
-                        Equipamento = $"Linha Telef�nica - {lt.LinhatelefonicaNavigation?.Numero}",
+                        Equipamento = $"Linha Telefônica - {lt.LinhatelefonicaNavigation?.Numero}",
                         Numeroserie = lt.LinhatelefonicaNavigation?.Numero.ToString(),
                         Patrimonio = lt.LinhatelefonicaNavigation?.PlanoNavigation?.ContratoNavigation?.OperadoraNavigation?.Nome ?? "N/A",
                         Dtentrega = lt.Dtentrega,
@@ -357,7 +357,7 @@ namespace SingleOne.Negocios
                         Equipamentostatus = status, // 4 = Entregue (Ativo), 5 = Devolvido
                         Numero = lt.LinhatelefonicaNavigation?.Numero ?? 0,
                         Linhaid = lt.Linhatelefonica,
-                        TipoAquisicao = 1 // 1 = Corporativo (n�o-BYOD)
+                        TipoAquisicao = 1 // 1 = Corporativo (não-BYOD)
                     };
                 }).ToList();
 
@@ -500,7 +500,7 @@ namespace SingleOne.Negocios
                                                              && evm.Dtprogramadaretorno.HasValue
                                                              && (evm.Equipamentostatus == 4 // Entregue
                                                                  || evm.Equipamentostatus == 7) // Requisitado (em trânsito para devolução)
-                                                             && !evm.Dtdevolucao.HasValue // Ainda n�o devolvido
+                                                             && !evm.Dtdevolucao.HasValue // Ainda não devolvido
                                                        select new Vwdevolucaoprogramadum
                                                        {
                                                            Cliente = cliente,
@@ -531,7 +531,7 @@ namespace SingleOne.Negocios
                 vm.TotalColaboradoresDesligados = idsDesligados.Count;
 
                 // Buscar equipamentos individuais de colaboradores desligados
-                // Status 4 = Entregue, e que n�o tenham data de devolu��o
+                // Status 4 = Entregue, e que não tenham data de devolução
                 var equipamentosAtivos = (from r in _requisicoesvmRepository.Query()
                                          join evm in _requisicaoequipamentosvmsRepository.Query() on r.Id equals evm.Requisicao
                                          join eq in _vwequipamentosdetalhesRepository.Query() on evm.Equipamentoid equals eq.Id
@@ -620,16 +620,16 @@ namespace SingleOne.Negocios
                 vm.TotalRecursosDesligados = (int)(vm.EquipamentosComColaboradorDesligado.Sum(x => x.Qtde ?? 0));
                 Console.WriteLine($"[DASHBOARD] Total desligados: {vm.TotalColaboradoresDesligados}; com recursos: {vm.TotalDesligadosComRecursos}; recursos somados: {vm.TotalRecursosDesligados}");
                     
-                // Buscar equipamentos por status, EXCLUINDO Linhas Telef�nicas (gest�o exclusiva no Telecom)
+                // Buscar equipamentos por status, EXCLUINDO Linhas Telefônicas (gestão exclusiva no Telecom)
                 vm.EquipamentosPorStatus = _equipamentosPorStatusRepository
                     .Buscar(x => x.Cliente == cliente && 
-                                 x.Tipoequipamento != "Linha Telef�nica" && 
+                                 x.Tipoequipamento != "Linha Telefônica" && 
                                  x.Tipoequipamento != "Linha Telefonica" &&
                                  !x.Tipoequipamento.ToLower().Contains("telefon"))
                     .ToList();
                     
-                // ?? FILTRAR APENAS REQUISI��ES DE COLABORADORES COM RECURSOS ATIVOS
-                // Buscar colaboradores que possuem recursos ativos (n�o devolvidos)
+                // Filtrar apenas requisições de colaboradores com recursos ativos
+                // Buscar colaboradores que possuem recursos ativos (não devolvidos)
                 var colaboradoresComRecursosAtivos = (from eh in _equipamentoHistoricoRepository.Query()
                                                        where eh.Equipamentostatus == 4 // Status 4 = Entregue (ATIVO)
                                                        select eh.Colaborador)
@@ -948,7 +948,7 @@ namespace SingleOne.Negocios
                 // ========== NOVO: KPI - N�O CONFORMIDADES DE ELEGIBILIDADE ==========
                 Console.WriteLine("[DASHBOARD] Calculando KPI: N�o Conformidades de Elegibilidade...");
                 
-                // Contar n�o conformidades usando a view vw_nao_conformidade_elegibilidade
+                // Contar não conformidades usando a view vw_nao_conformidade_elegibilidade
                 var sqlNaoConformidadeHoje = @"SELECT COUNT(*) FROM vw_nao_conformidade_elegibilidade WHERE cliente = @p0";
                 int naoConformidadesHoje = 0;
                 var connectionNC = _context.Database.GetDbConnection();
@@ -1008,7 +1008,7 @@ namespace SingleOne.Negocios
                     .Buscar(x => x.Cliente == cliente && x.Equipamentostatusid == 10)
                     .Count();
                     
-                // Para ontem, usar o mesmo valor (a view � din�mica e n�o tem hist�rico)
+                // Para ontem, usar o mesmo valor (a view é dinâmica e não tem histórico)
                 var recursosDescartadosOntem = recursosDescartadosHoje;
                     
                 vm.RecursosDescartados = CalcularKPI(
@@ -1027,7 +1027,7 @@ namespace SingleOne.Negocios
                     .Buscar(x => x.Cliente == cliente && (x.Equipamentostatusid == 5 || x.Equipamentostatusid == 8))
                     .Count();
                     
-                // Para ontem, usar o mesmo valor (a view � din�mica e n�o tem hist�rico)
+                // Para ontem, usar o mesmo valor (a view é dinâmica e não tem histórico)
                 var recursosPerdidosOntem = recursosPerdidosHoje;
                     
                 vm.RecursosPerdidos = CalcularKPI(
@@ -1062,7 +1062,7 @@ namespace SingleOne.Negocios
                 // ========== NOVO: KPI - CONTRATOS ==========
                 Console.WriteLine("[DASHBOARD] Calculando KPI: Contratos...");
                 
-                // Total de contratos ativos (n�o exclu�dos)
+                // Total de contratos ativos (não excluídos)
                 var totalContratos = _contratoRepository
                     .Buscar(x => x.Cliente == cliente && !x.DTExclusao.HasValue)
                     .Count();
@@ -1095,19 +1095,19 @@ namespace SingleOne.Negocios
                 // ========== NOVO: KPI - LAUDOS (SINISTROS) ==========
                 Console.WriteLine("[DASHBOARD] Calculando KPI: Laudos/Sinistros...");
                 
-                // Total de laudos ativos no sistema (n�o exclu�dos)
+                // Total de laudos ativos no sistema (não excluídos)
                 var totalLaudos = _laudoRepository
                     .Buscar(x => x.Cliente == cliente && x.Ativo)
                     .Count();
                 
-                // Laudos em an�lise (sem data de laudo = ainda n�o finalizados)
+                // Laudos em análise (sem data de laudo = ainda não finalizados)
                 var laudosEmAnaliseHoje = _laudoRepository
                     .Buscar(x => x.Cliente == cliente && x.Ativo && !x.Dtlaudo.HasValue)
                     .Count();
                 
                 var laudosEmAnaliseOntem = _laudoRepository
                     .Buscar(x => x.Cliente == cliente && x.Ativo && !x.Dtlaudo.HasValue)
-                    .Count(); // Para laudos, usamos snapshot atual pois n�o temos hist�rico temporal
+                    .Count(); // Para laudos, usamos snapshot atual pois não temos histórico temporal
                 
                 // Laudos encerrados (com data de laudo)
                 var laudosEncerradosHoje = _laudoRepository
@@ -1134,7 +1134,7 @@ namespace SingleOne.Negocios
 
                 var hojeData = TimeZoneMapper.GetDateTimeNow().Date;
 
-                // 1) Recursos associados HOJE (equipamentos entregues e n�o devolvidos + linhas sem devolu��o)
+                // 1) Recursos associados HOJE (equipamentos entregues e não devolvidos + linhas sem devolução)
                 var itensAtivosEquip = (from evm in _requisicaoequipamentosvmsRepository.Query()
                                         join r in _requisicaoRepository.Query() on evm.Requisicao equals r.Id
                                         where r.Cliente == cliente
@@ -1294,10 +1294,10 @@ namespace SingleOne.Negocios
                 vm.DistribuicaoMovimentacoes.Outros = 0;
                     
                 Console.WriteLine($"[DASHBOARD] Distribui��o: {vm.DistribuicaoMovimentacoes.Entregas} entregas, " +
-                                  $"{vm.DistribuicaoMovimentacoes.Devolucoes} devolu��es, " +
+                                  $"{vm.DistribuicaoMovimentacoes.Devolucoes} devoluções, " +
                                   $"{vm.DistribuicaoMovimentacoes.Outros} outros");
                 
-                // ========== NOVO: M�TRICAS DE REQUISI��ES (DADOS REAIS) ==========
+                // ========== NOVO: MÉTRICAS DE REQUISIÇÕES (DADOS REAIS) ==========
                 Console.WriteLine("[DASHBOARD] Calculando m�tricas de requisi��es...");
                 
                 vm.MetricasRequisicoes = new MetricasRequisicoesVM();
@@ -1306,14 +1306,14 @@ namespace SingleOne.Negocios
                 vm.MetricasRequisicoes.TotalRequisitados = (int)(vm.EquipamentosPorStatus?
                     .Sum(x => x.Requisitado) ?? 0);
                 
-                // Urgentes: requisi��es criadas nos �ltimos 3 dias ainda n�o processadas
+                // Urgentes: requisições criadas nos últimos 3 dias ainda não processadas
                 vm.MetricasRequisicoes.Urgentes = _requisicaoRepository
                     .Buscar(x => x.Cliente == cliente && 
                                  x.Dtsolicitacao.HasValue && x.Dtsolicitacao.Value >= hoje.AddDays(-3) && 
                                  (!x.Dtprocessamento.HasValue || x.Dtprocessamento.Value > hoje))
                     .Count();
                 
-                // Pendentes: requisi��es ainda n�o processadas (mais antigas que 3 dias)
+                // Pendentes: requisições ainda não processadas (mais antigas que 3 dias)
                 vm.MetricasRequisicoes.Pendentes = _requisicaoRepository
                     .Buscar(x => x.Cliente == cliente && 
                                  x.Dtsolicitacao.HasValue && x.Dtsolicitacao.Value < hoje.AddDays(-3) && 
@@ -1410,7 +1410,7 @@ namespace SingleOne.Negocios
             {
                 Id = lt.Id,
                 Equipamentoid = lt.Linhatelefonica,
-                Tipoequipamento = "Linha Telef�nica",
+                Tipoequipamento = "Linha Telefônica",
                 Fabricante = lt.LinhatelefonicaNavigation?.PlanoNavigation?.ContratoNavigation?.OperadoraNavigation?.Nome ?? "N/A",
                 Modelo = lt.LinhatelefonicaNavigation?.Numero.ToString() ?? "N/A",
                 Numeroserie = lt.LinhatelefonicaNavigation?.Numero.ToString(),
@@ -1594,7 +1594,7 @@ namespace SingleOne.Negocios
                     garantiasVM = garantiasVM.Where(x => x.StatusGarantia == filtros.StatusGarantia).ToList();
                 }
 
-                // Ordenar: primeiro por status de risco (expiradas, vence30, vence90, vence180, vigentes, n�o informado)
+                // Ordenar: primeiro por status de risco (expiradas, vence30, vence90, vence180, vigentes, não informado)
                 var ordem = new Dictionary<string, int>
                 {
                     { "expiradas", 1 },

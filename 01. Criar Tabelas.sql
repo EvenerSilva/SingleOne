@@ -834,7 +834,7 @@ CREATE TABLE IF NOT EXISTS RequisicoesItens
 (
 	Id serial not null primary key,
 	Requisicao int not null,
-	Equipamento int not null,
+	Equipamento int,
 	LinhaTelefonica int,
 	UsuarioEntrega int,
 	UsuarioDevolucao int,
