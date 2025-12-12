@@ -489,31 +489,34 @@ export class ColaboradoresComponent implements OnInit, AfterViewInit {
   }
 
   // 🎯 MÉTODO PARA FILTRAR POR TIPO (CARDS CLICÁVEIS)
-  async filtrarPorTipo(tipo: string): Promise<void> {
-    try {
-      console.log('[FRONTEND] Filtrar por tipo chamado:', tipo);
-      console.log('[FRONTEND] Estado atual:', { 
-        filtroAtivo: this.filtroAtivo, 
-        tipoFiltroAtual: this.tipoFiltroAtual,
-        termoPesquisaAtual: this.termoPesquisaAtual 
+  filtrarPorTipo(tipo: string): void {
+    console.log('[FRONTEND] ========== FILTRAR POR TIPO CHAMADO ==========');
+    console.log('[FRONTEND] Tipo recebido:', tipo);
+    console.log('[FRONTEND] Estado atual:', { 
+      filtroAtivo: this.filtroAtivo, 
+      tipoFiltroAtual: this.tipoFiltroAtual,
+      termoPesquisaAtual: this.termoPesquisaAtual,
+      cliente: this.cliente
+    });
+    
+    // Atualizar filtro ativo imediatamente para feedback visual
+    this.filtroAtivo = tipo;
+    
+    // Executar carregamento de forma assíncrona
+    if (tipo === 'total') {
+      this.tipoFiltroAtual = null;
+      console.log('[FRONTEND] Carregando total (sem filtro)');
+      this.carregarPagina(1, this.termoPesquisaAtual, null).catch(error => {
+        console.error('[FRONTEND] Erro ao carregar total:', error);
+        this.util.exibirFalhaComunicacao();
       });
-      
-      this.filtroAtivo = tipo;
-      
-      if (tipo === 'total') {
-        this.tipoFiltroAtual = null;
-        console.log('[FRONTEND] Carregando total (sem filtro)');
-        await this.carregarPagina(1, this.termoPesquisaAtual, null);
-      } else {
-        this.tipoFiltroAtual = tipo;
-        console.log('[FRONTEND] Carregando com filtro:', tipo);
-        await this.carregarPagina(1, this.termoPesquisaAtual, tipo);
-      }
-      
-      console.log('[FRONTEND] Filtro aplicado com sucesso');
-    } catch (error) {
-      console.error('[FRONTEND] Erro ao filtrar por tipo:', error);
-      this.util.exibirFalhaComunicacao();
+    } else {
+      this.tipoFiltroAtual = tipo;
+      console.log('[FRONTEND] Carregando com filtro:', tipo);
+      this.carregarPagina(1, this.termoPesquisaAtual, tipo).catch(error => {
+        console.error('[FRONTEND] Erro ao carregar com filtro:', error);
+        this.util.exibirFalhaComunicacao();
+      });
     }
   }
 
