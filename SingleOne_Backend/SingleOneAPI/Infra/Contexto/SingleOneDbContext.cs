@@ -120,26 +120,12 @@ namespace SingleOneAPI.Infra.Contexto
                 entity.Property(e => e.TipoAcesso).HasColumnName("tipo_acesso");
                 entity.Property(e => e.ColaboradorId).HasColumnName("colaborador_id");
                 entity.Property(e => e.CpfConsultado).HasColumnName("cpf_consultado");
-                entity.Property(e => e.IpAddress).HasColumnName("ip_address").HasColumnType("varchar(45)");
+                entity.Property(e => e.IpAddress).HasColumnName("ip_address").HasMaxLength(45);
                 entity.Property(e => e.UserAgent).HasColumnName("user_agent");
-                entity.Property(e => e.DadosConsultados).HasColumnName("dados_consultados");
+                entity.Property(e => e.DadosConsultados).HasColumnName("dados_consultados").HasColumnType("jsonb");
                 entity.Property(e => e.Sucesso).HasColumnName("sucesso");
                 entity.Property(e => e.MensagemErro).HasColumnName("mensagem_erro");
                 entity.Property(e => e.CreatedAt).HasColumnName("created_at");
-            });
-
-            // Configuração específica para GeolocalizacaoAssinatura
-            modelBuilder.Entity<GeolocalizacaoAssinatura>(entity =>
-            {
-                entity.ToTable("geolocalizacao_assinatura");
-                entity.HasKey(e => e.Id);
-                entity.Property(e => e.IpAddress).HasColumnName("ip_address").HasColumnType("varchar(45)");
-            });
-
-            // Configuração específica para SinalizacaoSuspeita
-            modelBuilder.Entity<SinalizacaoSuspeita>(entity =>
-            {
-                entity.Property(e => e.IpAddress).HasColumnName("ip_address").HasColumnType("varchar(45)");
             });
 
             // Configuração específica para PatrimonioContestacao

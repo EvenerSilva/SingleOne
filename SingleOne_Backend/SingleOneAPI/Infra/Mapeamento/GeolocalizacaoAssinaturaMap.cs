@@ -31,7 +31,7 @@ namespace SingleOneAPI.Infra.Mapeamento
 
             builder.Property(e => e.IpAddress)
                 .HasColumnName("ip_address")
-                .HasColumnType("inet")
+                .HasMaxLength(45)
                 .IsRequired();
 
             builder.Property(e => e.Country)

@@ -29,6 +29,7 @@ namespace SingleOne.Controllers
         private readonly IRepository<Usuario> _usuarioRepository;
         private readonly IRepository<Template> _templateRepository;
         private readonly IRepository<Empresa> _empresaRepository;
+        private readonly IRepository<Cliente> _clienteRepository;
         private readonly SendMail _mail;
 
         public ContestacoesController(
@@ -39,6 +40,7 @@ namespace SingleOne.Controllers
             IRepository<Usuario> usuarioRepository,
             IRepository<Template> templateRepository,
             IRepository<Empresa> empresaRepository,
+            IRepository<Cliente> clienteRepository,
             EnvironmentApiSettings environmentApiSettings,
             ISmtpConfigService smtpConfigService)
         {
@@ -47,6 +49,7 @@ namespace SingleOne.Controllers
             _equipamentoRepository = equipamentoRepository;
             _linhaRepository = linhaRepository;
             _usuarioRepository = usuarioRepository;
+            _clienteRepository = clienteRepository;
             _templateRepository = templateRepository;
             _empresaRepository = empresaRepository;
             _mail = new SendMail(environmentApiSettings, smtpConfigService);
@@ -750,6 +753,11 @@ namespace SingleOne.Controllers
                                     .OrderBy(e => e.Id)
                                     .FirstOrDefault();
 
+                                // Buscar URL do cliente (site_url da tabela clientes)
+                                var cliente = _clienteRepository.Buscar(c => c.Id == dto.ClienteId).FirstOrDefault();
+                                string urlSistema = cliente?.SiteUrl ?? "http://localhost:4200";
+                                Console.WriteLine($"[CONTESTACOES] URL do sistema para e-mail: {urlSistema}");
+
                                 // Substituir variáveis do template
                                 string conteudoEmail = template.Conteudo
                                     .Replace("@nomeColaborador", colaborador.Nome ?? "")
@@ -765,7 +773,8 @@ namespace SingleOne.Controllers
                                     .Replace("@telefoneEquipe", "Ramal XXXX") // TODO: Parametrizar
                                     .Replace("@usuarioQueForcou", nomeUsuarioQueForcou)
                                     .Replace("@mensagemAdicional", !string.IsNullOrWhiteSpace(dto.MensagemAdicional) ? $"<p><strong>Mensagem da equipe:</strong></p><p>{dto.MensagemAdicional}</p>" : "")
-                                    .Replace("@nomeEmpresa", empresaPrincipal?.Nome ?? "Empresa");
+                                    .Replace("@nomeEmpresa", empresaPrincipal?.Nome ?? "Empresa")
+                                    .Replace("@urlSistema", urlSistema); // ✅ Novo marcador para URL do sistema
 
                                 // Enviar e-mail
                                 await _mail.EnviarAsync(

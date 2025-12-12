@@ -317,38 +317,17 @@ namespace SingleOne.Controllers
                 // Verificar se o arquivo da logo existe fisicamente
                 if (!_fileUploadService.LogoExists(cliente.Logo))
                 {
-                    Console.WriteLine($"[BUSCAR-LOGO] ⚠️ Arquivo de logo não encontrado: {cliente.Logo}");
-                    Console.WriteLine($"[BUSCAR-LOGO] Tentando encontrar outro arquivo de logo do cliente {cliente.Id}...");
+                    Console.WriteLine($"[BUSCAR-LOGO] ❌ ERRO CRÍTICO: Arquivo de logo configurado não existe: {cliente.Logo}");
+                    Console.WriteLine($"[BUSCAR-LOGO] ❌ Cliente: {cliente.Razaosocial} (ID: {cliente.Id})");
+                    Console.WriteLine($"[BUSCAR-LOGO] ⚠️ SEGURANÇA: NÃO fazendo fallback para evitar servir logo de outro cliente!");
                     
-                    // Tentar encontrar outro arquivo de logo do mesmo cliente
-                    var logosPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "logos");
-                    if (Directory.Exists(logosPath))
-                    {
-                        var arquivosLogo = Directory.GetFiles(logosPath, $"cliente_{cliente.Id}_*.png")
-                            .Concat(Directory.GetFiles(logosPath, $"cliente_{cliente.Id}_*.jpg"))
-                            .Concat(Directory.GetFiles(logosPath, $"cliente_{cliente.Id}_*.jpeg"))
-                            .Concat(Directory.GetFiles(logosPath, $"cliente_{cliente.Id}_*.gif"))
-                            .OrderByDescending(f => System.IO.File.GetLastWriteTimeUtc(f)) // pegar o mais recente para evitar logos antigas
-                            .Select(f => Path.GetFileName(f))
-                            .FirstOrDefault();
-                        
-                        if (!string.IsNullOrEmpty(arquivosLogo))
-                        {
-                            Console.WriteLine($"[BUSCAR-LOGO] ✅ Arquivo alternativo encontrado: {arquivosLogo}");
-                            var logoPath = _fileUploadService.GetLogoPath(arquivosLogo);
-                            return Ok(new { 
-                                Logo = logoPath, 
-                                ClienteNome = cliente.Razaosocial,
-                                Mensagem = "Logo encontrada (arquivo alternativo)" 
-                            });
-                        }
-                    }
+                    // ❌ NÃO fazer fallback automático - isso pode servir logo errada!
+                    // O administrador deve fazer upload da logo correta
                     
-                    Console.WriteLine($"[BUSCAR-LOGO] ❌ Nenhum arquivo de logo válido encontrado para o cliente {cliente.Id}");
                     return Ok(new { 
                         Logo = (string)null, 
                         ClienteNome = cliente.Razaosocial,
-                        Mensagem = "Logo não encontrada" 
+                        Mensagem = $"❌ Logo configurada não encontrada: {cliente.Logo}. Faça upload novamente." 
                     });
                 }
                 

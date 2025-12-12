@@ -26,7 +26,7 @@ namespace SingleOneAPI.Infra.Mapeamento
                 .HasColumnType("jsonb");
             builder.Property(e => e.IpAddress)
                 .HasColumnName("ip_address")
-                .HasColumnType("inet");
+                .HasMaxLength(45);
             builder.Property(e => e.UserAgent).HasColumnName("user_agent");
             builder.Property(e => e.VigilanteId).HasColumnName("vigilante_id");
             builder.Property(e => e.InvestigadorId).HasColumnName("investigador_id");
