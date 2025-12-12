@@ -90,26 +90,56 @@ namespace SingleOne.Negocios
             _clienteRepository = clienteRepository;
         }
 
-        public PagedResult<ColaboradoresVM> ListarColaboradores(string pesquisa, int cliente, int pagina, int pageSize = 50)
+        public PagedResult<ColaboradoresVM> ListarColaboradores(string pesquisa, int cliente, int pagina)
         {
-            pesquisa = pesquisa?.ToLower();
+            // ✅ OTIMIZAÇÃO: Normalizar pesquisa uma vez só
+            pesquisa = pesquisa?.Trim().ToLower();
             bool temPesquisa = !string.IsNullOrWhiteSpace(pesquisa) && pesquisa != "null";
-            var colaboradores = _viewRepositoryColaboradoresVM
-                                .Buscar(x => x.Cliente == cliente && 
-                                       (!temPesquisa ||
-                                        x.Nome.ToLower().Contains(pesquisa) ||
-                                        x.Cpf.Contains(Cripto.CriptografarDescriptografar(pesquisa, true)) ||
-                                        x.Matricula.ToLower().Contains(pesquisa) ||
-                                        x.Empresa.ToLower().Contains(pesquisa) ||
-                                        x.CodigoCentroCusto.ToLower().Contains(pesquisa) ||
-                                        x.NomeCentroCusto.ToLower().Contains(pesquisa)))
-                                .OrderBy(x => x.Nome)
-                                .GetPaged(pagina, pageSize);
+            
+            // ✅ OTIMIZAÇÃO: Construir query de forma eficiente
+            IQueryable<ColaboradoresVM> query = _viewRepositoryColaboradoresVM
+                                .Buscar(x => x.Cliente == cliente);
+            
+            // ✅ OTIMIZAÇÃO: Aplicar filtros de pesquisa de forma otimizada
+            if (temPesquisa)
+            {
+                // Tentar buscar por CPF apenas se parecer um CPF (11 dígitos)
+                string cpfCriptografado = null;
+                if (pesquisa.Length == 11 && pesquisa.All(char.IsDigit))
+                {
+                    try
+                    {
+                        cpfCriptografado = Cripto.CriptografarDescriptografar(pesquisa, true);
+                    }
+                    catch
+                    {
+                        // Se falhar na criptografia, ignora busca por CPF
+                    }
+                }
+                
+                // Aplicar filtros de pesquisa
+                query = query.Where(x => 
+                    x.Nome.ToLower().Contains(pesquisa) ||
+                    x.Matricula.ToLower().Contains(pesquisa) ||
+                    x.Empresa.ToLower().Contains(pesquisa) ||
+                    x.CodigoCentroCusto.ToLower().Contains(pesquisa) ||
+                    x.NomeCentroCusto.ToLower().Contains(pesquisa) ||
+                    (cpfCriptografado != null && x.Cpf.Contains(cpfCriptografado))
+                );
+            }
+            
+            // ✅ OTIMIZAÇÃO: Usar AsNoTracking() para melhor performance (read-only)
+            query = query.AsNoTracking().OrderBy(x => x.Nome);
+            
+            var colaboradores = query.GetPaged(pagina, 10);
 
+            // ✅ OTIMIZAÇÃO: Descriptografar apenas os registros retornados (não todos)
             foreach (var col in colaboradores.Results)
             {
-                col.Email = Cripto.CriptografarDescriptografar(col.Email, false);
-                col.Cpf = Cripto.CriptografarDescriptografar(col.Cpf, false);
+                if (!string.IsNullOrEmpty(col.Email))
+                    col.Email = Cripto.CriptografarDescriptografar(col.Email, false);
+                if (!string.IsNullOrEmpty(col.Cpf))
+                    col.Cpf = Cripto.CriptografarDescriptografar(col.Cpf, false);
             }
             return colaboradores;
         }

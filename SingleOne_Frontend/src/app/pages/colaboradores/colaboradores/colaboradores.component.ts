@@ -48,7 +48,7 @@ export class ColaboradoresComponent implements OnInit, AfterViewInit {
   public dadosPagina: any[] = [];
   public indicadorFiltro: string = '';
   public totalLength = 0;
-  public pageSize = 50; // ✅ Aumentado de 10 para 50 registros por página
+  public pageSize = 10; // Mantido em 10 registros por página (otimizado para performance)
   public currentPageIndex = 0;
   public mostrarAtalhoCentral = false;
   public totalRegistrosBackend = 0; // Total de registros informado pelo backend (RowCount)
@@ -192,7 +192,7 @@ export class ColaboradoresComponent implements OnInit, AfterViewInit {
     this.util.aguardar(true);
 
     try {
-      const res = await this.api.listarColaboradores(termo, this.cliente, pagina, this.session.token, this.pageSize);
+      const res = await this.api.listarColaboradores(termo, this.cliente, pagina, this.session.token);
 
       this.util.aguardar(false);
 
