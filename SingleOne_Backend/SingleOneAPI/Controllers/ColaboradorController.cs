@@ -26,9 +26,9 @@ namespace SingleOne.Controllers
 
 
         [HttpGet("[action]/{pesquisa}/{cliente}/{pagina}", Name ="ListarColaboradores")]
-        public PagedResult<ColaboradoresVM> ListarColaboradores(string pesquisa, int cliente, int pagina)
+        public PagedResult<ColaboradoresVM> ListarColaboradores(string pesquisa, int cliente, int pagina, [FromQuery] int pageSize = 50)
         {
-            return _negocio.ListarColaboradores(pesquisa, cliente, pagina);
+            return _negocio.ListarColaboradores(pesquisa, cliente, pagina, pageSize);
         }
 
         [HttpGet("[action]/{pesquisa}/{cliente}", Name = "PesquisarColaboradores")]

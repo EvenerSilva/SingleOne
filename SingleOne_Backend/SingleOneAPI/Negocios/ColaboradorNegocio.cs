@@ -90,7 +90,7 @@ namespace SingleOne.Negocios
             _clienteRepository = clienteRepository;
         }
 
-        public PagedResult<ColaboradoresVM> ListarColaboradores(string pesquisa, int cliente, int pagina)
+        public PagedResult<ColaboradoresVM> ListarColaboradores(string pesquisa, int cliente, int pagina, int pageSize = 50)
         {
             pesquisa = pesquisa?.ToLower();
             bool temPesquisa = !string.IsNullOrWhiteSpace(pesquisa) && pesquisa != "null";
@@ -104,7 +104,7 @@ namespace SingleOne.Negocios
                                         x.CodigoCentroCusto.ToLower().Contains(pesquisa) ||
                                         x.NomeCentroCusto.ToLower().Contains(pesquisa)))
                                 .OrderBy(x => x.Nome)
-                                .GetPaged(pagina, 10);
+                                .GetPaged(pagina, pageSize);
 
             foreach (var col in colaboradores.Results)
             {

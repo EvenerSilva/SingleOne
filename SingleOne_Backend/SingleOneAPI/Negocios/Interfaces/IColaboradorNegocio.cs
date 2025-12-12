@@ -9,7 +9,7 @@ namespace SingleOneAPI.Negocios.Interfaces
 {
     public interface IColaboradorNegocio
     {
-        PagedResult<ColaboradoresVM> ListarColaboradores(string pesquisa, int cliente, int pagina);
+        PagedResult<ColaboradoresVM> ListarColaboradores(string pesquisa, int cliente, int pagina, int pageSize = 50);
         List<Colaboradore> ListarColaboradores(string pesquisa, int cliente);
         List<Colaboradore> ListarColaboradoresAtivos(string pesquisa, int cliente);
         ColaboradorCompletoDTO ObterColaboradorPorID(int id);
