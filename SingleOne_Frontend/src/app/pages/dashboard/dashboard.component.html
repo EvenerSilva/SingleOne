@@ -486,7 +486,7 @@
             </div>
 
             <!-- 📧 KPI: Agendamento de Emails (Hangfire) -->
-            <a (click)="abrirHangfire($event)" class="kpi-card hangfire-card hangfire-clickable" *ngIf="hangfireStats" matTooltip="Clique para abrir o dashboard do Hangfire">
+            <div (click)="abrirHangfire($event)" class="kpi-card hangfire-card hangfire-clickable" *ngIf="hangfireStats" matTooltip="Clique para abrir o dashboard do Hangfire" style="cursor: pointer;">
                 <div class="kpi-icon hangfire">
                     <i class="material-icons">schedule_send</i>
                 </div>

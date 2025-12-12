@@ -108,16 +108,33 @@ export class DashboardComponent implements OnInit {
       event.stopPropagation();
     }
     
-    // Construir URL completa para evitar interceptação do Angular Router
-    let url = this.hangfireDashboardUrl;
-    
-    // Se a URL começa com '/', construir URL absoluta
-    if (url.startsWith('/')) {
-      url = window.location.origin + url;
+    try {
+      // Construir URL completa para evitar interceptação do Angular Router
+      let url = this.hangfireDashboardUrl;
+      
+      // Se a URL começa com '/', construir URL absoluta
+      if (url.startsWith('/')) {
+        url = window.location.origin + url;
+      }
+      
+      // Garantir que a URL seja absoluta (com protocolo)
+      if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        url = window.location.origin + (url.startsWith('/') ? url : '/' + url);
+      }
+      
+      console.log('[DASHBOARD] Abrindo Hangfire:', url);
+      
+      // Abrir em nova aba usando window.open com URL absoluta
+      const newWindow = window.open(url, '_blank', 'noopener,noreferrer');
+      
+      if (!newWindow) {
+        console.error('[DASHBOARD] Falha ao abrir janela (popup bloqueado?)');
+        // Fallback: tentar navegar na mesma janela
+        window.location.href = url;
+      }
+    } catch (error) {
+      console.error('[DASHBOARD] Erro ao abrir Hangfire:', error);
     }
-    
-    // Abrir em nova aba usando window.open com URL absoluta
-    window.open(url, '_blank', 'noopener,noreferrer');
   }
 
   constructor(
