@@ -133,7 +133,7 @@ namespace SingleOne.Negocios
                     var hoje = DateTime.Now.Date;
                     query = query.Where(x => 
                         (x.Situacao != null && x.Situacao.ToUpper() == "A") ||
-                        (x.Dtdemissao == null || x.Dtdemissao > hoje)
+                        (x.Dtdemissao == null || x.Dtdemissao.Value.Date > hoje)
                     );
                     Console.WriteLine($"[COLABORADOR-NEGOCIO] Filtro aplicado: Ativos (Situacao == 'A' ou Dtdemissao == null ou Dtdemissao > hoje)");
                 }
@@ -141,11 +141,27 @@ namespace SingleOne.Negocios
                 {
                     // Desligados: situação 'D' ou data de demissão no passado
                     var hoje = DateTime.Now.Date;
+                    Console.WriteLine($"[COLABORADOR-NEGOCIO] Aplicando filtro desligados - Data de hoje: {hoje:yyyy-MM-dd}");
+                    
+                    // Contar antes do filtro para debug
+                    var totalAntes = query.Count();
+                    Console.WriteLine($"[COLABORADOR-NEGOCIO] Total antes do filtro desligados: {totalAntes}");
+                    
                     query = query.Where(x => 
                         (x.Situacao != null && x.Situacao.ToUpper() == "D") ||
-                        (x.Dtdemissao != null && x.Dtdemissao <= hoje)
+                        (x.Dtdemissao != null && x.Dtdemissao.Value.Date <= hoje)
                     );
+                    
+                    var totalApos = query.Count();
                     Console.WriteLine($"[COLABORADOR-NEGOCIO] Filtro aplicado: Desligados (Situacao == 'D' ou Dtdemissao <= hoje)");
+                    Console.WriteLine($"[COLABORADOR-NEGOCIO] Total após filtro desligados: {totalApos}");
+                    
+                    // Debug: listar alguns registros para verificar
+                    var amostra = query.Take(5).ToList();
+                    foreach (var item in amostra)
+                    {
+                        Console.WriteLine($"[COLABORADOR-NEGOCIO]   - ID: {item.Id}, Nome: {item.Nome}, Situacao: {item.Situacao}, Dtdemissao: {item.Dtdemissao}");
+                    }
                 }
                 else
                 {
@@ -279,17 +295,34 @@ namespace SingleOne.Negocios
         public ColaboradorEstatisticasDTO ObterEstatisticas(int cliente)
         {
             DateTime dtNow = TimeZoneMapper.GetDateTimeNow();
+            var hoje = dtNow.Date;
             
-            // ✅ OTIMIZAÇÃO: Usar uma única query com GROUP BY para calcular todas as estatísticas de uma vez
-            var query = _repository.Buscar(x => x.Cliente == cliente);
+            // ✅ CORREÇÃO CRÍTICA: Usar a MESMA view (ColaboradoresVM) que o filtro usa para garantir consistência
+            var query = _viewRepositoryColaboradoresVM.Buscar(x => x.Cliente == cliente);
             
-            // Calcular totais em uma única passada
+            Console.WriteLine($"[ESTATISTICAS] Calculando estatísticas para cliente {cliente} usando view ColaboradoresVM");
+            
+            // Calcular totais em uma única passada usando a mesma lógica do filtro
             var total = query.Count();
-            var funcionarios = query.Count(x => x.Tipocolaborador == 'F');
-            var terceiros = query.Count(x => x.Tipocolaborador == 'T');
-            var consultores = query.Count(x => x.Tipocolaborador == 'C');
-            var ativos = query.Count(x => !x.Dtdemissao.HasValue || (x.Dtdemissao.HasValue && x.Dtdemissao.Value > dtNow));
-            var desligados = query.Count(x => x.Dtdemissao.HasValue && x.Dtdemissao.Value <= dtNow);
+            
+            // Funcionários, Terceiros, Consultores: usar TipoColaborador da view
+            var funcionarios = query.Count(x => x.TipoColaborador != null && x.TipoColaborador.ToUpper() == "F");
+            var terceiros = query.Count(x => x.TipoColaborador != null && x.TipoColaborador.ToUpper() == "T");
+            var consultores = query.Count(x => x.TipoColaborador != null && x.TipoColaborador.ToUpper() == "C");
+            
+            // Ativos: mesma lógica do filtro
+            var ativos = query.Count(x => 
+                (x.Situacao != null && x.Situacao.ToUpper() == "A") ||
+                (x.Dtdemissao == null || x.Dtdemissao.Value.Date > hoje)
+            );
+            
+            // Desligados: mesma lógica do filtro (Situacao == 'D' OU Dtdemissao <= hoje)
+            var desligados = query.Count(x => 
+                (x.Situacao != null && x.Situacao.ToUpper() == "D") ||
+                (x.Dtdemissao != null && x.Dtdemissao.Value.Date <= hoje)
+            );
+            
+            Console.WriteLine($"[ESTATISTICAS] Total: {total}, Funcionários: {funcionarios}, Terceiros: {terceiros}, Consultores: {consultores}, Ativos: {ativos}, Desligados: {desligados}");
             
             return new ColaboradorEstatisticasDTO
             {
