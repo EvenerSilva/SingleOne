@@ -187,8 +187,8 @@ API_START=$(grep -n "location /api/" "$NGINX_CONFIG" | head -1 | cut -d: -f1)
 API_END=$(awk -v start="$API_START" 'NR > start && /^\s*\}/ {print NR; exit}' "$NGINX_CONFIG")
 
 if [ -n "$API_START" ] && [ -n "$API_END" ]; then
-    # Verificar se try_files está entre API_START e API_END
-    TRY_FILES_LINE=$(sed -n "${API_START},${API_END}p" "$NGINX_CONFIG" | grep -n "try_files" | head -1 | cut -d: -f1)
+    # Verificar se try_files está entre API_START e API_END (ignorando comentários)
+    TRY_FILES_LINE=$(sed -n "${API_START},${API_END}p" "$NGINX_CONFIG" | grep -v "^\s*#" | grep -n "try_files" | head -1 | cut -d: -f1)
     if [ -n "$TRY_FILES_LINE" ]; then
         echo "❌ ERRO: /api/ está usando try_files na linha $((API_START + TRY_FILES_LINE - 1)) (ERRADO!)"
         echo "   Conteúdo do bloco /api/:"
