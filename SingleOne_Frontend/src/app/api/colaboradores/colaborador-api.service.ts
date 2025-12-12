@@ -6,8 +6,8 @@ import { ConfigApiService } from '../config-api.service';
 })
 export class ColaboradorApiService extends ConfigApiService{
   public session: any = {};
-  listarColaboradores(pesquisa, cliente, pagina, token, pageSize = 50) {
-    return this.instance.get('/colaborador/ListarColaboradores/' + pesquisa + '/' + cliente + '/' + pagina + '?pageSize=' + pageSize, { headers: {
+  listarColaboradores(pesquisa, cliente, pagina, token) {
+    return this.instance.get('/colaborador/ListarColaboradores/' + pesquisa + '/' + cliente + '/' + pagina, { headers: {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer ' + token
     }}).then(res => {
