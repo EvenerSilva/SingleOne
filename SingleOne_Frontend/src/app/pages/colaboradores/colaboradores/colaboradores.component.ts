@@ -245,10 +245,13 @@ export class ColaboradoresComponent implements OnInit, AfterViewInit {
       // Limpar cache de estatísticas e forçar atualização
       this.clearStatsCache();
       this.cdr.detectChanges();
+      
+      console.log('[FRONTEND] Página carregada com sucesso. Total:', this.totalLength);
     } catch (error) {
       this.util.aguardar(false);
       this.util.exibirFalhaComunicacao();
-      console.error('[COLABORADORES] Erro ao carregar página:', error);
+      console.error('[FRONTEND] Erro ao carregar página:', error);
+      console.error('[FRONTEND] Stack trace:', error?.stack);
     }
   }
 
@@ -475,15 +478,30 @@ export class ColaboradoresComponent implements OnInit, AfterViewInit {
 
   // 🎯 MÉTODO PARA FILTRAR POR TIPO (CARDS CLICÁVEIS)
   async filtrarPorTipo(tipo: string): Promise<void> {
-    console.log('[FRONTEND] Filtrar por tipo:', tipo);
-    this.filtroAtivo = tipo;
-    
-    if (tipo === 'total') {
-      this.tipoFiltroAtual = null;
-      await this.carregarPagina(1, this.termoPesquisaAtual, null);
-    } else {
-      this.tipoFiltroAtual = tipo;
-      await this.carregarPagina(1, this.termoPesquisaAtual, tipo);
+    try {
+      console.log('[FRONTEND] Filtrar por tipo chamado:', tipo);
+      console.log('[FRONTEND] Estado atual:', { 
+        filtroAtivo: this.filtroAtivo, 
+        tipoFiltroAtual: this.tipoFiltroAtual,
+        termoPesquisaAtual: this.termoPesquisaAtual 
+      });
+      
+      this.filtroAtivo = tipo;
+      
+      if (tipo === 'total') {
+        this.tipoFiltroAtual = null;
+        console.log('[FRONTEND] Carregando total (sem filtro)');
+        await this.carregarPagina(1, this.termoPesquisaAtual, null);
+      } else {
+        this.tipoFiltroAtual = tipo;
+        console.log('[FRONTEND] Carregando com filtro:', tipo);
+        await this.carregarPagina(1, this.termoPesquisaAtual, tipo);
+      }
+      
+      console.log('[FRONTEND] Filtro aplicado com sucesso');
+    } catch (error) {
+      console.error('[FRONTEND] Erro ao filtrar por tipo:', error);
+      this.util.exibirFalhaComunicacao();
     }
   }
 

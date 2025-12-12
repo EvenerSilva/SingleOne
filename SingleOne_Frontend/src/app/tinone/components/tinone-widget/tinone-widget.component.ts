@@ -21,6 +21,7 @@ export class TinOneWidgetComponent implements OnInit, OnDestroy {
   
   private wasAuthenticatedBefore = false;
   private subscriptions: Subscription[] = [];
+  private lastConfigState: { habilitado?: boolean; chatHabilitado?: boolean; isEnabled?: boolean } | null = null;
 
   constructor(
     private configService: TinOneConfigService,
@@ -82,9 +83,17 @@ export class TinOneWidgetComponent implements OnInit, OnDestroy {
       setTimeout(() => {
         const config = this.configService.getConfig();
         if (config) {
-          this.posicao = config.posicao;
-          this.corPrimaria = config.corPrimaria;
-          this.isEnabled = config.habilitado && config.chatHabilitado;
+          this.posicao = config.posicao || 'bottom-right';
+          this.corPrimaria = config.corPrimaria || '#4a90e2';
+          this.isEnabled = !!(config.habilitado && config.chatHabilitado);
+          
+          this.lastConfigState = {
+            habilitado: config.habilitado,
+            chatHabilitado: config.chatHabilitado,
+            isEnabled: this.isEnabled
+          };
+          
+          console.log('[Oni Widget] Config carregada após autenticação:', this.lastConfigState);
         }
       }, 500);
       return;
@@ -94,16 +103,36 @@ export class TinOneWidgetComponent implements OnInit, OnDestroy {
     const config = this.configService.getConfig();
     
     if (config) {
-      this.posicao = config.posicao || 'bottom-right';
-      this.corPrimaria = config.corPrimaria || '#4a90e2';
-      this.isEnabled = !!(config.habilitado && config.chatHabilitado);
-      console.log('[Oni Widget] Config atualizada:', {
-        habilitado: config.habilitado,
-        chatHabilitado: config.chatHabilitado,
-        isEnabled: this.isEnabled
-      });
+      const newPosicao = config.posicao || 'bottom-right';
+      const newCorPrimaria = config.corPrimaria || '#4a90e2';
+      const newIsEnabled = !!(config.habilitado && config.chatHabilitado);
+      
+      // Só atualiza e loga se realmente mudou
+      const configChanged = 
+        this.posicao !== newPosicao ||
+        this.corPrimaria !== newCorPrimaria ||
+        this.isEnabled !== newIsEnabled ||
+        this.lastConfigState?.habilitado !== config.habilitado ||
+        this.lastConfigState?.chatHabilitado !== config.chatHabilitado;
+      
+      if (configChanged) {
+        this.posicao = newPosicao;
+        this.corPrimaria = newCorPrimaria;
+        this.isEnabled = newIsEnabled;
+        
+        this.lastConfigState = {
+          habilitado: config.habilitado,
+          chatHabilitado: config.chatHabilitado,
+          isEnabled: this.isEnabled
+        };
+        
+        console.log('[Oni Widget] Config atualizada:', this.lastConfigState);
+      }
     } else {
-      console.log('[Oni Widget] Config não disponível ainda');
+      if (this.lastConfigState !== null) {
+        console.log('[Oni Widget] Config não disponível ainda');
+        this.lastConfigState = null;
+      }
       this.isEnabled = false;
     }
   }
