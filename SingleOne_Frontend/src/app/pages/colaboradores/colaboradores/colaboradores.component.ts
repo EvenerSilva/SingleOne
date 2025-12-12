@@ -199,10 +199,12 @@ export class ColaboradoresComponent implements OnInit, AfterViewInit {
 
     this.termoPesquisaAtual = termo;
     this.tipoFiltroAtual = filtro;
+    console.log('[FRONTEND] Carregando página:', { pagina, termo, filtro, tipoFiltro });
     this.util.aguardar(true);
 
     try {
       const res = await this.api.listarColaboradores(termo, this.cliente, pagina, this.session.token, filtro);
+      console.log('[FRONTEND] Resposta recebida:', { status: res.status, rowCount: res.data?.rowCount || res.data?.RowCount, results: res.data?.results?.length || res.data?.Results?.length });
 
       this.util.aguardar(false);
 
@@ -473,6 +475,7 @@ export class ColaboradoresComponent implements OnInit, AfterViewInit {
 
   // 🎯 MÉTODO PARA FILTRAR POR TIPO (CARDS CLICÁVEIS)
   async filtrarPorTipo(tipo: string): Promise<void> {
+    console.log('[FRONTEND] Filtrar por tipo:', tipo);
     this.filtroAtivo = tipo;
     
     if (tipo === 'total') {

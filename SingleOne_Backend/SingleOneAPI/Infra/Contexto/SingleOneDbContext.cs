@@ -120,7 +120,7 @@ namespace SingleOneAPI.Infra.Contexto
                 entity.Property(e => e.TipoAcesso).HasColumnName("tipo_acesso");
                 entity.Property(e => e.ColaboradorId).HasColumnName("colaborador_id");
                 entity.Property(e => e.CpfConsultado).HasColumnName("cpf_consultado");
-                entity.Property(e => e.IpAddress).HasColumnName("ip_address");
+                entity.Property(e => e.IpAddress).HasColumnName("ip_address").HasColumnType("inet");
                 entity.Property(e => e.UserAgent).HasColumnName("user_agent");
                 entity.Property(e => e.DadosConsultados).HasColumnName("dados_consultados");
                 entity.Property(e => e.Sucesso).HasColumnName("sucesso");

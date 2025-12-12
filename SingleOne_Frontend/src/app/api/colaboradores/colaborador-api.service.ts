@@ -11,12 +11,15 @@ export class ColaboradorApiService extends ConfigApiService{
     if (tipoFiltro && tipoFiltro !== 'null' && tipoFiltro !== 'total') {
       url += '?tipoFiltro=' + encodeURIComponent(tipoFiltro);
     }
+    console.log('[API] Chamando URL:', url, 'tipoFiltro:', tipoFiltro);
     return this.instance.get(url, { headers: {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer ' + token
     }}).then(res => {
+      console.log('[API] Resposta:', { status: res.status, data: res.data });
       return res;
     }).catch(err => {
+      console.error('[API] Erro:', err);
       return err;
     })
   }
