@@ -1590,6 +1590,10 @@ namespace SingleOne.Negocios
             var clienteId = usuario.Cliente;
             Console.WriteLine($"[LIBERAR-ESTOQUE] Cliente ID: {clienteId}");
 
+            // ✅ CORREÇÃO: Capturar timestamp ANTES da transação para usar na query
+            var timestampInicio = TimeZoneMapper.GetDateTimeNow().AddMinutes(-1);
+            Console.WriteLine($"[LIBERAR-ESTOQUE] Timestamp de início capturado: {timestampInicio}");
+
             List<dynamic> equipamentohistoricoList = new List<dynamic>();
             int totalEquipamentosCriados = 0;
 
@@ -1727,7 +1731,7 @@ namespace SingleOne.Negocios
                     var equipamentosSalvos = _equipamentoRepository.Buscar(x => 
                         x.Cliente == clienteId && 
                         x.Notafiscal == notaCompleta.Id &&
-                        x.Dtcadastro >= DateTime.Now.AddMinutes(-5) // Últimos 5 minutos
+                        x.Dtcadastro >= timestampInicio // Timestamp capturado antes da transação
                     ).OrderByDescending(x => x.Id).Take(totalEquipamentosCriados).ToList();
                     
                     Console.WriteLine($"[LIBERAR-ESTOQUE] Encontrados {equipamentosSalvos.Count} equipamentos salvos para nota fiscal {notaCompleta.Id}");
