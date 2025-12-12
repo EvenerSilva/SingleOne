@@ -160,6 +160,18 @@ export class ColaboradoresComponent implements OnInit, AfterViewInit {
   private atualizarPagina() {
     // Com paginação no backend, a página atual já vem pronta do servidor
     this.dadosPagina = this.dadosFiltrados;
+    
+    // ✅ CORREÇÃO CRÍTICA: Atualizar o dataSource para que a tabela seja atualizada
+    if (!this.dataSource) {
+      this.dataSource = new MatTableDataSource<any>(this.dadosPagina);
+    } else {
+      this.dataSource.data = this.dadosPagina;
+    }
+    
+    // Atualizar paginator se existir
+    if (this.paginator) {
+      this.paginator.length = this.totalLength;
+    }
   }
 
   // 🎯 MÉTODO PARA TRATAR MUDANÇAS DE PÁGINA (paginação local)
