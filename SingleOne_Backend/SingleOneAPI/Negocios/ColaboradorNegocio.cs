@@ -139,7 +139,9 @@ namespace SingleOne.Negocios
                 }
                 else if (tipoFiltro == "desligados")
                 {
-                    // Desligados: situação 'D' ou data de demissão no passado
+                    // ✅ CORREÇÃO: A view já calcula situacao='D' quando dtdemissao < CURRENT_DATE
+                    // A view retorna 'D' quando: dtdemissao < CURRENT_DATE ou situacao = 'D'
+                    // Então basta filtrar por Situacao == 'D', mas vamos manter fallback para segurança
                     var hoje = DateTime.Now.Date;
                     Console.WriteLine($"[COLABORADOR-NEGOCIO] Aplicando filtro desligados - Data de hoje: {hoje:yyyy-MM-dd}");
                     
@@ -147,20 +149,21 @@ namespace SingleOne.Negocios
                     var totalAntes = query.Count();
                     Console.WriteLine($"[COLABORADOR-NEGOCIO] Total antes do filtro desligados: {totalAntes}");
                     
-                    query = query.Where(x => 
-                        (x.Situacao != null && x.Situacao.ToUpper() == "D") ||
-                        (x.Dtdemissao != null && x.Dtdemissao.Value.Date <= hoje)
-                    );
+                    // ✅ CORREÇÃO: A view já calcula situacao='D' quando dtdemissao < CURRENT_DATE
+                    // Vamos usar apenas Situacao == 'D' já que a view faz esse cálculo
+                    query = query.Where(x => x.Situacao != null && x.Situacao.ToUpper() == "D");
                     
+                    // Executar query para contar (materializar)
                     var totalApos = query.Count();
-                    Console.WriteLine($"[COLABORADOR-NEGOCIO] Filtro aplicado: Desligados (Situacao == 'D' ou Dtdemissao <= hoje)");
+                    Console.WriteLine($"[COLABORADOR-NEGOCIO] Filtro aplicado: Desligados (Situacao == 'D')");
                     Console.WriteLine($"[COLABORADOR-NEGOCIO] Total após filtro desligados: {totalApos}");
                     
-                    // Debug: listar alguns registros para verificar
-                    var amostra = query.Take(5).ToList();
-                    foreach (var item in amostra)
+                    // Debug: listar TODOS os registros desligados para verificar
+                    var todosDesligados = query.ToList();
+                    Console.WriteLine($"[COLABORADOR-NEGOCIO] Total de registros desligados encontrados: {todosDesligados.Count}");
+                    foreach (var item in todosDesligados)
                     {
-                        Console.WriteLine($"[COLABORADOR-NEGOCIO]   - ID: {item.Id}, Nome: {item.Nome}, Situacao: {item.Situacao}, Dtdemissao: {item.Dtdemissao}");
+                        Console.WriteLine($"[COLABORADOR-NEGOCIO]   - ID: {item.Id}, Nome: {item.Nome}, Situacao: '{item.Situacao}', Dtdemissao: {item.Dtdemissao?.ToString("yyyy-MM-dd") ?? "NULL"}, TipoColaborador: {item.TipoColaborador}");
                     }
                 }
                 else
@@ -316,11 +319,8 @@ namespace SingleOne.Negocios
                 (x.Dtdemissao == null || x.Dtdemissao.Value.Date > hoje)
             );
             
-            // Desligados: mesma lógica do filtro (Situacao == 'D' OU Dtdemissao <= hoje)
-            var desligados = query.Count(x => 
-                (x.Situacao != null && x.Situacao.ToUpper() == "D") ||
-                (x.Dtdemissao != null && x.Dtdemissao.Value.Date <= hoje)
-            );
+            // Desligados: mesma lógica do filtro (apenas Situacao == 'D', pois a view já calcula isso)
+            var desligados = query.Count(x => x.Situacao != null && x.Situacao.ToUpper() == "D");
             
             Console.WriteLine($"[ESTATISTICAS] Total: {total}, Funcionários: {funcionarios}, Terceiros: {terceiros}, Consultores: {consultores}, Ativos: {ativos}, Desligados: {desligados}");
             
