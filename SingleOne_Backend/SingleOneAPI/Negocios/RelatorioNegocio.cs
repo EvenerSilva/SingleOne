@@ -200,6 +200,11 @@ namespace SingleOne.Negocios
         // ? NOVO: Buscar hist�rico por n�mero de s�rie (resolve conflito de IDs entre equipamentos e linhas)
         public List<Equipamentohistoricovm> HistoricoEquipamentoPorNumeroSerie(string numeroSerie)
         {
+            Console.WriteLine($"[HISTORICO-SN] ========== INÍCIO ==========");
+            Console.WriteLine($"[HISTORICO-SN] Número de série recebido: '{numeroSerie}'");
+            
+            // Primeiro, verificar se é uma linha telefônica
+            Console.WriteLine($"[HISTORICO-SN] Verificando se é linha telefônica...");
             var linhaExiste = _requisicaoItensRepository.Buscar(x => x.Linhatelefonica.HasValue)
                 .Include(x => x.LinhatelefonicaNavigation)
                 .Where(x => x.LinhatelefonicaNavigation.Numero.ToString() == numeroSerie)
@@ -207,18 +212,29 @@ namespace SingleOne.Negocios
             
             if (linhaExiste != null)
             {
-                return BuscarHistoricoLinhaTelefonica(linhaExiste.Linhatelefonica.Value);
+                Console.WriteLine($"[HISTORICO-SN] ✅ É LINHA TELEFÔNICA! ID da linha: {linhaExiste.Linhatelefonica.Value}");
+                var historico = BuscarHistoricoLinhaTelefonica(linhaExiste.Linhatelefonica.Value);
+                Console.WriteLine($"[HISTORICO-SN] Retornando {historico.Count} registros de histórico");
+                Console.WriteLine($"[HISTORICO-SN] ========== FIM ==========");
+                return historico;
             }
             
+            Console.WriteLine($"[HISTORICO-SN] Não é linha telefônica. Verificando se é equipamento...");
             var equipamentoExiste = _equipamentoRepository
                 .Buscar(x => x.Numeroserie == numeroSerie)
                 .FirstOrDefault();
             
             if (equipamentoExiste != null)
             {
-                return BuscarHistoricoEquipamentoFisico(equipamentoExiste.Id);
+                Console.WriteLine($"[HISTORICO-SN] ✅ É EQUIPAMENTO! ID do equipamento: {equipamentoExiste.Id}");
+                var historico = BuscarHistoricoEquipamentoFisico(equipamentoExiste.Id);
+                Console.WriteLine($"[HISTORICO-SN] Retornando {historico.Count} registros de histórico");
+                Console.WriteLine($"[HISTORICO-SN] ========== FIM ==========");
+                return historico;
             }
             
+            Console.WriteLine($"[HISTORICO-SN] ❌ NÃO ENCONTRADO! Nem linha, nem equipamento");
+            Console.WriteLine($"[HISTORICO-SN] ========== FIM ==========");
             return new List<Equipamentohistoricovm>();
         }
 
