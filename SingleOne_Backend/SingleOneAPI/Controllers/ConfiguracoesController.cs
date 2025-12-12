@@ -233,38 +233,54 @@ namespace SingleOne.Controllers
                 // Primeiro, tentar encontrar cliente pelo site_url que corresponda ao domínio
                 if (!string.IsNullOrEmpty(dominio))
                 {
-                    // Normalizar domínio (remover http/https, porta, etc)
-                    var dominioNormalizado = dominio.ToLower()
-                        .Replace("http://", "")
-                        .Replace("https://", "")
-                        .Split(':')[0]
-                        .Split('/')[0]
-                        .Trim();
-                    
-                    Console.WriteLine($"[BUSCAR-LOGO] Domínio normalizado: {dominioNormalizado}");
-                    
-                    // ✅ CORREÇÃO: Buscar cliente de forma mais precisa e consistente
-                    // Primeiro, tentar match exato do domínio
-                    cliente = todosClientes.FirstOrDefault(c => 
-                        c.Ativo && 
-                        !string.IsNullOrEmpty(c.SiteUrl) &&
-                        !string.IsNullOrEmpty(c.Logo) &&
-                        c.SiteUrl.ToLower().Contains(dominioNormalizado));
-                    
-                    // Se não encontrou, tentar match reverso (domínio contém site_url)
-                    if (cliente == null)
+                    string NormalizarHost(string valor)
                     {
-                        var siteUrlNormalizado = dominioNormalizado;
-                        cliente = todosClientes.FirstOrDefault(c => 
-                            c.Ativo && 
-                            !string.IsNullOrEmpty(c.SiteUrl) &&
-                            !string.IsNullOrEmpty(c.Logo) &&
-                            dominioNormalizado.Contains(c.SiteUrl.ToLower()
+                        if (string.IsNullOrWhiteSpace(valor))
+                            return null;
+                        
+                        valor = valor.Trim().ToLower();
+                        if (!valor.StartsWith("http://") && !valor.StartsWith("https://"))
+                        {
+                            valor = "http://" + valor;
+                        }
+                        
+                        try
+                        {
+                            var uri = new Uri(valor);
+                            return uri.Host;
+                        }
+                        catch
+                        {
+                            // Fallback manual
+                            return valor
                                 .Replace("http://", "")
                                 .Replace("https://", "")
                                 .Split(':')[0]
                                 .Split('/')[0]
-                                .Trim()));
+                                .Trim();
+                        }
+                    }
+                    
+                    var dominioNormalizado = NormalizarHost(dominio);
+                    Console.WriteLine($"[BUSCAR-LOGO] Domínio normalizado (host): {dominioNormalizado}");
+                    
+                    // ✅ Buscar apenas match exato de host para evitar retornar logo de outro cliente
+                    cliente = todosClientes.FirstOrDefault(c => 
+                        c.Ativo && 
+                        !string.IsNullOrEmpty(c.SiteUrl) &&
+                        !string.IsNullOrEmpty(c.Logo) &&
+                        NormalizarHost(c.SiteUrl) == dominioNormalizado);
+                    
+                    // Se não encontrou, tentar match por sufixo (domínio termina com o host configurado),
+                    // mantendo a segurança para evitar colisões de nomes
+                    if (cliente == null)
+                    {
+                        cliente = todosClientes.FirstOrDefault(c =>
+                            c.Ativo &&
+                            !string.IsNullOrEmpty(c.SiteUrl) &&
+                            !string.IsNullOrEmpty(c.Logo) &&
+                            dominioNormalizado != null &&
+                            dominioNormalizado.EndsWith("." + NormalizarHost(c.SiteUrl)));
                     }
                     
                     if (cliente != null)
@@ -312,6 +328,7 @@ namespace SingleOne.Controllers
                             .Concat(Directory.GetFiles(logosPath, $"cliente_{cliente.Id}_*.jpg"))
                             .Concat(Directory.GetFiles(logosPath, $"cliente_{cliente.Id}_*.jpeg"))
                             .Concat(Directory.GetFiles(logosPath, $"cliente_{cliente.Id}_*.gif"))
+                            .OrderByDescending(File.GetLastWriteTimeUtc) // pegar o mais recente para evitar logos antigas
                             .Select(f => Path.GetFileName(f))
                             .FirstOrDefault();
                         
