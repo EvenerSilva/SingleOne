@@ -136,6 +136,12 @@ namespace SingleOneAPI.Infra.Contexto
                 entity.Property(e => e.IpAddress).HasColumnName("ip_address").HasColumnType("varchar(45)");
             });
 
+            // Configuração específica para SinalizacaoSuspeita
+            modelBuilder.Entity<SinalizacaoSuspeita>(entity =>
+            {
+                entity.Property(e => e.IpAddress).HasColumnName("ip_address").HasColumnType("varchar(45)");
+            });
+
             // Configuração específica para PatrimonioContestacao
             modelBuilder.Entity<PatrimonioContestacao>(entity =>
             {
