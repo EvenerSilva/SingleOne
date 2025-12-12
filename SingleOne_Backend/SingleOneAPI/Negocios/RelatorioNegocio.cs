@@ -306,7 +306,7 @@ namespace SingleOne.Negocios
                 {
                     Id = lt.Id,
                     Equipamentoid = lt.Linhatelefonica,
-                    Tipoequipamento = "Linha Telef�nica",
+                    Tipoequipamento = "Linha Telefônica",
                     Fabricante = lt.LinhatelefonicaNavigation?.PlanoNavigation?.ContratoNavigation?.OperadoraNavigation?.Nome ?? "N/A",
                     Modelo = lt.LinhatelefonicaNavigation?.Numero.ToString() ?? "N/A",
                     Numeroserie = lt.LinhatelefonicaNavigation?.Numero.ToString(),
