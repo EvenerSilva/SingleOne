@@ -128,6 +128,14 @@ namespace SingleOneAPI.Infra.Contexto
                 entity.Property(e => e.CreatedAt).HasColumnName("created_at");
             });
 
+            // Configuração específica para GeolocalizacaoAssinatura
+            modelBuilder.Entity<GeolocalizacaoAssinatura>(entity =>
+            {
+                entity.ToTable("geolocalizacao_assinatura");
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.IpAddress).HasColumnName("ip_address").HasColumnType("varchar(45)");
+            });
+
             // Configuração específica para PatrimonioContestacao
             modelBuilder.Entity<PatrimonioContestacao>(entity =>
             {
