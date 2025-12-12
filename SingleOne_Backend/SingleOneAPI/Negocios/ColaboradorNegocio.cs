@@ -104,6 +104,7 @@ namespace SingleOne.Negocios
             if (!string.IsNullOrWhiteSpace(tipoFiltro))
             {
                 tipoFiltro = tipoFiltro.ToLower().Trim();
+                Console.WriteLine($"[FILTRO] Aplicando filtro: '{tipoFiltro}'");
                 
                 if (tipoFiltro == "funcionarios")
                 {
@@ -133,6 +134,13 @@ namespace SingleOne.Negocios
                         (x.Dtdemissao != null && x.Dtdemissao.Value.Date <= hoje)
                     );
                 }
+                
+                var totalAposFiltro = query.Count();
+                Console.WriteLine($"[FILTRO] Total após aplicar filtro '{tipoFiltro}': {totalAposFiltro}");
+            }
+            else
+            {
+                Console.WriteLine($"[FILTRO] Nenhum filtro aplicado (tipoFiltro é null ou vazio)");
             }
             
             // ✅ OTIMIZAÇÃO: Aplicar filtros de pesquisa de forma otimizada
