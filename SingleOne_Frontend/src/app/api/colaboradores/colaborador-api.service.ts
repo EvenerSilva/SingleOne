@@ -8,15 +8,18 @@ export class ColaboradorApiService extends ConfigApiService{
   public session: any = {};
   listarColaboradores(pesquisa, cliente, pagina, token, tipoFiltro = null) {
     let url = '/colaborador/ListarColaboradores/' + pesquisa + '/' + cliente + '/' + pagina;
-    if (tipoFiltro) {
+    // ✅ CORREÇÃO: Sempre passar tipoFiltro se não for null/undefined/vazio
+    if (tipoFiltro && tipoFiltro !== 'null' && tipoFiltro !== 'total') {
       url += '?tipoFiltro=' + encodeURIComponent(tipoFiltro);
     }
+    console.log('[API] URL chamada:', url, 'tipoFiltro:', tipoFiltro);
     return this.instance.get(url, { headers: {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer ' + token
     }}).then(res => {
       return res;
     }).catch(err => {
+      console.error('[API] Erro ao listar colaboradores:', err);
       return err;
     })
   }

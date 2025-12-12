@@ -92,6 +92,9 @@ namespace SingleOne.Negocios
 
         public PagedResult<ColaboradoresVM> ListarColaboradores(string pesquisa, int cliente, int pagina, string tipoFiltro = null)
         {
+            // ✅ LOG: Debug do filtro recebido
+            Console.WriteLine($"[COLABORADOR-NEGOCIO] ListarColaboradores - Pesquisa: '{pesquisa}', Cliente: {cliente}, Página: {pagina}, TipoFiltro: '{tipoFiltro}'");
+            
             // ✅ OTIMIZAÇÃO: Normalizar pesquisa uma vez só
             pesquisa = pesquisa?.Trim().ToLower();
             bool temPesquisa = !string.IsNullOrWhiteSpace(pesquisa) && pesquisa != "null";
@@ -100,21 +103,29 @@ namespace SingleOne.Negocios
             IQueryable<ColaboradoresVM> query = _viewRepositoryColaboradoresVM
                                 .Buscar(x => x.Cliente == cliente);
             
+            int totalAntesFiltro = query.Count();
+            Console.WriteLine($"[COLABORADOR-NEGOCIO] Total de registros antes do filtro: {totalAntesFiltro}");
+            
             // ✅ FILTRO POR TIPO: Aplicar filtros de tipo de colaborador
             if (!string.IsNullOrWhiteSpace(tipoFiltro))
             {
-                tipoFiltro = tipoFiltro.ToLower();
+                tipoFiltro = tipoFiltro.ToLower().Trim();
+                Console.WriteLine($"[COLABORADOR-NEGOCIO] Aplicando filtro: '{tipoFiltro}'");
+                
                 if (tipoFiltro == "funcionarios")
                 {
                     query = query.Where(x => x.TipoColaborador != null && x.TipoColaborador.ToUpper() == "F");
+                    Console.WriteLine($"[COLABORADOR-NEGOCIO] Filtro aplicado: Funcionários (TipoColaborador == 'F')");
                 }
                 else if (tipoFiltro == "terceiros")
                 {
                     query = query.Where(x => x.TipoColaborador != null && x.TipoColaborador.ToUpper() == "T");
+                    Console.WriteLine($"[COLABORADOR-NEGOCIO] Filtro aplicado: Terceiros (TipoColaborador == 'T')");
                 }
                 else if (tipoFiltro == "consultores")
                 {
                     query = query.Where(x => x.TipoColaborador != null && x.TipoColaborador.ToUpper() == "C");
+                    Console.WriteLine($"[COLABORADOR-NEGOCIO] Filtro aplicado: Consultores (TipoColaborador == 'C')");
                 }
                 else if (tipoFiltro == "ativos")
                 {
@@ -124,6 +135,7 @@ namespace SingleOne.Negocios
                         (x.Situacao != null && x.Situacao.ToUpper() == "A") ||
                         (x.Dtdemissao == null || x.Dtdemissao > hoje)
                     );
+                    Console.WriteLine($"[COLABORADOR-NEGOCIO] Filtro aplicado: Ativos (Situacao == 'A' ou Dtdemissao == null ou Dtdemissao > hoje)");
                 }
                 else if (tipoFiltro == "desligados")
                 {
@@ -133,7 +145,19 @@ namespace SingleOne.Negocios
                         (x.Situacao != null && x.Situacao.ToUpper() == "D") ||
                         (x.Dtdemissao != null && x.Dtdemissao <= hoje)
                     );
+                    Console.WriteLine($"[COLABORADOR-NEGOCIO] Filtro aplicado: Desligados (Situacao == 'D' ou Dtdemissao <= hoje)");
                 }
+                else
+                {
+                    Console.WriteLine($"[COLABORADOR-NEGOCIO] AVISO: Tipo de filtro desconhecido: '{tipoFiltro}'");
+                }
+                
+                int totalAposFiltro = query.Count();
+                Console.WriteLine($"[COLABORADOR-NEGOCIO] Total de registros após filtro: {totalAposFiltro}");
+            }
+            else
+            {
+                Console.WriteLine($"[COLABORADOR-NEGOCIO] Nenhum filtro de tipo aplicado (tipoFiltro é null ou vazio)");
             }
             
             // ✅ OTIMIZAÇÃO: Aplicar filtros de pesquisa de forma otimizada
