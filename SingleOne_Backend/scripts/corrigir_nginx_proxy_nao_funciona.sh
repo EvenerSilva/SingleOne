@@ -168,25 +168,41 @@ echo ""
 
 # Verificar se está correto
 echo "📋 Verificando se a configuração está correta..."
-# Verificar apenas dentro do bloco location /api/ (até a próxima location ou })
-API_BLOCK=$(sed -n '/location \/api\/ {/,/^[[:space:]]*}/p' "$NGINX_CONFIG" | head -20)
+# Extrair apenas o bloco location /api/ usando awk para ser mais preciso
+API_BLOCK=$(awk '/location \/api\/ \{/,/^\s*\}/' "$NGINX_CONFIG")
 
 if echo "$API_BLOCK" | grep -q "proxy_pass"; then
     echo "✅ Configuração correta: /api/ usa proxy_pass"
+    HAS_PROXY_PASS=true
 else
     echo "❌ ERRO: /api/ NÃO está usando proxy_pass!"
     echo "   Conteúdo do bloco /api/:"
     echo "$API_BLOCK"
-    exit 1
+    HAS_PROXY_PASS=false
 fi
 
-if echo "$API_BLOCK" | grep -q "try_files"; then
-    echo "❌ ERRO: /api/ está usando try_files (ERRADO!)"
-    echo "   Conteúdo do bloco /api/:"
-    echo "$API_BLOCK"
-    exit 1
+# Verificar se try_files está DENTRO do bloco /api/ (não em outros blocos)
+# Contar quantas linhas tem o bloco e verificar se try_files está dentro
+API_START=$(grep -n "location /api/" "$NGINX_CONFIG" | head -1 | cut -d: -f1)
+API_END=$(awk -v start="$API_START" 'NR > start && /^\s*\}/ {print NR; exit}' "$NGINX_CONFIG")
+
+if [ -n "$API_START" ] && [ -n "$API_END" ]; then
+    # Verificar se try_files está entre API_START e API_END
+    TRY_FILES_LINE=$(sed -n "${API_START},${API_END}p" "$NGINX_CONFIG" | grep -n "try_files" | head -1 | cut -d: -f1)
+    if [ -n "$TRY_FILES_LINE" ]; then
+        echo "❌ ERRO: /api/ está usando try_files na linha $((API_START + TRY_FILES_LINE - 1)) (ERRADO!)"
+        echo "   Conteúdo do bloco /api/:"
+        sed -n "${API_START},${API_END}p" "$NGINX_CONFIG"
+        exit 1
+    else
+        echo "✅ Configuração correta: /api/ NÃO usa try_files"
+    fi
 else
-    echo "✅ Configuração correta: /api/ NÃO usa try_files"
+    echo "⚠️  Não foi possível verificar limites do bloco /api/"
+fi
+
+if [ "$HAS_PROXY_PASS" = false ]; then
+    exit 1
 fi
 echo ""
 
