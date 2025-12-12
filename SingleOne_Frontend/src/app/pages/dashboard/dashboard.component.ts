@@ -99,6 +99,17 @@ export class DashboardComponent implements OnInit {
     return environment.apiUrl.replace('/api', '/hangfire');
   }
 
+  /**
+   * Abre o dashboard do Hangfire em nova aba
+   */
+  abrirHangfire(event?: MouseEvent): void {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    window.open(this.hangfireDashboardUrl, '_blank');
+  }
+
   constructor(
     private util: UtilService, 
     private api: RelatorioApiService,
