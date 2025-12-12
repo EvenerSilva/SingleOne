@@ -107,7 +107,17 @@ export class DashboardComponent implements OnInit {
       event.preventDefault();
       event.stopPropagation();
     }
-    window.open(this.hangfireDashboardUrl, '_blank');
+    
+    // Construir URL completa para evitar interceptação do Angular Router
+    let url = this.hangfireDashboardUrl;
+    
+    // Se a URL começa com '/', construir URL absoluta
+    if (url.startsWith('/')) {
+      url = window.location.origin + url;
+    }
+    
+    // Abrir em nova aba usando window.open com URL absoluta
+    window.open(url, '_blank', 'noopener,noreferrer');
   }
 
   constructor(
