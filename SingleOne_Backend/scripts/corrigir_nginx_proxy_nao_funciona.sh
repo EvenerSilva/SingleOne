@@ -168,15 +168,22 @@ echo ""
 
 # Verificar se está correto
 echo "📋 Verificando se a configuração está correta..."
-if grep -A 2 "location /api/" "$NGINX_CONFIG" | grep -q "proxy_pass"; then
+# Verificar apenas dentro do bloco location /api/ (até a próxima location ou })
+API_BLOCK=$(sed -n '/location \/api\/ {/,/^[[:space:]]*}/p' "$NGINX_CONFIG" | head -20)
+
+if echo "$API_BLOCK" | grep -q "proxy_pass"; then
     echo "✅ Configuração correta: /api/ usa proxy_pass"
 else
     echo "❌ ERRO: /api/ NÃO está usando proxy_pass!"
+    echo "   Conteúdo do bloco /api/:"
+    echo "$API_BLOCK"
     exit 1
 fi
 
-if grep -A 2 "location /api/" "$NGINX_CONFIG" | grep -q "try_files"; then
+if echo "$API_BLOCK" | grep -q "try_files"; then
     echo "❌ ERRO: /api/ está usando try_files (ERRADO!)"
+    echo "   Conteúdo do bloco /api/:"
+    echo "$API_BLOCK"
     exit 1
 else
     echo "✅ Configuração correta: /api/ NÃO usa try_files"
