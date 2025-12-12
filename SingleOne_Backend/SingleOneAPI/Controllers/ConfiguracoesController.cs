@@ -328,7 +328,7 @@ namespace SingleOne.Controllers
                             .Concat(Directory.GetFiles(logosPath, $"cliente_{cliente.Id}_*.jpg"))
                             .Concat(Directory.GetFiles(logosPath, $"cliente_{cliente.Id}_*.jpeg"))
                             .Concat(Directory.GetFiles(logosPath, $"cliente_{cliente.Id}_*.gif"))
-                            .OrderByDescending(File.GetLastWriteTimeUtc) // pegar o mais recente para evitar logos antigas
+                            .OrderByDescending(f => System.IO.File.GetLastWriteTimeUtc(f)) // pegar o mais recente para evitar logos antigas
                             .Select(f => Path.GetFileName(f))
                             .FirstOrDefault();
                         

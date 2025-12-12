@@ -282,7 +282,6 @@ namespace SingleOne.Negocios
             );
             
             // Desligados: mesma lógica do filtro
-            var hoje = dtNow.Date;
             var desligados = query.Count(x => 
                 (x.Situacao != null && x.Situacao.ToUpper() == "D") ||
                 (x.Dtdemissao != null && x.Dtdemissao.Value.Date <= hoje)
