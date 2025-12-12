@@ -90,7 +90,7 @@ namespace SingleOne.Negocios
             _clienteRepository = clienteRepository;
         }
 
-        public PagedResult<ColaboradoresVM> ListarColaboradores(string pesquisa, int cliente, int pagina)
+        public PagedResult<ColaboradoresVM> ListarColaboradores(string pesquisa, int cliente, int pagina, string tipoFiltro = null)
         {
             // ✅ OTIMIZAÇÃO: Normalizar pesquisa uma vez só
             pesquisa = pesquisa?.Trim().ToLower();
@@ -99,6 +99,42 @@ namespace SingleOne.Negocios
             // ✅ OTIMIZAÇÃO: Construir query de forma eficiente
             IQueryable<ColaboradoresVM> query = _viewRepositoryColaboradoresVM
                                 .Buscar(x => x.Cliente == cliente);
+            
+            // ✅ FILTRO POR TIPO: Aplicar filtros de tipo de colaborador
+            if (!string.IsNullOrWhiteSpace(tipoFiltro))
+            {
+                tipoFiltro = tipoFiltro.ToLower();
+                if (tipoFiltro == "funcionarios")
+                {
+                    query = query.Where(x => x.TipoColaborador != null && x.TipoColaborador.ToUpper() == "F");
+                }
+                else if (tipoFiltro == "terceiros")
+                {
+                    query = query.Where(x => x.TipoColaborador != null && x.TipoColaborador.ToUpper() == "T");
+                }
+                else if (tipoFiltro == "consultores")
+                {
+                    query = query.Where(x => x.TipoColaborador != null && x.TipoColaborador.ToUpper() == "C");
+                }
+                else if (tipoFiltro == "ativos")
+                {
+                    // Ativos: situação 'A' ou sem data de demissão ou data de demissão futura
+                    var hoje = DateTime.Now.Date;
+                    query = query.Where(x => 
+                        (x.Situacao != null && x.Situacao.ToUpper() == "A") ||
+                        (x.Dtdemissao == null || x.Dtdemissao > hoje)
+                    );
+                }
+                else if (tipoFiltro == "desligados")
+                {
+                    // Desligados: situação 'D' ou data de demissão no passado
+                    var hoje = DateTime.Now.Date;
+                    query = query.Where(x => 
+                        (x.Situacao != null && x.Situacao.ToUpper() == "D") ||
+                        (x.Dtdemissao != null && x.Dtdemissao <= hoje)
+                    );
+                }
+            }
             
             // ✅ OTIMIZAÇÃO: Aplicar filtros de pesquisa de forma otimizada
             if (temPesquisa)

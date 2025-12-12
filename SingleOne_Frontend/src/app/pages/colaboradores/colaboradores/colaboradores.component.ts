@@ -52,7 +52,9 @@ export class ColaboradoresComponent implements OnInit, AfterViewInit {
   public currentPageIndex = 0;
   public mostrarAtalhoCentral = false;
   public totalRegistrosBackend = 0; // Total de registros informado pelo backend (RowCount)
+  public totalRegistrosFiltrados = 0; // Total de registros quando há filtro ativo
   private termoPesquisaAtual: string = 'null'; // Termo de pesquisa usado na última chamada
+  private tipoFiltroAtual: string = null; // Tipo de filtro ativo (funcionarios, terceiros, etc)
   public estatisticas: any = null; // Estatísticas do backend (total, funcionarios, terceiros, etc.)
   
   // 📤 VARIÁVEIS DO MODAL DE IMPORTAÇÃO
@@ -183,16 +185,19 @@ export class ColaboradoresComponent implements OnInit, AfterViewInit {
    * Carrega uma página específica de colaboradores a partir do backend.
    * Usa o endpoint paginado `ListarColaboradores`.
    */
-  private async carregarPagina(pagina: number = 1, pesquisa?: string): Promise<void> {
+  private async carregarPagina(pagina: number = 1, pesquisa?: string, tipoFiltro?: string): Promise<void> {
     const termo = (pesquisa !== undefined && pesquisa !== null && pesquisa !== '')
       ? pesquisa
       : this.termoPesquisaAtual || 'null';
 
+    const filtro = (tipoFiltro !== undefined) ? tipoFiltro : this.tipoFiltroAtual;
+
     this.termoPesquisaAtual = termo;
+    this.tipoFiltroAtual = filtro;
     this.util.aguardar(true);
 
     try {
-      const res = await this.api.listarColaboradores(termo, this.cliente, pagina, this.session.token);
+      const res = await this.api.listarColaboradores(termo, this.cliente, pagina, this.session.token, filtro);
 
       this.util.aguardar(false);
 
@@ -214,7 +219,12 @@ export class ColaboradoresComponent implements OnInit, AfterViewInit {
 
       // Atualizar totais e paginação
       this.totalLength = rowCount;
-      this.totalRegistrosBackend = rowCount;
+      if (filtro && filtro !== 'total') {
+        this.totalRegistrosFiltrados = rowCount;
+      } else {
+        this.totalRegistrosBackend = rowCount;
+        this.totalRegistrosFiltrados = 0;
+      }
       this.pageSize = pageSizeFromApi;
       this.currentPageIndex = Math.max(0, currentPageFromApi - 1);
 
@@ -350,8 +360,11 @@ export class ColaboradoresComponent implements OnInit, AfterViewInit {
   }
 
   getSelecionados(): number {
-    // Retorna a quantidade de colaboradores atualmente filtrados
-    return this.dataSource?.data?.length || 0;
+    // ✅ CORREÇÃO: Retorna o total de registros quando há filtro ativo, senão retorna 0
+    if (this.filtroAtivo && this.filtroAtivo !== 'total') {
+      return this.totalRegistrosFiltrados || 0;
+    }
+    return 0;
   }
 
   getFuncionarios(): number {
@@ -454,58 +467,17 @@ export class ColaboradoresComponent implements OnInit, AfterViewInit {
   }
 
   // 🎯 MÉTODO PARA FILTRAR POR TIPO (CARDS CLICÁVEIS)
-  filtrarPorTipo(tipo: string): void {
+  async filtrarPorTipo(tipo: string): Promise<void> {
     this.filtroAtivo = tipo;
     
+    // ✅ CORREÇÃO: Buscar no backend com o filtro aplicado (não apenas filtrar localmente)
     if (tipo === 'total') {
-      // Mostrar todos os colaboradores
-      this.dadosFiltrados = [...this.dadosOriginais];
-    } else if (tipo === 'funcionarios') {
-      // Filtrar apenas funcionários
-      this.dadosFiltrados = this.dadosOriginais.filter(colaborador => 
-        this.getTipoCodigo(this.obterValorCampo(colaborador, ['tipoColaborador', 'Tipocolaborador'])) === 'F'
-      );
-    } else if (tipo === 'terceiros') {
-      // Filtrar apenas terceirizados
-      this.dadosFiltrados = this.dadosOriginais.filter(colaborador => 
-        this.getTipoCodigo(this.obterValorCampo(colaborador, ['tipoColaborador', 'Tipocolaborador'])) === 'T'
-      );
-    } else if (tipo === 'consultores') {
-      // Filtrar apenas consultores
-      this.dadosFiltrados = this.dadosOriginais.filter(colaborador => 
-        this.getTipoCodigo(this.obterValorCampo(colaborador, ['tipoColaborador', 'Tipocolaborador'])) === 'C'
-      );
-    } else if (tipo === 'ativos') {
-      // Filtrar apenas ativos
-      const hoje = new Date();
-      hoje.setHours(0, 0, 0, 0);
-      this.dadosFiltrados = this.dadosOriginais.filter(colaborador => 
-        !this.isColaboradorDesligado(colaborador, hoje)
-      );
-    } else if (tipo === 'desligados') {
-      // Filtrar apenas desligados
-      const hoje = new Date();
-      hoje.setHours(0, 0, 0, 0);
-      this.dadosFiltrados = this.dadosOriginais.filter(colaborador => 
-        this.isColaboradorDesligado(colaborador, hoje)
-      );
+      this.tipoFiltroAtual = null;
+      await this.carregarPagina(1, this.termoPesquisaAtual, null);
+    } else {
+      this.tipoFiltroAtual = tipo;
+      await this.carregarPagina(1, this.termoPesquisaAtual, tipo);
     }
-    
-    // Atualizar dataSource
-    this.dataSource.data = this.dadosFiltrados;
-    
-    // Atualizar paginação
-    this.totalLength = this.dadosFiltrados.length;
-    this.currentPageIndex = 0;
-    if (this.paginator) {
-      this.paginator.pageIndex = 0;
-      this.paginator.length = this.dadosFiltrados.length;
-    }
-    this.atualizarPagina();
-    
-    // Limpar cache e forçar atualização
-    this.clearStatsCache();
-    this.cdr.detectChanges();
   }
 
   // ========== MÉTODOS DO MODAL DE IMPORTAÇÃO ==========

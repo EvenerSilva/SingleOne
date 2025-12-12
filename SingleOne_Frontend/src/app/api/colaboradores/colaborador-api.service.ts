@@ -6,8 +6,12 @@ import { ConfigApiService } from '../config-api.service';
 })
 export class ColaboradorApiService extends ConfigApiService{
   public session: any = {};
-  listarColaboradores(pesquisa, cliente, pagina, token) {
-    return this.instance.get('/colaborador/ListarColaboradores/' + pesquisa + '/' + cliente + '/' + pagina, { headers: {
+  listarColaboradores(pesquisa, cliente, pagina, token, tipoFiltro = null) {
+    let url = '/colaborador/ListarColaboradores/' + pesquisa + '/' + cliente + '/' + pagina;
+    if (tipoFiltro) {
+      url += '?tipoFiltro=' + encodeURIComponent(tipoFiltro);
+    }
+    return this.instance.get(url, { headers: {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer ' + token
     }}).then(res => {
