@@ -17,6 +17,7 @@ export class LoginComponent implements OnInit {
   public usuario:any = {};
   public frmLogin: FormGroup;
   public tentativas:number = 0;
+  private logoCarregada: boolean = false; // Evita recarregar logo desnecessariamente
   
   public showTwoFactorModal: boolean = false;
   
@@ -96,6 +97,26 @@ export class LoginComponent implements OnInit {
   }
 
   private async carregarLogoCliente() {
+    // Se já carregou com sucesso, reutilizar
+    if (this.logoCarregada && this.clienteLogo) {
+      console.log('[LOGIN] ✅ Logo já carregada, usando cache em memória:', this.clienteLogo);
+      return;
+    }
+
+    // 1) Tentar cache do localStorage (até 1h) para evitar tela sem logo
+    const logoCache = localStorage.getItem('cliente_logo_url');
+    const logoTimestamp = localStorage.getItem('cliente_logo_timestamp');
+    if (logoCache && logoTimestamp) {
+      const cacheAge = Date.now() - parseInt(logoTimestamp);
+      if (cacheAge < 3600000) { // 1 hora
+        console.log('[LOGIN] ✅ Usando logo do cache (localStorage):', logoCache);
+        this.clienteLogo = logoCache;
+        this.logoCarregada = true;
+        this.cdr.detectChanges();
+        return;
+      }
+    }
+
     try {
       console.log('[LOGIN] 🔍 Iniciando busca da logo...');
       const response = await this.configuracoesApi.buscarLogoCliente();
@@ -143,6 +164,18 @@ export class LoginComponent implements OnInit {
         
         console.log('[LOGIN] ✅ Logo definida:', logoUrl);
         this.clienteLogo = logoUrl;
+        this.logoCarregada = true;
+
+        // Salvar no cache para próximas visitas ao login
+        if (logoUrl) {
+          try {
+            localStorage.setItem('cliente_logo_url', logoUrl);
+            localStorage.setItem('cliente_logo_timestamp', Date.now().toString());
+          } catch (e) {
+            console.warn('[LOGIN] ⚠️ Não foi possível salvar logo no localStorage:', e);
+          }
+        }
+
         this.cdr.detectChanges();
       } else {
         console.warn('[LOGIN] ⚠️ Nenhuma logo encontrada na resposta');
@@ -152,6 +185,18 @@ export class LoginComponent implements OnInit {
     } catch (error) {
       console.error('[LOGIN] ❌ Erro ao carregar logo do cliente:', error);
       console.error('[LOGIN] ❌ Detalhes do erro:', error);
+      // Tentativa de último recurso: usar cache de até 24h
+      if (logoCache && logoTimestamp) {
+        const cacheAge = Date.now() - parseInt(logoTimestamp);
+        if (cacheAge < 86400000) { // 24 horas
+          console.log('[LOGIN] ✅ Usando logo do cache após erro:', logoCache);
+          this.clienteLogo = logoCache;
+          this.logoCarregada = true;
+          this.cdr.detectChanges();
+          return;
+        }
+      }
+
       this.clienteLogo = null;
     }
   }
