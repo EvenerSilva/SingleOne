@@ -388,8 +388,8 @@ namespace SingleOne.Negocios
                 
                 var novaSolicitacao = new PatrimonioContestacao
                 {
-                    ColaboradorId = dados.ColaboradorId,
-                    EquipamentoId = null, // Não tem equipamento ainda (será vinculado posteriormente)
+                    ColaboradorId = dados.ColaboradorId, // Garantir que é int (não-nullable)
+                    EquipamentoId = (int?)null, // Explicitamente nullable - Não tem equipamento ainda (será vinculado posteriormente)
                     TipoContestacao = "auto_inventario",
                     Motivo = "Auto Inventário",
                     Descricao = descricaoCompleta, // ✅ SN + Observações do colaborador
