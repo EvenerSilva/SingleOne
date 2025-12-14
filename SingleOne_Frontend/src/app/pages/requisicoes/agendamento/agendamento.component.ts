@@ -1,4 +1,4 @@
-﻿import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { RequisicaoApiService } from 'src/app/api/requisicoes/requisicao-api.service';
@@ -40,6 +40,10 @@ export class AgendamentoComponent implements OnInit {
     this.equipamento.requisicaoItemId = this.equipamento?.requisicaoItemId
       || this.equipamento?.requisicoesItemId
       || this.equipamento?.id;
+  }
+
+  limparDataDevolucao(): void {
+    this.equipamento.dtprogramadaretorno = null;
   }
 
   salvar() {

@@ -1,4 +1,4 @@
-﻿import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -251,6 +251,10 @@ ngOnInit(): void {
     this.mapaOpcoesCoResp[itemId] = [...toAdd, ...listaAtual];
   }
 
+  limparDataDevolucao(row: any): void {
+    row.dtprogramadaretorno = null;
+  }
+
   salvar() {
     const colaboradorUnico = this.requisicao.colaboradorfinalid != null ? this.requisicao.colaboradorfinalid : null;
     if (colaboradorUnico == null) {
@@ -290,6 +294,14 @@ ngOnInit(): void {
       };
 
       itensParaProcessar.forEach((x: any) => {
+        // Converter data de devolução para formato ISO sem timezone (se for Date)
+        let dtprogramadaretorno = x.dtprogramadaretorno;
+        if (dtprogramadaretorno instanceof Date) {
+          const date = dtprogramadaretorno as Date;
+          const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+          dtprogramadaretorno = local.toISOString().replace('Z', '');
+        }
+
         const item:any = {
           id: x.id,
           requisicao: x.requisicao || x.requisicaoId,
@@ -297,7 +309,7 @@ ngOnInit(): void {
           linhatelefonica: x.linhaid || x.linhatelefonica,
           usuarioentrega: this.session.usuario.id,
           observacaoentrega: x.observacaoentrega,
-          dtprogramadaretorno: x.dtprogramadaretorno
+          dtprogramadaretorno: dtprogramadaretorno
         };
 
         // Anexar co-responsáveis apenas para itens não-linha quando marcado como compartilhado

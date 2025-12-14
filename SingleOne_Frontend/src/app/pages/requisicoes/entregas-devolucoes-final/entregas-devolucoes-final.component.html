@@ -152,6 +152,17 @@
                 readonly 
                 [(ngModel)]="row.dtprogramadaretorno"
                 placeholder="Selecione a data">
+              <button 
+                mat-icon-button 
+                matSuffix 
+                type="button"
+                *ngIf="row.dtprogramadaretorno"
+                (click)="limparDataDevolucao(row)"
+                class="clear-date-button"
+                matTooltip="Limpar data"
+                aria-label="Limpar data">
+                <mat-icon>close</mat-icon>
+              </button>
               <mat-datepicker-toggle matSuffix [for]="dpdevprogramada"></mat-datepicker-toggle>
               <mat-datepicker #dpdevprogramada disabled="false"></mat-datepicker>
             </mat-form-field>

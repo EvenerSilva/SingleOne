@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using SingleOne.Enumeradores;
@@ -2296,7 +2296,15 @@ namespace SingleOne.Negocios
                 {
                     var item = _requisicaoItensRepository.ObterPorId(riDto.Id);
                     item.Observacaoentrega = riDto.Observacaoentrega;
-                    item.Dtprogramadaretorno = riDto.Dtprogramadaretorno;
+                    if (riDto.Dtprogramadaretorno.HasValue)
+                    {
+                        var data = riDto.Dtprogramadaretorno.Value;
+                        item.Dtprogramadaretorno = DateTime.SpecifyKind(data, DateTimeKind.Unspecified);
+                    }
+                    else
+                    {
+                        item.Dtprogramadaretorno = null;
+                    }
                     item.Usuarioentrega = riDto.Usuarioentrega;
                     item.Dtentrega = TimeZoneMapper.GetDateTimeNow();
                     _requisicaoItensRepository.Atualizar(item);

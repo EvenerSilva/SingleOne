@@ -24,6 +24,17 @@
                [(ngModel)]="equipamento.dtprogramadaretorno"
                placeholder="DD/MM/AAAA"
                readonly>
+        <button 
+          mat-icon-button 
+          matSuffix 
+          type="button"
+          *ngIf="equipamento.dtprogramadaretorno"
+          (click)="limparDataDevolucao()"
+          class="clear-date-button"
+          matTooltip="Limpar data"
+          aria-label="Limpar data">
+          <mat-icon>close</mat-icon>
+        </button>
         <mat-datepicker-toggle matSuffix [for]="dpnovadata">
           <mat-icon matDatepickerToggleIcon>calendar_today</mat-icon>
         </mat-datepicker-toggle>
