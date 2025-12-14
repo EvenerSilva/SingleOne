@@ -15,7 +15,7 @@ namespace SingleOneAPI.Models
         public int ColaboradorId { get; set; }
         
         [Column("equipamento_id")]
-        public int EquipamentoId { get; set; }
+        public int? EquipamentoId { get; set; }
         
         public string Motivo { get; set; } = string.Empty;
         public string Descricao { get; set; } = string.Empty;
