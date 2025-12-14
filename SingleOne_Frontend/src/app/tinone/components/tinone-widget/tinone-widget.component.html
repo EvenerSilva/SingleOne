@@ -1,4 +1,5 @@
-<div *ngIf="isEnabled" class="tinone-widget-container" [ngClass]="getPositionClass()">
+<!-- ✅ Oni só aparece se estiver habilitado E NÃO for rota pública -->
+<div *ngIf="isEnabled && !isRotaPublica" class="tinone-widget-container" [ngClass]="getPositionClass()">
   <!-- Janela de Chat (se aberta) -->
   <app-tinone-chat 
     *ngIf="isChatOpen" 
