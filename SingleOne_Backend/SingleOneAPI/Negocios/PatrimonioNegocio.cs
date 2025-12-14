@@ -389,7 +389,7 @@ namespace SingleOne.Negocios
                 var novaSolicitacao = new PatrimonioContestacao
                 {
                     ColaboradorId = dados.ColaboradorId,
-                    EquipamentoId = null, // Não tem equipamento ainda (será vinculado posteriormente)
+                    EquipamentoId = (int?)null, // Não tem equipamento ainda (será vinculado posteriormente)
                     TipoContestacao = "auto_inventario",
                     Motivo = "Auto Inventário",
                     Descricao = descricaoCompleta, // ✅ SN + Observações do colaborador
