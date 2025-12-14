@@ -135,7 +135,7 @@ namespace SingleOneAPI.Infra.Contexto
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Id).HasColumnName("id");
                 entity.Property(e => e.ColaboradorId).HasColumnName("colaborador_id");
-                entity.Property(e => e.EquipamentoId).HasColumnName("equipamento_id");
+                entity.Property(e => e.EquipamentoId).HasColumnName("equipamento_id").IsRequired(false);
                 entity.Property(e => e.Motivo).HasColumnName("motivo");
                 entity.Property(e => e.Descricao).HasColumnName("descricao");
                 entity.Property(e => e.Status).HasColumnName("status");
