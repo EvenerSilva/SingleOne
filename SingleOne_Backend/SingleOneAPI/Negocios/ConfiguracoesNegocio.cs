@@ -287,7 +287,7 @@ namespace SingleOne.Negocios
                         var totalFiliais = _filialRepository.Buscar(f => f.EmpresaId == empresa.Id && f.Ativo == true).Count();
                         empresa.TotalFiliais = totalFiliais;
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                         empresa.TotalFiliais = 0;
                     }
@@ -297,6 +297,7 @@ namespace SingleOne.Negocios
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"[CONFIGURACOES] Erro ao listar empresas: {ex.Message}");
                 throw;
             }
         }
