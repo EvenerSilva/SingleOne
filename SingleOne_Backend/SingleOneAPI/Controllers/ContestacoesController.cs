@@ -378,14 +378,19 @@ namespace SingleOne.Controllers
             }
         }
 
-        private string ObterNomeEquipamento(int equipamentoId)
+        private string ObterNomeEquipamento(int? equipamentoId)
         {
             try
             {
+                if (equipamentoId == null)
+                {
+                    return "N/A";
+                }
+
                 // Primeiro tenta buscar como equipamento
                 var equipamento = _equipamentoRepository
                     .Include(e => e.TipoequipamentoNavigation)
-                    .Where(x => x.Id == equipamentoId)
+                    .Where(x => x.Id == equipamentoId.Value)
                     .FirstOrDefault();
                 
                 if (equipamento != null)
@@ -409,7 +414,7 @@ namespace SingleOne.Controllers
                 // Se não encontrou como equipamento, tenta buscar na tabela de linhas telefônicas
                 var linha = _linhaRepository
                     .Include(l => l.PlanoNavigation)
-                    .Where(x => x.Id == equipamentoId)
+                    .Where(x => x.Id == equipamentoId.Value)
                     .FirstOrDefault();
                 
                 if (linha != null)
@@ -426,14 +431,19 @@ namespace SingleOne.Controllers
             }
         }
 
-        private string ObterNumeroSerieEquipamento(int equipamentoId)
+        private string ObterNumeroSerieEquipamento(int? equipamentoId)
         {
             try
             {
+                if (equipamentoId == null)
+                {
+                    return "N/A";
+                }
+
                 // Primeiro tenta buscar como equipamento
                 var equipamento = _equipamentoRepository
                     .Include(e => e.TipoequipamentoNavigation)
-                    .Where(x => x.Id == equipamentoId)
+                    .Where(x => x.Id == equipamentoId.Value)
                     .FirstOrDefault();
                 
                 if (equipamento != null)
@@ -467,7 +477,7 @@ namespace SingleOne.Controllers
                 }
 
                 // Se não encontrou como equipamento, tenta buscar na tabela de linhas telefônicas diretamente
-                var linhaDireta = _linhaRepository.Buscar(x => x.Id == equipamentoId).FirstOrDefault();
+                var linhaDireta = _linhaRepository.Buscar(x => x.Id == equipamentoId.Value).FirstOrDefault();
                 if (linhaDireta != null)
                 {
                     return !string.IsNullOrWhiteSpace(linhaDireta.Iccid) ? linhaDireta.Iccid : "N/A";
