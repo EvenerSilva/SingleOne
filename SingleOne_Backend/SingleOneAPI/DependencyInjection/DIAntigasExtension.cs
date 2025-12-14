@@ -175,6 +175,7 @@ namespace SingleOneAPI.DependencyInjection
                     provider.GetRequiredService<EnvironmentApiSettings>(),
                     provider.GetRequiredService<IRepository<Usuario>>(),
                     provider.GetRequiredService<IRepository<Parametro>>(),
+                    provider.GetRequiredService<IRepository<Cliente>>(),
                     provider.GetRequiredService<ISmtpConfigService>()
                 ));
             

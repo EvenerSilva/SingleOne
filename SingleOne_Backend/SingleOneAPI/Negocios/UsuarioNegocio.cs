@@ -23,15 +23,18 @@ namespace SingleOne.Negocios
         private readonly EnvironmentApiSettings _environmentApiSettings;
         private readonly IRepository<Usuario> _usuarioRepository;
         private readonly IRepository<Parametro> _parametroRepository;
+        private readonly IRepository<Cliente> _clienteRepository;
         private readonly ISmtpConfigService _smtpConfigService;
         public UsuarioNegocio(EnvironmentApiSettings environmentApiSettings, 
                              IRepository<Usuario> usuarioRepository,
                              IRepository<Parametro> parametroRepository,
+                             IRepository<Cliente> clienteRepository,
                              ISmtpConfigService smtpConfigService)
         {
             this.mail = new SendMail(environmentApiSettings, smtpConfigService);
             _usuarioRepository = usuarioRepository;
             _parametroRepository = parametroRepository;
+            _clienteRepository = clienteRepository;
             _environmentApiSettings = environmentApiSettings;
             _smtpConfigService = smtpConfigService;
         }
@@ -272,8 +275,9 @@ namespace SingleOne.Negocios
                 var file = Path.Combine(Directory.GetCurrentDirectory(), "Documentos", "recuperarPalavraCriptografada.html");
                 string template = System.IO.File.Exists(file) ? System.IO.File.ReadAllText(file) : string.Empty;
                 
-                // Gerar link seguro - correção específica para a barra
-                string baseUrl = ObterUrlSite();
+                // Buscar URL do cliente (site_url da tabela clientes)
+                var cliente = _clienteRepository.Buscar(c => c.Id == usr.Cliente).FirstOrDefault();
+                string baseUrl = cliente?.SiteUrl ?? ObterUrlSite();
                 baseUrl = baseUrl.TrimEnd('/');
                 
                 // Garantir que a URL tenha a barra correta após a porta
@@ -283,6 +287,7 @@ namespace SingleOne.Negocios
                 }
                 
                 string secureLink = baseUrl.TrimEnd('/') + "/validar-token/" + usr.Palavracriptografada;
+                Console.WriteLine($"[RECUPERACAO-SENHA] URL do sistema para e-mail: {baseUrl}");
                 
                 
                 template = template.Replace("@nome", usr.Nome)
