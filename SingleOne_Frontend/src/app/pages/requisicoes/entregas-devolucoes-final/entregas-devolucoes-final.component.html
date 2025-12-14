@@ -156,8 +156,8 @@
                 mat-icon-button 
                 matSuffix 
                 type="button"
-                *ngIf="row.dtprogramadaretorno"
-                (click)="limparDataDevolucao(row)"
+                *ngIf="temDataDevolucao(row)"
+                (click)="limparDataDevolucao(row); $event.stopPropagation()"
                 class="clear-date-button"
                 matTooltip="Limpar data"
                 aria-label="Limpar data">

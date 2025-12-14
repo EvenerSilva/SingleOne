@@ -251,8 +251,28 @@ ngOnInit(): void {
     this.mapaOpcoesCoResp[itemId] = [...toAdd, ...listaAtual];
   }
 
+  temDataDevolucao(row: any): boolean {
+    if (!row) return false;
+    const data = row.dtprogramadaretorno;
+    if (data === null || data === undefined || data === '') return false;
+    // Se for uma string vazia ou apenas espaços
+    if (typeof data === 'string' && data.trim() === '') return false;
+    // Se for uma data válida
+    if (data instanceof Date) return true;
+    // Se for uma string de data válida
+    if (typeof data === 'string' && data.length > 0) {
+      const date = new Date(data);
+      return !isNaN(date.getTime());
+    }
+    return false;
+  }
+
   limparDataDevolucao(row: any): void {
     row.dtprogramadaretorno = null;
+    // Forçar detecção de mudanças se necessário
+    if (this.dataSource) {
+      this.dataSource.data = [...this.dataSource.data];
+    }
   }
 
   salvar() {
