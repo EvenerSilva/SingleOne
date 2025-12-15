@@ -257,21 +257,13 @@ server {
 EOF
 
 if [[ "${USE_SSL}" == "true" ]]; then
+  # Se USE_SSL=true, configurar redirecionamento HTTP -> HTTPS
+  # O Certbot vai adicionar o bloco SSL automaticamente depois
   cat >> "${NGINX_CONF_PATH}" <<'EOF'
-    return 301 https://$server_name$request_uri;
-}
-
-server {
-    listen 443 ssl http2 default_server;
-    listen [::]:443 ssl http2 default_server;
-    server_name ${SERVER_NAME_VALUE} _;
-
-    # Ajustar caminhos dos certificados conforme Let's Encrypt
-    ssl_certificate /etc/letsencrypt/live/${SERVER_NAME_VALUE}/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/${SERVER_NAME_VALUE}/privkey.pem;
-    ssl_protocols TLSv1.2 TLSv1.3;
-    ssl_ciphers HIGH:!aNULL:!MD5;
+    # Redirecionamento para HTTPS será configurado pelo Certbot
+    # return 301 https://$server_name$request_uri;
 EOF
+  echo "   ⚠️  USE_SSL=true: Execute 'configurar_ssl_letsencrypt.sh' após a instalação para configurar SSL"
 else
   cat >> "${NGINX_CONF_PATH}" <<'EOF'
 
