@@ -88,8 +88,12 @@ echo
 echo ">>> [4/5] Atualizando configuração Nginx..."
 # Verificar se o domínio já está no server_name
 if ! grep -q "server_name.*${SITE_DOMAIN}" "${NGINX_CONF}"; then
-  # Adicionar domínio ao server_name (manter IP também)
-  sed -i "s/server_name.*;/server_name ${SITE_DOMAIN} _;/" "${NGINX_CONF}"
+  # Adicionar domínio ao server_name (manter IP também se existir)
+  if grep -q "server_name.*173.249.37.16\|server_name.*_" "${NGINX_CONF}"; then
+    sed -i "s/server_name.*;/server_name ${SITE_DOMAIN} 173.249.37.16 _;/" "${NGINX_CONF}"
+  else
+    sed -i "s/server_name.*;/server_name ${SITE_DOMAIN} _;/" "${NGINX_CONF}"
+  fi
   echo "   ✅ Domínio adicionado ao server_name"
 else
   echo "   ✅ Domínio já está no server_name"
@@ -116,6 +120,21 @@ certbot --nginx -d "${SITE_DOMAIN}" --non-interactive --agree-tos --email "admin
 
 if [[ $? -eq 0 ]]; then
   echo
+  echo ">>> [6/6] Atualizando SITE_URL no serviço da API..."
+  # Atualizar SITE_URL no serviço systemd
+  if [[ -f /etc/systemd/system/singleone-api.service ]]; then
+    # Fazer backup
+    cp /etc/systemd/system/singleone-api.service /etc/systemd/system/singleone-api.service.backup.$(date +%Y%m%d_%H%M%S)
+    # Atualizar SITE_URL
+    sed -i "s|Environment=SITE_URL=.*|Environment=SITE_URL=https://${SITE_DOMAIN}|" /etc/systemd/system/singleone-api.service
+    systemctl daemon-reload
+    systemctl restart singleone-api
+    echo "   ✅ SITE_URL atualizado para https://${SITE_DOMAIN}"
+  else
+    echo "   ⚠️  Serviço singleone-api não encontrado"
+  fi
+  echo
+  
   echo "======================================================="
   echo " ✅ SSL configurado com sucesso!"
   echo "======================================================="
@@ -126,6 +145,7 @@ if [[ $? -eq 0 ]]; then
   echo "   - Certificado válido por 90 dias"
   echo "   - Renovação automática configurada"
   echo "   - Redirecionamento HTTP -> HTTPS ativo"
+  echo "   - SITE_URL da API atualizado para HTTPS"
   echo ""
   echo "🔄 Para renovar manualmente:"
   echo "   certbot renew"
