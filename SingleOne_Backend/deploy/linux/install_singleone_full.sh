@@ -200,6 +200,8 @@ cd "${FRONTEND_DIR}"
 # Usar sempre npm install --legacy-peer-deps para resolver conflitos do Angular 10 com angularx-timeline
 # npm ci não suporta --legacy-peer-deps, então usamos npm install diretamente
 npm install --legacy-peer-deps
+# Node.js 17+ requer --openssl-legacy-provider para webpack 4 (Angular 10)
+export NODE_OPTIONS=--openssl-legacy-provider
 npm run build -- --configuration production || npm run build --prod
 
 echo
