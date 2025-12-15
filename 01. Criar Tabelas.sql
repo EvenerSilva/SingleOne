@@ -98,6 +98,8 @@ CREATE TABLE IF NOT EXISTS clientes
 	cnpj varchar(20) not null,
 	ativo boolean not null,
 	logo TEXT,
+	logo_bytes bytea,
+	logo_content_type varchar(100),
 	site_url VARCHAR(500)
 );
 
