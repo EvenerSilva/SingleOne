@@ -108,20 +108,33 @@ else
 fi
 
 echo
-echo ">>> [3/6] Preparando banco (init_db_atualizado.sql)..."
-# O init_db_atualizado.sql está na raiz do SingleOne_Backend
-INIT_SQL="${REPO_DIR}/SingleOne_Backend/init_db_atualizado.sql"
-if [[ ! -f "${INIT_SQL}" ]]; then
-  # Tentar caminho alternativo se REPO_DIR já é SingleOne_Backend
-  INIT_SQL="${REPO_DIR}/init_db_atualizado.sql"
-  if [[ ! -f "${INIT_SQL}" ]]; then
-    echo "❌ Arquivo init_db_atualizado.sql não encontrado em ${REPO_DIR}/SingleOne_Backend/ nem em ${REPO_DIR}/"
-    exit 1
-  fi
+echo ">>> [3/6] Preparando banco (criando tabelas, views e templates)..."
+# Os arquivos SQL estão na raiz do repositório
+SQL_DIR="${REPO_DIR}"
+if [[ ! -d "${SQL_DIR}" ]]; then
+  SQL_DIR="${REPO_DIR}/.."
 fi
 
-# Usar PGPASSWORD para autenticação sem prompt
-PGPASSWORD="${DB_PASSWORD}" psql -h 127.0.0.1 -U "${DB_USER}" -d "${DB_NAME}" -f "${INIT_SQL}"
+# Arquivos SQL na ordem correta
+SQL_FILES=(
+  "${SQL_DIR}/01. Criar Tabelas.sql"
+  "${SQL_DIR}/02. Criar Views.sql"
+  "${SQL_DIR}/03. Importar_templates.sql"
+)
+
+# Verificar se todos os arquivos existem
+for sql_file in "${SQL_FILES[@]}"; do
+  if [[ ! -f "${sql_file}" ]]; then
+    echo "❌ Arquivo SQL não encontrado: ${sql_file}"
+    exit 1
+  fi
+done
+
+# Executar cada arquivo SQL na ordem
+for sql_file in "${SQL_FILES[@]}"; do
+  echo "   Executando: $(basename "${sql_file}")..."
+  PGPASSWORD="${DB_PASSWORD}" psql -h 127.0.0.1 -U "${DB_USER}" -d "${DB_NAME}" -f "${sql_file}"
+done
 
 echo
 echo ">>> [4/6] Publicando API SingleOne..."
