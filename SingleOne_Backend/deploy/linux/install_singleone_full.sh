@@ -39,6 +39,10 @@ if [[ "$EUID" -ne 0 ]]; then
 fi
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+# Se estamos em SingleOne_Backend, subir um nível para a raiz do monorepo
+if [[ "$(basename "${REPO_DIR}")" == "SingleOne_Backend" ]]; then
+  REPO_DIR="$(dirname "${REPO_DIR}")"
+fi
 PUBLISH_DIR="/opt/singleone-api-publish"
 FRONTEND_DIR="${REPO_DIR}/SingleOne_Frontend"
 FRONTEND_DIST_DIR="${FRONTEND_DIR}/dist/SingleOne"
@@ -81,14 +85,15 @@ echo
 echo ">>> [1.1/6] Configurando usuário e banco..."
 sudo -u postgres psql <<SQL
 ALTER USER ${DB_USER} WITH PASSWORD '${DB_PASSWORD}';
-DO \$\$
-BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_database WHERE datname = '${DB_NAME}') THEN
-    CREATE DATABASE ${DB_NAME} OWNER ${DB_USER};
-  END IF;
-END
-\$\$;
 SQL
+
+# Criar banco se não existir (CREATE DATABASE não pode estar dentro de DO $$)
+if ! sudo -u postgres psql -lqt | cut -d \| -f 1 | grep -qw "${DB_NAME}"; then
+  echo "   Criando banco ${DB_NAME}..."
+  sudo -u postgres createdb -O "${DB_USER}" "${DB_NAME}"
+else
+  echo "   Banco ${DB_NAME} já existe, pulando criação."
+fi
 
 echo
 echo ">>> [2/6] Instalando .NET 6 (se necessário)..."
@@ -104,18 +109,33 @@ fi
 
 echo
 echo ">>> [3/6] Preparando banco (init_db_atualizado.sql)..."
-if [[ ! -f "${REPO_DIR}/init_db_atualizado.sql" ]]; then
-  echo "❌ Arquivo init_db_atualizado.sql não encontrado em ${REPO_DIR}"
-  exit 1
+# O init_db_atualizado.sql está na raiz do SingleOne_Backend
+INIT_SQL="${REPO_DIR}/SingleOne_Backend/init_db_atualizado.sql"
+if [[ ! -f "${INIT_SQL}" ]]; then
+  # Tentar caminho alternativo se REPO_DIR já é SingleOne_Backend
+  INIT_SQL="${REPO_DIR}/init_db_atualizado.sql"
+  if [[ ! -f "${INIT_SQL}" ]]; then
+    echo "❌ Arquivo init_db_atualizado.sql não encontrado em ${REPO_DIR}/SingleOne_Backend/ nem em ${REPO_DIR}/"
+    exit 1
+  fi
 fi
 
 # Usar PGPASSWORD para autenticação sem prompt
-PGPASSWORD="${DB_PASSWORD}" psql -h 127.0.0.1 -U "${DB_USER}" -d "${DB_NAME}" -f "${REPO_DIR}/init_db_atualizado.sql"
+PGPASSWORD="${DB_PASSWORD}" psql -h 127.0.0.1 -U "${DB_USER}" -d "${DB_NAME}" -f "${INIT_SQL}"
 
 echo
 echo ">>> [4/6] Publicando API SingleOne..."
 mkdir -p "${PUBLISH_DIR}"
-cd "${REPO_DIR}/SingleOne_Backend/SingleOneAPI"
+# Ajustar caminho da API conforme estrutura do repositório
+API_DIR="${REPO_DIR}/SingleOne_Backend/SingleOneAPI"
+if [[ ! -d "${API_DIR}" ]]; then
+  API_DIR="${REPO_DIR}/SingleOneAPI"
+  if [[ ! -d "${API_DIR}" ]]; then
+    echo "❌ Diretório SingleOneAPI não encontrado em ${REPO_DIR}/SingleOne_Backend/ nem em ${REPO_DIR}/"
+    exit 1
+  fi
+fi
+cd "${API_DIR}"
 dotnet publish -c Release -o "${PUBLISH_DIR}"
 
 echo
