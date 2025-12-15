@@ -99,7 +99,12 @@ namespace SingleOneAPI.Negocios
                     DataInicio = dataImportacao,
                     Status = "PROCESSANDO",
                     NomeArquivo = arquivo.FileName,
-                    TotalRegistros = registrosStaging.Count
+                    TotalRegistros = registrosStaging.Count,
+                    // Importante: coluna total_importados no banco é NOT NULL
+                    // então garantimos sempre um valor padrão (0) na criação
+                    TotalValidados = 0,
+                    TotalErros = 0,
+                    TotalImportados = 0
                 };
 
                 _context.ImportacaoLogs.Add(log);
@@ -741,7 +746,7 @@ namespace SingleOneAPI.Negocios
                 TotalRegistros = h.TotalRegistros,
                 TotalValidados = h.TotalValidados,
                 TotalErros = h.TotalErros,
-                TotalImportados = h.TotalImportados ?? 0,
+                TotalImportados = h.TotalImportados,
                 UsuarioNome = h.UsuarioNavigation?.Nome ?? "Sistema",
                 UsuarioEmail = h.UsuarioNavigation?.Email ?? "",
                 Observacoes = h.Observacoes

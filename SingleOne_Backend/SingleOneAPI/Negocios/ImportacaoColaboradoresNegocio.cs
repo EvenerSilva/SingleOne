@@ -1372,7 +1372,7 @@ namespace SingleOneAPI.Negocios
                 TotalRegistros = h.TotalRegistros,
                 TotalValidados = h.TotalValidados,
                 TotalErros = h.TotalErros,
-                TotalImportados = h.TotalImportados ?? 0,
+                TotalImportados = h.TotalImportados,
                 UsuarioNome = h.UsuarioNavigation?.Nome ?? "Sistema",
                 UsuarioEmail = h.UsuarioNavigation?.Email ?? "",
                 Observacoes = h.Observacoes
