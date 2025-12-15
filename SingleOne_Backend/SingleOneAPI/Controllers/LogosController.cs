@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.IO;
 using System.Linq;
-using SingleOne.Models;
 
 namespace SingleOne.Controllers
 {
@@ -12,12 +11,6 @@ namespace SingleOne.Controllers
     [AllowAnonymous]
     public class LogosController : ControllerBase
     {
-        private readonly SingleOneContext _context;
-
-        public LogosController(SingleOneContext context)
-        {
-            _context = context;
-        }
         /// <summary>
         /// Serve a logo do cliente pelo nome do arquivo
         /// </summary>
@@ -41,28 +34,6 @@ namespace SingleOne.Controllers
                 {
                     Console.WriteLine($"[GET-LOGO] ⚠️ Tentativa de path traversal detectada: {fileName}");
                     return BadRequest(new { Mensagem = "Nome de arquivo inválido" });
-                }
-
-                // ✅ Primeiro: tentar servir logo direto do banco (campo clientes.logo_bytes)
-                try
-                {
-                    var clienteDb = _context.Clientes
-                        .FirstOrDefault(c => c.Logo == sanitizedFileName && c.LogoBytes != null && c.LogoBytes.Length > 0);
-
-                    if (clienteDb != null)
-                    {
-                        Console.WriteLine($"[GET-LOGO] ✅ Servindo logo a partir do banco para cliente ID {clienteDb.Id}");
-                        var contentTypeDb = string.IsNullOrEmpty(clienteDb.LogoContentType)
-                            ? "image/png"
-                            : clienteDb.LogoContentType;
-
-                        Response.Headers.Add("Cache-Control", "public, max-age=3600");
-                        return File(clienteDb.LogoBytes, contentTypeDb);
-                    }
-                }
-                catch (Exception exDb)
-                {
-                    Console.WriteLine($"[GET-LOGO] ⚠️ Erro ao buscar logo no banco: {exDb.Message}");
                 }
 
                 var currentDir = Directory.GetCurrentDirectory();
