@@ -12,6 +12,10 @@ namespace SingleOneAPI.Services
     {
         public bool Authorize(DashboardContext context)
         {
+            // ⚠️ DEMO: liberar acesso geral ao Hangfire Dashboard
+            // Em produção, substitua por uma validação mais restrita (Admin, IP, VPN, etc.)
+            return true;
+
             var httpContext = context.GetHttpContext();
             
             // Verificar se usuário está autenticado
