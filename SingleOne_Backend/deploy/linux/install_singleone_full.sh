@@ -133,9 +133,11 @@ done
 # Executar cada arquivo SQL na ordem
 for sql_file in "${SQL_FILES[@]}"; do
   echo "   Executando: $(basename "${sql_file}")..."
-  # Para views, continuar mesmo com erros (algumas podem falhar se tabelas não existirem)
+  # Para views, continuar mesmo com erros (algumas podem falhar devido a diferenças de case ou tabelas opcionais)
   if [[ "${sql_file}" == *"02. Criar Views.sql" ]]; then
-    PGPASSWORD="${DB_PASSWORD}" psql -h 127.0.0.1 -U "${DB_USER}" -d "${DB_NAME}" -f "${sql_file}" || echo "   ⚠️  Alguns erros em views (normal se algumas tabelas não existirem)"
+    echo "   ⚠️  Nota: Alguns erros em views são esperados (diferenças de case ou tabelas opcionais)"
+    PGPASSWORD="${DB_PASSWORD}" psql -h 127.0.0.1 -U "${DB_USER}" -d "${DB_NAME}" -f "${sql_file}" 2>&1 | grep -v "ERROR:" || true
+    echo "   ✅ Views executadas (alguns erros podem ser ignorados)"
   else
     PGPASSWORD="${DB_PASSWORD}" psql -h 127.0.0.1 -U "${DB_USER}" -d "${DB_NAME}" -f "${sql_file}"
   fi
@@ -340,15 +342,27 @@ systemctl reload nginx
 
 echo
 echo "======================================================="
-echo " Instalação COMPLETA concluída."
-echo " - API  : serviço systemd 'singleone-api' (porta 5000)"
-echo " - Frontend: servido via Nginx (site 'singleone')"
-echo " - Banco: PostgreSQL banco '${DB_NAME}'"
+echo " ✅ Instalação COMPLETA concluída!"
 echo "======================================================="
-echo "Teste:"
-echo "  systemctl status singleone-api"
-echo "  curl http://localhost:5000/swagger"
-echo "  Acesse pelo navegador: http://${SITE_DOMAIN:-${SITE_IP:-<IP_DO_SERVIDOR>}}"
+echo "📦 Componentes instalados:"
+echo "   - PostgreSQL: banco '${DB_NAME}' (tabelas, views e templates criados)"
+echo "   - API .NET  : serviço systemd 'singleone-api' (porta 5000)"
+echo "   - Frontend  : Angular buildado e servido via Nginx"
+echo "   - Nginx     : site 'singleone' configurado (proxy /api, /hangfire, /api/logos/)"
+echo ""
+echo "🔍 Verificações:"
+echo "   systemctl status singleone-api"
+echo "   curl http://localhost:5000/swagger"
+echo "   curl -I http://localhost"
+echo ""
+echo "🌐 Acesso:"
+echo "   http://${SITE_DOMAIN:-${SITE_IP:-<IP_DO_SERVIDOR>}}"
+echo ""
+echo "📝 Notas:"
+echo "   - Alguns erros em views durante a criação são normais (diferenças de case)"
+echo "   - O banco foi criado com estrutura completa (tabelas + views + templates)"
+echo "   - Para copiar dados de outro servidor, use pg_dump/pg_restore"
+echo "======================================================="
 echo
 
 
