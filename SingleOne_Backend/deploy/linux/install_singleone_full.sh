@@ -133,7 +133,12 @@ done
 # Executar cada arquivo SQL na ordem
 for sql_file in "${SQL_FILES[@]}"; do
   echo "   Executando: $(basename "${sql_file}")..."
-  PGPASSWORD="${DB_PASSWORD}" psql -h 127.0.0.1 -U "${DB_USER}" -d "${DB_NAME}" -f "${sql_file}"
+  # Para views, continuar mesmo com erros (algumas podem falhar se tabelas não existirem)
+  if [[ "${sql_file}" == *"02. Criar Views.sql" ]]; then
+    PGPASSWORD="${DB_PASSWORD}" psql -h 127.0.0.1 -U "${DB_USER}" -d "${DB_NAME}" -f "${sql_file}" || echo "   ⚠️  Alguns erros em views (normal se algumas tabelas não existirem)"
+  else
+    PGPASSWORD="${DB_PASSWORD}" psql -h 127.0.0.1 -U "${DB_USER}" -d "${DB_NAME}" -f "${sql_file}"
+  fi
 done
 
 echo
