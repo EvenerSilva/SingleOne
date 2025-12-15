@@ -40,7 +40,7 @@ namespace SingleOneAPI.Models
         public int TotalErros { get; set; }
         
         [Column("total_importados")]
-        public int? TotalImportados { get; set; }
+        public int TotalImportados { get; set; }
         
         [Column("nome_arquivo")]
         public string NomeArquivo { get; set; }

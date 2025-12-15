@@ -55,7 +55,9 @@ namespace SingleOneAPI.Infra.Mapeamento
                 .HasColumnName("total_erros");
             
             builder.Property(e => e.TotalImportados)
-                .HasColumnName("total_importados");
+                .HasColumnName("total_importados")
+                .IsRequired()
+                .HasDefaultValue(0);
             
             builder.Property(e => e.NomeArquivo)
                 .HasColumnName("nome_arquivo")
