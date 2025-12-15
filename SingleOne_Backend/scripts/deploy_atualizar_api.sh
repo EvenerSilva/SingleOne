@@ -22,16 +22,39 @@ echo "📥 Atualizando código do Git..."
 cd /opt/SingleOne
 git pull origin main
 
-# 3. Limpar diretório de publish
+# 3. Preservar logos antes de limpar diretório de publish
+echo "🧹 Preparando limpeza do diretório de publish (preservando logos)..."
+LOGOS_DIR="/opt/singleone-api-publish/wwwroot/logos"
+LOGOS_TMP="/tmp/logos_before_deploy_$(date +%s)"
+
+if [ -d "$LOGOS_DIR" ] && [ "$(ls -A "$LOGOS_DIR" 2>/dev/null)" ]; then
+    echo "   ✅ Logos encontrados em $LOGOS_DIR, fazendo cópia temporária..."
+    mkdir -p "$LOGOS_TMP"
+    cp -a "$LOGOS_DIR" "$LOGOS_TMP/" || echo "   ⚠️  Não foi possível copiar logos (continuando mesmo assim)"
+else
+    echo "   ℹ️  Nenhuma logo encontrada em $LOGOS_DIR (nada para preservar)"
+fi
+
+# 4. Limpar diretório de publish
 echo "🧹 Limpando diretório de publish..."
 rm -rf /opt/singleone-api-publish/*
 
-# 4. Publicar API
+# 5. Publicar API
 echo "📦 Publicando API..."
 cd /opt/SingleOne/SingleOne_Backend/SingleOneAPI
 dotnet publish -c Release -o /opt/singleone-api-publish
 
-# 5. Detectar IP do servidor
+# 6. Restaurar logos após publish (se existirem)
+if [ -d "$LOGOS_TMP/logos" ]; then
+    echo "   ✅ Restaurando logos preservados..."
+    mkdir -p /opt/singleone-api-publish/wwwroot
+    cp -a "$LOGOS_TMP/logos" /opt/singleone-api-publish/wwwroot/ || echo "   ⚠️  Não foi possível restaurar logos automaticamente"
+    rm -rf "$LOGOS_TMP"
+else
+    echo "   ℹ️  Nenhuma logo preservada para restaurar"
+fi
+
+# 7. Detectar IP do servidor
 echo "🔍 Detectando IP do servidor..."
 SERVER_IP=$(hostname -I | awk '{print $1}')
 if [ -z "$SERVER_IP" ]; then
@@ -43,7 +66,7 @@ SITE_URL="http://${SERVER_IP}"
 echo "✅ IP detectado: ${SERVER_IP}"
 echo "✅ URL configurada: ${SITE_URL}"
 
-# 6. Configurar SITE_URL no systemd
+# 8. Configurar SITE_URL no systemd
 echo "⚙️  Configurando SITE_URL no systemd..."
 SERVICE_FILE="/etc/systemd/system/singleone-api.service"
 
@@ -67,23 +90,23 @@ else
     grep "SITE_URL" "$SERVICE_FILE" || echo "   (nenhuma linha SITE_URL encontrada)"
 fi
 
-# 7. Recarregar systemd
+# 9. Recarregar systemd
 echo "🔄 Recarregando systemd..."
 systemctl daemon-reload
 
-# 8. Iniciar API
+# 10. Iniciar API
 echo "▶️  Iniciando serviço..."
 systemctl start singleone-api
 
-# 9. Aguardar alguns segundos
+# 11. Aguardar alguns segundos
 sleep 3
 
-# 10. Verificar status
+# 12. Verificar status
 echo ""
 echo "📋 Status do serviço:"
 systemctl status singleone-api --no-pager -l | head -20
 
-# 11. Mostrar logs recentes com URL
+# 13. Mostrar logs recentes com URL
 echo ""
 echo "=========================================="
 echo "📋 Logs de detecção de URL:"
