@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using SingleOne.Models;
 
 namespace SingleOneAPI.Models
@@ -30,8 +32,17 @@ namespace SingleOneAPI.Models
         public string Cnpj { get; set; }
         public bool Ativo { get; set; }
         public string Logo { get; set; }
+
+        // Conteúdo binário da logo (armazenado em banco, mas não exposto no JSON da API)
+        [JsonIgnore]
+        [System.Text.Json.Serialization.JsonIgnore]
         public byte[] LogoBytes { get; set; }
+
+        // Content-Type da logo (image/png, image/jpeg, etc) - também não exposto no JSON
+        [JsonIgnore]
+        [System.Text.Json.Serialization.JsonIgnore]
         public string LogoContentType { get; set; }
+
         public string SiteUrl { get; set; }
 
         public virtual ICollection<Colaboradore> Colaboradores { get; set; }
