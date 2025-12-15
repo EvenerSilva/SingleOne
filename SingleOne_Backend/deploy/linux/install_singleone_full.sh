@@ -109,7 +109,8 @@ if [[ ! -f "${REPO_DIR}/init_db_atualizado.sql" ]]; then
   exit 1
 fi
 
-psql -h 127.0.0.1 -U "${DB_USER}" -d "${DB_NAME}" -w -f "${REPO_DIR}/init_db_atualizado.sql"
+# Usar PGPASSWORD para autenticação sem prompt
+PGPASSWORD="${DB_PASSWORD}" psql -h 127.0.0.1 -U "${DB_USER}" -d "${DB_NAME}" -f "${REPO_DIR}/init_db_atualizado.sql"
 
 echo
 echo ">>> [4/6] Publicando API SingleOne..."
