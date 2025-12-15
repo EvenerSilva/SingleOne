@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SingleOne.Models;
 using SingleOne.Models.ViewModels;
@@ -126,7 +126,7 @@ namespace SingleOne.Controllers
                 Console.WriteLine($"[UPLOAD-LOGO] Cliente.Id antes da atualização: {cliente.Id}");
                 Console.WriteLine($"[UPLOAD-LOGO] Iniciando upload do arquivo...");
 
-                // Fazer upload da logo
+                // Fazer upload da logo (arquivo físico - legado)
                 var fileName = await _fileUploadService.UploadLogoAsync(logo, clienteId);
                 
                 Console.WriteLine($"[UPLOAD-LOGO] ✅ Arquivo salvo: {fileName}");
@@ -142,6 +142,16 @@ namespace SingleOne.Controllers
                 
                 // Atualizar o cliente com o nome do arquivo da logo
                 cliente.Logo = fileName;
+
+                // ✅ NOVO: salvar logo também em banco (evita perda em deploy)
+                using (var ms = new MemoryStream())
+                {
+                    await logo.CopyToAsync(ms);
+                    cliente.LogoBytes = ms.ToArray();
+                    cliente.LogoContentType = string.IsNullOrEmpty(logo.ContentType)
+                        ? "image/png"
+                        : logo.ContentType;
+                }
                 Console.WriteLine($"[UPLOAD-LOGO] Cliente.Id antes de SalvarCliente: {cliente.Id}");
                 Console.WriteLine($"[UPLOAD-LOGO] Cliente.Logo antes de SalvarCliente: {cliente.Logo}");
                 Console.WriteLine($"[UPLOAD-LOGO] Cliente.RazaoSocial antes de SalvarCliente: {cliente.Razaosocial}");

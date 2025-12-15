@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using SingleOne.Models;
 
 namespace SingleOneAPI.Models
@@ -30,6 +30,8 @@ namespace SingleOneAPI.Models
         public string Cnpj { get; set; }
         public bool Ativo { get; set; }
         public string Logo { get; set; }
+        public byte[] LogoBytes { get; set; }
+        public string LogoContentType { get; set; }
         public string SiteUrl { get; set; }
 
         public virtual ICollection<Colaboradore> Colaboradores { get; set; }

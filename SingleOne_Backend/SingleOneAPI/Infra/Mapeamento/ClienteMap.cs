@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SingleOne.Models;
 
@@ -27,6 +27,13 @@ namespace SingleOneAPI.Infra.Mapeamento
             entity.Property(e => e.Logo)
                 .HasMaxLength(500)
                 .HasColumnName("logo");
+
+            entity.Property(e => e.LogoBytes)
+                .HasColumnName("logo_bytes");
+
+            entity.Property(e => e.LogoContentType)
+                .HasMaxLength(100)
+                .HasColumnName("logo_content_type");
 
             entity.Property(e => e.SiteUrl)
                 .HasMaxLength(500)
