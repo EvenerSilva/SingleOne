@@ -197,7 +197,12 @@ if [[ ! -d "${FRONTEND_DIR}" ]]; then
 fi
 
 cd "${FRONTEND_DIR}"
-npm ci || npm install
+# Tentar npm ci primeiro (mais rápido e determinístico), depois npm install com --legacy-peer-deps se falhar
+if [[ -f "package-lock.json" ]]; then
+  npm ci || npm install --legacy-peer-deps
+else
+  npm install --legacy-peer-deps
+fi
 npm run build -- --configuration production || npm run build --prod
 
 echo
