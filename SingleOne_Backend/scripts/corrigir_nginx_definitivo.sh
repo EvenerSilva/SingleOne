@@ -71,6 +71,18 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 
+    # PROXY PARA HANGFIRE DASHBOARD
+    location /hangfire {
+        proxy_pass http://127.0.0.1:5000/hangfire;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Connection "";
+        proxy_buffering off;
+    }
+
     # Assets estáticos (apenas para arquivos do frontend, não /api/)
     location ~* \.(jpg|jpeg|png|gif|ico|css|js|svg|woff|woff2|ttf|eot)$ {
         if ($request_uri ~ ^/api/) {
@@ -104,6 +116,18 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # PROXY PARA HANGFIRE DASHBOARD
+    location /hangfire {
+        proxy_pass http://127.0.0.1:5000/hangfire;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Connection "";
+        proxy_buffering off;
     }
 
     # Assets estáticos (apenas para arquivos do frontend, não /api/)
