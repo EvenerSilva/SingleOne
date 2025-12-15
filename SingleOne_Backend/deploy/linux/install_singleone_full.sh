@@ -197,9 +197,10 @@ if [[ ! -d "${FRONTEND_DIR}" ]]; then
 fi
 
 cd "${FRONTEND_DIR}"
-# Tentar npm ci primeiro (mais rápido e determinístico), depois npm install com --legacy-peer-deps se falhar
+# Usar sempre --legacy-peer-deps para resolver conflitos do Angular 10 com angularx-timeline
+# npm ci só funciona se package-lock.json existir e estiver atualizado
 if [[ -f "package-lock.json" ]]; then
-  npm ci || npm install --legacy-peer-deps
+  npm ci --legacy-peer-deps 2>/dev/null || npm install --legacy-peer-deps
 else
   npm install --legacy-peer-deps
 fi
