@@ -151,6 +151,9 @@ namespace SingleOneAPI.Infra.Mapeamento
             builder.Property(e => e.Centrocusto)
                 .HasColumnName("centrocusto");
 
+            builder.Property(e => e.Empresa)
+                .HasColumnName("empresa");
+
             builder.Property(e => e.FilialId)
                 .HasColumnName("filial_id");
 
