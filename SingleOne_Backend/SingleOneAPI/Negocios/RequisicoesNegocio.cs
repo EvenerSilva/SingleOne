@@ -333,36 +333,57 @@ namespace SingleOne.Negocios
                     Console.WriteLine($"[TERMO] ✅ Requisição encontrada na view: ID {r.Id}");
                 }
 
-                //var rs = _requisicaoRepository.Buscar(x => x.ColaboradorFinal == r.ColaboradorFinalId && x.AssinaturaEletronica == false).ToList();
-                var colaboradorFinalId = r.Colaboradorfinalid;
-                Console.WriteLine($"[TERMO] Buscando requisições pendentes para colaborador ID: {colaboradorFinalId}");
+                // ✅ CORREÇÃO: Buscar apenas a requisição com o hash específico, não todas as requisições do colaborador
+                // O termo deve mostrar apenas os recursos da requisição específica do hash
+                var rs = new List<Requisicoesvm>();
                 
-                var rs = _requisicoesvmRepository
-                    .Buscar(x => x.Colaboradorfinalid == colaboradorFinalId && x.Assinaturaeletronica == false && x.Equipamentospendentes > 0)
-                    .ToList();
-                
-                Console.WriteLine($"[TERMO] Requisições pendentes encontradas na view: {rs.Count}");
-                
-                // ✅ FALLBACK: Se não encontrar requisições pendentes na view, buscar diretamente das tabelas
-                if (rs.Count == 0 && r != null)
+                // Primeiro, verificar se a requisição encontrada tem itens entregues
+                if (r != null)
                 {
-                    Console.WriteLine($"[TERMO] View não retornou requisições pendentes, buscando diretamente das tabelas...");
-                    var reqsDiretas = _requisicaoRepository
-                        .Buscar(x => x.Colaboradorfinal == colaboradorFinalId && 
-                                    x.Assinaturaeletronica == false &&
-                                    x.Requisicaostatus == 3)
+                    Console.WriteLine($"[TERMO] Verificando se a requisição {r.Id} tem itens entregues...");
+                    
+                    // Buscar itens entregues da requisição
+                    var itensEntregues = _requisicaoItensRepository
+                        .Buscar(x => x.Requisicao == r.Id && 
+                                    x.Dtentrega.HasValue && 
+                                    x.Dtdevolucao == null)
                         .ToList();
                     
-                    Console.WriteLine($"[TERMO] Requisições encontradas diretamente: {reqsDiretas.Count}");
+                    Console.WriteLine($"[TERMO] Itens entregues encontrados: {itensEntregues.Count}");
                     
-                    // Verificar se há itens entregues sem devolução
-                    foreach (var reqDireta in reqsDiretas)
+                    // Se houver itens entregues, adicionar a requisição à lista
+                    if (itensEntregues.Count > 0)
                     {
+                        // Atualizar Equipamentospendentes com o valor real
+                        r.Equipamentospendentes = itensEntregues.Count;
+                        rs.Add(r);
+                        Console.WriteLine($"[TERMO] ✅ Requisição {r.Id} adicionada com {itensEntregues.Count} itens entregues");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"[TERMO] ⚠️ Requisição {r.Id} não tem itens entregues");
+                    }
+                }
+                
+                // ✅ FALLBACK: Se não encontrou requisição na view, buscar diretamente da tabela
+                if (rs.Count == 0)
+                {
+                    Console.WriteLine($"[TERMO] Nenhuma requisição encontrada na view, buscando diretamente da tabela...");
+                    var reqDireta = _requisicaoRepository
+                        .Buscar(x => x.Hashrequisicao != null && x.Hashrequisicao.ToLower() == hash.ToLower())
+                        .FirstOrDefault();
+                    
+                    if (reqDireta != null)
+                    {
+                        Console.WriteLine($"[TERMO] Requisição encontrada diretamente: ID {reqDireta.Id}");
+                        
                         var itensEntregues = _requisicaoItensRepository
                             .Buscar(x => x.Requisicao == reqDireta.Id && 
                                         x.Dtentrega.HasValue && 
                                         x.Dtdevolucao == null)
                             .ToList();
+                        
+                        Console.WriteLine($"[TERMO] Itens entregues encontrados: {itensEntregues.Count}");
                         
                         if (itensEntregues.Count > 0)
                         {
@@ -391,10 +412,10 @@ namespace SingleOne.Negocios
                                 Hashrequisicao = reqDireta.Hashrequisicao,
                                 Equipamentospendentes = itensEntregues.Count
                             });
+                            
+                            Console.WriteLine($"[TERMO] ✅ Requisição montada via fallback com {itensEntregues.Count} itens entregues");
                         }
                     }
-                    
-                    Console.WriteLine($"[TERMO] Requisições pendentes montadas via fallback: {rs.Count}");
                 }
 
                 // ✅ COBRIR CASO DE LINHAS TELEFÔNICAS: se não há pendentes pela view (equipamentos),
