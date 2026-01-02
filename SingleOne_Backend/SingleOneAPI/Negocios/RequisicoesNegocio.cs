@@ -2149,6 +2149,10 @@ namespace SingleOne.Negocios
                 return;
             }
 
+            // ✅ CORREÇÃO: Salvar o valor anterior para log
+            var valorAnterior = ri.Dtprogramadaretorno;
+            
+            // ✅ CORREÇÃO: Atualizar campos
             ri.Observacaoentrega = rivm.Observacaoentrega;
             
             // ✅ CORREÇÃO: Sempre atualizar o campo, mesmo quando for null (para permitir remover agendamento)
@@ -2163,8 +2167,9 @@ namespace SingleOne.Negocios
                 ri.Dtprogramadaretorno = null;
             }
 
-            Console.WriteLine($"[NEGOCIO] AtualizarItemRequisicao - Item ID: {ri.Id}, Dtprogramadaretorno: {(ri.Dtprogramadaretorno?.ToString() ?? "NULL")}");
+            Console.WriteLine($"[NEGOCIO] AtualizarItemRequisicao - Item ID: {ri.Id}, Dtprogramadaretorno anterior: {(valorAnterior?.ToString() ?? "NULL")}, novo: {(ri.Dtprogramadaretorno?.ToString() ?? "NULL")}");
             
+            // ✅ CORREÇÃO: Usar Update() que força atualização de todos os campos, incluindo null
             _requisicaoItensRepository.Atualizar(ri);
             _requisicaoItensRepository.SalvarAlteracoes(); // ✅ CORREÇÃO: Garantir que as alterações sejam salvas
             
