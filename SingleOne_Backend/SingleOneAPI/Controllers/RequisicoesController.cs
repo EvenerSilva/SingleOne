@@ -44,7 +44,10 @@ namespace SingleOne.Controllers
         [AllowAnonymous]
         public RequisicaoVM ListarEquipamentosDaRequisicao(string hash, bool byod)
         {
-            return _negocio.ListarEquipamentosDaRequisicao(hash, byod);
+            Console.WriteLine($"[CONTROLLER] ListarEquipamentosDaRequisicao chamado - Hash: {hash}, BYOD: {byod}");
+            var resultado = _negocio.ListarEquipamentosDaRequisicao(hash, byod);
+            Console.WriteLine($"[CONTROLLER] ListarEquipamentosDaRequisicao retornou {resultado?.EquipamentosRequisicao?.Count ?? 0} recursos");
+            return resultado;
         }
         [HttpPost("[action]", Name ="SalvarRequisicao")]
         public string SalvarRequisicao([FromBody] RequisicaoDTO dto)
