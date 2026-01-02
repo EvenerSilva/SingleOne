@@ -282,14 +282,55 @@ namespace SingleOne.Negocios
         }
         public RequisicaoVM ListarEquipamentosDaRequisicao(string hash, bool byod)
         {
+            Console.WriteLine($"[TERMO] ========== INÍCIO ListarEquipamentosDaRequisicao ==========");
+            Console.WriteLine($"[TERMO] Hash recebido: {hash}, BYOD: {byod}");
+            
             var req = new RequisicaoVM();
             try
             {
                 var r = _requisicoesvmRepository.Buscar(x => x.Hashrequisicao == hash).FirstOrDefault();
                 if (r == null)
                 {
-                    Console.WriteLine($"[LISTAR_REQ] AVISO: Nenhuma requisição encontrada para hash {hash}");
-                    return req; // retorna vazio para o caller tratar
+                    Console.WriteLine($"[TERMO] ❌ Nenhuma requisição encontrada para hash {hash}");
+                    // ✅ FALLBACK: Buscar diretamente da tabela
+                    Console.WriteLine($"[TERMO] Tentando buscar diretamente da tabela requisicoes...");
+                    var rDireta = _requisicaoRepository.Buscar(x => x.Hashrequisicao != null && x.Hashrequisicao.ToLower() == hash.ToLower()).FirstOrDefault();
+                    if (rDireta == null)
+                    {
+                        Console.WriteLine($"[TERMO] ❌ Requisição não encontrada nem na view nem na tabela");
+                        return req; // retorna vazio para o caller tratar
+                    }
+                    
+                    // Converter para Requisicoesvm
+                    var usuarioReq = _usuarioRepository.ObterPorId(rDireta.Usuariorequisicao);
+                    var tecnico = _usuarioRepository.ObterPorId(rDireta.Tecnicoresponsavel);
+                    var colaborador = _colaboradorRepository.ObterPorId(rDireta.Colaboradorfinal ?? 0);
+                    
+                    r = new Requisicoesvm
+                    {
+                        Id = rDireta.Id,
+                        Cliente = rDireta.Cliente,
+                        Usuariorequisicaoid = rDireta.Usuariorequisicao,
+                        Usuariorequisicao = usuarioReq?.Nome ?? "N/A",
+                        Tecnicoresponsavelid = rDireta.Tecnicoresponsavel,
+                        Tecnicoresponsavel = tecnico?.Nome ?? "N/A",
+                        Colaboradorfinalid = rDireta.Colaboradorfinal,
+                        Colaboradorfinal = colaborador?.Nome ?? "N/A",
+                        Requisicaostatusid = rDireta.Requisicaostatus,
+                        Requisicaostatus = rDireta.Requisicaostatus == 1 ? "Ativa" : rDireta.Requisicaostatus == 3 ? "Processada" : "Cancelada",
+                        Dtsolicitacao = rDireta.Dtsolicitacao,
+                        Dtprocessamento = rDireta.Dtprocessamento,
+                        Assinaturaeletronica = rDireta.Assinaturaeletronica,
+                        Dtassinaturaeletronica = rDireta.Dtassinaturaeletronica,
+                        Dtenviotermo = rDireta.Dtenviotermo,
+                        Hashrequisicao = rDireta.Hashrequisicao,
+                        Equipamentospendentes = 0
+                    };
+                    Console.WriteLine($"[TERMO] ✅ Requisição encontrada diretamente da tabela: ID {r.Id}");
+                }
+                else
+                {
+                    Console.WriteLine($"[TERMO] ✅ Requisição encontrada na view: ID {r.Id}");
                 }
 
                 //var rs = _requisicaoRepository.Buscar(x => x.ColaboradorFinal == r.ColaboradorFinalId && x.AssinaturaEletronica == false).ToList();
@@ -379,6 +420,9 @@ namespace SingleOne.Negocios
                         });
                     }
                 }
+                Console.WriteLine($"[TERMO] ✅ Total de recursos encontrados: {req.EquipamentosRequisicao.Count}");
+                Console.WriteLine($"[TERMO] ========== FIM ListarEquipamentosDaRequisicao ==========");
+                
                 //req.Requisicao = _requisicaoRepositoryVm.Buscar(x => x.HashRequisicao == hash).FirstOrDefault();
                 //req.EquipamentosRequisicao = db.RequisicaoEquipamentosVm.Buscar(x => x.Requisicao == req.Requisicao.Id && x.EquipamentoStatus != 8).ToList();
 
