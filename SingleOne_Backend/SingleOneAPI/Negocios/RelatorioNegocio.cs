@@ -854,6 +854,34 @@ namespace SingleOne.Negocios
                                      .ToList();
                 
                 // Consolidar contagem por usu�rio (entregas + devolu��es)
+                Console.WriteLine($"[DASHBOARD] Movimentações encontradas na view: {movimentacoes.Count}");
+                
+                // ✅ FALLBACK: Se a view não retornar resultados, buscar diretamente das tabelas
+                if (movimentacoes.Count == 0)
+                {
+                    Console.WriteLine($"[DASHBOARD] View não retornou movimentações, buscando diretamente das tabelas...");
+                    var movimentacoesDiretas = (from ri in _requisicaoItensRepository.Query()
+                                               join r in _requisicaoRepository.Query() on ri.Requisicao equals r.Id
+                                               join ue in _usuarioRepository.Query() on ri.Usuarioentrega equals ue.Id into entregaUsuarios
+                                               from ue in entregaUsuarios.DefaultIfEmpty()
+                                               join ud in _usuarioRepository.Query() on ri.Usuariodevolucao equals ud.Id into devolucaoUsuarios
+                                               from ud in devolucaoUsuarios.DefaultIfEmpty()
+                                               where r.Cliente == cliente && 
+                                                     ((ri.Dtentrega.HasValue && ri.Dtentrega.Value >= dataLimite) ||
+                                                      (ri.Dtdevolucao.HasValue && ri.Dtdevolucao.Value >= dataLimite))
+                                               select new
+                                               {
+                                                   UsuarioEntrega = ue != null ? ue.Nome : null,
+                                                   UsuarioDevolucao = ud != null ? ud.Nome : null,
+                                                   TemEntrega = ri.Dtentrega.HasValue && ri.Dtentrega.Value >= dataLimite,
+                                                   TemDevolucao = ri.Dtdevolucao.HasValue && ri.Dtdevolucao.Value >= dataLimite
+                                               })
+                                               .ToList();
+                    
+                    Console.WriteLine($"[DASHBOARD] Movimentações encontradas diretamente das tabelas: {movimentacoesDiretas.Count}");
+                    movimentacoes = movimentacoesDiretas;
+                }
+                
                 var contagemPorUsuario = new Dictionary<string, int>();
                 
                 foreach (var mov in movimentacoes)
