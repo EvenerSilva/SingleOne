@@ -2022,10 +2022,10 @@ namespace SingleOne.Negocios
             // Como a view de n�o conformidade � din�mica (calcula em tempo real),
             // para o sparkline vamos usar o mesmo valor (snapshot atual)
             // Em uma implementa��o futura, poderia haver uma tabela de hist�rico
-            var sqlCount = @"
-                SELECT COUNT(*) 
-                FROM vw_nao_conformidade_elegibilidade 
-                WHERE cliente = {0}";
+            // var sqlCount = @"  // Comentado - não usado no momento
+            //     SELECT COUNT(*) 
+            //     FROM vw_nao_conformidade_elegibilidade 
+            //     WHERE cliente = {0}";
                 
             int countAtual = 0;
             var connectionNC2 = _context.Database.GetDbConnection();
@@ -2851,7 +2851,7 @@ namespace SingleOne.Negocios
                 
                 return resultado;
             }
-            catch (Exception ex)
+            catch
             {
                 throw;
             }
