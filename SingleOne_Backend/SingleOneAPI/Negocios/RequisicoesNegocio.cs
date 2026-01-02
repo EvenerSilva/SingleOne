@@ -2290,14 +2290,15 @@ namespace SingleOne.Negocios
                         if (itens.Count > 0)
                         {
                             // Se encontrou itens no banco, usar eles
-                            if (dto.Requisicoesitens == null) dto.Requisicoesitens = new List<RequisicoesitenDTO>();
+                            if (dto.Requisicoesitens == null) dto.Requisicoesitens = new List<RequisicaoItemDTO>();
                             foreach (var item in itens)
                             {
-                                dto.Requisicoesitens.Add(new RequisicoesitenDTO
+                                dto.Requisicoesitens.Add(new RequisicaoItemDTO
                                 {
                                     Id = item.Id,
+                                    Requisicao = item.Requisicao,
                                     Equipamento = item.Equipamento,
-                                    Linha = item.Linha,
+                                    Linhatelefonica = item.Linha,
                                     Observacaoentrega = item.Observacaoentrega,
                                     Dtprogramadaretorno = item.Dtprogramadaretorno,
                                     Usuarioentrega = item.Usuarioentrega

@@ -88,8 +88,8 @@ SELECT e.id,
 -- View: EquipamentoHistoricoVM
 DROP VIEW IF EXISTS EquipamentoHistoricoVM CASCADE;
 CREATE OR REPLACE VIEW EquipamentoHistoricoVM AS
-SELECT e.id, te.id TipoequipamentoID, te.descricao TipoEquipamento, f.Id FabricanteId, f.Descricao Fabricante, m.Id ModeloId, m.Descricao Modelo, e.NumeroSerie, e.Patrimonio, es.Id EquipamentoStatusId, es.Descricao EquipamentoStatus, c.Id ColaboradorId, c.Nome Colaborador, eh.DtRegistro,
-	u.Id UsuarioId, u.Nome Usuario
+SELECT e.id, e.id AS equipamentoid, te.id TipoequipamentoID, te.descricao TipoEquipamento, f.Id FabricanteId, f.Descricao Fabricante, m.Id ModeloId, m.Descricao Modelo, e.NumeroSerie, e.Patrimonio, es.Id EquipamentoStatusId, es.Descricao EquipamentoStatus, c.Id ColaboradorId, c.Nome Colaborador, eh.DtRegistro,
+	u.Id UsuarioId, u.Nome Usuario, NULL::integer AS tecnicoresponsavelid, NULL::varchar AS tecnicoresponsavel
 FROM EquipamentoHistorico eh
 	JOIN Equipamentos e ON eh.Equipamento = e.Id
 	JOIN Usuarios u ON eh.Usuario = u.Id
