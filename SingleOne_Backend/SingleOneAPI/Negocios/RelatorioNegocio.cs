@@ -390,6 +390,48 @@ namespace SingleOne.Negocios
                 
                 // ? CORRE��O: Buscar equipamentos f�sicos
                 var equipamentos = _requisicaoequipamentosvmsRepository.Buscar(x => x.Requisicao == r.Id).OrderByDescending(x => x.Dtdevolucao).ToList();
+                Console.WriteLine($"[RELATORIO] Requisição {r.Id}: Equipamentos encontrados na view: {equipamentos.Count}");
+                
+                // ✅ FALLBACK: Se a view não retornar equipamentos, buscar diretamente das tabelas
+                if (equipamentos.Count == 0)
+                {
+                    Console.WriteLine($"[RELATORIO] View não retornou equipamentos, buscando diretamente das tabelas...");
+                    var itens = _requisicaoItensRepository
+                        .Buscar(x => x.Requisicao == r.Id && x.Equipamento.HasValue)
+                        .Include(x => x.EquipamentoNavigation)
+                        .ThenInclude(x => x.TipoequipamentoNavigation)
+                        .Include(x => x.EquipamentoNavigation)
+                        .ThenInclude(x => x.FabricanteNavigation)
+                        .Include(x => x.EquipamentoNavigation)
+                        .ThenInclude(x => x.ModeloNavigation)
+                        .ToList();
+                    
+                    Console.WriteLine($"[RELATORIO] Itens de requisição encontrados: {itens.Count}");
+                    
+                    foreach (var item in itens)
+                    {
+                        if (item.EquipamentoNavigation != null)
+                        {
+                            equipamentos.Add(new Requisicaoequipamentosvm
+                            {
+                                Id = item.Id,
+                                Requisicao = item.Requisicao,
+                                Equipamentoid = item.Equipamento.Value,
+                                Equipamento = $"{item.EquipamentoNavigation.TipoequipamentoNavigation?.Descricao ?? "Equipamento"} {item.EquipamentoNavigation.FabricanteNavigation?.Descricao ?? ""} {item.EquipamentoNavigation.ModeloNavigation?.Descricao ?? ""}".Trim(),
+                                Numeroserie = item.EquipamentoNavigation.Numeroserie,
+                                Patrimonio = item.EquipamentoNavigation.Patrimonio,
+                                Equipamentostatus = item.EquipamentoNavigation.Equipamentostatus ?? 0,
+                                Dtentrega = item.Dtentrega,
+                                Dtdevolucao = item.Dtdevolucao,
+                                Observacaoentrega = item.Observacaoentrega,
+                                Dtprogramadaretorno = item.Dtprogramadaretorno,
+                                TipoAquisicao = item.EquipamentoNavigation.Tipoaquisicao ?? 0
+                            });
+                        }
+                    }
+                    
+                    Console.WriteLine($"[RELATORIO] Equipamentos montados via fallback: {equipamentos.Count}");
+                }
                 
                 
                 // ? NOVO: Buscar linhas telef�nicas da requisi��o
