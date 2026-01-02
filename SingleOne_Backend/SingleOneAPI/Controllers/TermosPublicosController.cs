@@ -50,10 +50,14 @@ namespace SingleOneAPI.Controllers
         [AllowAnonymous]
         public IActionResult Validar(string hash)
         {
+            Console.WriteLine($"[TERMO] ========== INÍCIO VALIDAÇÃO TERMO ==========");
+            Console.WriteLine($"[TERMO] Hash recebido: {hash}");
+            
             try
             {
                 if (string.IsNullOrWhiteSpace(hash))
                 {
+                    Console.WriteLine($"[TERMO] ❌ Hash inválido (vazio ou nulo)");
                     return BadRequest(new { sucesso = false, mensagem = "Hash inválido" });
                 }
 
@@ -65,9 +69,12 @@ namespace SingleOneAPI.Controllers
                 catch { }
                 if (hash.StartsWith(":")) hash = hash.Substring(1);
                 hash = (hash ?? string.Empty).Trim();
+                
+                Console.WriteLine($"[TERMO] Hash após saneamento: {hash}");
 
                 // Buscar TODAS as requisições que compartilham o mesmo hash
                 var hashLower = hash.ToLower();
+                Console.WriteLine($"[TERMO] Buscando requisições com hash: {hashLower}");
                 var requisicoesHash = _requisicaoRepository
                     .Buscar(x => x.Hashrequisicao != null && x.Hashrequisicao.ToLower() == hashLower)
                     .ToList();
