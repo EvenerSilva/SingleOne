@@ -1247,18 +1247,45 @@ namespace SingleOne.Negocios
                                               && !evm.Dtdevolucao.HasValue
                                         select new { r.Colaboradorfinal }).ToList();
 
+                Console.WriteLine($"[DASHBOARD] Equipamentos ativos encontrados na view: {itensAtivosEquip.Count}");
+                
+                // ✅ FALLBACK: Se a view não retornar resultados, buscar diretamente das tabelas
+                if (itensAtivosEquip.Count == 0)
+                {
+                    Console.WriteLine($"[DASHBOARD] View não retornou equipamentos, buscando diretamente das tabelas...");
+                    var itensDiretos = (from ri in _requisicaoItensRepository.Query()
+                                       join r in _requisicaoRepository.Query() on ri.Requisicao equals r.Id
+                                       join e in _equipamentoRepository.Query() on ri.Equipamento equals e.Id
+                                       where r.Cliente == cliente
+                                             && r.Colaboradorfinal.HasValue
+                                             && ri.Equipamento.HasValue
+                                             && ri.Dtentrega.HasValue
+                                             && !ri.Dtdevolucao.HasValue
+                                             && e.Equipamentostatus == 4
+                                       select new { r.Colaboradorfinal }).ToList();
+                    
+                    Console.WriteLine($"[DASHBOARD] Equipamentos encontrados diretamente das tabelas: {itensDiretos.Count}");
+                    itensAtivosEquip = itensDiretos;
+                }
+
                 var itensAtivosLinhas = (from it in _requisicaoItensRepository.Query()
                                          join r in _requisicaoRepository.Query() on it.Requisicao equals r.Id
                                          where r.Cliente == cliente
                                                && r.Colaboradorfinal.HasValue
                                                && it.Linhatelefonica.HasValue && it.Linhatelefonica.Value > 0
+                                               && it.Dtentrega.HasValue
                                                && !it.Dtdevolucao.HasValue
                                          select new { r.Colaboradorfinal }).ToList();
+
+                Console.WriteLine($"[DASHBOARD] Linhas telefônicas ativas encontradas: {itensAtivosLinhas.Count}");
 
                 var recursosAssociadosHoje = itensAtivosEquip.Count + itensAtivosLinhas.Count;
                 var colaboradoresComRecursosHoje = itensAtivosEquip.Select(x => x.Colaboradorfinal.Value)
                     .Concat(itensAtivosLinhas.Select(x => x.Colaboradorfinal.Value))
                     .Distinct().Count();
+                
+                Console.WriteLine($"[DASHBOARD] Recursos associados HOJE: {recursosAssociadosHoje} (equipamentos: {itensAtivosEquip.Count}, linhas: {itensAtivosLinhas.Count})");
+                Console.WriteLine($"[DASHBOARD] Colaboradores com recursos HOJE: {colaboradoresComRecursosHoje}");
 
                 // 2) Colaboradores ATIVOS hoje (excluindo desligados e com invent�rio for�ado pendente)
                 var colaboradoresAtivosHoje = _colaboradorRepository
