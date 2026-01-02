@@ -2141,11 +2141,12 @@ namespace SingleOne.Negocios
         {
             try
             {
-            // ✅ CORREÇÃO: Remover AsNoTracking() para permitir rastreamento de mudanças, especialmente para campos nullable
+            // ✅ CORREÇÃO: Buscar a entidade do banco para garantir rastreamento correto
             var ri = _requisicaoItensRepository.Buscar(x => x.Id == rivm.Id).FirstOrDefault();
 
             if (ri == null)
             {
+                Console.WriteLine($"[NEGOCIO] AtualizarItemRequisicao - Item não encontrado: ID {rivm.Id}");
                 return;
             }
 
@@ -2169,9 +2170,13 @@ namespace SingleOne.Negocios
 
             Console.WriteLine($"[NEGOCIO] AtualizarItemRequisicao - Item ID: {ri.Id}, Dtprogramadaretorno anterior: {(valorAnterior?.ToString() ?? "NULL")}, novo: {(ri.Dtprogramadaretorno?.ToString() ?? "NULL")}");
             
-            // ✅ CORREÇÃO: Usar Update() que força atualização de todos os campos, incluindo null
+            // ✅ CORREÇÃO: O método Atualizar() do repositório usa Update() que força atualização de todos os campos, incluindo null
             _requisicaoItensRepository.Atualizar(ri);
             _requisicaoItensRepository.SalvarAlteracoes(); // ✅ CORREÇÃO: Garantir que as alterações sejam salvas
+            
+            // ✅ VERIFICAÇÃO: Buscar novamente para confirmar que foi atualizado
+            var riVerificado = _requisicaoItensRepository.Buscar(x => x.Id == rivm.Id).FirstOrDefault();
+            Console.WriteLine($"[NEGOCIO] AtualizarItemRequisicao - Verificação pós-atualização: Dtprogramadaretorno = {(riVerificado?.Dtprogramadaretorno?.ToString() ?? "NULL")}");
             
             Console.WriteLine($"[NEGOCIO] AtualizarItemRequisicao - Item atualizado com sucesso");
             }
