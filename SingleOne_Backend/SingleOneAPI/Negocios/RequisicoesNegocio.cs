@@ -1349,13 +1349,24 @@ namespace SingleOne.Negocios
 
             foreach (var item in entregasAtivas.Results)
             {
-                var ultimasRequisicoes = ObterUltimasRequisicoesColaborador(cliente, item.ColaboradorId, byod).DistinctBy(x => x.RequisicaoId).ToList();
-                if (ultimasRequisicoes.Count > 0)
+                try
                 {
-                    // Se existir qualquer requisição não assinada, deve marcar como pendente
-                    var possuiPendente = ultimasRequisicoes.Any(x => x.AssinaturaEletronica == false);
-                    item.AssinouUltimaRequisicao = !possuiPendente;
-                    item.RequisicoesColaborador = MontarRequisicoesColaborador(ultimasRequisicoes);
+                    var ultimasRequisicoes = ObterUltimasRequisicoesColaborador(cliente, item.ColaboradorId, byod).DistinctBy(x => x.RequisicaoId).ToList();
+                    if (ultimasRequisicoes.Count > 0)
+                    {
+                        // Se existir qualquer requisição não assinada, deve marcar como pendente
+                        var possuiPendente = ultimasRequisicoes.Any(x => x.AssinaturaEletronica == false);
+                        item.AssinouUltimaRequisicao = !possuiPendente;
+                        item.RequisicoesColaborador = MontarRequisicoesColaborador(ultimasRequisicoes);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[REQUISICOES] Erro ao processar entregas do colaborador {item.ColaboradorId}: {ex.Message}");
+                    Console.WriteLine($"[REQUISICOES] StackTrace: {ex.StackTrace}");
+                    // Continuar com valores padrão
+                    item.AssinouUltimaRequisicao = false;
+                    item.RequisicoesColaborador = new List<RequisicaoColaboradorVM>();
                 }
             }
             return entregasAtivas;
