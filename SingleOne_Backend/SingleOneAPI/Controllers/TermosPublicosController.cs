@@ -96,7 +96,7 @@ namespace SingleOneAPI.Controllers
                         .ToList();
 
                     var recursosVm = new List<object>();
-                    foreach (var it in itensVm)
+                    foreach (var it in itensEntreguesVm)
                     {
                         string tipo = "Corporativo";
                         string patrimonio = string.Empty;
@@ -220,12 +220,29 @@ namespace SingleOneAPI.Controllers
 
                 // Compilar itens ativos (sem devolução) das requisições do hash
                 var reqIds = requisicoesHash.Select(r => r.Id).ToList();
+                Console.WriteLine($"[TERMO] Buscando itens para requisições: {string.Join(", ", reqIds)}");
+                
                 var itens = _requisicaoItensRepository
                     .Buscar(x => reqIds.Contains(x.Requisicao) && x.Dtdevolucao == null)
                     .ToList();
+                
+                Console.WriteLine($"[TERMO] Itens encontrados (sem devolução): {itens.Count}");
+                
+                // ✅ CORREÇÃO: Filtrar apenas itens que foram entregues (Dtentrega não nulo)
+                // O termo deve mostrar apenas recursos que foram entregues mas ainda não foram assinados
+                var itensEntregues = itens.Where(x => x.Dtentrega.HasValue).ToList();
+                Console.WriteLine($"[TERMO] Itens entregues (Dtentrega não nulo): {itensEntregues.Count}");
+                
+                // ✅ FALLBACK: Se não encontrar itens entregues, buscar todos os itens da requisição
+                // (pode ser que o termo seja gerado antes da entrega)
+                if (itensEntregues.Count == 0)
+                {
+                    Console.WriteLine($"[TERMO] Nenhum item entregue encontrado, buscando todos os itens da requisição...");
+                    itensEntregues = itens;
+                }
 
                 var recursos = new List<object>();
-                foreach (var it in itens)
+                foreach (var it in itensEntregues)
                 {
                     string tipo = "Corporativo";
                     string patrimonio = string.Empty;
