@@ -688,6 +688,34 @@ namespace SingleOne.Negocios
                                              Patrimonio = eq.Patrimonio ?? ""
                                          })
                                          .ToList();
+                
+                Console.WriteLine($"[DASHBOARD] Equipamentos ativos de colaboradores desligados encontrados na view: {equipamentosAtivos.Count}");
+                
+                // ✅ FALLBACK: Se a view não retornar resultados, buscar diretamente das tabelas
+                if (equipamentosAtivos.Count == 0)
+                {
+                    Console.WriteLine($"[DASHBOARD] View não retornou equipamentos de colaboradores desligados, buscando diretamente das tabelas...");
+                    equipamentosAtivos = (from ri in _requisicaoItensRepository.Query()
+                                         join r in _requisicaoRepository.Query() on ri.Requisicao equals r.Id
+                                         join eq in _vwequipamentosdetalhesRepository.Query() on ri.Equipamento equals eq.Id
+                                         where r.Cliente == cliente
+                                               && r.Colaboradorfinal.HasValue
+                                               && ri.Dtentrega.HasValue // Equipamento entregue (status 4)
+                                               && (!ri.Dtdevolucao.HasValue) // Ainda não devolvido
+                                         select new 
+                                         { 
+                                             ColabId = r.Colaboradorfinal.Value,
+                                             EquipamentoId = eq.Id.Value,
+                                             TipoEquipamento = eq.Tipoequipamento ?? "Equipamento",
+                                             Fabricante = eq.Fabricante ?? "",
+                                             Modelo = eq.Modelo ?? "",
+                                             NumeroSerie = eq.Numeroserie ?? "",
+                                             Patrimonio = eq.Patrimonio ?? ""
+                                         })
+                                         .ToList();
+                    
+                    Console.WriteLine($"[DASHBOARD] Equipamentos ativos de colaboradores desligados encontrados diretamente das tabelas: {equipamentosAtivos.Count}");
+                }
 
                 var equipamentosComDesligados = new List<Vwequipamentoscomcolaboradoresdesligado>();
                 
