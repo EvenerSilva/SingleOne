@@ -2141,8 +2141,11 @@ namespace SingleOne.Negocios
         {
             try
             {
-            // ✅ CORREÇÃO: Buscar a entidade do banco para garantir rastreamento correto
-            var ri = _requisicaoItensRepository.Buscar(x => x.Id == rivm.Id).FirstOrDefault();
+            Console.WriteLine($"[NEGOCIO] AtualizarItemRequisicao - INÍCIO - Item ID: {rivm.Id}");
+            Console.WriteLine($"[NEGOCIO] AtualizarItemRequisicao - Dtprogramadaretorno recebido: {(rivm.Dtprogramadaretorno?.ToString() ?? "NULL")}");
+            
+            // ✅ CORREÇÃO: Buscar a entidade do banco com AsNoTracking para evitar conflitos
+            var ri = _requisicaoItensRepository.Buscar(x => x.Id == rivm.Id).AsNoTracking().FirstOrDefault();
 
             if (ri == null)
             {
@@ -2152,33 +2155,36 @@ namespace SingleOne.Negocios
 
             // ✅ CORREÇÃO: Salvar o valor anterior para log
             var valorAnterior = ri.Dtprogramadaretorno;
+            Console.WriteLine($"[NEGOCIO] AtualizarItemRequisicao - Valor anterior no banco: {(valorAnterior?.ToString() ?? "NULL")}");
             
-            // ✅ CORREÇÃO: Atualizar campos
-            ri.Observacaoentrega = rivm.Observacaoentrega;
-            
-            // ✅ CORREÇÃO: Sempre atualizar o campo, mesmo quando for null (para permitir remover agendamento)
-            if (rivm.Dtprogramadaretorno.HasValue)
+            // ✅ CORREÇÃO: Criar nova instância com os valores atualizados para forçar Update()
+            // Isso garante que o EF detecte TODAS as mudanças, incluindo null
+            var riAtualizado = new Requisicoesiten
             {
-                var data = rivm.Dtprogramadaretorno.Value;
-                ri.Dtprogramadaretorno = DateTime.SpecifyKind(data, DateTimeKind.Unspecified);
-            }
-            else
-            {
-                // ✅ CORREÇÃO: Forçar null explicitamente para remover agendamento
-                ri.Dtprogramadaretorno = null;
-            }
+                Id = ri.Id,
+                Requisicao = ri.Requisicao,
+                Equipamento = ri.Equipamento,
+                Linhatelefonica = ri.Linhatelefonica,
+                Usuarioentrega = ri.Usuarioentrega,
+                Usuariodevolucao = ri.Usuariodevolucao,
+                Dtentrega = ri.Dtentrega,
+                Dtdevolucao = ri.Dtdevolucao,
+                Observacaoentrega = rivm.Observacaoentrega ?? ri.Observacaoentrega,
+                Dtprogramadaretorno = rivm.Dtprogramadaretorno // ✅ Isso pode ser null, e será salvo como null
+            };
 
-            Console.WriteLine($"[NEGOCIO] AtualizarItemRequisicao - Item ID: {ri.Id}, Dtprogramadaretorno anterior: {(valorAnterior?.ToString() ?? "NULL")}, novo: {(ri.Dtprogramadaretorno?.ToString() ?? "NULL")}");
+            Console.WriteLine($"[NEGOCIO] AtualizarItemRequisicao - Novo valor a ser salvo: {(riAtualizado.Dtprogramadaretorno?.ToString() ?? "NULL")}");
             
-            // ✅ CORREÇÃO: O método Atualizar() do repositório usa Update() que força atualização de todos os campos, incluindo null
-            _requisicaoItensRepository.Atualizar(ri);
-            _requisicaoItensRepository.SalvarAlteracoes(); // ✅ CORREÇÃO: Garantir que as alterações sejam salvas
+            // ✅ CORREÇÃO: Usar Update() que força atualização de TODOS os campos, incluindo null
+            _requisicaoItensRepository.Atualizar(riAtualizado);
+            _requisicaoItensRepository.SalvarAlteracoes();
             
-            // ✅ VERIFICAÇÃO: Buscar novamente para confirmar que foi atualizado
-            var riVerificado = _requisicaoItensRepository.Buscar(x => x.Id == rivm.Id).FirstOrDefault();
+            Console.WriteLine($"[NEGOCIO] AtualizarItemRequisicao - SaveChanges executado");
+            
+            // ✅ VERIFICAÇÃO: Buscar novamente com AsNoTracking para confirmar que foi atualizado
+            var riVerificado = _requisicaoItensRepository.Buscar(x => x.Id == rivm.Id).AsNoTracking().FirstOrDefault();
             Console.WriteLine($"[NEGOCIO] AtualizarItemRequisicao - Verificação pós-atualização: Dtprogramadaretorno = {(riVerificado?.Dtprogramadaretorno?.ToString() ?? "NULL")}");
-            
-            Console.WriteLine($"[NEGOCIO] AtualizarItemRequisicao - Item atualizado com sucesso");
+            Console.WriteLine($"[NEGOCIO] AtualizarItemRequisicao - FIM");
             }
             catch (Exception ex)
             {
