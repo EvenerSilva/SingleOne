@@ -641,8 +641,7 @@ namespace SingleOne.Negocios
                                                        from mod in modelos.DefaultIfEmpty()
                                                        where r.Cliente == cliente
                                                              && ri.Dtprogramadaretorno.HasValue
-                                                             && (ri.Equipamentostatus == 4 // Entregue
-                                                                 || ri.Equipamentostatus == 7) // Requisitado (em trânsito para devolução)
+                                                             && ri.Dtentrega.HasValue // Equipamento entregue (equivalente a status 4)
                                                              && !ri.Dtdevolucao.HasValue // Ainda não devolvido
                                                        select new Vwdevolucaoprogramadum
                                                        {
