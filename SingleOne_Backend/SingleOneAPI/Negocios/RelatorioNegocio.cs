@@ -425,7 +425,7 @@ namespace SingleOne.Negocios
                                 Dtdevolucao = item.Dtdevolucao,
                                 Observacaoentrega = item.Observacaoentrega,
                                 Dtprogramadaretorno = item.Dtprogramadaretorno,
-                                TipoAquisicao = item.EquipamentoNavigation.Tipoaquisicao.HasValue ? item.EquipamentoNavigation.Tipoaquisicao.Value : 0
+                                TipoAquisicao = item.EquipamentoNavigation.Tipoaquisicao
                             });
                         }
                     }
