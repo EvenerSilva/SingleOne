@@ -2298,7 +2298,7 @@ namespace SingleOne.Negocios
                                     Id = item.Id,
                                     Requisicao = item.Requisicao,
                                     Equipamento = item.Equipamento,
-                                    Linhatelefonica = item.Linha,
+                                    Linhatelefonica = item.Linhatelefonica,
                                     Observacaoentrega = item.Observacaoentrega,
                                     Dtprogramadaretorno = item.Dtprogramadaretorno,
                                     Usuarioentrega = item.Usuarioentrega
