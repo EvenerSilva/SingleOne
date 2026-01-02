@@ -882,6 +882,12 @@ namespace SingleOne.Negocios
                     movimentacoes = movimentacoesDiretas;
                 }
                 
+                // Log detalhado das movimentações encontradas
+                foreach (var mov in movimentacoes)
+                {
+                    Console.WriteLine($"[DASHBOARD] Movimentação - TemEntrega: {mov.TemEntrega}, UsuarioEntrega: '{mov.UsuarioEntrega ?? "NULL"}', TemDevolucao: {mov.TemDevolucao}, UsuarioDevolucao: '{mov.UsuarioDevolucao ?? "NULL"}'");
+                }
+                
                 var contagemPorUsuario = new Dictionary<string, int>();
                 
                 foreach (var mov in movimentacoes)
