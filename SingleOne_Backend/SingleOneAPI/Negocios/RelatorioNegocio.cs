@@ -632,13 +632,7 @@ namespace SingleOne.Negocios
                     devolucoesProgramadasDetalhadas = (from ri in _requisicaoItensRepository.Query()
                                                        join r in _requisicaoRepository.Query() on ri.Requisicao equals r.Id
                                                        join col in _colaboradorRepository.Query() on r.Colaboradorfinal equals col.Id
-                                                       join eq in _equipamentoRepository.Query() on ri.Equipamento equals eq.Id
-                                                       join ta in _tipoaquisicaoRepository.Query() on eq.Tipoaquisicao equals ta.Id into tipoAquisicao
-                                                       from ta in tipoAquisicao.DefaultIfEmpty()
-                                                       join fab in _fabricanteRepository.Query() on eq.Fabricante equals fab.Id into fabricantes
-                                                       from fab in fabricantes.DefaultIfEmpty()
-                                                       join mod in _modeloRepository.Query() on eq.Modelo equals mod.Id into modelos
-                                                       from mod in modelos.DefaultIfEmpty()
+                                                       join eq in _vwequipamentosdetalhesRepository.Query() on ri.Equipamento equals eq.Id
                                                        where r.Cliente == cliente
                                                              && ri.Dtprogramadaretorno.HasValue
                                                              && ri.Dtentrega.HasValue // Equipamento entregue (equivalente a status 4)
@@ -650,7 +644,7 @@ namespace SingleOne.Negocios
                                                            Dtprogramadaretorno = ri.Dtprogramadaretorno,
                                                            Matricula = col.Matricula,
                                                            ColaboradorId = col.Id,
-                                                           Equipamento = (ta != null ? ta.Descricao ?? "" : "") + " " + (fab != null ? fab.Nome ?? "" : "") + " " + (mod != null ? mod.Nome ?? "" : ""),
+                                                           Equipamento = (eq.Tipoequipamento ?? "") + " " + (eq.Fabricante ?? "") + " " + (eq.Modelo ?? ""),
                                                            Serial = eq.Numeroserie,
                                                            Patrimonio = eq.Patrimonio,
                                                            EquipamentoId = eq.Id,
