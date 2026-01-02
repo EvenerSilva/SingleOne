@@ -2267,8 +2267,9 @@ namespace SingleOne.Negocios
         {
             Console.WriteLine($"[NEGOCIO] AdicionarAgendamentoEquipamentoVM - INÍCIO");
             Console.WriteLine($"[NEGOCIO] AdicionarAgendamentoEquipamentoVM - RequisicaoItemId: {equipamento?.RequisicaoItemId}");
-            Console.WriteLine($"[NEGOCIO] AdicionarAgendamentoEquipamentoVM - DTProgramadaRetorno recebido: {(equipamento?.DTProgramadaRetorno?.ToString() ?? "NULL")}");
-            Console.WriteLine($"[NEGOCIO] AdicionarAgendamentoEquipamentoVM - DTProgramadaRetorno.HasValue: {equipamento?.DTProgramadaRetorno?.HasValue ?? false}");
+            var dtProgramada = equipamento?.DTProgramadaRetorno;
+            Console.WriteLine($"[NEGOCIO] AdicionarAgendamentoEquipamentoVM - DTProgramadaRetorno recebido: {(dtProgramada?.ToString() ?? "NULL")}");
+            Console.WriteLine($"[NEGOCIO] AdicionarAgendamentoEquipamentoVM - DTProgramadaRetorno é null: {dtProgramada == null}");
             
             var item = _requisicaoItensRepository
                 .Buscar(x => x.Id == equipamento.RequisicaoItemId)

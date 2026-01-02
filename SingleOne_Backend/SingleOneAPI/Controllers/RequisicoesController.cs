@@ -319,8 +319,9 @@ namespace SingleOne.Controllers
         {
             Console.WriteLine($"[CONTROLLER] AdicionarAgendamentoEquipamentoVM - INÍCIO");
             Console.WriteLine($"[CONTROLLER] AdicionarAgendamentoEquipamentoVM - RequisicaoItemId: {equipamento?.RequisicaoItemId}");
-            Console.WriteLine($"[CONTROLLER] AdicionarAgendamentoEquipamentoVM - DTProgramadaRetorno recebido: {(equipamento?.DTProgramadaRetorno?.ToString() ?? "NULL")}");
-            Console.WriteLine($"[CONTROLLER] AdicionarAgendamentoEquipamentoVM - DTProgramadaRetorno.HasValue: {equipamento?.DTProgramadaRetorno?.HasValue ?? false}");
+            var dtProgramada = equipamento?.DTProgramadaRetorno;
+            Console.WriteLine($"[CONTROLLER] AdicionarAgendamentoEquipamentoVM - DTProgramadaRetorno recebido: {(dtProgramada?.ToString() ?? "NULL")}");
+            Console.WriteLine($"[CONTROLLER] AdicionarAgendamentoEquipamentoVM - DTProgramadaRetorno é null: {dtProgramada == null}");
             
             try
             {
