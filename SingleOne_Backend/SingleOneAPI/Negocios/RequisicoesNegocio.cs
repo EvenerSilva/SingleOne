@@ -1603,6 +1603,7 @@ namespace SingleOne.Negocios
         private PagedResult<EntregaAtivaVM> BuscarEntregasAtivas(string pesquisa, int cliente, int pagina)
         {
             // ✅ DEBUG: Log de entrada
+            Console.WriteLine($"[REQUISICOES] BuscarEntregasAtivas - Cliente: {cliente}, Pesquisa: {pesquisa}, Página: {pagina}");
             
             // ✅ CORREÇÃO: Buscar equipamentos entregues (não-BYOD) incluindo matrícula
             var equipamentosEntregues = (from x in _vwUltimasRequisicaoNaoBYODRepository.Query()
@@ -1619,6 +1620,8 @@ namespace SingleOne.Negocios
                             x.Patrimonio.ToLower().Contains(pesquisa) ||
                             (colab != null && colab.Matricula != null && colab.Matricula.ToLower().Contains(pesquisa)) : true)
                     select x).AsNoTracking().ToList();
+            
+            Console.WriteLine($"[REQUISICOES] Equipamentos entregues encontrados: {equipamentosEntregues.Count}");
             
 
             // ✅ NOVO: Buscar linhas telefônicas entregues (apenas não-BYOD/corporativas) incluindo matrícula e número da linha
@@ -1704,6 +1707,7 @@ namespace SingleOne.Negocios
             var skip = (pagina - 1) * 10;
             var results = entregasAgrupadas.Skip(skip).Take(10).ToList();
 
+            Console.WriteLine($"[REQUISICOES] Total de entregas agrupadas: {total}, Resultados na página: {results.Count}");
 
             return new PagedResult<EntregaAtivaVM>
             {
