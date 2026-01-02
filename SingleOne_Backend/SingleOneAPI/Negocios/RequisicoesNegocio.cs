@@ -442,14 +442,43 @@ namespace SingleOne.Negocios
                             .ToList();
                     }
                 }
+                // ✅ CORREÇÃO: Se não encontrou requisições pendentes, usar a requisição do hash diretamente
+                // Mas ainda precisa processar os equipamentos dela
                 if (rs.Count > 0)
                 {
                     req.Requisicao = rs.FirstOrDefault();
                 }
                 else
                 {
-                    req.Requisicao = r;
+                    // Se não encontrou requisições pendentes, usar a requisição do hash
+                    // Mas verificar se ela tem itens entregues antes de processar
+                    if (r != null)
+                    {
+                        var itensEntregues = _requisicaoItensRepository
+                            .Buscar(x => x.Requisicao == r.Id && 
+                                        x.Dtentrega.HasValue && 
+                                        x.Dtdevolucao == null)
+                            .ToList();
+                        
+                        if (itensEntregues.Count > 0)
+                        {
+                            Console.WriteLine($"[TERMO] Usando requisição do hash diretamente com {itensEntregues.Count} itens entregues");
+                            req.Requisicao = r;
+                            rs.Add(r); // Adicionar à lista para processar os equipamentos
+                        }
+                        else
+                        {
+                            Console.WriteLine($"[TERMO] ⚠️ Requisição do hash não tem itens entregues");
+                            req.Requisicao = r;
+                        }
+                    }
+                    else
+                    {
+                        req.Requisicao = r;
+                    }
                 }
+                
+                Console.WriteLine($"[TERMO] Total de requisições para processar: {rs.Count}");
                 foreach (var requisicao in rs)
                 {
                     Console.WriteLine($"[TERMO] Processando requisição ID: {requisicao.Id}, BYOD: {byod}");
