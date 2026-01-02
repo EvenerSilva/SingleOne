@@ -1448,10 +1448,15 @@ namespace SingleOne.Negocios
         {
             List<EquipamentoRequisicaoVM> equipamentosVM = new List<EquipamentoRequisicaoVM>();
             
+            Console.WriteLine($"[REQUISICOES] MontarEquipamentosRequisicao - Requisição ID: {requisicaoId}");
+            
             // ✅ CORREÇÃO: Buscar equipamentos entregues
             var equipamentos = _requisicaoequipamentosvmsRepository
                 .Buscar(x => x.Requisicao == requisicaoId && x.Equipamentostatus == 4 && x.Dtdevolucao == null)
                 .ToList();
+            
+            Console.WriteLine($"[REQUISICOES] Equipamentos encontrados na view: {equipamentos.Count}");
+            
             foreach (var item in equipamentos)
             {
                 equipamentosVM.Add(new EquipamentoRequisicaoVM
@@ -1465,6 +1470,42 @@ namespace SingleOne.Negocios
                     ObservacaoEntrega = item.Observacaoentrega,
                     Usuariodevolucaoid = item.Usuariodevolucaoid
                 });
+            }
+            
+            // ✅ FALLBACK: Se a view não retornar resultados, buscar diretamente das tabelas
+            if (equipamentos.Count == 0)
+            {
+                Console.WriteLine($"[REQUISICOES] View não retornou equipamentos, buscando diretamente das tabelas...");
+                var itensEntregues = _requisicaoItensRepository
+                    .Buscar(x => x.Requisicao == requisicaoId && 
+                                x.Equipamento.HasValue && 
+                                x.Dtentrega.HasValue && 
+                                x.Dtdevolucao == null)
+                    .Include(x => x.EquipamentoNavigation)
+                    .ToList();
+                
+                Console.WriteLine($"[REQUISICOES] Itens de requisição entregues encontrados: {itensEntregues.Count}");
+                
+                foreach (var item in itensEntregues)
+                {
+                    if (item.EquipamentoNavigation != null)
+                    {
+                        equipamentosVM.Add(new EquipamentoRequisicaoVM
+                        {
+                            Equipamento = $"{item.EquipamentoNavigation.TipoequipamentoNavigation?.Descricao ?? "Equipamento"} {item.EquipamentoNavigation.FabricanteNavigation?.Descricao ?? ""} {item.EquipamentoNavigation.ModeloNavigation?.Descricao ?? ""}".Trim(),
+                            EquipamentoId = item.Equipamento.Value,
+                            RequisicaoItemId = item.Id,
+                            DTProgramadaRetorno = item.Dtprogramadaretorno,
+                            NumeroSerie = item.EquipamentoNavigation.Numeroserie,
+                            Patrimonio = item.EquipamentoNavigation.Patrimonio,
+                            ObservacaoEntrega = item.Observacaoentrega,
+                            Usuariodevolucaoid = item.Usuariodevolucao,
+                            DtEntrega = item.Dtentrega
+                        });
+                    }
+                }
+                
+                Console.WriteLine($"[REQUISICOES] Equipamentos montados via fallback: {equipamentosVM.Count}");
             }
 
             // ✅ NOVO: Buscar linhas telefônicas entregues (apenas não-BYOD/corporativas)
