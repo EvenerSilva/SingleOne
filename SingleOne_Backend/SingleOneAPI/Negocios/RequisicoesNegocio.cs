@@ -2278,7 +2278,41 @@ namespace SingleOne.Negocios
         public void RealizarEntregaComCompartilhados(RequisicaoDTO dto)
         {
             if (dto == null) throw new Exception("Payload inválido");
-            if (dto.Requisicoesitens == null || dto.Requisicoesitens.Count == 0) throw new Exception("Sem itens para entrega");
+            if (dto.Requisicoesitens == null || dto.Requisicoesitens.Count == 0)
+            {
+                // Buscar itens da requisição no banco se não vieram no DTO
+                if (dto.Id > 0)
+                {
+                    var requisicao = _requisicaoRepository.Buscar(x => x.Id == dto.Id).FirstOrDefault();
+                    if (requisicao != null)
+                    {
+                        var itens = _requisicaoItensRepository.Buscar(x => x.Requisicao == dto.Id).ToList();
+                        if (itens.Count > 0)
+                        {
+                            // Se encontrou itens no banco, usar eles
+                            if (dto.Requisicoesitens == null) dto.Requisicoesitens = new List<RequisicoesitenDTO>();
+                            foreach (var item in itens)
+                            {
+                                dto.Requisicoesitens.Add(new RequisicoesitenDTO
+                                {
+                                    Id = item.Id,
+                                    Equipamento = item.Equipamento,
+                                    Linha = item.Linha,
+                                    Observacaoentrega = item.Observacaoentrega,
+                                    Dtprogramadaretorno = item.Dtprogramadaretorno,
+                                    Usuarioentrega = item.Usuarioentrega
+                                });
+                            }
+                            Console.WriteLine($"[REQUISICOES] Recuperados {dto.Requisicoesitens.Count} itens do banco para requisição {dto.Id}");
+                        }
+                    }
+                }
+                
+                if (dto.Requisicoesitens == null || dto.Requisicoesitens.Count == 0)
+                {
+                    throw new Exception($"Sem itens para entrega. Requisição ID: {dto?.Id ?? 0}");
+                }
+            }
 
             _requisicaoRepository.ExecuteInTransaction(() =>
             {
