@@ -1648,6 +1648,7 @@ namespace SingleOne.Negocios
                         where r.Cliente == cliente &&
                                 r.Requisicaostatus == 3 &&
                                 e.Equipamentostatus == 4 &&
+                                e.Tipoaquisicao != 2 && // ✅ FILTRO: Excluir BYOD (TipoAquisicao 2)
                                 ri.Equipamento.HasValue &&
                                 ri.Dtentrega.HasValue &&
                                 ri.Dtdevolucao == null &&
