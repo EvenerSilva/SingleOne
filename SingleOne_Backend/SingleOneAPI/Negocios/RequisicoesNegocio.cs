@@ -1605,7 +1605,21 @@ namespace SingleOne.Negocios
             // ✅ DEBUG: Log de entrada
             Console.WriteLine($"[REQUISICOES] BuscarEntregasAtivas - Cliente: {cliente}, Pesquisa: {pesquisa}, Página: {pagina}");
             
+            // ✅ DEBUG: Verificar diretamente no banco se há requisições processadas
+            var reqsProcessadas = _requisicaoRepository.Buscar(x => x.Cliente == cliente && x.Requisicaostatus == 3).ToList();
+            Console.WriteLine($"[REQUISICOES] Requisições processadas (status 3) encontradas: {reqsProcessadas.Count}");
+            
+            // ✅ DEBUG: Verificar itens de requisição entregues
+            var itensEntregues = _requisicaoItensRepository.Buscar(x => 
+                x.RequisicaoNavigation.Cliente == cliente && 
+                x.RequisicaoNavigation.Requisicaostatus == 3 &&
+                x.Equipamento.HasValue &&
+                x.Dtentrega.HasValue &&
+                x.Dtdevolucao == null).ToList();
+            Console.WriteLine($"[REQUISICOES] Itens de requisição entregues encontrados: {itensEntregues.Count}");
+            
             // ✅ CORREÇÃO: Buscar equipamentos entregues (não-BYOD) incluindo matrícula
+            // Primeiro, buscar diretamente das tabelas se a view não retornar resultados
             var equipamentosEntregues = (from x in _vwUltimasRequisicaoNaoBYODRepository.Query()
                     join c in _colaboradorRepository.Query() on x.ColaboradorFinal equals c.Id into colabJoin
                     from colab in colabJoin.DefaultIfEmpty()
@@ -1621,7 +1635,56 @@ namespace SingleOne.Negocios
                             (colab != null && colab.Matricula != null && colab.Matricula.ToLower().Contains(pesquisa)) : true)
                     select x).AsNoTracking().ToList();
             
-            Console.WriteLine($"[REQUISICOES] Equipamentos entregues encontrados: {equipamentosEntregues.Count}");
+            Console.WriteLine($"[REQUISICOES] Equipamentos entregues encontrados na view: {equipamentosEntregues.Count}");
+            
+            // ✅ FALLBACK: Se a view não retornar resultados, buscar diretamente das tabelas
+            if (equipamentosEntregues.Count == 0 && itensEntregues.Count > 0)
+            {
+                Console.WriteLine($"[REQUISICOES] View não retornou resultados, buscando diretamente das tabelas...");
+                equipamentosEntregues = (from ri in _requisicaoItensRepository.Query()
+                        join r in _requisicaoRepository.Query() on ri.Requisicao equals r.Id
+                        join e in _equipamentoRepository.Query() on ri.Equipamento equals e.Id
+                        join c in _colaboradorRepository.Query() on r.Colaboradorfinal equals c.Id
+                        where r.Cliente == cliente &&
+                                r.Requisicaostatus == 3 &&
+                                e.Equipamentostatus == 4 &&
+                                ri.Equipamento.HasValue &&
+                                ri.Dtentrega.HasValue &&
+                                ri.Dtdevolucao == null &&
+                                r.Colaboradorfinal.HasValue &&
+                                ((pesquisa != "null") ?
+                                c.Nome.ToLower().Contains(pesquisa) ||
+                                e.Numeroserie.ToLower().Contains(pesquisa) ||
+                                (e.Patrimonio != null && e.Patrimonio.ToLower().Contains(pesquisa)) ||
+                                (c.Matricula != null && c.Matricula.ToLower().Contains(pesquisa)) : true)
+                        select new VwUltimasRequisicaoNaoBYOD
+                        {
+                            RequisicaoId = r.Id,
+                            ColaboradorFinal = r.Colaboradorfinal.Value,
+                            NomeColaboradorFinal = c.Nome,
+                            EquipamentoStatus = 4,
+                            RequisicaoStatus = 3,
+                            DtEntrega = ri.Dtentrega,
+                            DtDevolucao = null,
+                            NumeroSerie = e.Numeroserie ?? "",
+                            Patrimonio = e.Patrimonio ?? "",
+                            Cliente = cliente,
+                            Equipamento = e.Id,
+                            EquipamentoId = e.Id,
+                            RequisicaoItemId = ri.Id,
+                            UsuarioRequisicao = r.Usuariorequisicao,
+                            TecnicoResponsavel = r.Tecnicoresponsavel,
+                            DtSolicitacao = r.Dtsolicitacao ?? DateTime.Now,
+                            DtProcessamento = r.Dtprocessamento,
+                            AssinaturaEletronica = r.Assinaturaeletronica,
+                            HashRequisicao = r.Hashrequisicao ?? "",
+                            TipoAquisicao = e.Tipoaquisicao,
+                            UsuarioEntrega = ri.Usuarioentrega,
+                            ObservacaoEntrega = ri.Observacaoentrega ?? ""
+                        }).AsNoTracking().ToList();
+                
+                Console.WriteLine($"[REQUISICOES] Equipamentos encontrados via fallback: {equipamentosEntregues.Count}");
+            }
             
 
             // ✅ NOVO: Buscar linhas telefônicas entregues (apenas não-BYOD/corporativas) incluindo matrícula e número da linha
