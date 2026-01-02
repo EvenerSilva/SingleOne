@@ -1672,6 +1672,8 @@ namespace SingleOne.Negocios
 
             // Adicionar linhas telefônicas (não-BYOD/corporativas)
             todasEntregas.AddRange(linhasTelefonicasEntregues);
+            
+            Console.WriteLine($"[REQUISICOES] Total de entregas combinadas (equipamentos + linhas): {todasEntregas.Count}");
 
             // ✅ AGRUPAR: Agrupar por colaborador
             var entregasAgrupadas = todasEntregas
