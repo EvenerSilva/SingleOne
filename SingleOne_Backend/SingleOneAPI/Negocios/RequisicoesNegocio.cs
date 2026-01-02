@@ -984,6 +984,63 @@ namespace SingleOne.Negocios
                         _equipamentohistoricoRepository.SalvarAlteracoes();
                     }
 
+                    // ✅ CORREÇÃO: Atualizar itens da requisição se foram fornecidos
+                    if (req.Requisicoesitens != null && req.Requisicoesitens.Any())
+                    {
+                        Console.WriteLine($"[NEGOCIO] GravarRequisicao - Atualizando {req.Requisicoesitens.Count} itens da requisição");
+                        
+                        foreach (var itemDto in req.Requisicoesitens)
+                        {
+                            if (itemDto.Id > 0)
+                            {
+                                Console.WriteLine($"[NEGOCIO] GravarRequisicao - Atualizando item ID: {itemDto.Id}");
+                                Console.WriteLine($"[NEGOCIO] GravarRequisicao - Dtprogramadaretorno recebido: {(itemDto.Dtprogramadaretorno?.ToString() ?? "NULL")}");
+                                Console.WriteLine($"[NEGOCIO] GravarRequisicao - Observacaoentrega: {itemDto.Observacaoentrega ?? "NULL"}");
+                                
+                                // Buscar o item existente com AsNoTracking para criar nova instância
+                                var itemExistente = _requisicaoItensRepository.Buscar(x => x.Id == itemDto.Id).AsNoTracking().FirstOrDefault();
+                                
+                                if (itemExistente != null)
+                                {
+                                    Console.WriteLine($"[NEGOCIO] GravarRequisicao - Item encontrado. Dtprogramadaretorno atual: {(itemExistente.Dtprogramadaretorno?.ToString() ?? "NULL")}");
+                                    
+                                    // Criar nova instância com valores atualizados
+                                    var itemAtualizado = new Requisicoesiten
+                                    {
+                                        Id = itemExistente.Id,
+                                        Requisicao = itemExistente.Requisicao,
+                                        Equipamento = itemExistente.Equipamento,
+                                        Linhatelefonica = itemExistente.Linhatelefonica,
+                                        Usuarioentrega = itemDto.Usuarioentrega ?? itemExistente.Usuarioentrega,
+                                        Usuariodevolucao = itemDto.Usuariodevolucao ?? itemExistente.Usuariodevolucao,
+                                        Dtentrega = itemDto.Dtentrega ?? itemExistente.Dtentrega,
+                                        Dtdevolucao = itemDto.Dtdevolucao ?? itemExistente.Dtdevolucao,
+                                        Observacaoentrega = itemDto.Observacaoentrega ?? itemExistente.Observacaoentrega,
+                                        // ✅ CRÍTICO: Permitir que Dtprogramadaretorno seja null
+                                        Dtprogramadaretorno = itemDto.Dtprogramadaretorno
+                                    };
+                                    
+                                    Console.WriteLine($"[NEGOCIO] GravarRequisicao - Item atualizado. Dtprogramadaretorno novo: {(itemAtualizado.Dtprogramadaretorno?.ToString() ?? "NULL")}");
+                                    
+                                    // Usar Atualizar com nova instância para forçar update completo
+                                    _requisicaoItensRepository.Atualizar(itemAtualizado);
+                                }
+                                else
+                                {
+                                    Console.WriteLine($"[NEGOCIO] GravarRequisicao - ⚠️ Item ID {itemDto.Id} não encontrado no banco");
+                                }
+                            }
+                        }
+                        
+                        // Salvar alterações nos itens
+                        _requisicaoItensRepository.SalvarAlteracoes();
+                        Console.WriteLine($"[NEGOCIO] GravarRequisicao - Itens atualizados e salvos");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"[NEGOCIO] GravarRequisicao - Nenhum item fornecido para atualização");
+                    }
+
                     // ✅ CORREÇÃO: Verificar se o status foi salvo corretamente
                     var requisicaoVerificada = _requisicaoRepository.Buscar(x => x.Id == req.Id).AsNoTracking().FirstOrDefault();
                     Console.WriteLine($"[NEGOCIO] GravarRequisicao - Status final no banco: {requisicaoVerificada?.Requisicaostatus}");
