@@ -864,6 +864,8 @@ namespace SingleOne.Negocios
                                                join r in _requisicaoRepository.Query() on ri.Requisicao equals r.Id
                                                join ue in _usuarioRepository.Query() on ri.Usuarioentrega equals ue.Id into entregaUsuarios
                                                from ue in entregaUsuarios.DefaultIfEmpty()
+                                               join ur in _usuarioRepository.Query() on r.Usuariorequisicao equals ur.Id into requisicaoUsuarios
+                                               from ur in requisicaoUsuarios.DefaultIfEmpty()
                                                join ud in _usuarioRepository.Query() on ri.Usuariodevolucao equals ud.Id into devolucaoUsuarios
                                                from ud in devolucaoUsuarios.DefaultIfEmpty()
                                                where r.Cliente == cliente && 
@@ -871,7 +873,7 @@ namespace SingleOne.Negocios
                                                       (ri.Dtdevolucao.HasValue && ri.Dtdevolucao.Value >= dataLimite))
                                                select new
                                                {
-                                                   UsuarioEntrega = ue != null ? ue.Nome : null,
+                                                   UsuarioEntrega = (ue != null ? ue.Nome : null) ?? (ur != null ? ur.Nome : null),
                                                    UsuarioDevolucao = ud != null ? ud.Nome : null,
                                                    TemEntrega = ri.Dtentrega.HasValue && ri.Dtentrega.Value >= dataLimite,
                                                    TemDevolucao = ri.Dtdevolucao.HasValue && ri.Dtdevolucao.Value >= dataLimite
