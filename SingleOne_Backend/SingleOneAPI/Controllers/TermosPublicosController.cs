@@ -78,14 +78,21 @@ namespace SingleOneAPI.Controllers
                 var requisicoesHash = _requisicaoRepository
                     .Buscar(x => x.Hashrequisicao != null && x.Hashrequisicao.ToLower() == hashLower)
                     .ToList();
+                Console.WriteLine($"[TERMO] Requisições encontradas diretamente: {requisicoesHash?.Count ?? 0}");
+                
                 if (requisicoesHash == null || requisicoesHash.Count == 0)
                 {
+                    Console.WriteLine($"[TERMO] Nenhuma requisição encontrada diretamente, tentando via view...");
                     // Fallback: consultar a view consolidada
                     var rvm = _requisicoesvmRepository
                         .Buscar(x => x.Hashrequisicao != null && x.Hashrequisicao.ToLower() == hashLower)
                         .ToList();
+                    
+                    Console.WriteLine($"[TERMO] Requisições encontradas via view: {rvm?.Count ?? 0}");
+                    
                     if (rvm == null || rvm.Count == 0)
                     {
+                        Console.WriteLine($"[TERMO] ❌ Termo não encontrado para o hash informado");
                         return Ok(new { sucesso = true, assinado = false, mensagem = "Termo não encontrado para o hash informado." });
                     }
 
@@ -220,6 +227,9 @@ namespace SingleOneAPI.Controllers
                         }
                     }
 
+                    Console.WriteLine($"[TERMO] ✅ Retornando termo via view - Recursos: {recursosVm.Count}, Colaborador: {colaboradorNomeVm}");
+                    Console.WriteLine($"[TERMO] ========== FIM VALIDAÇÃO TERMO (VIEW) ==========");
+                    
                     return Ok(new {
                         sucesso = true,
                         assinado = assinadoVm,
@@ -372,6 +382,9 @@ namespace SingleOneAPI.Controllers
                     }
                 }
 
+                Console.WriteLine($"[TERMO] ✅ Retornando termo - Recursos: {recursos.Count}, Colaborador: {colaboradorNome}");
+                Console.WriteLine($"[TERMO] ========== FIM VALIDAÇÃO TERMO ==========");
+                
                 return Ok(new {
                     sucesso = true,
                     assinado,
