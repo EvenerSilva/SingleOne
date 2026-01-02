@@ -1074,6 +1074,7 @@ CREATE TABLE IF NOT EXISTS patrimonio_contestoes (
     motivo TEXT NOT NULL,
     descricao TEXT,
     status VARCHAR(20) DEFAULT 'pendente' CHECK (status IN ('pendente', 'aprovada', 'rejeitada', 'negada')),
+    tipo_contestacao VARCHAR(50) DEFAULT 'contestacao',
     evidencia_url VARCHAR(500),
     data_contestacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     data_resolucao TIMESTAMP NULL,
