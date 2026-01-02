@@ -610,7 +610,7 @@ namespace SingleOne.Negocios
                                                            Cliente = cliente,
                                                            Nomecolaborador = col.Nome,
                                                            Dtprogramadaretorno = evm.Dtprogramadaretorno,
-                                                           // ?? Campos adicionais para enriquecer os dados
+                                                           // ✅ Campos adicionais para enriquecer os dados
                                                            Matricula = col.Matricula,
                                                            ColaboradorId = col.Id,
                                                            Equipamento = (eq.Tipoequipamento ?? "") + " " + (eq.Fabricante ?? "") + " " + (eq.Modelo ?? ""),
@@ -622,6 +622,47 @@ namespace SingleOne.Negocios
                                                        })
                                                        .OrderByDescending(x => x.Dtprogramadaretorno)
                                                        .ToList();
+                
+                Console.WriteLine($"[DASHBOARD] Devoluções programadas encontradas na view: {devolucoesProgramadasDetalhadas.Count}");
+                
+                // ✅ FALLBACK: Se a view não retornar resultados, buscar diretamente das tabelas
+                if (devolucoesProgramadasDetalhadas.Count == 0)
+                {
+                    Console.WriteLine($"[DASHBOARD] View não retornou devoluções programadas, buscando diretamente das tabelas...");
+                    devolucoesProgramadasDetalhadas = (from ri in _requisicaoItensRepository.Query()
+                                                       join r in _requisicaoRepository.Query() on ri.Requisicao equals r.Id
+                                                       join col in _colaboradorRepository.Query() on r.Colaboradorfinal equals col.Id
+                                                       join eq in _equipamentoRepository.Query() on ri.Equipamento equals eq.Id
+                                                       join ta in _tipoaquisicaoRepository.Query() on eq.Tipoaquisicao equals ta.Id into tipoAquisicao
+                                                       from ta in tipoAquisicao.DefaultIfEmpty()
+                                                       join fab in _fabricanteRepository.Query() on eq.Fabricante equals fab.Id into fabricantes
+                                                       from fab in fabricantes.DefaultIfEmpty()
+                                                       join mod in _modeloRepository.Query() on eq.Modelo equals mod.Id into modelos
+                                                       from mod in modelos.DefaultIfEmpty()
+                                                       where r.Cliente == cliente
+                                                             && ri.Dtprogramadaretorno.HasValue
+                                                             && (ri.Equipamentostatus == 4 // Entregue
+                                                                 || ri.Equipamentostatus == 7) // Requisitado (em trânsito para devolução)
+                                                             && !ri.Dtdevolucao.HasValue // Ainda não devolvido
+                                                       select new Vwdevolucaoprogramadum
+                                                       {
+                                                           Cliente = cliente,
+                                                           Nomecolaborador = col.Nome,
+                                                           Dtprogramadaretorno = ri.Dtprogramadaretorno,
+                                                           Matricula = col.Matricula,
+                                                           ColaboradorId = col.Id,
+                                                           Equipamento = (ta != null ? ta.Descricao ?? "" : "") + " " + (fab != null ? fab.Nome ?? "" : "") + " " + (mod != null ? mod.Nome ?? "" : ""),
+                                                           Serial = eq.Numeroserie,
+                                                           Patrimonio = eq.Patrimonio,
+                                                           EquipamentoId = eq.Id,
+                                                           RequisicaoId = r.Id,
+                                                           RequisicoesItemId = ri.Id
+                                                       })
+                                                       .OrderByDescending(x => x.Dtprogramadaretorno)
+                                                       .ToList();
+                    
+                    Console.WriteLine($"[DASHBOARD] Devoluções programadas encontradas diretamente das tabelas: {devolucoesProgramadasDetalhadas.Count}");
+                }
                 
                 vm.DevolucoesProgramadas = devolucoesProgramadasDetalhadas;
                     
