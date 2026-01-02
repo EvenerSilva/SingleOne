@@ -2265,6 +2265,11 @@ namespace SingleOne.Negocios
 
         public void AdicionarAgendamentoEquipamentoVM(EquipamentoRequisicaoVM equipamento)
         {
+            Console.WriteLine($"[NEGOCIO] AdicionarAgendamentoEquipamentoVM - INÍCIO");
+            Console.WriteLine($"[NEGOCIO] AdicionarAgendamentoEquipamentoVM - RequisicaoItemId: {equipamento?.RequisicaoItemId}");
+            Console.WriteLine($"[NEGOCIO] AdicionarAgendamentoEquipamentoVM - DTProgramadaRetorno recebido: {(equipamento?.DTProgramadaRetorno?.ToString() ?? "NULL")}");
+            Console.WriteLine($"[NEGOCIO] AdicionarAgendamentoEquipamentoVM - DTProgramadaRetorno.HasValue: {equipamento?.DTProgramadaRetorno?.HasValue}");
+            
             var item = _requisicaoItensRepository
                 .Buscar(x => x.Id == equipamento.RequisicaoItemId)
                 .AsNoTracking()
@@ -2272,20 +2277,51 @@ namespace SingleOne.Negocios
 
             if (item == null)
             {
+                Console.WriteLine($"[NEGOCIO] AdicionarAgendamentoEquipamentoVM - ⚠️ Item não encontrado (ID: {equipamento.RequisicaoItemId})");
                 return;
             }
+
+            Console.WriteLine($"[NEGOCIO] AdicionarAgendamentoEquipamentoVM - Item encontrado. Dtprogramadaretorno atual: {(item.Dtprogramadaretorno?.ToString() ?? "NULL")}");
 
             if (equipamento.DTProgramadaRetorno.HasValue)
             {
                 var data = equipamento.DTProgramadaRetorno.Value;
+                Console.WriteLine($"[NEGOCIO] AdicionarAgendamentoEquipamentoVM - Definindo Dtprogramadaretorno para: {data}");
                 item.Dtprogramadaretorno = DateTime.SpecifyKind(data, DateTimeKind.Unspecified);
             }
             else
             {
+                Console.WriteLine($"[NEGOCIO] AdicionarAgendamentoEquipamentoVM - Definindo Dtprogramadaretorno para NULL (removendo agendamento)");
                 item.Dtprogramadaretorno = null;
             }
 
-            _requisicaoItensRepository.Atualizar(item);
+            Console.WriteLine($"[NEGOCIO] AdicionarAgendamentoEquipamentoVM - Dtprogramadaretorno após atualização: {(item.Dtprogramadaretorno?.ToString() ?? "NULL")}");
+            
+            // ✅ CORREÇÃO: Criar nova instância para forçar update completo
+            var itemAtualizado = new Requisicoesiten
+            {
+                Id = item.Id,
+                Requisicao = item.Requisicao,
+                Equipamento = item.Equipamento,
+                Linhatelefonica = item.Linhatelefonica,
+                Usuarioentrega = item.Usuarioentrega,
+                Usuariodevolucao = item.Usuariodevolucao,
+                Dtentrega = item.Dtentrega,
+                Dtdevolucao = item.Dtdevolucao,
+                Observacaoentrega = item.Observacaoentrega,
+                // ✅ CRÍTICO: Permitir que Dtprogramadaretorno seja null
+                Dtprogramadaretorno = item.Dtprogramadaretorno
+            };
+            
+            Console.WriteLine($"[NEGOCIO] AdicionarAgendamentoEquipamentoVM - Nova instância criada. Dtprogramadaretorno: {(itemAtualizado.Dtprogramadaretorno?.ToString() ?? "NULL")}");
+            
+            _requisicaoItensRepository.Atualizar(itemAtualizado);
+            
+            // ✅ Verificar se foi salvo corretamente
+            var itemVerificado = _requisicaoItensRepository.Buscar(x => x.Id == equipamento.RequisicaoItemId).AsNoTracking().FirstOrDefault();
+            Console.WriteLine($"[NEGOCIO] AdicionarAgendamentoEquipamentoVM - Verificação pós-update. Dtprogramadaretorno no banco: {(itemVerificado?.Dtprogramadaretorno?.ToString() ?? "NULL")}");
+            
+            Console.WriteLine($"[NEGOCIO] AdicionarAgendamentoEquipamentoVM - FIM");
         }
         public void RealizarDevolucaoEquipamento(EquipamentoRequisicaoVM equipamento)
         {

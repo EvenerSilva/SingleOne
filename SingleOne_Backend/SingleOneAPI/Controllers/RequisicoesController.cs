@@ -317,7 +317,24 @@ namespace SingleOne.Controllers
         [HttpPost("[action]", Name = "AdicionarAgendamentoEquipamentoVM")]
         public void AdicionarAgendamentoEquipamentoVM(EquipamentoRequisicaoVM equipamento)
         {
-            _negocio.AdicionarAgendamentoEquipamentoVM(equipamento);
+            Console.WriteLine($"[CONTROLLER] AdicionarAgendamentoEquipamentoVM - INÍCIO");
+            Console.WriteLine($"[CONTROLLER] AdicionarAgendamentoEquipamentoVM - RequisicaoItemId: {equipamento?.RequisicaoItemId}");
+            Console.WriteLine($"[CONTROLLER] AdicionarAgendamentoEquipamentoVM - DTProgramadaRetorno recebido: {(equipamento?.DTProgramadaRetorno?.ToString() ?? "NULL")}");
+            Console.WriteLine($"[CONTROLLER] AdicionarAgendamentoEquipamentoVM - DTProgramadaRetorno.HasValue: {equipamento?.DTProgramadaRetorno?.HasValue}");
+            
+            try
+            {
+                _negocio.AdicionarAgendamentoEquipamentoVM(equipamento);
+                Console.WriteLine($"[CONTROLLER] AdicionarAgendamentoEquipamentoVM - Método do negócio executado com sucesso");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[CONTROLLER] ERRO em AdicionarAgendamentoEquipamentoVM: {ex.Message}");
+                Console.WriteLine($"[CONTROLLER] Stack trace: {ex.StackTrace}");
+                throw;
+            }
+            
+            Console.WriteLine($"[CONTROLLER] AdicionarAgendamentoEquipamentoVM - FIM");
         }
 
         [HttpPost("[action]", Name ="RealizarDevolucaoEquipamento")]
