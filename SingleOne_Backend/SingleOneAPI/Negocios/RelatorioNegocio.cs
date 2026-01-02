@@ -1446,6 +1446,22 @@ namespace SingleOne.Negocios
                                             evm.Dtdevolucao.HasValue && evm.Dtdevolucao.Value.Date == ontem
                                       select evm).Count();
                 
+                // ✅ FALLBACK: Se a view não retornar resultados, buscar diretamente das tabelas
+                if (entregasOntem == 0 && devolucoesOntem == 0)
+                {
+                    entregasOntem = (from ri in _requisicaoItensRepository.Query()
+                                    join r in _requisicaoRepository.Query() on ri.Requisicao equals r.Id
+                                    where r.Cliente == cliente && 
+                                          ri.Dtentrega.HasValue && ri.Dtentrega.Value.Date == ontem
+                                    select ri).Count();
+                    
+                    devolucoesOntem = (from ri in _requisicaoItensRepository.Query()
+                                      join r in _requisicaoRepository.Query() on ri.Requisicao equals r.Id
+                                      where r.Cliente == cliente && 
+                                            ri.Dtdevolucao.HasValue && ri.Dtdevolucao.Value.Date == ontem
+                                      select ri).Count();
+                }
+                
                 vm.QtdeAtivosMovimentadoDiaAnterior = entregasOntem + devolucoesOntem;
                                                         
                 Console.WriteLine($"[DASHBOARD] Movimenta��es HOJE: {vm.QtdeAtivosMovimentadoDia}, ONTEM: {vm.QtdeAtivosMovimentadoDiaAnterior}");
