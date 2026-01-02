@@ -335,9 +335,67 @@ namespace SingleOne.Negocios
 
                 //var rs = _requisicaoRepository.Buscar(x => x.ColaboradorFinal == r.ColaboradorFinalId && x.AssinaturaEletronica == false).ToList();
                 var colaboradorFinalId = r.Colaboradorfinalid;
+                Console.WriteLine($"[TERMO] Buscando requisições pendentes para colaborador ID: {colaboradorFinalId}");
+                
                 var rs = _requisicoesvmRepository
                     .Buscar(x => x.Colaboradorfinalid == colaboradorFinalId && x.Assinaturaeletronica == false && x.Equipamentospendentes > 0)
                     .ToList();
+                
+                Console.WriteLine($"[TERMO] Requisições pendentes encontradas na view: {rs.Count}");
+                
+                // ✅ FALLBACK: Se não encontrar requisições pendentes na view, buscar diretamente das tabelas
+                if (rs.Count == 0 && r != null)
+                {
+                    Console.WriteLine($"[TERMO] View não retornou requisições pendentes, buscando diretamente das tabelas...");
+                    var reqsDiretas = _requisicaoRepository
+                        .Buscar(x => x.Colaboradorfinal == colaboradorFinalId && 
+                                    x.Assinaturaeletronica == false &&
+                                    x.Requisicaostatus == 3)
+                        .ToList();
+                    
+                    Console.WriteLine($"[TERMO] Requisições encontradas diretamente: {reqsDiretas.Count}");
+                    
+                    // Verificar se há itens entregues sem devolução
+                    foreach (var reqDireta in reqsDiretas)
+                    {
+                        var itensEntregues = _requisicaoItensRepository
+                            .Buscar(x => x.Requisicao == reqDireta.Id && 
+                                        x.Dtentrega.HasValue && 
+                                        x.Dtdevolucao == null)
+                            .ToList();
+                        
+                        if (itensEntregues.Count > 0)
+                        {
+                            // Converter para Requisicoesvm
+                            var usuarioReq = _usuarioRepository.ObterPorId(reqDireta.Usuariorequisicao);
+                            var tecnico = _usuarioRepository.ObterPorId(reqDireta.Tecnicoresponsavel);
+                            var colaborador = _colaboradorRepository.ObterPorId(reqDireta.Colaboradorfinal ?? 0);
+                            
+                            rs.Add(new Requisicoesvm
+                            {
+                                Id = reqDireta.Id,
+                                Cliente = reqDireta.Cliente,
+                                Usuariorequisicaoid = reqDireta.Usuariorequisicao,
+                                Usuariorequisicao = usuarioReq?.Nome ?? "N/A",
+                                Tecnicoresponsavelid = reqDireta.Tecnicoresponsavel,
+                                Tecnicoresponsavel = tecnico?.Nome ?? "N/A",
+                                Colaboradorfinalid = reqDireta.Colaboradorfinal,
+                                Colaboradorfinal = colaborador?.Nome ?? "N/A",
+                                Requisicaostatusid = reqDireta.Requisicaostatus,
+                                Requisicaostatus = reqDireta.Requisicaostatus == 1 ? "Ativa" : reqDireta.Requisicaostatus == 3 ? "Processada" : "Cancelada",
+                                Dtsolicitacao = reqDireta.Dtsolicitacao,
+                                Dtprocessamento = reqDireta.Dtprocessamento,
+                                Assinaturaeletronica = reqDireta.Assinaturaeletronica,
+                                Dtassinaturaeletronica = reqDireta.Dtassinaturaeletronica,
+                                Dtenviotermo = reqDireta.Dtenviotermo,
+                                Hashrequisicao = reqDireta.Hashrequisicao,
+                                Equipamentospendentes = itensEntregues.Count
+                            });
+                        }
+                    }
+                    
+                    Console.WriteLine($"[TERMO] Requisições pendentes montadas via fallback: {rs.Count}");
+                }
 
                 // ✅ COBRIR CASO DE LINHAS TELEFÔNICAS: se não há pendentes pela view (equipamentos),
                 // procurar requisições processadas sem assinatura com itens de linha telefônica ainda não devolvidos
