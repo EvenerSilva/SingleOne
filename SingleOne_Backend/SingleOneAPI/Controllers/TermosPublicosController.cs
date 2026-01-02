@@ -91,9 +91,24 @@ namespace SingleOneAPI.Controllers
 
                     // Tentar listar itens a partir dos IDs da view
                     var reqIdsVm = rvm.Where(r => r.Id.HasValue).Select(r => r.Id.Value).Distinct().ToList();
+                    Console.WriteLine($"[TERMO] Buscando itens via view para requisições: {string.Join(", ", reqIdsVm)}");
+                    
                     var itensVm = _requisicaoItensRepository
                         .Buscar(x => reqIdsVm.Contains(x.Requisicao) && x.Dtdevolucao == null)
                         .ToList();
+                    
+                    Console.WriteLine($"[TERMO] Itens encontrados via view (sem devolução): {itensVm.Count}");
+                    
+                    // ✅ CORREÇÃO: Filtrar apenas itens que foram entregues
+                    var itensEntreguesVm = itensVm.Where(x => x.Dtentrega.HasValue).ToList();
+                    Console.WriteLine($"[TERMO] Itens entregues via view (Dtentrega não nulo): {itensEntreguesVm.Count}");
+                    
+                    // ✅ FALLBACK: Se não encontrar itens entregues, buscar todos os itens da requisição
+                    if (itensEntreguesVm.Count == 0)
+                    {
+                        Console.WriteLine($"[TERMO] Nenhum item entregue encontrado via view, buscando todos os itens...");
+                        itensEntreguesVm = itensVm;
+                    }
 
                     var recursosVm = new List<object>();
                     foreach (var it in itensEntreguesVm)
