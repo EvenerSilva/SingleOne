@@ -1244,6 +1244,7 @@ namespace SingleOne.Negocios
                                         where r.Cliente == cliente
                                               && r.Colaboradorfinal.HasValue
                                               && evm.Equipamentostatus.HasValue && evm.Equipamentostatus.Value == 4
+                                              && evm.Dtentrega.HasValue
                                               && !evm.Dtdevolucao.HasValue
                                         select new { r.Colaboradorfinal }).ToList();
 
