@@ -117,6 +117,16 @@ namespace SingleOneAPI.Infra.Repositorio
             Console.WriteLine($"[REPOSITORY] 🔍 Atualizando entidade do tipo: {typeof(T).Name}");
             Console.WriteLine($"[REPOSITORY] 🔍 Entidade: {entity}");
             
+            // ✅ Adicionar stack trace para identificar origem da chamada
+            var stackTrace = Environment.StackTrace;
+            var caller = stackTrace.Split('\n').Skip(1).Take(3).ToArray();
+            Console.WriteLine($"[REPOSITORY] 🔍 Chamado de:");
+            foreach (var line in caller)
+            {
+                if (!string.IsNullOrWhiteSpace(line))
+                    Console.WriteLine($"[REPOSITORY]    {line.Trim()}");
+            }
+            
             try
             {
                 var entityType = typeof(T);
@@ -126,6 +136,17 @@ namespace SingleOneAPI.Infra.Repositorio
                 {
                     var entityId = idProperty.GetValue(entity);
                     Console.WriteLine($"[REPOSITORY] 🔍 ID da entidade: {entityId}");
+                    
+                    // ✅ Log específico para Requisicoesiten com Dtprogramadaretorno
+                    if (entityType.Name == "Requisicoesiten")
+                    {
+                        var dtProgramadoProperty = entityType.GetProperty("Dtprogramadaretorno");
+                        if (dtProgramadoProperty != null)
+                        {
+                            var dtProgramadoValue = dtProgramadoProperty.GetValue(entity);
+                            Console.WriteLine($"[REPOSITORY] 🔍 Requisicoesiten.Dtprogramadaretorno: {(dtProgramadoValue?.ToString() ?? "NULL")}");
+                        }
+                    }
                     
                     // Verificar se a entidade já está sendo rastreada
                     var trackedEntity = _context.Entry(entity);
