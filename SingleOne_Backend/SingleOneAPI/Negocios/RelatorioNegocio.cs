@@ -2751,7 +2751,7 @@ namespace SingleOne.Negocios
                 
                 return empresas;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return new List<dynamic>();
             }
@@ -2783,7 +2783,7 @@ namespace SingleOne.Negocios
                 
                 return localidades;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return new List<dynamic>();
             }
@@ -2815,7 +2815,7 @@ namespace SingleOne.Negocios
                 
                 return centrosCusto;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return new List<dynamic>();
             }
