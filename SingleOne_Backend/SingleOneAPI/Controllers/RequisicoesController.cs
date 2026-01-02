@@ -288,7 +288,24 @@ namespace SingleOne.Controllers
         [HttpPost("[action]", Name ="AtualizarItemRequisicao")]
         public void AtualizarItemRequisicao(Requisicaoequipamentosvm ri)
         {
-            _negocio.AtualizarItemRequisicao(ri);
+            Console.WriteLine($"[CONTROLLER] AtualizarItemRequisicao - INÍCIO");
+            Console.WriteLine($"[CONTROLLER] AtualizarItemRequisicao - Item ID: {ri?.Id}");
+            Console.WriteLine($"[CONTROLLER] AtualizarItemRequisicao - Dtprogramadaretorno recebido: {(ri?.Dtprogramadaretorno?.ToString() ?? "NULL")}");
+            Console.WriteLine($"[CONTROLLER] AtualizarItemRequisicao - Observacaoentrega: {ri?.Observacaoentrega ?? "NULL"}");
+            
+            try
+            {
+                _negocio.AtualizarItemRequisicao(ri);
+                Console.WriteLine($"[CONTROLLER] AtualizarItemRequisicao - Método do negócio executado com sucesso");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[CONTROLLER] ERRO em AtualizarItemRequisicao: {ex.Message}");
+                Console.WriteLine($"[CONTROLLER] Stack trace: {ex.StackTrace}");
+                throw;
+            }
+            
+            Console.WriteLine($"[CONTROLLER] AtualizarItemRequisicao - FIM");
         }
 
         [HttpPost("[action]", Name = "AdicionarObservacaoEquipamentoVM")]
