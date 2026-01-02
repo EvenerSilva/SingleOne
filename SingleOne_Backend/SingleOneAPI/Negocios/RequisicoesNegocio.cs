@@ -373,11 +373,59 @@ namespace SingleOne.Negocios
                 }
                 foreach (var requisicao in rs)
                 {
+                    Console.WriteLine($"[TERMO] Processando requisição ID: {requisicao.Id}, BYOD: {byod}");
+                    
                     if (byod)
                     {
                         var eqp = _requisicaoequipamentosvmsRepository
                             .Buscar(x => x.Requisicao == requisicao.Id && x.Equipamentostatus != 8 && x.TipoAquisicao == 2)
                             .ToList();
+                        Console.WriteLine($"[TERMO] Equipamentos BYOD encontrados na view: {eqp.Count}");
+                        
+                        // ✅ FALLBACK: Se a view não retornar, buscar diretamente das tabelas
+                        if (eqp.Count == 0)
+                        {
+                            Console.WriteLine($"[TERMO] View não retornou equipamentos BYOD, buscando diretamente das tabelas...");
+                            var itens = _requisicaoItensRepository
+                                .Buscar(x => x.Requisicao == requisicao.Id && 
+                                            x.Equipamento.HasValue &&
+                                            x.Dtentrega.HasValue &&
+                                            x.Dtdevolucao == null)
+                                .Include(x => x.EquipamentoNavigation)
+                                .ThenInclude(x => x.TipoequipamentoNavigation)
+                                .Include(x => x.EquipamentoNavigation)
+                                .ThenInclude(x => x.FabricanteNavigation)
+                                .Include(x => x.EquipamentoNavigation)
+                                .ThenInclude(x => x.ModeloNavigation)
+                                .ToList();
+                            
+                            Console.WriteLine($"[TERMO] Itens encontrados diretamente: {itens.Count}");
+                            
+                            foreach (var item in itens)
+                            {
+                                if (item.EquipamentoNavigation != null && item.EquipamentoNavigation.Tipoaquisicao == 2)
+                                {
+                                    eqp.Add(new Requisicaoequipamentosvm
+                                    {
+                                        Id = item.Id,
+                                        Requisicao = item.Requisicao,
+                                        Equipamentoid = item.Equipamento.Value,
+                                        Equipamento = $"{item.EquipamentoNavigation.TipoequipamentoNavigation?.Descricao ?? "Equipamento"} {item.EquipamentoNavigation.FabricanteNavigation?.Descricao ?? ""} {item.EquipamentoNavigation.ModeloNavigation?.Descricao ?? ""}".Trim(),
+                                        Numeroserie = item.EquipamentoNavigation.Numeroserie,
+                                        Patrimonio = item.EquipamentoNavigation.Patrimonio,
+                                        Equipamentostatus = item.EquipamentoNavigation.Equipamentostatus ?? 0,
+                                        Dtentrega = item.Dtentrega,
+                                        Dtdevolucao = item.Dtdevolucao,
+                                        Observacaoentrega = item.Observacaoentrega,
+                                        Dtprogramadaretorno = item.Dtprogramadaretorno,
+                                        TipoAquisicao = item.EquipamentoNavigation.Tipoaquisicao
+                                    });
+                                }
+                            }
+                            
+                            Console.WriteLine($"[TERMO] Equipamentos BYOD montados via fallback: {eqp.Count}");
+                        }
+                        
                         foreach (var e in eqp)
                         {
                             req.EquipamentosRequisicao.Add(e);
@@ -388,6 +436,52 @@ namespace SingleOne.Negocios
                         var eqp = _requisicaoequipamentosvmsRepository
                             .Buscar(x => x.Requisicao == requisicao.Id && x.Equipamentostatus != 8 && x.TipoAquisicao != 2)
                             .ToList();
+                        Console.WriteLine($"[TERMO] Equipamentos não-BYOD encontrados na view: {eqp.Count}");
+                        
+                        // ✅ FALLBACK: Se a view não retornar, buscar diretamente das tabelas
+                        if (eqp.Count == 0)
+                        {
+                            Console.WriteLine($"[TERMO] View não retornou equipamentos não-BYOD, buscando diretamente das tabelas...");
+                            var itens = _requisicaoItensRepository
+                                .Buscar(x => x.Requisicao == requisicao.Id && 
+                                            x.Equipamento.HasValue &&
+                                            x.Dtentrega.HasValue &&
+                                            x.Dtdevolucao == null)
+                                .Include(x => x.EquipamentoNavigation)
+                                .ThenInclude(x => x.TipoequipamentoNavigation)
+                                .Include(x => x.EquipamentoNavigation)
+                                .ThenInclude(x => x.FabricanteNavigation)
+                                .Include(x => x.EquipamentoNavigation)
+                                .ThenInclude(x => x.ModeloNavigation)
+                                .ToList();
+                            
+                            Console.WriteLine($"[TERMO] Itens encontrados diretamente: {itens.Count}");
+                            
+                            foreach (var item in itens)
+                            {
+                                if (item.EquipamentoNavigation != null && item.EquipamentoNavigation.Tipoaquisicao != 2)
+                                {
+                                    eqp.Add(new Requisicaoequipamentosvm
+                                    {
+                                        Id = item.Id,
+                                        Requisicao = item.Requisicao,
+                                        Equipamentoid = item.Equipamento.Value,
+                                        Equipamento = $"{item.EquipamentoNavigation.TipoequipamentoNavigation?.Descricao ?? "Equipamento"} {item.EquipamentoNavigation.FabricanteNavigation?.Descricao ?? ""} {item.EquipamentoNavigation.ModeloNavigation?.Descricao ?? ""}".Trim(),
+                                        Numeroserie = item.EquipamentoNavigation.Numeroserie,
+                                        Patrimonio = item.EquipamentoNavigation.Patrimonio,
+                                        Equipamentostatus = item.EquipamentoNavigation.Equipamentostatus ?? 0,
+                                        Dtentrega = item.Dtentrega,
+                                        Dtdevolucao = item.Dtdevolucao,
+                                        Observacaoentrega = item.Observacaoentrega,
+                                        Dtprogramadaretorno = item.Dtprogramadaretorno,
+                                        TipoAquisicao = item.EquipamentoNavigation.Tipoaquisicao
+                                    });
+                                }
+                            }
+                            
+                            Console.WriteLine($"[TERMO] Equipamentos não-BYOD montados via fallback: {eqp.Count}");
+                        }
+                        
                         foreach (var e in eqp)
                         {
                             req.EquipamentosRequisicao.Add(e);
