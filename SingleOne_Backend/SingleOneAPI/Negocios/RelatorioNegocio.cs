@@ -833,6 +833,27 @@ namespace SingleOne.Negocios
                                      select evm).Count();
                 
                 // Total de movimenta��es = entregas + devolu��es
+                Console.WriteLine($"[DASHBOARD] Entregas HOJE (view): {entregasHoje}, Devoluções HOJE (view): {devolucoesHoje}");
+                
+                // ✅ FALLBACK: Se a view não retornar resultados, buscar diretamente das tabelas
+                if (entregasHoje == 0 && devolucoesHoje == 0)
+                {
+                    Console.WriteLine($"[DASHBOARD] View não retornou movimentações de hoje, buscando diretamente das tabelas...");
+                    entregasHoje = (from ri in _requisicaoItensRepository.Query()
+                                   join r in _requisicaoRepository.Query() on ri.Requisicao equals r.Id
+                                   where r.Cliente == cliente && 
+                                         ri.Dtentrega.HasValue && ri.Dtentrega.Value.Date == hoje
+                                   select ri).Count();
+                    
+                    devolucoesHoje = (from ri in _requisicaoItensRepository.Query()
+                                     join r in _requisicaoRepository.Query() on ri.Requisicao equals r.Id
+                                     where r.Cliente == cliente && 
+                                           ri.Dtdevolucao.HasValue && ri.Dtdevolucao.Value.Date == hoje
+                                     select ri).Count();
+                    
+                    Console.WriteLine($"[DASHBOARD] Entregas HOJE (tabelas): {entregasHoje}, Devoluções HOJE (tabelas): {devolucoesHoje}");
+                }
+                
                 vm.QtdeAtivosMovimentadoDia = entregasHoje + devolucoesHoje;
                                                
                 // ? CORRE��O: Contar ENTREGAS e DEVOLU��ES nos �ltimos 5 dias
