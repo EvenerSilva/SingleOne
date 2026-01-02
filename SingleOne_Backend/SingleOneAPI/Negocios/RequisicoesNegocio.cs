@@ -1663,14 +1663,28 @@ namespace SingleOne.Negocios
             var entregasAgrupadas = todasEntregas
                 .GroupBy(x => new { x.ColaboradorId, x.Colaborador })
                 .Select(g => {
-                    var colaborador = _colaboradorRepository.ObterPorId(g.Key.ColaboradorId);
-                    return new EntregaAtivaVM()
+                    try
                     {
-                        ColaboradorId = g.Key.ColaboradorId,
-                        Colaborador = g.Key.Colaborador,
-                        Matricula = colaborador?.Matricula ?? "" // 🆔 Adicionar matrícula
-                    };
+                        var colaborador = _colaboradorRepository.ObterPorId(g.Key.ColaboradorId);
+                        return new EntregaAtivaVM()
+                        {
+                            ColaboradorId = g.Key.ColaboradorId,
+                            Colaborador = g.Key.Colaborador,
+                            Matricula = colaborador?.Matricula ?? "" // 🆔 Adicionar matrícula
+                        };
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"[REQUISICOES] Erro ao buscar colaborador {g.Key.ColaboradorId}: {ex.Message}");
+                        return new EntregaAtivaVM()
+                        {
+                            ColaboradorId = g.Key.ColaboradorId,
+                            Colaborador = g.Key.Colaborador,
+                            Matricula = ""
+                        };
+                    }
                 })
+                .Where(x => x != null)
                 .OrderBy(x => x.Colaborador)
                 .ToList();
 
