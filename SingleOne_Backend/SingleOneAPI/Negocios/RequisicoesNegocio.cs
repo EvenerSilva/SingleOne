@@ -2284,13 +2284,48 @@ namespace SingleOne.Negocios
 
             Console.WriteLine($"[NEGOCIO] AdicionarAgendamentoEquipamentoVM - Item encontrado. Dtprogramadaretorno atual: {(item.Dtprogramadaretorno?.ToString() ?? "NULL")}");
 
+            // ✅ CORREÇÃO: Se a data enviada é igual à data atual no banco, tratar como remoção
+            // Isso acontece quando o frontend envia a data existente ao invés de null ao remover
+            // Comparação com tolerância de 1 minuto para evitar problemas de precisão
+            bool deveRemover = false;
+            
             if (equipamento.DTProgramadaRetorno.HasValue)
             {
-                var data = equipamento.DTProgramadaRetorno.Value;
-                Console.WriteLine($"[NEGOCIO] AdicionarAgendamentoEquipamentoVM - Definindo Dtprogramadaretorno para: {data}");
-                item.Dtprogramadaretorno = DateTime.SpecifyKind(data, DateTimeKind.Unspecified);
+                var dataEnviada = equipamento.DTProgramadaRetorno.Value;
+                var dataEnviadaUnspecified = DateTime.SpecifyKind(dataEnviada, DateTimeKind.Unspecified);
+                
+                // Se já existe uma data no banco, verificar se é igual (indicando remoção)
+                if (item.Dtprogramadaretorno.HasValue)
+                {
+                    var dataAtual = item.Dtprogramadaretorno.Value;
+                    // Comparar com tolerância de 1 minuto (diferença absoluta menor que 1 minuto = mesma data)
+                    var diferenca = Math.Abs((dataAtual - dataEnviadaUnspecified).TotalMinutes);
+                    
+                    if (diferenca < 1.0)
+                    {
+                        Console.WriteLine($"[NEGOCIO] AdicionarAgendamentoEquipamentoVM - ⚠️ Data enviada ({dataEnviadaUnspecified}) é igual à data atual ({dataAtual}). Tratando como remoção.");
+                        deveRemover = true;
+                    }
+                    else
+                    {
+                        Console.WriteLine($"[NEGOCIO] AdicionarAgendamentoEquipamentoVM - Data diferente. Atualizando de {dataAtual} para {dataEnviadaUnspecified}");
+                        item.Dtprogramadaretorno = dataEnviadaUnspecified;
+                    }
+                }
+                else
+                {
+                    // Não existe data no banco, então está adicionando
+                    Console.WriteLine($"[NEGOCIO] AdicionarAgendamentoEquipamentoVM - Adicionando nova data: {dataEnviadaUnspecified}");
+                    item.Dtprogramadaretorno = dataEnviadaUnspecified;
+                }
             }
             else
+            {
+                Console.WriteLine($"[NEGOCIO] AdicionarAgendamentoEquipamentoVM - DTProgramadaRetorno é null. Removendo agendamento.");
+                deveRemover = true;
+            }
+            
+            if (deveRemover)
             {
                 Console.WriteLine($"[NEGOCIO] AdicionarAgendamentoEquipamentoVM - Definindo Dtprogramadaretorno para NULL (removendo agendamento)");
                 item.Dtprogramadaretorno = null;
