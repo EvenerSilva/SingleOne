@@ -2371,7 +2371,7 @@ namespace SingleOne.Negocios
                         {
                             Equipamento = riDto.Equipamento ?? 0,
                             Equipamentostatus = 4,
-                            Usuario = riDto.Usuarioentrega.Value,
+                            Usuario = riDto.Usuarioentrega ?? dto.Usuariorequisicao,
                             Colaborador = dto.Colaboradorfinal,
                             Requisicao = dto.Id,
                             Dtregistro = TimeZoneMapper.GetDateTimeNow()
@@ -2389,7 +2389,7 @@ namespace SingleOne.Negocios
                             Equipamento = 1,
                             Linhatelefonica = riDto.Linhatelefonica.Value,
                             Equipamentostatus = 4,
-                            Usuario = riDto.Usuarioentrega.Value,
+                            Usuario = riDto.Usuarioentrega ?? dto.Usuariorequisicao,
                             Colaborador = dto.Colaboradorfinal,
                             Requisicao = dto.Id,
                             Dtregistro = TimeZoneMapper.GetDateTimeNow()
