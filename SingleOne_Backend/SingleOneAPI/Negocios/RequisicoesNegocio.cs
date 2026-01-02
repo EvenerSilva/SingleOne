@@ -2141,7 +2141,8 @@ namespace SingleOne.Negocios
         {
             try
             {
-            var ri = _requisicaoItensRepository.Buscar(x => x.Id == rivm.Id).AsNoTracking().FirstOrDefault();
+            // ✅ CORREÇÃO: Remover AsNoTracking() para permitir rastreamento de mudanças, especialmente para campos nullable
+            var ri = _requisicaoItensRepository.Buscar(x => x.Id == rivm.Id).FirstOrDefault();
 
             if (ri == null)
             {
@@ -2149,6 +2150,8 @@ namespace SingleOne.Negocios
             }
 
             ri.Observacaoentrega = rivm.Observacaoentrega;
+            
+            // ✅ CORREÇÃO: Sempre atualizar o campo, mesmo quando for null (para permitir remover agendamento)
             if (rivm.Dtprogramadaretorno.HasValue)
             {
                 var data = rivm.Dtprogramadaretorno.Value;
@@ -2156,13 +2159,21 @@ namespace SingleOne.Negocios
             }
             else
             {
+                // ✅ CORREÇÃO: Forçar null explicitamente para remover agendamento
                 ri.Dtprogramadaretorno = null;
             }
 
+            Console.WriteLine($"[NEGOCIO] AtualizarItemRequisicao - Item ID: {ri.Id}, Dtprogramadaretorno: {(ri.Dtprogramadaretorno?.ToString() ?? "NULL")}");
+            
             _requisicaoItensRepository.Atualizar(ri);
+            _requisicaoItensRepository.SalvarAlteracoes(); // ✅ CORREÇÃO: Garantir que as alterações sejam salvas
+            
+            Console.WriteLine($"[NEGOCIO] AtualizarItemRequisicao - Item atualizado com sucesso");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine($"[NEGOCIO] ERRO em AtualizarItemRequisicao: {ex.Message}");
+                Console.WriteLine($"[NEGOCIO] Stack trace: {ex.StackTrace}");
                 throw;
             }
         }
