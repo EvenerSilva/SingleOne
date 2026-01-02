@@ -335,8 +335,54 @@ namespace SingleOne.Negocios
         
         public List<RequisicaoVM> EquipamentosComColaboradores(int id)
         {
+            Console.WriteLine($"[RELATORIO] EquipamentosComColaboradores - Colaborador ID: {id}");
             var vms = new List<RequisicaoVM>();
+            
+            // Buscar requisições do colaborador
             var reqs = _requisicoesvmRepository.Buscar(x => x.Colaboradorfinalid == id).OrderByDescending(x => x.Id).ToList();
+            Console.WriteLine($"[RELATORIO] Requisições encontradas na view: {reqs.Count}");
+            
+            // ✅ FALLBACK: Se a view não retornar resultados, buscar diretamente das tabelas
+            if (reqs.Count == 0)
+            {
+                Console.WriteLine($"[RELATORIO] View não retornou resultados, buscando diretamente das tabelas...");
+                var reqsDiretas = _requisicaoRepository
+                    .Buscar(x => x.Colaboradorfinal == id)
+                    .OrderByDescending(x => x.Id)
+                    .ToList();
+                
+                Console.WriteLine($"[RELATORIO] Requisições encontradas diretamente: {reqsDiretas.Count}");
+                
+                // Converter para Requisicoesvm
+                foreach (var req in reqsDiretas)
+                {
+                    var usuarioReq = _usuarioRepository.ObterPorId(req.Usuariorequisicao);
+                    var tecnico = _usuarioRepository.ObterPorId(req.Tecnicoresponsavel);
+                    var colaborador = _colaboradorRepository.ObterPorId(req.Colaboradorfinal ?? 0);
+                    
+                    var reqVM = new Requisicoesvm
+                    {
+                        Id = req.Id,
+                        Cliente = req.Cliente,
+                        Usuariorequisicaoid = req.Usuariorequisicao,
+                        Usuariorequisicao = usuarioReq?.Nome ?? "N/A",
+                        Tecnicoresponsavelid = req.Tecnicoresponsavel,
+                        Tecnicoresponsavel = tecnico?.Nome ?? "N/A",
+                        Colaboradorfinalid = req.Colaboradorfinal,
+                        Colaboradorfinal = colaborador?.Nome ?? "N/A",
+                        Requisicaostatusid = req.Requisicaostatus,
+                        Requisicaostatus = req.Requisicaostatus == 1 ? "Ativa" : req.Requisicaostatus == 3 ? "Processada" : "Cancelada",
+                        Dtsolicitacao = req.Dtsolicitacao,
+                        Dtprocessamento = req.Dtprocessamento,
+                        Assinaturaeletronica = req.Assinaturaeletronica,
+                        Dtassinaturaeletronica = req.Dtassinaturaeletronica,
+                        Dtenviotermo = req.Dtenviotermo,
+                        Hashrequisicao = req.Hashrequisicao,
+                        Equipamentospendentes = 0
+                    };
+                    reqs.Add(reqVM);
+                }
+            }
             foreach(var r in reqs)
             {
                 var vm = new RequisicaoVM();
