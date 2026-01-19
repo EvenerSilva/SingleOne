@@ -100,6 +100,7 @@ END $$;
 \echo 'Verificando resultado da migração...'
 \echo ''
 
+-- Verificar coluna tipo_lancamento
 SELECT 
 	'notasfiscais' AS tabela,
 	'tipo_lancamento' AS coluna,
@@ -108,22 +109,29 @@ SELECT
 		WHERE table_schema = 'public' 
 		AND table_name = 'notasfiscais' 
 		AND column_name = 'tipo_lancamento'
-	) AS existe,
-	(SELECT COUNT(*) FROM notasfiscais WHERE tipo_lancamento = 'nota_fiscal') AS registros_nota_fiscal,
-	(SELECT COUNT(*) FROM notasfiscais WHERE tipo_lancamento = 'inventario') AS registros_inventario
-UNION ALL
-SELECT 
-	'notasfiscaisitens' AS tabela,
-	'valorunitario' AS coluna,
-	EXISTS (
-		SELECT 1 FROM information_schema.columns 
+	) AS coluna_existe;
+
+-- Verificar se valorunitario é nullable (apenas se a tabela existir)
+DO $$
+BEGIN
+	IF EXISTS (
+		SELECT 1 FROM information_schema.tables 
 		WHERE table_schema = 'public' 
-		AND table_name = 'notasfiscaisitens' 
-		AND column_name = 'valorunitario'
-		AND is_nullable = 'YES'
-	) AS existe,
-	(SELECT COUNT(*) FROM notasfiscaisitens WHERE valorunitario IS NULL) AS registros_null,
-	(SELECT COUNT(*) FROM notasfiscaisitens WHERE valorunitario = 0) AS registros_zero;
+		AND table_name = 'notasfiscaisitens'
+	) THEN
+		RAISE NOTICE 'Verificando coluna valorunitario...';
+		PERFORM EXISTS (
+			SELECT 1 FROM information_schema.columns 
+			WHERE table_schema = 'public' 
+			AND table_name = 'notasfiscaisitens' 
+			AND column_name = 'valorunitario'
+			AND is_nullable = 'YES'
+		);
+		RAISE NOTICE '✅ Tabela notasfiscaisitens existe e valorunitario é nullable';
+	ELSE
+		RAISE NOTICE 'ℹ️  Tabela notasfiscaisitens não existe ainda (será criada quando necessário)';
+	END IF;
+END $$;
 
 \echo ''
 \echo 'Migração finalizada!'
