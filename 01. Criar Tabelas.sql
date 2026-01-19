@@ -355,6 +355,7 @@ CREATE TABLE IF NOT EXISTS notasfiscais
 	usuariouploadarquivo INT,
 	usuarioremocaoarquivo INT,
 	dataremocaoarquivo TIMESTAMP,
+	tipo_lancamento VARCHAR(20) DEFAULT 'nota_fiscal',
 	constraint fknfcliente foreign key (cliente) references clientes(id),
 	constraint fknffornecedor foreign key (fornecedor) references fornecedores(id),
 	constraint fknfcontrato foreign key (contrato) references contratos(id),
@@ -397,9 +398,9 @@ CREATE TABLE IF NOT EXISTS notasfiscaisitens
 	fabricante int not null,
 	modelo int not null,
 	quantidade int not null,
-	valorunitario money not null,
+	valorunitario money,
 	tipoaquisicao int not null,
-	dtlimitegarantia TIMESTAMP,,
+	dtlimitegarantia TIMESTAMP,
 	contrato int,
 	constraint fknfinotafiscal foreign key (notafiscal) references notasfiscais(id),
 	constraint fknfitipoeqp foreign key (tipoequipamento) references tipoequipamentos(id),
@@ -431,6 +432,64 @@ BEGIN
 EXCEPTION
 	WHEN OTHERS THEN
 		RAISE NOTICE 'Erro na migração de NotasFiscaisItens: %', SQLERRM;
+END $$;
+
+-- =====================================================
+-- MIGRAÇÃO: Adicionar suporte a Inventário (Tipo de Lançamento)
+-- Data: 2025-01-02
+-- Descrição: Permite cadastrar notas fiscais como "inventário" (sem valor obrigatório)
+-- =====================================================
+DO $$
+BEGIN
+	-- Adicionar coluna tipo_lancamento na tabela notasfiscais se não existir
+	IF NOT EXISTS (
+		SELECT 1 FROM information_schema.columns 
+		WHERE table_schema = 'public' 
+		AND table_name = 'notasfiscais' 
+		AND column_name = 'tipo_lancamento'
+	) THEN
+		ALTER TABLE notasfiscais ADD COLUMN tipo_lancamento VARCHAR(20) DEFAULT 'nota_fiscal';
+		RAISE NOTICE 'Coluna tipo_lancamento adicionada à tabela notasfiscais';
+	ELSE
+		RAISE NOTICE 'Coluna tipo_lancamento já existe na tabela notasfiscais';
+	END IF;
+	
+	-- Atualizar registros existentes para garantir que todos tenham tipo_lancamento
+	UPDATE notasfiscais 
+	SET tipo_lancamento = 'nota_fiscal' 
+	WHERE tipo_lancamento IS NULL OR tipo_lancamento = '';
+	
+	-- Tornar valorunitario nullable na tabela notasfiscaisitens (para permitir inventário sem valor)
+	IF EXISTS (
+		SELECT 1 FROM information_schema.columns 
+		WHERE table_schema = 'public' 
+		AND table_name = 'notasfiscaisitens' 
+		AND column_name = 'valorunitario'
+		AND is_nullable = 'NO'
+	) THEN
+		ALTER TABLE notasfiscaisitens ALTER COLUMN valorunitario DROP NOT NULL;
+		RAISE NOTICE 'Coluna valorunitario tornada nullable na tabela notasfiscaisitens';
+	ELSE
+		RAISE NOTICE 'Coluna valorunitario já é nullable na tabela notasfiscaisitens';
+	END IF;
+	
+	-- Adicionar constraint CHECK para validar valores de tipo_lancamento
+	IF NOT EXISTS (
+		SELECT 1 FROM information_schema.table_constraints 
+		WHERE table_schema = 'public' 
+		AND table_name = 'notasfiscais' 
+		AND constraint_name = 'ck_notasfiscais_tipo_lancamento'
+	) THEN
+		ALTER TABLE notasfiscais 
+		ADD CONSTRAINT ck_notasfiscais_tipo_lancamento 
+		CHECK (tipo_lancamento IN ('nota_fiscal', 'inventario'));
+		RAISE NOTICE 'Constraint de validação adicionada para tipo_lancamento';
+	END IF;
+	
+	RAISE NOTICE '✅ Migração de suporte a inventário concluída com sucesso';
+EXCEPTION
+	WHEN OTHERS THEN
+		RAISE NOTICE '⚠️ Erro na migração de suporte a inventário: %', SQLERRM;
 END $$;
 
 -- =====================================================

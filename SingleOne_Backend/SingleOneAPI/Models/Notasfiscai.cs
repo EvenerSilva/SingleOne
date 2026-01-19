@@ -28,6 +28,7 @@ namespace SingleOneAPI.Models
         public int? UsuarioUploadArquivo { get; set; }
         public int? UsuarioRemocaoArquivo { get; set; }
         public DateTime? DataRemocaoArquivo { get; set; }
+        public string TipoLancamento { get; set; } = "nota_fiscal"; // 'nota_fiscal' ou 'inventario'
 
         // Propriedades para controlar a visibilidade dos botões de ação
         [JsonPropertyName("podeVisualizar")]
@@ -51,7 +52,9 @@ namespace SingleOneAPI.Models
             decimal valor = 0;
             foreach (var item in Notasfiscaisitens)
             {
-                valor += (item.Valorunitario * item.Quantidade);
+                // Se valorunitario for null (inventário), considerar como zero
+                decimal valorUnitario = item.Valorunitario ?? 0;
+                valor += (valorUnitario * item.Quantidade);
             }
             return valor;
         }

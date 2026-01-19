@@ -11,7 +11,7 @@ namespace SingleOneAPI.Models
         public int Fabricante { get; set; }
         public int Modelo { get; set; }
         public int Quantidade { get; set; }
-        public decimal Valorunitario { get; set; }
+        public decimal? Valorunitario { get; set; } // Nullable para permitir inventário sem valor
         public int TipoAquisicao { get; set; }
         public DateTime? Dtlimitegarantia { get; set; }
         public int? Contrato { get; set; }

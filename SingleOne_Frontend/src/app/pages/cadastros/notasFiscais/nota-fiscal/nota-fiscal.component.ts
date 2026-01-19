@@ -19,6 +19,7 @@ export class NotaFiscalComponent implements OnInit {
   private session:any = {};
   public nota:any = {
     id: 0,
+    tipoLancamento: 'nota_fiscal', // Default: nota fiscal
     notasfiscaisitens: []
   };
   public notaItem:any = {};
@@ -55,6 +56,7 @@ export class NotaFiscalComponent implements OnInit {
         quantidade: [''],
         valorunitario: [''],
         virtual: [''],
+        tipoLancamento: ['nota_fiscal', Validators.required],
         descricao: [''],
         tipoaquisicao: [''],
         dtlimitegarantia: [''],
@@ -94,7 +96,8 @@ export class NotaFiscalComponent implements OnInit {
   avancarPasso1() {
     if (this.form.get('fornecedor')?.valid && 
         this.form.get('numero')?.valid && 
-        this.form.get('emissao')?.valid) {
+        this.form.get('emissao')?.valid &&
+        this.form.get('tipoLancamento')?.valid) {
       this.step1Completed = true;
       this.step2Active = true;
       this.scrollToTop();
@@ -150,6 +153,12 @@ export class NotaFiscalComponent implements OnInit {
     this.api.buscarNotaFiscalPorId(this.nota.id, this.session.token).then(res => {
       this.util.aguardar(false);
       this.nota = res.data;
+      
+      // ✅ NOVO: Garantir que tipoLancamento tenha valor padrão se não vier do backend
+      if (!this.nota.tipoLancamento) {
+        this.nota.tipoLancamento = 'nota_fiscal';
+      }
+      
       this.dataSource = new MatTableDataSource<any>(this.nota.notasfiscaisitens);
       this.dataSource.paginator = this.paginator;
       
@@ -217,11 +226,27 @@ export class NotaFiscalComponent implements OnInit {
   }
 
   adicionarComposicao(){
-    // Validação dos campos obrigatórios
+    // Validação dos campos obrigatórios básicos
     if (!this.notaItem.tipoequipamento || !this.notaItem.fabricante || 
-        !this.notaItem.modelo || !this.notaItem.quantidade || !this.notaItem.valorunitario) {
+        !this.notaItem.modelo || !this.notaItem.quantidade) {
       this.util.exibirMensagemToast('Preencha todos os campos obrigatórios do item', 3000);
       return;
+    }
+
+    // ✅ NOVO: Validação condicional de valor conforme tipo de lançamento
+    const tipoLancamento = this.nota.tipoLancamento || 'nota_fiscal';
+    
+    if (tipoLancamento === 'nota_fiscal') {
+      // Para nota fiscal, valor é obrigatório e deve ser maior que zero
+      if (!this.notaItem.valorunitario || this.notaItem.valorunitario <= 0) {
+        this.util.exibirMensagemToast('Para nota fiscal, o valor unitário é obrigatório e deve ser maior que zero', 4000);
+        return;
+      }
+    } else if (tipoLancamento === 'inventario') {
+      // Para inventário, valor é opcional (pode ser zero ou vazio)
+      if (!this.notaItem.valorunitario || this.notaItem.valorunitario === '') {
+        this.notaItem.valorunitario = 0; // Definir como zero se não informado
+      }
     }
 
     if(this.nota.id == 0) {

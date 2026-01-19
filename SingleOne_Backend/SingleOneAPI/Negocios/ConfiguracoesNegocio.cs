@@ -1298,6 +1298,20 @@ namespace SingleOne.Negocios
         {
             try
             {
+                // ✅ NOVO: Validar e definir tipo de lançamento
+                if (string.IsNullOrEmpty(nf.TipoLancamento))
+                {
+                    nf.TipoLancamento = "nota_fiscal"; // Default para compatibilidade
+                }
+                
+                // Validar tipo de lançamento
+                if (nf.TipoLancamento != "nota_fiscal" && nf.TipoLancamento != "inventario")
+                {
+                    throw new ArgumentException($"Tipo de lançamento inválido: {nf.TipoLancamento}. Valores permitidos: 'nota_fiscal' ou 'inventario'.");
+                }
+                
+                Console.WriteLine($"[SALVAR-NF] Tipo de lançamento: {nf.TipoLancamento}");
+                
                 // Converter DateTimes UTC para Local antes de salvar no banco
                 if (nf.Dtemissao.Kind == DateTimeKind.Utc)
                 {
@@ -1319,6 +1333,33 @@ namespace SingleOne.Negocios
                 {
                     foreach (var item in nf.Notasfiscaisitens)
                     {
+                        // ✅ NOVO: Validação condicional de valor conforme tipo de lançamento
+                        if (nf.TipoLancamento == "nota_fiscal")
+                        {
+                            // Para nota fiscal, valor deve ser obrigatório e maior que zero
+                            if (!item.Valorunitario.HasValue || item.Valorunitario.Value <= 0)
+                            {
+                                throw new ArgumentException(
+                                    $"Item (Tipo: {item.Tipoequipamento}, Fabricante: {item.Fabricante}, Modelo: {item.Modelo}): " +
+                                    "Para nota fiscal, o valor unitário deve ser maior que zero."
+                                );
+                            }
+                            Console.WriteLine($"[SALVAR-NF] Item validado (Nota Fiscal): Valor = R$ {item.Valorunitario.Value:N2}");
+                        }
+                        else if (nf.TipoLancamento == "inventario")
+                        {
+                            // Para inventário, valor pode ser zero ou NULL
+                            if (!item.Valorunitario.HasValue)
+                            {
+                                item.Valorunitario = 0; // Definir como zero se for NULL
+                                Console.WriteLine($"[SALVAR-NF] Item (Inventário): Valor definido como zero (NULL convertido)");
+                            }
+                            else
+                            {
+                                Console.WriteLine($"[SALVAR-NF] Item validado (Inventário): Valor = R$ {item.Valorunitario.Value:N2}");
+                            }
+                        }
+                        
                         if (item.Dtlimitegarantia.HasValue && item.Dtlimitegarantia.Value.Kind == DateTimeKind.Utc)
                         {
                             item.Dtlimitegarantia = DateTime.SpecifyKind(item.Dtlimitegarantia.Value, DateTimeKind.Local);

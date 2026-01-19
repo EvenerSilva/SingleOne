@@ -55,6 +55,11 @@ namespace SingleOneAPI.Infra.Mapeamento
             entity.Property(e => e.DataRemocaoArquivo)
                 .HasColumnName("dataremocaoarquivo");
 
+            entity.Property(e => e.TipoLancamento)
+                .HasMaxLength(20)
+                .HasDefaultValue("nota_fiscal")
+                .HasColumnName("tipo_lancamento");
+
             entity.HasOne(d => d.ClienteNavigation)
                 .WithMany(p => p.Notasfiscais)
                 .HasForeignKey(d => d.Cliente)

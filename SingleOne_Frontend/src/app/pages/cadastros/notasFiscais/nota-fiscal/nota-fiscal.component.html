@@ -140,6 +140,33 @@
               </div>
             </div>
 
+            <!-- Tipo de Lançamento -->
+            <div class="form-field">
+              <label class="form-label">
+                <i class="cil-tag"></i>
+                Tipo de Lançamento *
+              </label>
+              <mat-select formControlName="tipoLancamento" 
+                         [(ngModel)]="nota.tipoLancamento"
+                         required
+                         class="modern-select">
+                <mat-option value="nota_fiscal">
+                  <i class="cil-receipt"></i> Nota Fiscal
+                </mat-option>
+                <mat-option value="inventario">
+                  <i class="cil-list"></i> Inventário (sem nota fiscal)
+                </mat-option>
+              </mat-select>
+              <div class="field-info" *ngIf="nota.tipoLancamento === 'inventario'">
+                <i class="cil-info"></i>
+                Para inventário, o valor unitário é opcional (pode ser zero)
+              </div>
+              <div class="field-info" *ngIf="nota.tipoLancamento === 'nota_fiscal' || !nota.tipoLancamento">
+                <i class="cil-info"></i>
+                Para nota fiscal, o valor unitário é obrigatório e deve ser maior que zero
+              </div>
+            </div>
+
             <!-- Descrição -->
             <div class="form-field full-width">
               <label class="form-label">
