@@ -18,8 +18,10 @@
 \echo ''
 
 DO $$
+DECLARE
+	v_count INTEGER;
 BEGIN
-	\echo '[1/4] Adicionando coluna tipo_lancamento na tabela notasfiscais...'
+	RAISE NOTICE '[1/4] Adicionando coluna tipo_lancamento na tabela notasfiscais...';
 	
 	-- Adicionar coluna tipo_lancamento na tabela notasfiscais se não existir
 	IF NOT EXISTS (
@@ -34,16 +36,17 @@ BEGIN
 		RAISE NOTICE 'ℹ️  Coluna tipo_lancamento já existe na tabela notasfiscais';
 	END IF;
 	
-	\echo '[2/4] Atualizando registros existentes...'
+	RAISE NOTICE '[2/4] Atualizando registros existentes...';
 	
 	-- Atualizar registros existentes para garantir que todos tenham tipo_lancamento
 	UPDATE notasfiscais 
 	SET tipo_lancamento = 'nota_fiscal' 
 	WHERE tipo_lancamento IS NULL OR tipo_lancamento = '';
 	
-	RAISE NOTICE '✅ Registros existentes atualizados: % registros', (SELECT COUNT(*) FROM notasfiscais);
+	SELECT COUNT(*) INTO v_count FROM notasfiscais;
+	RAISE NOTICE '✅ Registros existentes atualizados: % registros', v_count;
 	
-	\echo '[3/4] Tornando valorunitario nullable na tabela notasfiscaisitens...'
+	RAISE NOTICE '[3/4] Tornando valorunitario nullable na tabela notasfiscaisitens...';
 	
 	-- Tornar valorunitario nullable na tabela notasfiscaisitens (para permitir inventário sem valor)
 	IF EXISTS (
@@ -59,7 +62,7 @@ BEGIN
 		RAISE NOTICE 'ℹ️  Coluna valorunitario já é nullable na tabela notasfiscaisitens';
 	END IF;
 	
-	\echo '[4/4] Adicionando constraint de validação...'
+	RAISE NOTICE '[4/4] Adicionando constraint de validação...';
 	
 	-- Adicionar constraint CHECK para validar valores de tipo_lancamento
 	IF NOT EXISTS (
@@ -76,23 +79,16 @@ BEGIN
 		RAISE NOTICE 'ℹ️  Constraint de validação já existe';
 	END IF;
 	
-	\echo ''
-	\echo '====================================================='
-	\echo '✅ Migração concluída com sucesso!'
-	\echo '====================================================='
-	\echo ''
-	\echo 'Resumo:'
-	\echo '  - Coluna tipo_lancamento adicionada/verificada'
-	\echo '  - Coluna valorunitario tornada nullable'
-	\echo '  - Constraint de validação adicionada'
-	\echo '  - Registros existentes atualizados'
-	\echo ''
-	\echo 'Próximos passos:'
-	\echo '  1. Atualizar modelos C# (Notasfiscai.cs e Notasfiscaisiten.cs)'
-	\echo '  2. Atualizar mapeamentos EF Core'
-	\echo '  3. Modificar validações no backend'
-	\echo '  4. Adicionar campo no formulário frontend'
-	\echo ''
+	RAISE NOTICE '';
+	RAISE NOTICE '=====================================================';
+	RAISE NOTICE '✅ Migração concluída com sucesso!';
+	RAISE NOTICE '=====================================================';
+	RAISE NOTICE '';
+	RAISE NOTICE 'Resumo:';
+	RAISE NOTICE '  - Coluna tipo_lancamento adicionada/verificada';
+	RAISE NOTICE '  - Coluna valorunitario tornada nullable';
+	RAISE NOTICE '  - Constraint de validação adicionada';
+	RAISE NOTICE '  - Registros existentes atualizados';
 	
 EXCEPTION
 	WHEN OTHERS THEN
