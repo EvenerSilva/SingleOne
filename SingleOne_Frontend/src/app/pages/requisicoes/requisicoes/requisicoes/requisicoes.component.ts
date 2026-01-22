@@ -189,7 +189,23 @@ export class RequisicoesComponent implements OnInit, AfterViewInit {
           
           // ✅ DEBUG: Verificar estrutura dos dados recebidos
           if (results.length > 0) {
-            // ✅ NOVO: Verificar se há outras propriedades que podem conter os dados
+            // ✅ DEBUG: Log da primeira requisição para verificar estrutura
+            const primeiraReq = results[0];
+            console.log('[REQUISICOES] Estrutura da primeira requisição:', {
+              row: primeiraReq,
+              equipamentosRequisicao: primeiraReq?.equipamentosRequisicao || primeiraReq?.EquipamentosRequisicao,
+              requisicao: primeiraReq?.requisicao,
+              todasChaves: Object.keys(primeiraReq || {})
+            });
+            
+            // ✅ DEBUG: Verificar equipamentos se existirem
+            const equipamentos = primeiraReq?.equipamentosRequisicao || primeiraReq?.EquipamentosRequisicao || [];
+            if (equipamentos.length > 0) {
+              console.log('[REQUISICOES] Primeiro equipamento:', {
+                equipamento: equipamentos[0],
+                todasChaves: Object.keys(equipamentos[0] || {})
+              });
+            }
           }
           
           // ✅ NOVO: Calcular estatísticas com TODOS os dados
@@ -485,16 +501,42 @@ export class RequisicoesComponent implements OnInit, AfterViewInit {
   }
 
   getEquipamentosRequisicao(row: any): any[] {
-    // ✅ Retornar equipamentos se existirem
-    let equipamentos = row?.equipamentosRequisicao || row?.EquipamentosRequisicao || [];
+    // ✅ DEBUG: Verificar estrutura do objeto row
+    if (!row) {
+      return [];
+    }
+    
+    // ✅ Retornar equipamentos se existirem - verificar múltiplas possibilidades
+    let equipamentos = row?.equipamentosRequisicao || 
+                       row?.EquipamentosRequisicao || 
+                       row?.requisicao?.equipamentosRequisicao ||
+                       row?.requisicao?.EquipamentosRequisicao ||
+                       [];
     
     // ✅ CORREÇÃO: Normalizar equipamentos que vêm diretamente de equipamentosRequisicao
     // Garantir que o campo numeroserie esteja sempre presente e no formato correto
     if (equipamentos && equipamentos.length > 0) {
       equipamentos = equipamentos.map((item: any) => {
-        // Extrair número de série de qualquer variação possível
-        const numeroSerie = item?.Numeroserie || item?.numeroserie || item?.numeroSerie || item?.NumeroSerie || 'N/A';
-        const equipamento = item?.Equipamento || item?.equipamento || 'N/A';
+        // ✅ DEBUG: Log para verificar estrutura do item
+        if (!item) {
+          return null;
+        }
+        
+        // Extrair número de série de qualquer variação possível (verificar todas as propriedades)
+        const numeroSerie = item?.Numeroserie || 
+                           item?.numeroserie || 
+                           item?.numeroSerie || 
+                           item?.NumeroSerie ||
+                           item?.numero_serie ||
+                           item?.NUMERO_SERIE ||
+                           (item && typeof item === 'object' ? Object.keys(item).find(k => k.toLowerCase().includes('serie') || k.toLowerCase().includes('numeroserie')) ? item[Object.keys(item).find(k => k.toLowerCase().includes('serie') || k.toLowerCase().includes('numeroserie'))] : null : null) ||
+                           'N/A';
+        
+        const equipamento = item?.Equipamento || 
+                           item?.equipamento || 
+                           item?.EquipamentoNome ||
+                           item?.equipamentoNome ||
+                           'N/A';
         
         // Criar objeto normalizado sem os campos conflitantes
         const itemNormalizado: any = {};
@@ -505,18 +547,30 @@ export class RequisicoesComponent implements OnInit, AfterViewInit {
           // Ignorar variações de numeroserie e equipamento
           if (keyLower !== 'numeroserie' && keyLower !== 'numero_serie' && 
               keyLower !== 'equipamento' && key !== 'Numeroserie' && 
-              key !== 'numeroSerie' && key !== 'Equipamento') {
+              key !== 'numeroSerie' && key !== 'Equipamento' &&
+              !keyLower.includes('numeroserie') && !keyLower.includes('equipamento')) {
             itemNormalizado[key] = item[key];
           }
         });
         
-        return {
+        const resultado = {
           ...itemNormalizado,
           equipamento: equipamento,
-          numeroserie: numeroSerie, // Sempre minúsculo e normalizado
+          numeroserie: numeroSerie && numeroSerie !== 'N/A' ? String(numeroSerie).trim() : 'N/A', // Sempre minúsculo e normalizado
           tipo: 'equipamento'
         };
-      });
+        
+        // ✅ DEBUG: Log para verificar o resultado
+        if (numeroSerie === 'N/A' || !numeroSerie) {
+          console.warn('[REQUISICOES] Número de série não encontrado para equipamento:', {
+            item: item,
+            todasChaves: Object.keys(item),
+            resultado: resultado
+          });
+        }
+        
+        return resultado;
+      }).filter(item => item !== null);
     }
     // ✅ NOVO: Verificar se os equipamentos estão em RequisicaoItens (fallback)
     else {
