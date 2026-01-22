@@ -507,11 +507,18 @@ export class RequisicoesComponent implements OnInit, AfterViewInit {
     }
     
     // ✅ Retornar equipamentos se existirem - verificar múltiplas possibilidades
+    // IMPORTANTE: A API retorna os dados em RequisicaoVM, que tem EquipamentosRequisicao
     let equipamentos = row?.equipamentosRequisicao || 
                        row?.EquipamentosRequisicao || 
                        row?.requisicao?.equipamentosRequisicao ||
                        row?.requisicao?.EquipamentosRequisicao ||
+                       (row?.RequisicaoVM?.EquipamentosRequisicao) ||
                        [];
+    
+    // ✅ DEBUG: Se não encontrou em equipamentosRequisicao, verificar RequisicaoItens
+    if ((!equipamentos || equipamentos.length === 0) && row?.RequisicaoItens) {
+      console.log('[REQUISICOES] EquipamentosRequisicao vazio, verificando RequisicaoItens:', row.RequisicaoItens);
+    }
     
     // ✅ CORREÇÃO: Normalizar equipamentos que vêm diretamente de equipamentosRequisicao
     // Garantir que o campo numeroserie esteja sempre presente e no formato correto
