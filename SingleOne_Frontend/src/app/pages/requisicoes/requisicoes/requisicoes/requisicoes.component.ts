@@ -492,13 +492,29 @@ export class RequisicoesComponent implements OnInit, AfterViewInit {
     // Garantir que o campo numeroserie esteja sempre presente e no formato correto
     if (equipamentos && equipamentos.length > 0) {
       equipamentos = equipamentos.map((item: any) => {
-        // Normalizar campos para garantir compatibilidade
+        // Extrair número de série de qualquer variação possível
+        const numeroSerie = item?.Numeroserie || item?.numeroserie || item?.numeroSerie || item?.NumeroSerie || 'N/A';
+        const equipamento = item?.Equipamento || item?.equipamento || 'N/A';
+        
+        // Criar objeto normalizado sem os campos conflitantes
+        const itemNormalizado: any = {};
+        
+        // Copiar todos os campos exceto os que vamos normalizar
+        Object.keys(item).forEach(key => {
+          const keyLower = key.toLowerCase();
+          // Ignorar variações de numeroserie e equipamento
+          if (keyLower !== 'numeroserie' && keyLower !== 'numero_serie' && 
+              keyLower !== 'equipamento' && key !== 'Numeroserie' && 
+              key !== 'numeroSerie' && key !== 'Equipamento') {
+            itemNormalizado[key] = item[key];
+          }
+        });
+        
         return {
-          equipamento: item?.Equipamento || item?.equipamento || 'N/A',
-          numeroserie: item?.Numeroserie || item?.numeroserie || item?.numeroSerie || 'N/A',
-          tipo: 'equipamento',
-          // Preservar outros campos que possam ser úteis
-          ...item
+          ...itemNormalizado,
+          equipamento: equipamento,
+          numeroserie: numeroSerie, // Sempre minúsculo e normalizado
+          tipo: 'equipamento'
         };
       });
     }
