@@ -1,4 +1,4 @@
-﻿import { Component, OnInit, ViewChild, AfterViewInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
@@ -488,8 +488,22 @@ export class RequisicoesComponent implements OnInit, AfterViewInit {
     // ✅ Retornar equipamentos se existirem
     let equipamentos = row?.equipamentosRequisicao || row?.EquipamentosRequisicao || [];
     
-    // ✅ NOVO: Verificar se os equipamentos estão em RequisicaoItens
-    if (!equipamentos || equipamentos.length === 0) {
+    // ✅ CORREÇÃO: Normalizar equipamentos que vêm diretamente de equipamentosRequisicao
+    // Garantir que o campo numeroserie esteja sempre presente e no formato correto
+    if (equipamentos && equipamentos.length > 0) {
+      equipamentos = equipamentos.map((item: any) => {
+        // Normalizar campos para garantir compatibilidade
+        return {
+          equipamento: item?.Equipamento || item?.equipamento || 'N/A',
+          numeroserie: item?.Numeroserie || item?.numeroserie || item?.numeroSerie || 'N/A',
+          tipo: 'equipamento',
+          // Preservar outros campos que possam ser úteis
+          ...item
+        };
+      });
+    }
+    // ✅ NOVO: Verificar se os equipamentos estão em RequisicaoItens (fallback)
+    else {
       const requisicaoItens = row?.RequisicaoItens || row?.requisicaoItens || [];
       if (requisicaoItens && requisicaoItens.length > 0) {
         // ✅ Filtrar APENAS equipamentos (não linhas telefônicas)
@@ -505,7 +519,7 @@ export class RequisicoesComponent implements OnInit, AfterViewInit {
           if (isEquipamento) {
             return {
               equipamento: isEquipamento,
-              numeroserie: item?.Numeroserie || item?.numeroserie || 'N/A',
+              numeroserie: item?.Numeroserie || item?.numeroserie || item?.numeroSerie || 'N/A',
               tipo: 'equipamento'
             };
           }
