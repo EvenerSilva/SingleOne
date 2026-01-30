@@ -143,6 +143,17 @@ for sql_file in "${SQL_FILES[@]}"; do
   fi
 done
 
+# Correção: permitir equipamento_id NULL em patrimonio_contestoes (Auto Inventário)
+CORRIGIR_EQUIPAMENTO_NULLABLE="${REPO_DIR}/deploy/linux/corrigir_patrimonio_contestoes_equipamento_nullable.sql"
+if [[ ! -f "${CORRIGIR_EQUIPAMENTO_NULLABLE}" ]]; then
+  CORRIGIR_EQUIPAMENTO_NULLABLE="${REPO_DIR}/SingleOne_Backend/deploy/linux/corrigir_patrimonio_contestoes_equipamento_nullable.sql"
+fi
+if [[ -f "${CORRIGIR_EQUIPAMENTO_NULLABLE}" ]]; then
+  echo "   Executando correção: equipamento_id nullable (Auto Inventário)..."
+  PGPASSWORD="${DB_PASSWORD}" psql -h 127.0.0.1 -U "${DB_USER}" -d "${DB_NAME}" -f "${CORRIGIR_EQUIPAMENTO_NULLABLE}" 2>/dev/null || true
+  echo "   ✅ Correção aplicada (ou já estava correta)"
+fi
+
 echo
 echo ">>> [4/6] Publicando API SingleOne..."
 mkdir -p "${PUBLISH_DIR}"

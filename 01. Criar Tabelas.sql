@@ -1,4 +1,4 @@
-﻿-- =====================================================
+-- =====================================================
 -- SCRIPT DE INICIALIZAÇÃO DO BANCO DE DADOS - SINGLEONE
 -- Descrição: Script completo para criar banco limpo com dados básicos
 -- Versão: 2.4 (Atualizado em 08/11/2025)
@@ -1125,11 +1125,12 @@ END $$;
 -- TABELAS DE PASSCHECK E PATRIM´┐¢NIO
 -- =====================================================
 
--- Tabela: Patrim´┐¢nio Contestaçes
+-- Tabela: Patrimônio Contestações
+-- equipamento_id NULL: Auto Inventário (colaborador declara por número de série; equipamento vinculado depois)
 CREATE TABLE IF NOT EXISTS patrimonio_contestoes (
     id SERIAL PRIMARY KEY,
     colaborador_id INTEGER NOT NULL REFERENCES colaboradores(id),
-    equipamento_id INTEGER NOT NULL REFERENCES equipamentos(id),
+    equipamento_id INTEGER NULL REFERENCES equipamentos(id),
     motivo TEXT NOT NULL,
     descricao TEXT,
     status VARCHAR(20) DEFAULT 'pendente' CHECK (status IN ('pendente', 'aprovada', 'rejeitada', 'negada')),

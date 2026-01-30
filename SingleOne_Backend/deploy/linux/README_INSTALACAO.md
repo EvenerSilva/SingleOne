@@ -128,6 +128,24 @@ scp /tmp/singleone_backup.dump root@SERVIDOR_DESTINO:/tmp/
 sudo -u postgres pg_restore -c -d singleone /tmp/singleone_backup.dump
 ```
 
+## 🔧 Scripts de correção / migração
+
+- **Novos ambientes:** o script `install_singleone_full.sh` já executa automaticamente a correção `corrigir_patrimonio_contestoes_equipamento_nullable.sql` após criar tabelas/views, então **novas instalações** já saem com `equipamento_id` nullable em `patrimonio_contestoes` (Auto Inventário funciona sem erro).
+
+Em **ambientes já existentes** (instalados antes dessa alteração), rode manualmente se aparecer o erro ao criar Auto Inventário:
+
+| Script | Quando usar |
+|--------|-------------|
+| `corrigir_coluna_tipo_contestacao.sql` | Adiciona coluna `tipo_contestacao` em `patrimonio_contestoes` |
+| `corrigir_patrimonio_contestoes_equipamento_nullable.sql` | Corrige erro ao **criar Auto Inventário**: "null value in column equipamento_id". Permite `equipamento_id` NULL (equipamento vinculado depois). |
+
+Exemplo (ajuste o caminho conforme o diretório atual):
+
+```bash
+cd /opt/SingleOne/SingleOne_Backend
+sudo -u postgres psql -d singleone -f deploy/linux/corrigir_patrimonio_contestoes_equipamento_nullable.sql
+```
+
 ## 🐛 Troubleshooting
 
 ### Erro: "npm ci" falha
